@@ -1,0 +1,451 @@
+--- 
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 751
+    created_at: 2011-03-22 15:07:48
+    updated_at: 2011-03-22 15:07:48
+    mark_id: 1
+    id: 3
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 751
+    created_at: 2011-03-22 15:07:48
+    updated_at: 2011-03-22 15:07:48
+    mark_id: 2
+    id: 4
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 749
+    created_at: 2011-03-22 18:28:25
+    updated_at: 2011-03-22 18:28:25
+    mark_id: 1
+    id: 7
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 749
+    created_at: 2011-03-22 18:28:25
+    updated_at: 2011-03-22 18:28:25
+    mark_id: 2
+    id: 8
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 760
+    created_at: 2011-03-22 18:49:34
+    updated_at: 2011-03-22 18:49:34
+    mark_id: 1
+    id: 9
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 760
+    created_at: 2011-03-22 18:49:34
+    updated_at: 2011-03-22 18:49:34
+    mark_id: 2
+    id: 10
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 750
+    created_at: 2011-03-23 02:06:01
+    updated_at: 2011-03-23 02:06:01
+    mark_id: 1
+    id: 17
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 750
+    created_at: 2011-03-23 02:06:01
+    updated_at: 2011-03-23 02:06:01
+    mark_id: 2
+    id: 18
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 753
+    created_at: 2011-03-23 02:08:36
+    updated_at: 2011-03-23 02:08:36
+    mark_id: 1
+    id: 19
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 753
+    created_at: 2011-03-23 02:08:36
+    updated_at: 2011-03-23 02:08:36
+    mark_id: 2
+    id: 20
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 752
+    created_at: 2011-03-23 10:47:04
+    updated_at: 2011-03-23 10:47:04
+    mark_id: 1
+    id: 23
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 752
+    created_at: 2011-03-23 10:47:04
+    updated_at: 2011-03-23 10:47:04
+    mark_id: 2
+    id: 24
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 738
+    created_at: 2011-03-23 12:09:01
+    updated_at: 2011-03-23 12:09:01
+    mark_id: 1
+    id: 25
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 738
+    created_at: 2011-03-23 12:09:02
+    updated_at: 2011-03-23 12:09:02
+    mark_id: 2
+    id: 26
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 757
+    created_at: 2011-03-23 13:42:19
+    updated_at: 2011-03-23 13:42:19
+    mark_id: 1
+    id: 29
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 757
+    created_at: 2011-03-23 13:42:19
+    updated_at: 2011-03-23 13:42:19
+    mark_id: 2
+    id: 30
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 756
+    created_at: 2011-03-23 17:54:08
+    updated_at: 2011-03-23 17:54:08
+    mark_id: 1
+    id: 32
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 756
+    created_at: 2011-03-23 17:54:08
+    updated_at: 2011-03-23 17:54:08
+    mark_id: 2
+    id: 33
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 742
+    created_at: 2011-03-23 19:01:28
+    updated_at: 2011-03-23 19:01:28
+    mark_id: 1
+    id: 34
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 742
+    created_at: 2011-03-23 19:01:28
+    updated_at: 2011-03-23 19:01:28
+    mark_id: 2
+    id: 35
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 743
+    created_at: 2011-03-23 19:02:35
+    updated_at: 2011-03-23 19:02:35
+    mark_id: 1
+    id: 36
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 743
+    created_at: 2011-03-23 19:02:35
+    updated_at: 2011-03-23 19:02:35
+    mark_id: 2
+    id: 37
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 744
+    created_at: 2011-03-23 19:02:58
+    updated_at: 2011-03-23 19:02:58
+    mark_id: 1
+    id: 38
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 744
+    created_at: 2011-03-23 19:02:58
+    updated_at: 2011-03-23 19:02:58
+    mark_id: 2
+    id: 39
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 745
+    created_at: 2011-03-23 19:03:19
+    updated_at: 2011-03-23 19:03:19
+    mark_id: 1
+    id: 40
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 745
+    created_at: 2011-03-23 19:03:19
+    updated_at: 2011-03-23 19:03:19
+    mark_id: 2
+    id: 41
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 754
+    created_at: 2011-03-23 19:34:25
+    updated_at: 2011-03-23 19:34:25
+    mark_id: 1
+    id: 42
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 754
+    created_at: 2011-03-23 19:34:25
+    updated_at: 2011-03-23 19:34:25
+    mark_id: 2
+    id: 43
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 755
+    created_at: 2011-03-23 19:36:20
+    updated_at: 2011-03-23 19:36:20
+    mark_id: 1
+    id: 44
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 755
+    created_at: 2011-03-23 19:36:20
+    updated_at: 2011-03-23 19:36:20
+    mark_id: 2
+    id: 45
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 761
+    created_at: 2011-03-23 19:38:29
+    updated_at: 2011-03-23 19:38:29
+    mark_id: 1
+    id: 47
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 761
+    created_at: 2011-03-23 19:38:29
+    updated_at: 2011-03-23 19:38:29
+    mark_id: 2
+    id: 48
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 759
+    created_at: 2011-03-23 19:39:58
+    updated_at: 2011-03-23 19:39:58
+    mark_id: 1
+    id: 49
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 759
+    created_at: 2011-03-23 19:39:58
+    updated_at: 2011-03-23 19:39:58
+    mark_id: 2
+    id: 50
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 736
+    created_at: 2011-03-23 19:41:21
+    updated_at: 2011-03-23 19:41:21
+    mark_id: 1
+    id: 51
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 736
+    created_at: 2011-03-23 19:41:21
+    updated_at: 2011-03-23 19:41:21
+    mark_id: 2
+    id: 52
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 731
+    created_at: 2011-03-23 21:02:24
+    updated_at: 2011-03-23 21:02:24
+    mark_id: 1
+    id: 53
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 731
+    created_at: 2011-03-23 21:02:24
+    updated_at: 2011-03-23 21:02:24
+    mark_id: 2
+    id: 54
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 734
+    created_at: 2011-03-23 21:06:35
+    updated_at: 2011-03-23 21:06:35
+    mark_id: 1
+    id: 55
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 734
+    created_at: 2011-03-23 21:06:35
+    updated_at: 2011-03-23 21:06:35
+    mark_id: 2
+    id: 56
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 733
+    created_at: 2011-03-23 21:07:04
+    updated_at: 2011-03-23 21:07:04
+    mark_id: 1
+    id: 57
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 741
+    created_at: 2011-03-23 21:31:17
+    updated_at: 2011-03-23 21:31:17
+    mark_id: 1
+    id: 58
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 741
+    created_at: 2011-03-23 21:31:17
+    updated_at: 2011-03-23 21:31:17
+    mark_id: 2
+    id: 59
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 739
+    created_at: 2011-03-23 22:22:26
+    updated_at: 2011-03-23 22:22:26
+    mark_id: 1
+    id: 60
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 739
+    created_at: 2011-03-23 22:22:26
+    updated_at: 2011-03-23 22:22:26
+    mark_id: 2
+    id: 61
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 758
+    created_at: 2011-03-23 22:31:19
+    updated_at: 2011-03-23 22:31:19
+    mark_id: 1
+    id: 62
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 758
+    created_at: 2011-03-23 22:31:19
+    updated_at: 2011-03-23 22:31:19
+    mark_id: 2
+    id: 63
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 730
+    created_at: 2011-03-23 23:36:36
+    updated_at: 2011-03-23 23:36:36
+    mark_id: 1
+    id: 64
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 762
+    created_at: 2011-03-23 23:56:21
+    updated_at: 2011-03-23 23:56:21
+    mark_id: 1
+    id: 65
+  attributes_cache: {}
+
+- !ruby/object:Assignment 
+  attributes: 
+    package_id: 764
+    created_at: 2011-03-23 23:58:13
+    updated_at: 2011-03-23 23:58:13
+    mark_id: 1
+    id: 66
+  attributes_cache: {}
+

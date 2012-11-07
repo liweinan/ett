@@ -1,0 +1,33 @@
+<h2>Listing users</h2>
+<div class='manage-tbl'>
+  <table>
+    <tr>
+      <th class='content-list-head'>Name</th>
+      <th class='content-list-head'>Email</th>
+      <th class='content-list-head'>&nbsp;Can Manage&nbsp;</th>
+      <% if session[:current_user] %>
+          <th class='content-list-head'> Operation</th>
+      <% end %>
+    </tr>
+
+    <% @users.each do |user| %>
+        <tr>
+          <td><%= h user.name %></td>
+          <td><%= h user.email %></td>
+          <td><%= h user.can_manage %></td>
+          <% if session[:current_user] %>
+              <td>
+                <% if session[:current_user].email == user.email || session[:current_user].can_manage == 'Yes' %>
+                    <%= link_to 'Edit', edit_user_path(user) %>
+                <% end %>
+              </td>
+          <% end %>
+        </tr>
+    <% end %>
+  </table>
+</div>
+<br/>
+
+<% if can_manage? %>
+    <%= link_to 'New User', :controller => :users, :action => :new %>
+<% end %>

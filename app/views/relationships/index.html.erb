@@ -1,0 +1,24 @@
+<h1>Listing relationships</h1>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Is global</th>
+    <th>Brew tag</th>
+  </tr>
+
+  <% @relationships.each do |relationship| %>
+      <tr>
+        <td><%= h relationship.name %></td>
+        <td><%= h relationship.is_global %></td>
+        <td><%= h relationship.brew_tag_id %></td>
+        <td><%= link_to 'Show', relationship %></td>
+        <td><%= link_to 'Edit', edit_relationship_path(relationship) %></td>
+        <td><%= link_to 'Destroy', relationship, :confirm => 'Are you sure?', :method => :delete %></td>
+      </tr>
+  <% end %>
+</table>
+
+<br/>
+
+<%= link_to 'New relationship', new_relationship_path %>

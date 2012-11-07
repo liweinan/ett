@@ -1,0 +1,18 @@
+<p>
+  <b>Name:</b>
+  <%= h @relationship.name %>
+</p>
+
+<p>
+  <b>Is global:</b>
+  <%= h @relationship.is_global %>
+</p>
+
+<p>
+  <b>Brew tag:</b>
+  <%= h @relationship.brew_tag_id %>
+</p>
+
+
+<%= link_to 'Edit', edit_relationship_path(@relationship) %> |
+<%= link_to 'Back', relationships_path %>

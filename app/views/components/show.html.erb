@@ -1,0 +1,12 @@
+<% cache :action => 'show', :id => @component.id do %>
+<h2><%= h @component.name %></h2>
+
+<%= render :partial => 'show' %>
+
+<%= render :partial => 'layouts/sep' %>
+
+<% if can_manage? %>
+<%= link_to 'Edit', :controller => :components, :action => :edit, :id => escape_url(@component.name) %> |
+<% end %>
+<%= link_to 'Back', components_path %>
+<% end %>

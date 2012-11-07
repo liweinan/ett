@@ -1,0 +1,19 @@
+## Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+#
+#one:
+#  package_id: 1
+#  changed_by: 1
+#  changed_at: 2011-10-07 10:20:00
+#  category: MyString
+#  from_value: MyString
+#  to_value: MyString
+#  references: MyString
+#
+#two:
+#  package_id: 1
+#  changed_by: 1
+#  changed_at: 2011-10-07 10:20:00
+#  category: MyString
+#  from_value: MyString
+#  to_value: MyString
+#  references: MyString

@@ -1,0 +1,11 @@
+<%#
+# To change this template, choose Tools | Templates
+# and open the template in the editor.
+%>
+
+<% unless @package.notes.blank? %>
+    <%= render :partial => 'layouts/sep' %>
+    <h3>Notes</h3>
+    <%= render :partial => 'layouts/line' %>
+    <%= Extractor.extract_url(@package.notes) %>
+<% end %>

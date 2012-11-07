@@ -1,0 +1,4 @@
+<% disabled ||= false %>
+<% Setting::PROPS.each do |k, v| %>
+    <%= check_box_tag("props[]", v, (@setting.props & v > 0), :disabled => disabled) %> - <%= t "prop_#{k}" %><br/>
+<% end %>

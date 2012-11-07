@@ -1,0 +1,10 @@
+<% if session[:current_user].can_manage == 'Yes' %>
+    <tr>
+      <td align='right'>
+        <%= f.label :can_manage %>
+      </td>
+      <td align='left'>
+        <%= f.check_box :can_manage, {}, 'Yes', 'No' %>
+      </td>
+    </tr>
+<% end %>

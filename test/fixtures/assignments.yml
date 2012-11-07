@@ -1,0 +1,12 @@
+## Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+#
+#one:
+#  attribute_id: 1
+#  package_id: 1
+#
+#two:
+#  attribute_id: 1
+#  package_id: 1
+default:
+  mark_id: 1
+  package_id: 1

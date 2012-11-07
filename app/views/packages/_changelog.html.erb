@@ -1,0 +1,32 @@
+<% unless @package.changelogs.blank? %>
+    <h3>Changelog</h3>
+    <%= render :partial => 'layouts/line' %>
+
+    <% @package.changelogs.each_with_index do |changelog, i| %>
+        <div style="background:<%=background_style(i)%>;">
+          <div class='comment-login' id='changelog-<%= changelog.id %>'>
+            <sup style="padding:2px;font-weight:normal;"><%= link_to "##{changelog.id}", "#changelog-#{changelog.id}" %></sup>
+            <%= changelog.changed_at.strftime("%Y-%m-%d %I:%M%p") %>
+          </div>
+          <div class="comment-comment">
+            <!--<span class="comment-date"></span>-->
+            <p><span>
+              <%= render_changelog(changelog) %>
+
+              <% if changelog.category == Changelog::CATEGORY[:update] %>
+                  <%= render :partial => 'layouts/sep_tiny' %>
+                  <% if changelog.references == 'notes' %>
+                      <%= Extractor.extract_url(changelog.to_value.gsub(/\n/, "<br/>")) %>
+                  <% else %>
+                    <%= changelog.references %>:
+                      <%= Extractor.extract_url(changelog.from_value) %>
+                      =>
+                      <%= Extractor.extract_url(changelog.to_value) %>
+                  <% end %>
+              <% end %>
+            </span></p>
+          </div>
+        </div>
+    <% end %>
+
+<% end %>

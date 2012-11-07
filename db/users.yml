@@ -1,0 +1,133 @@
+--- 
+- !ruby/object:User 
+  attributes: 
+    name: Weinan Li
+    can_manage: "Yes"
+    created_at: 2010-11-04 06:27:15
+    brew_link: ""
+    updated_at: 2011-01-24 03:13:39
+    id: 1
+    email: weli@redhat.com
+  attributes_cache: {}
+
+- !ruby/object:User 
+  attributes: 
+    name: Martha Benitez
+    can_manage: "Yes"
+    created_at: 2010-11-04 07:09:20
+    brew_link: 
+    updated_at: 2010-11-04 07:09:20
+    id: 2
+    email: mbenitez@redhat.com
+  attributes_cache: {}
+
+- !ruby/object:User 
+  attributes: 
+    name: Permaine Cheung
+    can_manage: "Yes"
+    created_at: 2010-11-04 07:09:45
+    brew_link: 
+    updated_at: 2010-11-04 07:09:45
+    id: 3
+    email: pcheung@redhat.com
+  attributes_cache: {}
+
+- !ruby/object:User 
+  attributes: 
+    name: David Walluck
+    can_manage: "Yes"
+    created_at: 2010-11-04 08:36:56
+    brew_link: 
+    updated_at: 2010-11-04 08:36:56
+    id: 4
+    email: dwalluck@redhat.com
+  attributes_cache: {}
+
+- !ruby/object:User 
+  attributes: 
+    name: Vaclav Tunka
+    can_manage: "Yes"
+    created_at: 2010-11-12 10:56:40
+    brew_link: 
+    updated_at: 2010-11-12 10:56:40
+    id: 5
+    email: vtunka@redhat.com
+  attributes_cache: {}
+
+- !ruby/object:User 
+  attributes: 
+    name: Yiqiao Wang
+    can_manage: "Yes"
+    created_at: 2010-11-12 20:02:50
+    brew_link: 
+    updated_at: 2010-11-12 20:02:50
+    id: 6
+    email: yiwang@redhat.com
+  attributes_cache: {}
+
+- !ruby/object:User 
+  attributes: 
+    name: Lin Gao
+    can_manage: "Yes"
+    created_at: 2010-11-15 03:23:00
+    brew_link: 
+    updated_at: 2010-11-15 03:23:00
+    id: 7
+    email: lgao@redhat.com
+  attributes_cache: {}
+
+- !ruby/object:User 
+  attributes: 
+    name: yyang
+    can_manage: "Yes"
+    created_at: 2010-11-15 06:16:17
+    brew_link: 
+    updated_at: 2010-11-15 06:16:17
+    id: 8
+    email: yyang@redhat.com
+  attributes_cache: {}
+
+- !ruby/object:User 
+  attributes: 
+    name: Hui Wang
+    can_manage: "Yes"
+    created_at: 2010-11-15 09:19:13
+    brew_link: 
+    updated_at: 2010-11-15 09:19:13
+    id: 9
+    email: huwang@redhat.com
+  attributes_cache: {}
+
+- !ruby/object:User 
+  attributes: 
+    name: Fernando
+    can_manage: "Yes"
+    created_at: 2010-12-21 15:27:56
+    brew_link: 
+    updated_at: 2011-01-21 03:50:58
+    id: 10
+    email: fnasser@redhat.com
+  attributes_cache: {}
+
+- !ruby/object:User 
+  attributes: 
+    name: Luiz George Barreiros
+    can_manage: "Yes"
+    created_at: 2010-12-21 17:55:38
+    brew_link: 
+    updated_at: 2010-12-21 17:55:38
+    id: 11
+    email: gbarreir@redhat.com
+  attributes_cache: {}
+
+- !ruby/object:User 
+  attributes: 
+    name: Strong Liu
+    can_manage: "Yes"
+    created_at: 2011-01-05 02:56:53
+    brew_link: 
+    updated_at: 2011-01-05 02:56:53
+    id: 12
+    email: stliu@redhat.com
+  attributes_cache: {}
+

@@ -1,0 +1,13 @@
+<h2>
+  Extended Attributes Of Package:
+</h2>
+<% if @setting.is_system_setting? %>
+    <span style="background-color: #ffc7c7;">
+    Please do not edit extended attributes in global system settings<br/>
+    unless you know what you are doing! Instead, you should use the<br/>
+    'Settings' function in each tag (on top of package list page for<br/>
+    each tag) to customize the extended attributes to be used.</span>
+    <%= render :partial =>'layouts/sep' %>
+<% end %>
+<% disabled ||= false %>
+<%= f.text_area :xattrs, :class => 'small_text_area', :disabled => disabled %>

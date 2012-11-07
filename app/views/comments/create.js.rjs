@@ -1,0 +1,10 @@
+unless @package.blank?
+  div = 'added_comment'
+  count = Comment.count(:conditions => "commentable_type='Package' and commentable_id = #{@package.id}")
+  page.insert_html :bottom, div, :partial => '/comments/show', :locals => {:comment => @comment, :index => @comment.id}
+end
+
+page.select('form').each { |f| f.reset }
+div = 'send_comment'
+page.replace_html(div, 'Comment posted.')
+page.visual_effect :highlight, div

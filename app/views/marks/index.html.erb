@@ -1,0 +1,39 @@
+<% if params[:brew_tag_id].blank? %>
+    <h2>Listing marks</h2>
+<% else %>
+    <h2>Listing marks of <%= params[:brew_tag_id] %></h2>
+<% end %>
+
+<div class='manage-tbl'>
+  <table style="width:300px;">
+    <tr>
+      <th>Id</th>
+      <th>Name</th>
+      <th>Description</th>
+      <th>-</th>
+    </tr>
+
+    <% @marks.each do |mark| %>
+        <tr>
+          <td><%= h mark.id %></td>
+          <td><%= h mark.key %></td>
+          <td><%= h mark.value %></td>
+          <td>
+            <% if can_manage? %>
+                <%= link_to 'Edit', edit_mark_path(mark) %>
+            <% end %>
+          </td>
+        </tr>
+    <% end %>
+  </table>
+</div>
+
+<br/>
+<% if params[:brew_tag_id].blank? %>
+    <%= link_to 'New mark', :controller => :marks, :action => :new, :brew_tag_id => params[:brew_tag_id] %>
+<% else %>
+    <%= link_to "New mark of #{unescape_url(params[:brew_tag_id])}", :controller => :marks, :action => :new, :brew_tag_id => params[:brew_tag_id] %>
+    <%= render :partial => 'layouts/sep_tiny' %>
+    <%= link_to "Back to #{unescape_url(params[:brew_tag_id])}", :controller => :packages, :action => :index, :brew_tag_id => escape_url(params[:brew_tag_id]) %>
+
+<% end %>

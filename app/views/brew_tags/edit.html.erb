@@ -1,0 +1,19 @@
+<h2>Editing Tag</h2>
+<div style="height:20px;border:none;"></div>
+<div class='manage-tbl'>
+  <% form_for(@brew_tag) do |f| %>
+      <%= f.error_messages %>
+      <table>
+        <%= render :partial => 'name', :locals => {:f => f} %>
+        <%= render :partial => 'description', :locals => {:f => f} %>
+		<%= render :partial => 'labels/fields/can_show', :locals => {:f => f} %>
+        <tr>
+          <td colspan='2'>
+            <%= f.submit 'Update' %>
+          </td>
+        </tr>
+      </table>
+  <% end %>
+</div>
+<br/>
+<%= link_to 'Back', brew_tags_path %>

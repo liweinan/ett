@@ -1,0 +1,6 @@
+<% if @package.has_the_relationships_of?('clone') %>
+    <%= render :partial => "layouts/sep_tiny" %>
+    <label>
+      <input type="checkbox" name="sync_<%=key%>" value="yes"/>&nbsp;sync among cloned packages
+    </label>
+<% end %>

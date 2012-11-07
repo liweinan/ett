@@ -1,0 +1,18 @@
+<p>
+  <b>From package:</b>
+  <%= h @package_relationship.from_package_id %>
+</p>
+
+<p>
+  <b>To package:</b>
+  <%= h @package_relationship.to_package_id %>
+</p>
+
+<p>
+  <b>Relationship:</b>
+  <%= h @package_relationship.relationship_id %>
+</p>
+
+
+<%= link_to 'Edit', edit_package_relationship_path(@package_relationship) %> |
+<%= link_to 'Back', package_relationships_path %>

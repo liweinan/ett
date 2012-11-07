@@ -1,0 +1,32 @@
+<h1>Listing changelogs</h1>
+
+<table>
+  <tr>
+    <th>Package</th>
+    <th>Changed by</th>
+    <th>Changed at</th>
+    <th>Category</th>
+    <th>From value</th>
+    <th>To value</th>
+    <th>References</th>
+  </tr>
+
+<% @changelogs.each do |changelog| %>
+  <tr>
+    <td><%=h changelog.package_id %></td>
+    <td><%=h changelog.changed_by %></td>
+    <td><%=h changelog.changed_at %></td>
+    <td><%=h changelog.category %></td>
+    <td><%=h changelog.from_value %></td>
+    <td><%=h changelog.to_value %></td>
+    <td><%=h changelog.references %></td>
+    <td><%= link_to 'Show', changelog %></td>
+    <td><%= link_to 'Edit', edit_changelog_path(changelog) %></td>
+    <td><%= link_to 'Destroy', changelog, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New changelog', new_changelog_path %>

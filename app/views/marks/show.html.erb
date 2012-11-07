@@ -1,0 +1,13 @@
+<p>
+  <b>Key:</b>
+  <%= h @mark.key %>
+</p>
+
+<p>
+  <b>Value:</b>
+  <%= h @mark.value %>
+</p>
+
+
+<%= link_to 'Edit', :controller => :marks, :action => :edit, :id => @mark.id, :brew_tag_id => params[:brew_tag_id] %> |
+<%= link_to 'Back', :controller => :marks, :action => :index, :brew_tag_id => params[:brew_tag_id] %>

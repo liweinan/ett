@@ -1,0 +1,8 @@
+<% BrewTag.find_by_name(unescape_url(brew_tag_id)).marks.each do |mark| %>
+    <% if @package %>
+        <% assignment = Assignment.find_by_package_id_and_mark_id(@package.id, mark.id) %>
+        <label><%= mark.key %> - <%= check_box_tag("marks[]", mark.key, assignment != nil) %></label> /
+    <% else %>
+        <label><%= mark.key %> - <%= check_box_tag("marks[]", mark.key, false) %></label> /
+    <% end %>
+<% end %>

@@ -1,0 +1,46 @@
+--- 
+- !ruby/object:BrewTag 
+  attributes: 
+    name: jb-eap-5-rhel-6
+    created_at: 2011-02-21 03:29:55
+    updated_at: 2011-02-21 03:34:41
+    id: 1
+    parent_id: 
+  attributes_cache: {}
+
+- !ruby/object:BrewTag 
+  attributes: 
+    name: jb-eap-6-rhel-6
+    created_at: 2011-02-21 04:03:02
+    updated_at: 2011-02-21 04:03:02
+    id: 2
+    parent_id: 
+  attributes_cache: {}
+
+- !ruby/object:BrewTag 
+  attributes: 
+    name: jb-eap-4.3-rhel-6
+    created_at: 2011-02-21 04:05:11
+    updated_at: 2011-02-24 21:33:01
+    id: 3
+    parent_id: 1
+  attributes_cache: {}
+
+- !ruby/object:BrewTag 
+  attributes: 
+    name: jb-eap-5-mead
+    created_at: 2011-02-24 22:17:41
+    updated_at: 2011-02-24 22:17:41
+    id: 4
+    parent_id: 
+  attributes_cache: {}
+
+- !ruby/object:BrewTag 
+  attributes: 
+    name: dist-5e-ep-5
+    created_at: 2011-03-22 13:29:06
+    updated_at: 2011-03-22 13:29:06
+    id: 5
+    parent_id: 
+  attributes_cache: {}
+

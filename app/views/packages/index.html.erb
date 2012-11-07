@@ -1,0 +1,171 @@
+<% unless session[:cloned_packages].blank? %>
+Cloned Packages:
+<% session[:cloned_packages].each do |pack| %>
+<%= pack %> /
+<% end %>
+<% session[:cloned_packages] = nil %>
+<% end %>
+<%= render :partial => 'layouts/sep' %>
+<% unless session[:not_cloned_packages].blank? %>
+Not Cloned Packages:
+<% session[:not_cloned_packages].keys.each do |key| %>
+<%= key %><%#session[:clone_reports][key]%> /
+<% end %>
+<% session[:not_cloned_packages] = nil %>
+<% end %>
+
+
+<% cache :action => 'index', :id => "#{params[:brew_tag_id]}#{params[:label]}#{params[:mark]}#{params[:user]}#{current_user_email}" do %>
+    <% if has_tag? %>
+        <% @brew_tag = BrewTag.find_by_name(unescape_url(params[:brew_tag_id])) %>
+        <h2>
+          Listing packages of <%= unescape_url(params[:brew_tag_id]) %>
+          <% if has_label? %>
+              / <%= unescape_url(params[:label]) %>
+          <% end %>
+          <% if has_mark? %>
+              / <%= unescape_url(params[:mark]) %>
+          <% end %>
+        </h2>
+        <% unless @brew_tag.description.blank? %>
+            <%= @brew_tag.description %>
+        <% end %>
+    <% else %>
+        <h2>Listing packages</h2>
+    <% end %>
+
+    <%= render :partial => 'ops' %>
+
+    <%= render :partial => 'layouts/sep' %>
+
+    Labels:
+    <%= link_to "All (#{@all_packages_count})", :controller => :packages, :action => :index, :brew_tag_id => params[:brew_tag_id] %> /
+
+    <% if logged_in? %>
+        <%= link_to "My (#{@my_packages_count})", :controller => :packages, :action => :index, :brew_tag_id => params[:brew_tag_id], :user => session[:current_user].email %> /
+    <% end %>
+
+    <% Label.find_all_can_show_by_brew_tag_id_in_global_scope(BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).id).each do |label| %>
+        <%= link_to "#{label.name} (#{count_packages(unescape_url(params[:brew_tag_id]), label.name)})", :controller => :packages, :action => :index, :brew_tag_id => params[:brew_tag_id], :label => escape_url(label.name) %> /
+    <% end %>
+    <%= render :partial => 'layouts/sep' %>
+    <% marks = BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).marks %>
+    <% unless marks.blank? %>
+        Marks:
+        <% marks.each do |mark| %>
+            <%= link_to "#{mark.key} (#{mark.packages_can_show.size})", :controller => :packages, :action => :index, :brew_tag_id => params[:brew_tag_id], :mark => mark.key %> /
+        <% end %>
+    <% end %>
+
+    <div class='manage-tbl'>
+      <%= render :partial=>'layouts/sep' %>
+      <table>
+        <tr>
+          <th class='content-list-head'>Name</th>
+          <th class='content-list-head'>Label</th>
+          <th class='content-list-head'>Marks</th>
+          <th class='content-list-head'>Assignee</th>
+
+          <% get_xattrs(@brew_tag, true, false) do |attr| %>
+              <th class='content-list-head'><%= attr.camelcase %></th>
+          <% end %>
+
+          <% if logged_in? %>
+              <th class='content-list-head'>
+                Operations
+              </th>
+          <% end %>
+        </tr>
+        <% @packages.each_with_index do |package, i| %>
+            <% if i % 25 == 0 && i > 0 %>
+                <tr>
+                  <td class='content-list-head'>Name</td>
+                  <td class='content-list-head'>Label</td>
+                  <td class='content-list-head'>Marks</td>
+                  <td class='content-list-head'>Assignee</td>
+
+                  <% get_xattrs(@brew_tag, true, false) do |attr| %>
+                      <td class='content-list-head'><%= attr.camelcase %></td>
+                  <% end %>
+
+
+                  <% if logged_in? %>
+                      <td class='content-list-head'>
+                        Operations
+                      </td>
+                  <% end %>
+                </tr>
+            <% end %>
+            <tr>
+              <td style='font-size:10px;text-align:left;<%= deleted_style(package) %>'>
+                <% if params[:user] %>
+                    <%= link_to "#{package.name}", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :brew_tag_id => escape_url(package.brew_tag.name), :user => params[:user] %>
+                <% else %>
+                    <%= link_to "#{package.name}", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :brew_tag_id => escape_url(package.brew_tag.name) %>
+                <% end %>
+              </td>
+
+
+              <% if package.label %>
+                  <td style="font-size:10px;<%= package.label.style %>">
+                    <%= h package.label.name %>
+                  </td>
+              <% else %>
+                  <td style='font-size:10px;<%= deleted_style(package) %>'>
+                    -
+                  </td>
+              <% end %>
+
+              <td style='font-size:10px;<%= deleted_style(package) %>'>
+                <% if package.marks.size > 0 %>
+                    <% package.marks.each do |mark| %>
+                        <%= mark.key %> /
+                    <% end %>
+                <% else %>
+                    -
+                <% end %>
+              </td>
+
+              <td style='font-size:10px;<%= deleted_style(package) %>'>
+                <% if !package.user_id.blank? %>
+                    <%= h package.user.name %>
+                <% else %>
+                    -
+                <% end %>
+              </td>
+
+              <% get_xattrs(@brew_tag, true, false) do |attr| %>
+                  <td style='font-size:10px;<%= deleted_style(package) %>'>
+                    <% if package.read_attribute(attr).blank? %>
+                        -
+                    <% else %>
+                        <%= Extractor.extract_url(package.read_attribute(attr)) %>
+                    <% end %>
+                  </td>
+              <% end %>
+
+              <% if logged_in? %>
+                  <td style='font-size:10px;'>
+                    <% unless package.deleted? %>
+                        <% if can_manage? %>
+                            <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(package.name), :brew_tag_id => escape_url(package.brew_tag.name) %>
+                            /
+                            <%= link_to 'Delete', package, :confirm => "Are you sure to delete #{escape_url(package.name)}?", :method => :delete %>
+                            /
+                        <% elsif package.user_id == nil %>
+                            <%= link_to 'Take', :controller => 'actions', :action => 'take', :id => escape_url(package.name), :brew_tag_id => escape_url(package.brew_tag.name) %>
+                            /
+                        <% end %>
+                    <% end %>
+
+                    <% if can_edit_package? package %>
+                        <%= link_to 'Edit', :controller => 'packages', :action => 'edit', :id => escape_url(package.name), :brew_tag_id => escape_url(package.brew_tag.name) %>
+                    <% end %>
+
+                  </td>
+              <% end %>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+<% end %>

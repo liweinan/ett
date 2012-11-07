@@ -1,0 +1,22 @@
+<h2>Login</h2>
+
+<div class='manage-tbl'>
+  <% form_for(@session) do |f| %>
+      <table>
+        <tr>
+          <td>
+            Email
+          </td>
+          <td>
+            <%= f.text_field :email %>
+          </td>
+        </tr>
+        <tr>
+          <td colspan=2 style="text-align:right;">
+            <%= f.submit 'Login' %>
+          </td>
+        </tr>
+      </table>
+  <% end %>
+</div>
+<br/>

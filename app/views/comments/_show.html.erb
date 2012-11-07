@@ -1,0 +1,33 @@
+<% background||='#fff' %>
+<% if comment %>
+    <div id='div-comment-<%= comment.id %>' style="background:<%=background%>;border:0px;"
+         <% if can_delete_comment?(comment) %>onmouseover="Element.show('delete-comment-<%=comment.id%>');" onmouseout="Element.hide('delete-comment-<%=comment.id%>');"
+         <% end %>>
+      <div class="comment-comment">
+        <div class='comment-login' id='comment-<%= comment.id %>'>
+          <sup style="padding:2px;font-weight:normal;"><%= link_to "##{comment.id}", "#comment-#{comment.id}" %></sup>
+          <%= h comment.user.name %>
+        </div>
+        <span class="comment-date"><sup style="padding:2px;">&nbsp;</sup><%= comment.created_at.strftime("%Y-%m-%d %I:%M%p") %></span>
+
+        <p><span class="comment-body"><%= Extractor.extract_url(comment.comment) %></span></p>
+
+        <% if can_delete_comment?(comment) %>
+            <div id='delete-comment-<%= comment.id %>' style='text-align:left;display:none;padding-bottom:3px;'>
+              <% form_remote_tag(
+                         :url => {:controller => "comments", :action => 'destroy', :id => comment.id},
+                         :html => {:id => "comment-form-#{comment.id}"},
+                         :loading => "Element.show('spinner-delete-comment-#{comment.id}');",
+                         :success => "Element.hide('div-comment-#{comment.id}');",
+                         :confirm => "Are you sure?") do %>
+                  <%= hidden_field_tag '_method', 'delete' %>
+                  <%= hidden_field_tag :id, comment.id %>
+                  <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "spinner-delete-comment-#{comment.id}"} %>
+                  <%= submit_tag 'Delete' %>
+              <% end %>
+            </div>
+        <% end %>
+
+      </div>
+    </div>
+<% end %>

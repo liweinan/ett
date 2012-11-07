@@ -1,0 +1,40 @@
+<% if @setting.brew_tag.blank? %>
+    <h1>Editing System Settings</h1>
+<% else %>
+    <h1>Edit Settings of <%= @setting.brew_tag.name %></h1>
+<% end %>
+<%= render :partial => 'layouts/sep' %>
+<% form_for(@setting) do |f| %>
+    <%= render :partial => 'settings/fields/enabled', :locals => {:f => f} %>
+    <%= render :partial => 'layouts/sep' %>
+
+    <% if @setting.is_system_setting? %>
+        <%= render :partial => 'settings/fields/default_tag', :locals => {:f => f} %>
+        <%= render :partial => 'layouts/sep' %>
+    <% end %>
+
+
+    <h2>
+      Send email notifications to:
+    </h2>
+    <%= f.error_messages %>
+    <%= render :partial => 'settings/fields/props', :locals => {:f => f} %>
+    <%= render :partial => 'settings/fields/recipients', :locals => {:f => f} %>
+    <h2>
+      When:
+    </h2>
+    <%= render :partial => 'settings/fields/actions', :locals => {:f => f} %>
+    <%= render :partial => 'layouts/sep' %>
+
+    <%= render :partial => 'settings/fields/xattrs', :locals => {:f => f} %>
+    <%= render :partial => 'layouts/sep' %>
+
+    <%= render :partial => 'settings/fields/enable_xattrs', :locals => {:f => f} %>
+    <%= render :partial => 'layouts/sep' %>
+
+    <%= render :partial => 'settings/fields/show_xattrs', :locals => {:f => f} %>
+    <%= render :partial => 'layouts/sep' %>
+    <p>
+      <%= f.submit 'Update' %>
+    </p>
+<% end %>

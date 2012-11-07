@@ -1,0 +1,5 @@
+<% if has_tag? %>
+    <%= link_to 'Back', :controller => :packages, :action => :index, :brew_tag_id => params[:brew_tag_id] %>
+<% else %>
+    <%= link_to 'Back', packages_path %>
+<% end %>

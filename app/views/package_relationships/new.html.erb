@@ -1,0 +1,23 @@
+<h1>New package_relationship</h1>
+
+<% form_for(@package_relationship) do |f| %>
+    <%= f.error_messages %>
+
+    <p>
+      <%= f.label :from_package_id %><br/>
+      <%= f.text_field :from_package_id %>
+    </p>
+    <p>
+      <%= f.label :to_package_id %><br/>
+      <%= f.text_field :to_package_id %>
+    </p>
+    <p>
+      <%= f.label :relationship_id %><br/>
+      <%= f.text_field :relationship_id %>
+    </p>
+    <p>
+      <%= f.submit 'Create' %>
+    </p>
+<% end %>
+
+<%= link_to 'Back', package_relationships_path %>

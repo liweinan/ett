@@ -1,0 +1,40 @@
+<h2>
+  Listing packages of <%= params[:user_id] %>
+</h2>
+
+<div class='manage-tbl'>
+<%# render :partial => 'packages/stats' %>
+  <p/>
+  <table>
+    <tr>
+      <th class='content-list-head' style="width:150px;">Name</th>
+      <th class='content-list-head' style="width:100px;">Tag</th>
+      <th class='content-list-head' style="width:100px;">Label</th>
+      <th class='content-list-head' style="width:100px;">Marks</th>
+    </tr>
+    <% @packages.each do |package| %>
+        <tr>
+          <td style='font-size:10px'>
+            <%= link_to "#{package.name}", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :brew_tag_id => escape_url(package.brew_tag.name), :user => params[:user] %>
+          </td>
+          <td style='font-size:10px'>
+            <%= link_to package.brew_tag.name, :controller => 'packages', :action => 'index', :brew_tag_id => package.brew_tag.name %>
+          </td>
+          <td style='font-size:10px'>
+            <% if package.label %>
+                <%= package.label.name %>
+            <% end %>
+          </td>
+          <td style='font-size:10px'>
+            <% if package.marks.size > 0 %>
+                <% package.marks.each do |mark| %>
+                    <%= mark.key %> /
+                <% end %>
+            <% else %>
+                -
+            <% end %>
+          </td>
+        </tr>
+    <% end %>
+  </table>
+</div>

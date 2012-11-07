@@ -1,0 +1,25 @@
+<% unless is_global?(@label) %>
+    <h2>Editing label of <%= params[:brew_tag_id] %></h2>
+<% else %>
+    <h2>Editing system internal label</h2>
+<% end %>
+<div class='manage-tbl'>
+  <% form_for(@label) do |f| %>
+      <%= f.error_messages %>
+      <table>
+        <%= f.hidden_field :id, :value => @label.id %>
+        <%= render :partial => 'labels/fields/name', :locals => {:f => f} %>
+        <%= render :partial => 'labels/fields/style', :locals => {:f => f} %>
+        <%= render :partial => 'labels/fields/can_show', :locals => {:f => f} %>
+        <%= render :partial => 'labels/fields/can_select', :locals => {:f => f} %>
+        <%= render :partial => 'labels/fields/is_track_time', :locals => {:f => f} %>
+        <% unless is_global?(@label) %>
+            <%= render :partial => 'labels/fields/brew_tag', :locals => {:f => f} %>
+        <% end %>
+        <tr>
+          <td colspan=2 style='text-align:right;'><%= f.submit 'Update' %></td>
+        </tr>
+      </table>
+      </p>
+  <% end %>
+</div>

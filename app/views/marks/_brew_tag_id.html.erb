@@ -1,0 +1,7 @@
+<% if params[:brew_tag_id].blank? %>
+    Tag
+    <br/>
+    <%= f.collection_select :brew_tag_id, BrewTag.all(:order => "name"), :id, :name %>
+<% else %>
+    <%= f.hidden_field :brew_tag_id, :value => BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).id %>
+<% end %>

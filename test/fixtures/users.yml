@@ -1,0 +1,17 @@
+## Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+#
+#one:
+#  name: MyString
+#  email: MyString
+#  brew_link: MyString
+#
+#two:
+#  name: MyString
+#  email: MyString
+#  brew_link: MyString
+
+admin:
+  id: 1
+  name: admin
+  email: example.com
+  can_manage: "Yes"

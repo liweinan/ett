@@ -1,0 +1,12 @@
+<h1>Editing mark</h1>
+
+<% form_for(@mark) do |f| %>
+    <%= f.error_messages %>
+
+    <%= render :partial => 'key', :locals => {:f => f} %>
+    <%= render :partial => 'value', :locals => {:f => f} %>
+
+    <p>
+      <%= f.submit 'Update' %>
+    </p>
+<% end %>

@@ -1,0 +1,1673 @@
+---
+- !ruby/object:Package
+  attributes:
+    name: antlr
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: apache-cxf
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: apache-james
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: avalon-framework
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: avalon-logkit
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: bcel
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: bsf
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: bsh
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: cglib
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: codehaus-jackson
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: codehaus-stax11
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: concurrent
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: dom4j
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: dtdparser
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: ecj
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: facelets
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: glassfish-jaf
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: glassfish-javamail
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: glassfish-jaxb
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: glassfish-jaxws
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: glassfish-jsf
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: glassfish-jstl
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: gnu-getopt
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: gnu-trove
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: hibernate3
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: hibernate3-annotations
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: hibernate3-commons-annotations
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: hibernate3-ejb-persistence-3.0-api
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: hibernate3-entitymanager
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: hibernate3-search
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: hibernate3-validator
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: hornetq
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: hornetq-jopr-plugin
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: hsqldb
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: i18nlog
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: icu4j
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: isorelax
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jacorb-jboss
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-commons-beanutils
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-commons-codec
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-commons-collections
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-commons-dbcp
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-commons-digester
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-commons-discovery
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-commons-el
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-commons-fileupload
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-commons-httpclient
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-commons-io
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-commons-lang
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-commons-logging
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-commons-logging-jboss
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-commons-parent
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-commons-pool
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-commons-transaction
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-oro
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jakarta-slide-webdavclient
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: javacc
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: javassist
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jaxbintros
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jaxen
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss5-libs
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-aop2
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jbossas
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-aspects-common
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jbossas-ws-cxf
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-bootstrap
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-cache-core
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-cache-pojo
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-cl
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-cluster-ha-client
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-cluster-ha-server-api
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-cluster-ha-server-cache-jbc
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-cluster-ha-server-cache-spi
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-common-core
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-common-logging-jdk
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-common-logging-log4j
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-common-logging-spi
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-current-invocation-aspects
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-deployers
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-eap5-native
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-build
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-cache
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-common
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-context
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-core
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-deployers
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-endpoint
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-endpoint-deployer
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-ext-api
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-ext-api-impl
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-interceptors
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-jpa-int
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-mc-int
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-metadata
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-metrics-deployer
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-proxy-clustered
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-proxy-impl
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-proxy-spi
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-security
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-timeout
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-timerservice-spi
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-transactions
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-ejb3-vfs
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-el
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-integration
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-javaee
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-jaxr
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-jpa-deployers
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-logbridge
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-logmanager
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-man
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-mdr
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-messaging
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-metadata
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-microcontainer2
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-naming
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-parent
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-reflect
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-remoting
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-remoting-aspects
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-seam2
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-seam-int
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-security-aspects
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-security-negotiation
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-security-spi
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-security-xacml
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-serialization
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jbosssx2
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-threads
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-transaction-aspects
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jbossts
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-vfs2
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jbossweb
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jbossws
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jbossws-common
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jbossws-framework
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jbossws-parent
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jbossws-spi
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jbossxb2
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-xnio-base
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jboss-xnio-metadata
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jcip-annotations
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jcommon
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jdom
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jettison
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jfreechart
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jgroups
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: joda-time
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: joesnmp
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jopr-embedded
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jopr-hibernate-plugin
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jopr-jboss-as-5-plugin
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jopr-jboss-cache-v3-plugin
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: juddi
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: jyaml
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: log4j
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: mockobjects
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: mod_cluster
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: mod_cluster-native
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: mod_jk
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: msv
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: mx4j
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: netty
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: objectweb-asm
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: org-mc4j-ems
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: quartz
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: regexp
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: relaxngDatatype
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: resteasy
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: rh-eap-docs
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: rhq
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: rhq-jmx-plugin
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: rhq-platform-plugin
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: richfaces
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: scannotation
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: servletapi4
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: slf4j
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: slf4j-jboss-logging
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: snmptrapappender
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: spring2
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: stax-ex
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: sun-fi
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: sun-sjsxp
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: sun-ws-metadata-2.0-api
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: sun-xmlstreambuffer
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: sun-xsom
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: tomcat-native
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: velocity
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: werken-xpath
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: ws-commons-axiom
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: ws-commons-neethi
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: ws-commons-XmlSchema
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: wsdl4j
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: ws-fx-addressing
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: ws-jaxme
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: wss4j
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: ws-scout
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: wstx
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: xalan-j2
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: xdoclet
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: xerces-j2
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: xjavadoc
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: xml-commons
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: xml-im-exporter
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: xml-security
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: xom
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: xpp2
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: xpp3
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+
+- !ruby/object:Package
+  attributes:
+    name: xstream
+    created_at: Thu Nov 04 15:07:10 +0800 2010
+    dist: jb-eap-5-rhel-6
+    state: Open
+  attributes_cache: {}
+

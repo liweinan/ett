@@ -1,0 +1,9 @@
+<tr>
+  <td>
+    <%= xattr.camelcase %>
+  </td>
+  <td style="text-align:left;">
+    <%= f.text_field xattr %>
+    <%= render :partial => 'sync', :locals => {:key => xattr} %>
+  </td>
+</tr>

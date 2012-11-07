@@ -1,0 +1,40 @@
+<h1>Editing changelog</h1>
+
+<% form_for(@changelog) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :package_id %><br />
+    <%= f.text_field :package_id %>
+  </p>
+  <p>
+    <%= f.label :changed_by %><br />
+    <%= f.text_field :changed_by %>
+  </p>
+  <p>
+    <%= f.label :changed_at %><br />
+    <%= f.datetime_select :changed_at %>
+  </p>
+  <p>
+    <%= f.label :category %><br />
+    <%= f.text_field :category %>
+  </p>
+  <p>
+    <%= f.label :from_value %><br />
+    <%= f.text_field :from_value %>
+  </p>
+  <p>
+    <%= f.label :to_value %><br />
+    <%= f.text_field :to_value %>
+  </p>
+  <p>
+    <%= f.label :references %><br />
+    <%= f.text_field :references %>
+  </p>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @changelog %> |
+<%= link_to 'Back', changelogs_path %>

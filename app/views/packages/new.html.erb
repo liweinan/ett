@@ -1,0 +1,38 @@
+<%
+   unless @user.blank?
+       params[:user] = @user
+   end
+%>
+
+<h2>New package of <%= params[:brew_tag_id] %></h2>
+
+<div class='manage-tbl'>
+  <% form_for(@package) do |f| %>
+      <%= f.error_messages %>
+
+      <table>
+        <%= render :partial => 'packages/fields/name', :locals => {:f => f} %>
+        <%= render :partial => 'packages/fields/brew_tag', :locals => {:f => f} %>
+        <%= render :partial => 'packages/fields/label', :locals => {:f => f} %>
+        <%= render :partial => 'packages/fields/marks', :locals => {:f => f} %>
+        <%= render :partial => 'packages/fields/assignee', :locals => {:f => f} %>
+        <% get_xattrs(BrewTag.find_by_name(unescape_url(params[:brew_tag_id])), false, true) do |attr| %>
+            <%= render :partial => 'packages/fields/xattrs', :locals => {:f => f, :xattr => attr} %>
+        <% end %>
+        <%= render :partial => 'packages/fields/notes', :locals => {:f => f} %>
+        <tr>
+          <td colspan=2 style="text-align:left;">
+            <%= render :partial => 'layouts/notification', :locals => {:title => 'Notify the package creation to:', :div_id => 'package_create'} %>
+          </td>
+        </tr>
+        <tr>
+          <td colspan=2 style="text-align:left;">
+            <%= render :partial => 'layouts/notification_link', :locals => {:div_id => 'package_create'} %>
+            <%= f.submit 'Create' %>
+          </td>
+        </tr>
+      </table>
+
+  <% end %>
+</div>
+

@@ -1,0 +1,43 @@
+<h2>Import Result Of <%= params[:brew_tag_id] %></h2>
+
+<% if @packages.size > 0 %>
+    <div style="height:10px;"></div>
+    The following packages are successfully imported:
+    <div style="height:10px;"></div>
+    <div class='manage-tbl'>
+      <table>
+        <tr>
+          <th>Name</th>
+        </tr>
+        <% @packages.each do |package| %>
+            <tr>
+              <td>
+                <%= package.name %>
+              </td>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+<% end %>
+
+<% if @problem_packages.size > 0 %>
+    <div style="height:10px;"></div>
+    The following packages haven't been imported due to some problems(possible reasons are form resubmission or the package name is already exist in this tag):
+    <div style="height:10px;"></div>
+    <div class='manage-tbl'>
+      <table>
+        <tr>
+          <th>Name</th>
+        </tr>
+        <% @problem_packages.each do |package| %>
+            <tr>
+              <td>
+                <%= package.name %>
+              </td>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+<% end %>
+<%= render :partial =>'layouts/sep_tiny' %>
+<%= link_to "Go to #{params[:brew_tag_id]}", :controller => :packages, :action => :index, :brew_tag_id => escape_url(params[:brew_tag_id]) %>

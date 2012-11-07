@@ -1,0 +1,143 @@
+<% if confirmed? %>
+    <h2>Update result of <%= params[:id] %></h2>
+<% else %>
+    <h2>Preview the actions that will be performed on <%= params[:id] %></h2>
+<% end %>
+<% if @packages.size > 0 %>
+    <div style="height:10px;"></div>
+    <% if confirmed? %>
+        The following packages are successfully updated:
+    <% else %>
+        The following packages will be updated:
+    <% end %>
+    <div style="height:10px;"></div>
+    <div class='manage-tbl'>
+      <table>
+        <tr>
+          <th class='content-list-head'>Name</th>
+          <th class='content-list-head'>Label</th>
+          <th class='content-list-head'>Assignee</th>
+
+          <% get_xattrs(BrewTag.find_by_name(unescape_url(params[:id])), true, false) do |attr| %>
+              <th class='content-list-head'><%= attr.camelcase %></th>
+          <% end %>
+        </tr>
+        <%
+           def diff_output(target_p, source_p, attr)
+               if attr == 'assignee'
+                   if target_p.user == source_p.user
+                       target_p.user.name
+                   elsif confirmed?
+                       "<span style='color:red;'>#{target_p.user.name}</span>"
+                   else
+                       "<span style='color:red;'>#{source_p.user.name} => #{target_p.user.name}</span>"
+                   end
+               elsif target_p.read_attribute(attr) == source_p.read_attribute(attr)
+                   target_p.read_attribute(attr)
+               elsif confirmed?
+                   "<span style='color:red;'>#{target_p.read_attribute(attr)}</span>"
+               else
+                   "<span style='color:red;'>#{source_p.read_attribute(attr)} => #{target_p.read_attribute(attr)}</span>"
+               end
+           end
+        %>
+        <% @packages.each_with_index do |package, i| %>
+            <tr>
+              <td><%= package.name %></td>
+              <td><%= package.name %></td>
+              <td><%= diff_output(package, @cloned_packages[i], 'assignee') %></td>
+              <% get_xattrs(BrewTag.find_by_name(unescape_url(params[:id])), true, false) do |attr| %>
+                  <td>
+                    <%= diff_output(package, @cloned_packages[i], attr) %>
+                  </td>
+              <% end %>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+<% end %>
+
+<% if @problem_packages.size > 0 %>
+    <div style="height:10px;"></div>
+    The following packages haven't been imported due to some problems(possible reasons are form resubmission or
+    the package name is already exist in this tag):
+    <div style="height:10px;"></div>
+    <div class='manage-tbl'>
+      <table>
+        <tr>
+          <th>Name</th>
+          <th>Reason</th>
+        </tr>
+        <% @problem_packages.each do |package| %>
+            <tr>
+              <td>
+                <%= package.name %>
+              </td>
+              <td>
+                <%= package.errors.full_messages %>
+              </td>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+<% end %>
+
+<% if @not_found_packages.size > 0 %>
+    <div style="height:10px;"></div>
+    The following packages are not found:
+    <div style="height:10px;"></div>
+    <div class='manage-tbl'>
+      <table>
+        <tr>
+          <th>Name</th>
+        </tr>
+        <% @not_found_packages.each do |package| %>
+            <tr>
+              <td>
+                <%= package.name %>
+              </td>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+<% end %>
+
+
+<% if @parse_error_packages.size > 0 %>
+    <div style="height:10px;"></div>
+    The following packages cannot be parsed correctly:
+    <div style="height:10px;"></div>
+    <div class='manage-tbl'>
+      <table>
+        <tr>
+          <th>Import Data</th>
+          <th>Reason</th>
+        </tr>
+        <% @parse_error_packages.each_key do |package_json| %>
+            <tr>
+              <td>
+                <%= package_json %>
+              </td>
+              <td>
+                <%= @parse_error_packages[package_json].message %>
+              </td>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+<% end %>
+
+<%= render :partial =>'layouts/sep_tiny' %>
+
+<% if confirmed? %>
+    <%= link_to "Go to #{params[:id]}", :controller => :packages, :action => :index, :brew_tag_id => escape_url(params[:id]) %>
+<% else %>
+    <form action="/import/<%= escape_url(params[:id]) %>" method="post">
+      <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
+      <input name="_method" type="hidden" value="put"/>
+      <%= render :partial => 'layouts/confirm_field' %>
+      <textarea style="display:none;" name="packages"><%= params[:packages] %></textarea>
+      <input name="commit" type="submit" value="Confirm the above report and go ahead to perform the actions"/>
+    </form>
+
+<% end %>

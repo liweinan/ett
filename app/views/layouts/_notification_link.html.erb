@@ -1,0 +1,10 @@
+<span id="<%= div_id %>_notification_link"><a href="javascript:showNotification('div_<%= div_id %>_notification', '<%= div_id %>_notification_link');">+Notification</a></span>
+
+<% content_for :js do %>
+    <script type="text/javascript">
+        function showNotification(area, button) {
+            new Effect.Appear(area);
+            new Effect.Fade(button);
+        }
+    </script>
+<% end %>

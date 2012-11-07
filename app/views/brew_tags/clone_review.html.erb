@@ -1,0 +1,73 @@
+<h2>Clone Action Review</h2>
+
+Please review the clone action you are going to performed in below:
+<%= render :partial => 'layouts/sep_tiny' %>
+
+<strong>Source Tag:</strong> <%= unescape_url(session[:clone_review][:source_tag_name]) %>
+<%= render :partial => 'layouts/sep_tiny' %>
+<strong>Target Tag:</strong> <%= unescape_url(session[:clone_review][:target_tag_name]) %>
+<%= render :partial => 'layouts/sep_tiny' %>
+<strong>Options:</strong>
+
+<% if session[:clone_review][:scopes].include? 'package' %>
+    Clone packages /
+	<% if session[:clone_review][:scopes].include? 'assignee' %>
+		Clone Assignee / 
+	<% end %>
+<% end %>
+<% if session[:clone_review][:scopes].include? 'label' %>
+    Clone labels /
+<% end %>
+<% if session[:clone_review][:scopes].include? 'mark' %>
+    Clone marks /
+<% end %>
+
+<%= render :partial => 'layouts/sep_tiny' %>
+
+<% session[:clone_review][:label_option] %>
+
+<% if session[:clone_review][:scopes].include? 'package' %>
+    <%= render :partial => 'layouts/line' %>
+    <h3>Package clone settings</h3>
+	<% if session[:clone_review][:scopes].include? 'assignee' %>
+	<strong>Clone Assignee</strong>
+		<%= render :partial => 'layouts/sep_tiny' %>
+	<% end %>
+    <% if !session[:clone_review][:mark_options].blank? %>
+        <% if session[:clone_review][:mark_options].include? 'default' %>
+            <strong>Add currently assigned marks to cloned packages.</strong>
+            <%= render :partial => 'layouts/sep_tiny' %>
+        <% end %>
+        <% if session[:clone_review][:mark_options].include? 'selection' %>
+            <strong>Add these marks to cloned packages: <%= session[:clone_review][:marks].inspect%></strong>
+            <%= render :partial => 'layouts/sep_tiny' %>
+        <% end %>
+        <% if session[:clone_review][:mark_options].include? 'new_value' %>
+            <strong>Add these new marks to cloned packages: <%= session[:clone_review][:initial_mark_values] %></strong>
+            <%= render :partial => 'layouts/sep_tiny' %>
+        <% end %>
+    <% end %>
+
+    <% if session[:clone_review][:label_option] == 'default' %>
+        <strong>Set label of cloned packages to currently assigned one.</strong>
+        <%= render :partial => 'layouts/sep_tiny' %>
+
+    <% elsif session[:clone_review][:label_option] == 'selection' %>
+        <strong>Set label of cloned packages to: <%= session[:clone_review][:label_selection_value].strip %> </strong>
+        <%= render :partial => 'layouts/sep_tiny' %>
+    <% elsif session[:clone_review][:label_option] == 'selection_global' %>
+        <strong>Set label of cloned packages to: <%= session[:clone_review][:label_selection_value_global].strip %> </strong>
+        <%= render :partial => 'layouts/sep_tiny' %>
+
+    <% elsif session[:clone_review][:label_option] == 'new_value' %>
+        <strong>Set label of cloned packages to: <%= session[:clone_review][:initial_label_value].strip %></strong>
+        <%= render :partial => 'layouts/sep_tiny' %>
+
+    <% end %>
+
+<% end %>
+<%= render :partial => 'layouts/line' %>
+<%= render :partial => 'layouts/sep_tiny' %>
+<%= link_to "Confirm the setting and start the clone process", :controller =>:brew_tags, :action => :process_clone, :id => escape_url(session[:clone_review][:target_tag_name]) %>
+<%= render :partial => 'layouts/sep_tiny' %>
+<%= link_to "Go back and review the setting" %>

@@ -1,0 +1,20 @@
+.Open {
+	background-color: #fef49c;
+}
+
+.Assigned {
+	background-color: #adf4ff;
+}
+
+.Finished {
+	background-color: #b2ffa1;	
+}
+
+.Uploaded {
+	background-color: #b6caff;
+}
+
+.Deleted {
+	text-decoration: line-through;
+	background-color: #eeeeee;
+}

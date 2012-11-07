@@ -1,0 +1,56 @@
+<div class='manage-tbl'>
+  <table>
+    <tr>
+      <td>Packages \ Tags</td>
+      <% @component.brew_tags.each do |tag| %>
+          <td>
+            <%= tag.name %>
+          </td>
+      <% end %>
+    </tr>
+    <% @packages.each do |package| %>
+
+        <tr>
+          <td>
+            <%= package.name %>
+          </td>
+
+          <%
+             package_tags = BrewTag.all_that_have_package_with_name(package.name)
+          %>
+
+          <% @component.brew_tags.each do |tag| %>
+              <td style="text-align: left;vertical-align:text-top;">
+                <% if package_tags.include?(tag) %>
+                    <% package = Package.find_by_name_and_brew_tag_id(package.name, tag.id) %>
+                    <% unless package.assignee.blank? %>
+                        Assigned to: <%= package.assignee.name %>
+                        <%= render :partial => 'layouts/sep_tiny' %>
+                    <% end %>
+                    <% unless package.label.blank? %>
+                        Label: <span style="<%= package.label.style %>"><%= package.label.name %></span>
+                        <%= render :partial => 'layouts/sep_tiny' %>
+                    <% end %>
+                    <% unless package.marks.blank? %>
+                        Marks:
+                        <% package.marks.each do |mark| %>
+                            <%= mark.key %> /
+                        <% end %>
+                        <%= render :partial => 'layouts/sep_tiny' %>
+                    <% end %>
+
+                    <% get_xattrs(nil, false, false) do |attr| %>
+                        <% unless package.read_attribute(attr).blank? %>
+                            <%= attr.camelcase %>: <%= package.read_attribute(attr) %>
+                            <%= render :partial => 'layouts/sep_tiny' %>
+                        <% end %>
+                    <% end %>
+
+                    <a href="/brew_tags/<%= escape_url(tag.name) %>/packages/<%= escape_url(package.name) %>" target="_blank">Show</a>
+                <% end %>
+              </td>
+          <% end %>
+        </tr>
+    <% end %>
+  </table>
+</div>

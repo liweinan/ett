@@ -1,0 +1,58 @@
+.tree {
+    background-color: #fff;
+}
+
+.tree span.root {
+    font-weight: bold;
+    background-color: #fff;
+}
+
+.tree ul {
+    padding-left: 2em;
+    list-style: none;
+    margin-top: 0em;
+    margin-bottom: 0em;
+}
+
+.tree span.treeBranch {
+    border-bottom: 1px solid #000;
+    border-left: 1px solid #000;
+    font-size: 1.2em;
+}
+
+.tree li.sibling > span.treeBranch {
+    border-left-width: 0em;
+}
+
+.tree li.sibling {
+    border-left: 1px solid #000;
+}
+
+.tree a {
+    text-decoration: none;
+}
+
+.tree span.treeLabel {
+    position: relative;
+    top: 0.6em;
+    margin-left: 1.2em;
+    padding-left: 0.2em;
+    background-color: #fff;
+    font-size: 0.83em;
+}
+
+.tree > ul {
+    padding-bottom: 0.6em;
+}
+
+.hidden {
+    display: none;
+}
+
+.tree span.treeToggle {
+    font-weight: bold;
+}
+
+.tree span.treeLink {
+    font-size: smaller;
+}

@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8"/>
+  <title><%= controller.class %> - <%= controller.action_name %></title>
+  <%= stylesheet_link_tag 'scaffold' %>
+  <%= yield :css %>
+  <%= stylesheet_link_tag '/javascripts/syntaxHighlighter/styles/shCore.css' %>
+  <%= stylesheet_link_tag '/javascripts/syntaxHighlighter/styles/shThemeDefault.css' %>
+</head>
+<body>
+<%= image_tag 'confidential.jpg' %>
+<%= render :partial => 'layouts/sep_tiny' %>
+<h1>EAP Build Tracking Tool (ETT)</h1>
+<%= render :partial => 'layouts/line' %>
+<%= render :partial => 'layouts/menus' %>
+<%= render :partial => 'layouts/components' %>
+<%= render :partial => 'layouts/tags' %>
+
+<p style="color: green"><%= flash[:notice] %></p>
+
+<div style="padding:20px;">
+  <%= yield %>
+</div>
+<%= render :partial => 'layouts/sep' %>
+<%= render :partial => 'layouts/line' %>
+<div style="width:100%;padding-left:20px;text-align:left;">
+  Copyright &copy; 2011 Red Hat
+</div>
+<%= render :partial => 'layouts/sep' %>
+
+<%= javascript_include_tag :defaults %>
+<%= yield :js %>
+<%= javascript_include_tag 'syntaxHighlighter/scripts/shCore.js' %>
+<%= javascript_include_tag 'syntaxHighlighter/scripts/shBrushJava.js' %>
+<%= javascript_include_tag 'syntaxHighlighter/scripts/shBrushXml.js' %>
+<%= javascript_include_tag 'syntaxHighlighter/scripts/shBrushBash.js' %>
+<%= javascript_include_tag 'syntaxHighlighter/scripts/shBrushRuby.js' %>
+<%= javascript_include_tag 'syntaxHighlighter/scripts/shBrushPerl.js' %>
+<%= javascript_include_tag 'syntaxHighlighter/scripts/shBrushJScript.js' %>
+<%= javascript_include_tag 'syntaxHighlighter/scripts/shBrushSql.js' %>
+
+<script type="text/javascript">
+    SyntaxHighlighter.config.clipboardSwf = '/javascripts/syntaxHighlighter/scripts/clipboard.swf';
+    SyntaxHighlighter.all();
+</script>
+</body>
+</html>
+

@@ -1,0 +1,24 @@
+<h1>Listing package_relationships</h1>
+
+<table>
+  <tr>
+    <th>From package</th>
+    <th>To package</th>
+    <th>Relationship</th>
+  </tr>
+
+  <% @package_relationships.each do |package_relationship| %>
+      <tr>
+        <td><%= h package_relationship.from_package_id %></td>
+        <td><%= h package_relationship.to_package_id %></td>
+        <td><%= h package_relationship.relationship_id %></td>
+        <td><%= link_to 'Show', package_relationship %></td>
+        <td><%= link_to 'Edit', edit_package_relationship_path(package_relationship) %></td>
+        <td><%= link_to 'Destroy', package_relationship, :confirm => 'Are you sure?', :method => :delete %></td>
+      </tr>
+  <% end %>
+</table>
+
+<br/>
+
+<%= link_to 'New package_relationship', new_package_relationship_path %>

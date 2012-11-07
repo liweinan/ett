@@ -1,0 +1,29 @@
+<h2>Clone Package</h2>
+<%= render :partial => 'layouts/line' %>
+<%= render :partial => 'layouts/sep_tiny' %>
+<%= render :partial => 'layouts/error_messages' %>
+<form action="/packages/clone/<%= escape_url(params[:id]) %>?brew_tag_id=<%= escape_url(params[:brew_tag_id]) %>" method="post" onsubmit="return validateForm();">
+  <input type='hidden' value='<%= unescape_url(params[:brew_tag_id]) %>' name='source_tag_name'/>
+  <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
+
+  Clone <%= unescape_url(params[:id]) %> @ <%= unescape_url(params[:brew_tag_id]) %> to:
+  <select name="target_tag_name">
+    <option value="-"> - </option>
+    <% BrewTag.find(:all, :conditions => ["name != ?", params[:brew_tag_id]], :order => 'lower(name)').each do |tag| %>
+        <option value="<%= tag.name %>"><%= tag.name %></option>
+    <% end %>
+  </select>
+  <%= render :partial => 'layouts/sep_tiny' %>
+  <input id='clone_assignee_option' name="clone_assignee_option" type="checkbox" value="Yes">
+  <label for="clone_assignee_option">Clone Assignee</label>
+  <%= render :partial => 'layouts/sep_tiny' %>
+  <input id='clone_label_option' name="clone_label_option" type="checkbox" value="Yes">
+  <label for="clone_label_option">Clone label (If the label doesn't exist in target tag, it will be created
+    automatically.)</label>
+  <%= render :partial => 'layouts/sep_tiny' %>
+  <input id='clone_marks_option' name="clone_marks_option" type="checkbox" value="Yes">
+  <label for="clone_marks_option"> Clone marks (If the marks don't exist in target tag, it will be created automatically.)</label>
+  <%= render :partial => 'layouts/sep' %>
+  <input type="submit" value="Clone">
+
+</form>

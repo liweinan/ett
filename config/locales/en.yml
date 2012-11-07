@@ -1,0 +1,11 @@
+# Sample localization file for English. Add more files in this directory for other locales.
+# See http://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
+
+en:
+  hello: "Hello world"
+  prop_creator: "Package creator"
+  prop_assignee: "Assignee"
+  prop_commenter: "Commenters"
+  action_updated: "Package information is updated"
+  action_commented: "Someone adds comment to the package"
+  action_created: "Package is created"

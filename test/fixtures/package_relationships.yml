@@ -1,0 +1,11 @@
+## Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+#
+#one:
+#  from_package_id: 1
+#  to_package_id: 1
+#  relationship_id: 1
+#
+#two:
+#  from_package_id: 1
+#  to_package_id: 1
+#  relationship_id: 1

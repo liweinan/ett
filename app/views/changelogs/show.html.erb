@@ -1,0 +1,38 @@
+<p>
+  <b>Package:</b>
+  <%=h @changelog.package_id %>
+</p>
+
+<p>
+  <b>Changed by:</b>
+  <%=h @changelog.changed_by %>
+</p>
+
+<p>
+  <b>Changed at:</b>
+  <%=h @changelog.changed_at %>
+</p>
+
+<p>
+  <b>Category:</b>
+  <%=h @changelog.category %>
+</p>
+
+<p>
+  <b>From value:</b>
+  <%=h @changelog.from_value %>
+</p>
+
+<p>
+  <b>To value:</b>
+  <%=h @changelog.to_value %>
+</p>
+
+<p>
+  <b>References:</b>
+  <%=h @changelog.references %>
+</p>
+
+
+<%= link_to 'Edit', edit_changelog_path(@changelog) %> |
+<%= link_to 'Back', changelogs_path %>

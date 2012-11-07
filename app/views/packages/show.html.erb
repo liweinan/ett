@@ -1,0 +1,77 @@
+<h2>
+<span style="<%= deleted_style(@package) %>">
+<%= h @package.name %>
+  @<%= link_to @package.brew_tag.name, :controller => 'packages', :action => 'index', :brew_tag_id => escape_url(@package.brew_tag.name) %>
+</span>
+</h2>
+
+Created By:
+<% unless @package.created_by.blank? %>
+    <%= h @package.creator.name %>
+<% else %>
+    -
+<% end %>
+/
+Assignee:
+<% if !@package.user_id.blank? %>
+    <%= h @package.user.name %>
+<% end %>
+<%= render :partial => 'layouts/sep_tiny' %>
+
+<% unless @package.label.blank? %>
+    Label:
+    <%= h @package.label.name %>
+    <%= render :partial => 'layouts/sep_tiny' %>
+<% end %>
+
+<% unless @package.marks.blank? %>
+    Marks:
+    <% @package.marks.each do |mark| %>
+        <%= mark.key %> /
+    <% end %>
+<% end %>
+
+<% get_xattrs(@package.brew_tag, true, false) do |attr| %>
+    <%= render :partial => 'layouts/sep_tiny' %>
+    <% unless @package.read_attribute(attr).blank? %>
+        <%= attr.camelcase %>: <%= Extractor.extract_url(@package.read_attribute(attr)) %>
+    <% end %>
+<% end %>
+
+<%= render :partial => 'layouts/sep_tiny' %>
+Time Consumed:
+
+<% TrackTime.all(:conditions => "package_id = #{@package.id}", :order => "label_id").each do |tt| %>
+    <%= tt.label.name %>: <%= tt.time_consumed / 60 %> min  /
+<% end %>
+
+<%= render :partial => 'layouts/sep' %>
+<% if can_edit_package? @package %>
+    <%= link_to 'Edit', :controller => 'packages', :action => 'edit', :id => escape_url(@package.name) %>
+<% end %>
+
+<% if can_manage? %>
+    <% unless @package.deleted? %>
+        | <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(@package.name), :brew_tag_id => escape_url(@package.brew_tag.name) %>
+        | <%= link_to 'Delete', @package, :confirm => "Are you sure to delete #{escape_url(@package.name)}?", :method => :delete %>
+    <% end %>
+<% end %>
+
+<%= render :partial => 'packages/notes' %>
+<%= render :partial => 'layouts/sep' %>
+
+<%= render :partial => 'packages/relationships' %>
+<%= render :partial => 'layouts/sep' %>
+
+<%= render :partial => 'packages/attachment' %>
+<%= render :partial => 'layouts/sep' %>
+
+<%= render :partial => 'changelog' %>
+<%= render :partial => 'layouts/sep' %>
+
+<%= render :partial => "comments/index" %>
+<% if logged_in? %>
+    <%= render :partial => "comments/new" %>
+<% end %>
+
+<%# link_to 'Back', :controller => 'packages', :action => 'index', :brew_tag_id => params[:brew_tag_id] %>

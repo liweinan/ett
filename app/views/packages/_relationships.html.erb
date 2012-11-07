@@ -1,0 +1,34 @@
+<% tos = @package.to_relationships %>
+<% froms = @package.from_relationships %>
+<% if tos.size > 0 || froms.size > 0 %>
+    <h3>Relationships</h3>
+    <%= render :partial => 'layouts/line' %>
+    This package is:
+    <%= render :partial => 'layouts/sep' %>
+<% end %>
+<%
+   if tos.size > 0
+       tos.each do |to|
+%>  <span style="<%= deleted_style(to.to_package) %>">
+
+        <%= to.relationship.to_name %> <%= link_to to.to_package.name, :controller => :packages, :action => :show, :id => escape_url(to.to_package.name), :brew_tag_id => escape_url(to.to_package.brew_tag.name) %>
+  @<%= link_to (to.to_package.brew_tag.name), :controller => :packages, :action => :index, :brew_tag_id => escape_url(to.to_package.brew_tag.name) %>
+  </span>
+        <%= render :partial => 'layouts/sep' %>
+    <%
+       end
+       end
+    %>
+<%
+   if froms.size > 0
+       froms.each do |from|
+%>
+        <span style="<%= deleted_style(from.from_package) %>">
+        <%= from.relationship.from_name %> <%= link_to from.from_package.name, :controller => :packages, :action => :show, :id => escape_url(from.from_package.name), :brew_tag_id => escape_url(from.from_package.brew_tag.name) %>
+          @<%= link_to (from.from_package.brew_tag.name), :controller => :packages, :action => :index, :brew_tag_id => escape_url(from.from_package.brew_tag.name) %>
+          </span>
+        <%= render :partial => 'layouts/sep' %>
+    <%
+       end
+       end
+    %>

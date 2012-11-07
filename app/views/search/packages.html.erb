@@ -1,0 +1,65 @@
+<% if request.post? %>
+    <h2>Search result of <%= uebtag %></h2>
+<% else %>
+    <h2>Search packages in <%= uebtag %></h2>
+<% end %>
+
+<div class='manage-tbl'>
+  <form action="/search/packages?brew_tag_id=<%= ebtag %>" method="post">
+    <%= hidden_field_tag 'brew_tag_id', ebtag %>
+    <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
+    <textarea cols="50" rows="15" id="keyword" name="keyword"><%=@keyword%></textarea>
+
+    <div style="height:10px;">&nbsp;</div>
+    <input name="search" type="submit" value="Search"/>
+  </form>
+</div>
+<%= render :partial =>'layouts/line' %>
+<%= render :partial =>'layouts/sep' %>
+<% if request.post? %>
+
+    <h2>Found Packages</h2>
+    <%= render :partial => "layouts/sep_tiny" %>
+    <div class='manage-tbl'>
+      <table>
+        <tr>
+          <th class='content-list-head'>Search Keyword</th>
+          <th class='content-list-head'>Result</th>
+        </tr>
+        <% @found.each_key do |found| %>
+            <tr>
+              <td>
+                <%= found %>
+              </td>
+              <td>
+                <% @found[found].each do |_p| %>
+                    <%= link_to _p.name, :controller => :packages, :action => :show, :id => escape_url(_p.name), :brew_tag_id =>ebtag %>
+                    /
+                <% end %>
+              </td>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+    <%= render :partial =>'layouts/line' %>
+
+    <%= render :partial => "layouts/sep" %>
+    <h2>Not Found Packages</h2>
+    <%= render :partial => "layouts/sep_tiny" %>
+
+    <div class='manage-tbl'>
+      <table>
+        <tr>
+          <th class='content-list-head'>Not Found</th>
+        </tr>
+        <% @not_found.each do |not_found| %>
+            <tr>
+              <td>
+                <%= not_found %>
+              </td>
+            </tr>
+        <% end %>
+      </table>
+    </div>
+<% end %>
+

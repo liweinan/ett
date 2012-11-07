@@ -1,0 +1,24 @@
+<h1>Editing relationship</h1>
+
+<% form_for(@relationship) do |f| %>
+    <%= f.error_messages %>
+
+    <p>
+      <%= f.label :name %><br/>
+      <%= f.text_field :name %>
+    </p>
+    <p>
+      <%= f.label :is_global %><br/>
+      <%= f.text_field :is_global %>
+    </p>
+    <p>
+      <%= f.label :brew_tag_id %><br/>
+      <%= f.text_field :brew_tag_id %>
+    </p>
+    <p>
+      <%= f.submit 'Update' %>
+    </p>
+<% end %>
+
+<%= link_to 'Show', @relationship %> |
+<%= link_to 'Back', relationships_path %>

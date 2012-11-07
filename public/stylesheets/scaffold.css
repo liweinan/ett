@@ -1,0 +1,158 @@
+body {
+    background-color: #fff;
+    color: #333;
+}
+
+body, p, ol, ul, td {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 13px;
+    line-height: 18px;
+    padding-right: 50px;
+}
+
+h2 a, h2 a:visited, h2 a:hover {
+    text-decoration: none;
+    color: #000;
+    background: none;
+}
+
+pre {
+    background-color: #eee;
+    padding: 10px;
+    font-size: 11px;
+}
+
+sup {
+    color: #666;
+}
+
+a {
+    color: #000;
+}
+
+a:visited {
+    color: #666;
+}
+
+a:hover {
+    color: #fff;
+    background-color: #000;
+}
+
+.fieldWithErrors {
+    padding: 2px;
+    background-color: red;
+    display: table;
+}
+
+#errorExplanation {
+    width: 400px;
+    border: 2px solid red;
+    padding: 7px 7px 12px;
+    margin-bottom: 20px;
+    background-color: #f0f0f0;
+}
+
+#errorExplanation h2 {
+    text-align: left;
+    font-weight: bold;
+    padding: 5px 5px 5px 15px;
+    font-size: 12px;
+    margin: -7px;
+    background-color: #c00;
+    color: #fff;
+}
+
+#errorExplanation p {
+    color: #333;
+    margin-bottom: 0;
+    padding: 5px;
+}
+
+#errorExplanation ul li {
+    font-size: 12px;
+    list-style: square;
+}
+
+.manage-tbl table {
+    border: 1px solid #dedede;
+    border-collapse: collapse;
+}
+
+.manage-tbl th {
+    background: url('/images/th-bar.jpg') repeat-x;
+    height: 24.5px;
+    border: 1px solid #dedede;
+    color: #000;
+    white-space: nowrap;
+}
+
+.manage-tbl td {
+    padding: 8px;
+    border: 1px solid #dedede;
+    color: #000;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.manage-title {
+    color: #5e5e60;
+    padding: 5px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.content-list-head {
+    background-color: #f5f5f5;
+    color: #000;
+    font-size: 11px;
+}
+
+.content-list-head a, .content-list-head a:visited {
+    color: #000;
+    text-decoration: none;
+    font-size: 11px;
+}
+
+.content-list-head a:hover {
+    color: #fff;
+}
+
+.comment_text_area {
+    border: 1px solid #ccc;
+    width: 550px;
+    height: 230px;
+}
+
+.small_text_area {
+    border: 1px solid #ccc;
+    width: 550px;
+    height: 150px;
+}
+
+.comment-body {
+    color: #797979;
+}
+
+.comment-date {
+    font-size: 11px;
+    font-family: Arial, serif;
+    font-weight: bold;
+}
+
+.comment-login {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.comment-login a {
+    text-decoration: none;
+}
+
+.comment-comment {
+    padding: 5px 0 5px 5px;
+}
+
+
+
+

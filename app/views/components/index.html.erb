@@ -1,0 +1,13 @@
+<div style="width:100%;text-align:left;">
+  <h2>Components</h2>
+	<span style="padding-right:20px;">
+      <% Component.all(:order => 'name').each do |component| %>
+		<%= link_to "#{component.name}", :controller => :components, :action => :show, :id => escape_url(component.name) %>
+          /
+		<% end %>
+	</span>
+  <%= render :partial => 'layouts/sep' %>
+  <% if can_manage? %>
+      <%= link_to 'Create New Components View', :controller => :components, :action => :new %>
+  <% end %>
+</div>

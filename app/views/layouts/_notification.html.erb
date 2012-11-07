@@ -1,0 +1,17 @@
+<div id='div_<%= div_id %>_notification' style="display:none;">
+  <p><%= title %></p>
+  <%= hidden_field_tag :request_path, generate_request_path(request) %>
+  <%= text_area_tag "div_#{div_id}_notification_area", nil, :class => "comment_text_area_small", :rows => 4, :cols => 50 %>
+  <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "#{div_id}_notification_auto_complete_indicator"} %>
+  <div class="auto_complete" id="<%= div_id %>_notification_auto_complete"></div>
+</div>
+
+<% content_for :css do %>
+    <%= stylesheet_link_tag 'auto_complete' %>
+<% end %>
+
+<% content_for :js do %>
+    <script type="text/javascript">
+        var <%=div_id%>_auto_completor = new Ajax.Autocompleter('div_<%=div_id%>_notification_area', '<%=div_id%>_notification_auto_complete', '/users.js', {method:'get', paramName:'search', tokens:' ', indicator: '<%=div_id%>_notification_auto_complete_indicator'})
+    </script>
+<% end %>

@@ -1,0 +1,21 @@
+<h2>Editing user</h2>
+
+<div class='manage-tbl'>
+  <% form_for(@user) do |f| %>
+      <%= f.error_messages %>
+      <table>
+
+        <%= render :partial => 'users/fields/name', :locals => {:f => f} %>
+        <%= render :partial => 'users/fields/email', :locals => {:f => f} %>
+        <%= render :partial => 'users/fields/can_manage', :locals => {:f => f} %>
+        <tr>
+          <td colspan=2 style="text-align:right;">
+            <%= f.submit 'Update' %>
+          </td>
+        </tr>
+      </table>
+  <% end %>
+</div>
+<br>
+
+<%= link_to 'Back', users_path %>

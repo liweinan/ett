@@ -1,0 +1,47 @@
+<% if can_edit_package? @package %>
+<%= render :partial => 'layouts/line' %>
+    <div class='manage-tbl' style="width:400px;">
+      <% form_for PAttachment.new, :html => {:multipart => true} do |f| %>
+          <%= f.hidden_field :package_id, :value => @package.id %>
+          <p>
+            Add Attachment:
+          </p>
+
+          <p>
+            <%= f.file_field :attachment %>
+          </p>
+          <%= render :partial => 'layouts/notification', :locals => {:title => 'Notify the attachment uploading to:', :div_id => 'attachment'} %>
+          <p>
+            <%= f.submit 'Upload' %>
+            <%= render :partial => 'layouts/notification_link', :locals => {:div_id => 'attachment'} %>
+          </p>
+
+      <% end %>
+    </div>
+<% end %>
+
+<% if @package.p_attachments.size > 0 %>
+    <%= render :partial => 'layouts/sep' %>
+    <h3>Attachments</h3>
+    <%= render :partial => 'layouts/line' %>
+
+    <% @background ||= '#fff' %>
+    <% @package.p_attachments.each_with_index do |p, i| %>
+        <%
+           if i % 2 == 0
+               @background = '#fff'
+           else
+               @background = '#f5f5f5'
+           end
+        %>
+
+        <div style="background:<%=@background%>;border:0px;">
+          <div class="comment-comment" style="padding:5px 0 5px 5px;">
+            <div class='comment-login'><%= p.creator.name %></div>
+            <span class="comment-date"><%= p.created_at %></span>
+
+            <p><span class="comment-body"><%= link_to p.attachment_file_name, p.attachment.url %></span></p>
+          </div>
+        </div>
+    <% end %>
+<% end %>

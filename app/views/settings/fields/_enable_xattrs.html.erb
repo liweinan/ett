@@ -1,0 +1,2 @@
+<% disabled ||= false %>
+<label><%= check_box_tag("setting[enable_xattrs]", 'Yes', @setting.enable_xattrs?, :disabled => disabled) %> Enable extended attributes for users to be able to edit them</label>

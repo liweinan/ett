@@ -1,0 +1,11 @@
+<% unless @error_message.blank? %>
+    <div class="errorExplanation" id="errorExplanation"><h2>Errors occured</h2>
+
+      <p>There were problems:</p>
+      <ul>
+        <% @error_message.each do |msg| %>
+            <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+<% end %>

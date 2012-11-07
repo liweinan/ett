@@ -1,0 +1,22 @@
+<h2><%= h @user.name %></h2>
+<div class='manage-tbl'>
+  <table>
+    <tr>
+      <td>Name</td>
+      <td><%= h @user.name %></td>
+    </tr>
+    <tr>
+      <td>Email</td>
+      <td><%= h @user.email %></td>
+    </tr>
+    <tr>
+      <td>&nbsp;Can Manage&nbsp;</th>
+      <td><%= h @user.can_manage %></td>
+    </tr>
+  </table>
+</div>
+
+<br/>
+
+<%= link_to 'Edit', edit_user_path(@user) %> |
+<%= link_to 'Back', users_path %>

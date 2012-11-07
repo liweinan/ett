@@ -1,0 +1,19 @@
+<% if params[:brew_tag_id].blank? %>
+<h2>New mark</h2>
+<% else %>
+<h2>New mark of <%= params[:brew_tag_id] %></h2>
+<% end %>
+
+<% form_for(@mark) do |f| %>
+    <%= f.error_messages %>
+
+    <%= render :partial => 'key', :locals => {:f => f} %>
+    <%= render :partial => 'value', :locals => {:f => f} %>
+    <%= render :partial => 'brew_tag_id', :locals => {:f => f} %>
+
+    <p>
+      <%= f.submit 'Create' %>
+    </p>
+<% end %>
+
+<%= link_to 'Back', marks_path %>

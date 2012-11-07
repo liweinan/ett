@@ -1,0 +1,22 @@
+<div style="width:100%;text-align:right;">
+	<span style="padding-right:20px;"> 
+		<%= link_to 'Settings', '/settings/1' %>
+      /
+      <%= link_to 'Components', '/components' %>
+      /
+      <%= link_to 'Label List', '/labels' %>
+      /
+      <%= link_to 'Tag List', brew_tags_path %>
+      /
+      <%= link_to 'User List', users_path %>
+      /
+      <% if !session[:current_user] %>
+			<%= link_to 'Login', '/login' %> /
+          <%= link_to 'Register', new_user_path %>
+		<% else %>
+			Welcome, <%= session[:current_user].name %>
+          (<%= link_to 'All My Packages', :controller => :packages, :action => :index, :user => session[:current_user].email, :brew_tag_id => nil %>)&nbsp;/&nbsp;<%= link_to 'Logout', '/logout' %>
+		<% end %>
+	</span>
+</div>
+<%= render :partial => 'layouts/line' %>

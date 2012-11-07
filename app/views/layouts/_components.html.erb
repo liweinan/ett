@@ -1,0 +1,10 @@
+<div style="width:100%;text-align:left;">
+	<span style="padding-right:20px;"> 
+	  Components:
+      <% Component.all(:order => 'name').each do |component| %>
+		<%= link_to "#{component.name}", :controller => :components, :action => :show, :id => escape_url(component.name), :user => params[:user] %>
+          /
+		<% end %>
+	</span>
+</div>
+<%= render :partial => 'layouts/line' %>

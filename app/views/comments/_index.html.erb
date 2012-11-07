@@ -1,0 +1,15 @@
+<%= render :partial => "layouts/sep" %>
+<% comments = @package.comments %>
+<% if comments.size > 0 %>
+    <% if comments.size == 1 %>
+        <h3><%= comments.size %> Comment to <%= @package.name %></h3>
+    <% else %>
+        <h3><%= comments.size %> Comments to <%= @package.name %></h3>
+    <% end %>
+    <%= render :partial => 'layouts/line' %>
+
+    <% comments.each_with_index do |comment, i| %>
+        <%= render :partial => "/comments/show", :locals => {:comment => comment, :background => background_style(i), :index => i+1} %>
+    <% end
+       end %>
+<div id="added_comment"></div>

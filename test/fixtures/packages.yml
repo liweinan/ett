@@ -1,0 +1,24 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+#one:
+#  name: MyString
+#  build: MyString
+#  comments: MyText
+#  state: MyString
+#  user_id: 1
+#
+#two:
+#  name: MyString
+#  build: MyString
+#  comments: MyText
+#  state: MyString
+#  user_id: 1
+
+default:
+  id: 1
+  name: default
+  notes: default
+  user_id: 1
+  brew_tag_id: 1
+  created_by: 1
+  updated_by: 1

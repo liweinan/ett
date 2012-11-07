@@ -1,0 +1,12 @@
+<h1>Editing p_attachment</h1>
+
+<% form_for(@p_attachment) do |f| %>
+    <%= f.error_messages %>
+
+    <p>
+      <%= f.submit 'Update' %>
+    </p>
+<% end %>
+
+<%= link_to 'Show', @p_attachment %> |
+<%= link_to 'Back', p_attachments_path %>

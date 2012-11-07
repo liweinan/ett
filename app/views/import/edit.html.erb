@@ -1,0 +1,60 @@
+<h2>Update packages in tag: <%= params[:id] %></h2>
+<br/>
+
+<% @text=<<EOF
+h2. _Usage_
+
+* Please input *one package per line* in _JSON_ format. Here's an example:
+
+<pre class="brush:javascript;">
+  {"name":"hibernate3-commons-annotations","ver":"4.0.0.CR2","notes":"RPM BUILD"}
+</pre>
+
+* Multiple package can be updated together. Please don't forget to put *one package per line*.
+Here's the example:
+
+<pre class="brush:javascript;">
+  {"name":"hibernate3-commons-annotations","ver":"4.0.0.CR2","notes":"RPM BUILD"}
+  {"name":"jboss-osgi-http","ver":"1.0.5","notes":"New version 1.0.5 in AS 7.1.0.alpha"}
+</pre>
+
+* If you want to *add* notes instead of *replace* the notes of a package, using *'+'* in front of your text.
+Example:
+
+<pre class="brush:javascript;">
+{"name":"hibernate3-commons-annotations","ver":"4.0.0.CR2","notes":"+This text will be added on top of the existing notes."}
+</pre>
+
+
+h2. _Available Fields To Update_
+
+* name -- Package name will be used as the *id* to find package to be updated.
+* label_id -- The Id of label can be checked in 'labels' link on each tag's package list page.
+* notes
+* group_id -- Maven group id
+* artifact_id -- Maven artifact id
+* ver -- Project version
+* license
+* project_url
+* brew_link
+* scm
+
+_Marks of package cannot be updated this way currently._
+
+h2. _Packages to be updated:_
+EOF
+%>
+
+<%=RedCloth.new(@text).to_html%>
+
+
+<div class='manage-tbl'>
+  <form action="/import/<%= escape_url(params[:id]) %>" method="post">
+    <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
+    <input name="_method" type="hidden" value="put" />
+    <textarea cols="100" rows="50" id="packages" name="packages"></textarea>
+
+    <div style="height:10px;">&nbsp;</div>
+    <input name="commit" type="submit" value="Revise the packages to be updated"/>
+  </form>
+</div>

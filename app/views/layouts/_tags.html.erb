@@ -1,0 +1,10 @@
+<div style="width:100%;text-align:left;">
+	<span style="padding-right:20px;"> 
+		Tags:
+      <% BrewTag.all(:order => 'name', :conditions => "can_show='Yes'").each do |tag| %>
+		<%= link_to "#{tag.name}", :controller => :packages, :action => :index, :brew_tag_id => escape_url(tag.name), :user => params[:user] %>
+          /
+		<% end %>
+	</span>
+</div>
+<%= render :partial => 'layouts/line' %>

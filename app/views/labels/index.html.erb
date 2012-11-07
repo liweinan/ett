@@ -1,0 +1,66 @@
+<h2>
+  <% if params[:brew_tag_id].blank? %>
+      System internal label list
+  <% else %>
+      Listing labels of <%= unescape_url(params[:brew_tag_id]) %>
+  <% end %>
+</h2>
+<div class='manage-tbl'>
+  <table>
+    <tr>
+      <th>Id</th>
+      <th>Name</th>
+      <th>Tag</th>
+      <th>Can Show</th>
+      <th>Can Select</th>
+      <th>Track Time</th>
+      <th>CSS Style</th>
+      <% if can_manage? %>
+          <th>Operation</th>
+      <% end %>
+    </tr>
+
+    <% @labels.each do |label| %>
+        <tr>
+          <td><%= label.id %></td>
+          <td><%= h label.name %></td>
+          <td>
+            <% if is_global?(label) %>
+                -
+            <% else %>
+                <%= h label.brew_tag.name %>
+            <% end %>
+          </td>
+          <td>
+            <%= label.can_show %>
+          </td>
+          <td>
+            <%= label.can_select %>
+          </td>
+          <td>
+            <%= label.is_track_time %>
+          </td>
+          <td style="<%= label.style %>">
+            Example
+          </td>
+          <% if can_manage? %>
+              <td>
+                <%= link_to 'Edit', :controller => :labels, :action => :edit, :id => escape_url(label.name), :brew_tag_id => escape_url(params[:brew_tag_id]) %>
+              </td>
+          <% end %>
+        </tr>
+    <% end %>
+  </table>
+</div>
+<%= render :partial => 'layouts/sep' %>
+
+<% if can_manage? %>
+    <% if has_tag? %>
+        <%= link_to "New label of #{unescape_url(params[:brew_tag_id])}", :controller => :labels, :action => :new, :brew_tag_id => escape_url(params[:brew_tag_id]) %>
+        <%= render :partial => 'layouts/sep_tiny' %>
+        <%= link_to "Back to #{unescape_url(params[:brew_tag_id])}", :controller => :packages, :action => :index, :brew_tag_id => escape_url(params[:brew_tag_id]) %>
+
+    <% else %>
+        <%= link_to 'New label', new_label_path %>
+    <% end %>
+<% end %>
