@@ -90,15 +90,20 @@ class ImportController < ApplicationController
       end
     end
     
-    debugger
-    
-    @packages = []
+	  @packages = []
     @problem_packages = []
     Package.transaction do
+      @brew_tag = BrewTag.find_by_name(unescape_url(params[:brew_tag_id]))
+      
+      @marks = process_marks(params[:marks], @brew_tag.id)
+      @label = Label.find(params[:label_id]) unless params[:label_id].blank?
+      
       @final_package_names.each do |name|
         package = Package.new
         package.name = name.strip
-        package.brew_tag_id = BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).id
+        package.label_id = params[:label_id] unless params[:label_id].blank?
+        package.marks = @marks unless @marks.blank?
+        package.brew_tag_id = @brew_tag.id
         package.created_by = current_user.id
         package.updated_by = current_user.id
         result = package.save
