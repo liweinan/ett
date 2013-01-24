@@ -89,7 +89,9 @@ class ImportController < ApplicationController
         end
       end
     end
-
+    
+    debugger
+    
     @packages = []
     @problem_packages = []
     Package.transaction do

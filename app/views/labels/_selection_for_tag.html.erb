@@ -1,0 +1,16 @@
+<% form ||= nil %>
+<% 
+	blank_label = Label.new 
+	blank_label.id = ''
+	blank_label.name = '-'
+
+	labels = []
+	labels << blank_label
+	labels << Label.find_all_can_select_by_brew_tag_id_in_global_scope(tag_id)
+	labels = labels.flatten
+%>
+<% if form.blank? %>
+	<%= select_tag('label_id', options_from_collection_for_select(labels, :id, :name)) %>
+<% else %>
+	<%= form.collection_select :label_id, labels, :id, :name, {:include_blank => " - "} %>
+<% end %>

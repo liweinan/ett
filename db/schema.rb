@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120227132759) do
+ActiveRecord::Schema.define(:version => 20121221094737) do
 
   create_table "assignments", :force => true do |t|
     t.integer  "mark_id"
@@ -77,6 +77,7 @@ ActiveRecord::Schema.define(:version => 20120227132759) do
     t.string   "can_show"
     t.string   "code"
     t.text     "style"
+    t.string   "is_track_time"
   end
 
   create_table "marks", :force => true do |t|
@@ -124,8 +125,10 @@ ActiveRecord::Schema.define(:version => 20120227132759) do
     t.string   "project_url"
     t.string   "project_name"
     t.string   "license"
-    t.string   "scm"
+    t.string   "internal_scm"
     t.integer  "updated_by"
+    t.datetime "label_changed_at"
+    t.string   "external_scm"
   end
 
   create_table "relationships", :force => true do |t|
@@ -160,6 +163,12 @@ ActiveRecord::Schema.define(:version => 20120227132759) do
     t.string   "enabled"
     t.string   "enable_xattrs"
     t.string   "default_tag"
+  end
+
+  create_table "track_times", :force => true do |t|
+    t.integer "label_id"
+    t.integer "package_id"
+    t.integer "time_consumed"
   end
 
   create_table "users", :force => true do |t|
