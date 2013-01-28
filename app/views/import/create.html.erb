@@ -3,7 +3,21 @@
 <% if @packages.size > 0 %>
     <div style="height:10px;"></div>
     The following packages are successfully imported:
-    <div style="height:10px;"></div>
+
+	<% unless @label.blank? %>
+		<div style="height:10px;">&nbsp;</div>
+		<b>Initial Label:</b> <%= @label.name %>
+	<% end %>
+
+	<% unless @marks.blank? %>
+		<div style="height:10px;">&nbsp;</div>
+		<b>Initial Marks: </b>
+		<% @marks.each do |m| %>
+			<%= m.key %> / 
+		<% end %>
+	<% end %>
+	
+	<div style="height:10px;">&nbsp;</div>
     <div class='manage-tbl'>
       <table>
         <tr>
