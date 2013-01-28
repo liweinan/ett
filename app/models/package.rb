@@ -35,8 +35,6 @@ class Package < ActiveRecord::Base
   validates_presence_of :created_by
   validates_presence_of :updated_by
 
-  #validates_url_format_of :brew_link, :on => :update, :allow_nil => true
-
   def self.per_page
     10
   end
