@@ -1,0 +1,7 @@
+<span id='pac_<%= package.id %>_name_field'>
+<% if params[:user] %>
+	<%= link_to "#{package.name}", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :brew_tag_id => escape_url(package.brew_tag.name), :user => params[:user] %>
+<% else %>
+	<%= link_to "#{package.name}", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :brew_tag_id => escape_url(package.brew_tag.name) %>
+<% end %>
+</span>

@@ -1,0 +1,7 @@
+<td style='font-size:10px;<%= deleted_style(package) %>'>
+  <% if !package.user_id.blank? %>
+      <%= h package.user.name %>
+  <% else %>
+      -
+  <% end %>
+</td>

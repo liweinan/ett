@@ -1,0 +1,9 @@
+<td style='font-size:10px;<%= deleted_style(package) %>'>
+<% if package.marks.size > 0 %>
+	<% package.marks.each do |mark| %>
+		<%= mark.key %> /
+	<% end %>
+<% else %>
+	-
+<% end %>
+</td>

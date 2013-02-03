@@ -93,7 +93,6 @@ class PackagesController < ApplicationController
   # PUT /packages/1
   # PUT /packages/1.xml
   def update
-    expire_all_fragments
 
     # for Changelog.package_updated
     @orig_package = Package.find(params[:id])
@@ -117,6 +116,7 @@ class PackagesController < ApplicationController
     respond_to do |format|
       Package.transaction do
         if @package.update_attributes(params[:package])
+
 
           @package.marks = process_marks(params[:marks], params[:package][:brew_tag_id])
 
@@ -148,25 +148,38 @@ class PackagesController < ApplicationController
           sync_marks if params[:sync_marks] == 'yes'
 
           flash[:notice] = 'Package was successfully updated.'
+          ### TODO HACK HACK! this should be fixed, ajax update call in list page should also be able to send notification!
+          unless params[:request_path].blank?
+            url = params[:request_path].sub(/\/edit$/, '')
 
-          url = params[:request_path].sub(/\/edit$/, '')
+            if Setting.activated?(@package.brew_tag, Setting::ACTIONS[:updated])
+              Notify::Package.update(current_user, url, @package, Setting.all_recipients_of_package(@package, current_user, :edit))
+            end
 
-          if Setting.activated?(@package.brew_tag, Setting::ACTIONS[:updated])
-            Notify::Package.update(current_user, url, @package, Setting.all_recipients_of_package(@package, current_user, :edit))
+            unless params[:div_package_edit_notification_area].blank?
+              Notify::Package.update(current_user, url, @package, params[:div_package_edit_notification_area])
+            end
           end
 
-          unless params[:div_package_edit_notification_area].blank?
-            Notify::Package.update(current_user, url, @package, params[:div_package_edit_notification_area])
-          end
-
-          format.html { redirect_to(:controller => :packages, :action => :show, :id => escape_url(@package.name), :brew_tag_id => escape_url(@package.brew_tag.name), :user => params[:user]) }
+          @output = true
         else
           unless @package.errors[:name].blank?
             @error_message = "Package #{@package.name} already exists. Here's the <a href='/brew_tags/#{escape_url(@package.brew_tag.name)}/packages/#{unescape_url(@package.name)}' target='_blank'>link</a>."
           end
           @user = params[:user]
-          format.html { render :action => :edit }
+          @output = false
+
         end
+      end
+
+
+      if @output == true
+        expire_all_fragments
+        format.html { redirect_to(:controller => :packages, :action => :show, :id => escape_url(@package.name), :brew_tag_id => escape_url(@package.brew_tag.name), :user => params[:user]) }
+        format.js
+      else
+        format.html { render :action => :edit }
+        format.js
       end
     end
   end

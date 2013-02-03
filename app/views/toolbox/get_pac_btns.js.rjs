@@ -1,0 +1,12 @@
+if logged_in?
+  params[:ids].split(',').each do |pac|
+    pac_id = pac.split('_')[1]
+    package = Package.find(pac_id)
+    if can_edit_package?(package) || can_manage?
+      page.replace_html pac, :partial => '/packages/index/edit_btn', :locals => {:package => package}
+    end
+  end
+end
+
+
+

@@ -1,0 +1,13 @@
+<% if package.label %>
+  <td style="font-size:10px;<%= package.label.style %>">
+	<span id='pac_<%=package.id%>_label'>
+	  <%= h package.label.name %>
+	</span>
+  </td>
+<% else %>
+  <td style='font-size:10px;<%= deleted_style(package) %>'>
+	<span id='pac_<%=package.id%>_label'>
+	-
+	</span>
+  </td>
+<% end %>

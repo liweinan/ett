@@ -1,0 +1,9 @@
+<% get_xattrs(@brew_tag, true, false) do |attr| %>
+    <td style='font-size:10px;<%= deleted_style(package) %>'>
+      <% if package.read_attribute(attr).blank? %>
+          -
+      <% else %>
+          <%= Extractor.extract_url(package.read_attribute(attr)) %>
+      <% end %>
+    </td>
+<% end %>
