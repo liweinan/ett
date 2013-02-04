@@ -1,0 +1,31 @@
+<% is_xattr||='no' %>
+<td style='font-size:10px;text-align:left;<%= deleted_style(package) %>;' onmouseover="show_pac_btn('pac_<%= package.id %>_<%=field_name%>');" onmouseout="hide_pac_btn('pac_<%= package.id %>_<%=field_name%>');">
+  <span id='pac_<%= package.id %>_<%= field_name %>_switch' style="display:none;">on</span>
+  <%= render :partial => 'packages/index/field_col', :locals => {:partial => partial, :package => package, :field_name => field_name} %>
+  <span id='pac_<%= package.id %>_<%= field_name %>_editor' style="display:none">
+  <form action="/packages/<%= package.id %>"
+        id="pac_<%= package.id %>_<%= field_name %>_form"
+        method="post"
+        onsubmit="new Ajax.Request('/packages/<%=package.id%>',
+                {
+                        asynchronous:true, evalScripts:true,
+                        onLoading:function(request) {Element.show('pac_<%=package.id%>_<%=field_name%>_spinner');},
+                        onSuccess:function(request) {
+
+                                },
+                        parameters:Form.serialize(this)
+                        });return false;">
+
+    <%= hidden_field_tag '_method', 'put' %>
+    <%= hidden_field_tag :id, package.id %>
+    <%= hidden_field_tag :div, "pac_#{package.id}_#{field_name}" %>
+    <%= hidden_field_tag :user, params[:user] %>
+    <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+    <%= hidden_field_tag :is_xattr, is_xattr %>
+    <%= text_field_tag "package[#{field_name.underscore}]", package[field_name.underscore], :id => "pac_#{package.id}_#{field_name}_input" %>
+    <%= submit_tag 'Update' %>
+    <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "pac_#{package.id}_#{field_name}_spinner"} %>
+  </form></span>
+
+  <span id='pac_<%= package.id %>_<%= field_name %>_btn' style="display:none;">&nbsp;</span>
+</td>
