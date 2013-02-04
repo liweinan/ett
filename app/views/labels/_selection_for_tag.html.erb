@@ -16,10 +16,10 @@
    labels = labels.flatten
 %>
 <% if form.blank? %>
-    <% if package.blank? %>
+    <% if package.blank? || package.label.blank?%>
         <%= select_tag('package[label_id]', options_from_collection_for_select(labels, :id, :name)) %>
     <% else %>
-        <%= select_tag('package[label_id]', options_from_collection_for_select(labels, :id, :name)) %>
+        <%= select_tag('package[label_id]', options_from_collection_for_select(labels, :id, :name, package.label.id)) %>
     <% end %>
 <% else %>
     <%= form.collection_select :label_id, labels, :id, :name, {:include_blank => " - "} %>

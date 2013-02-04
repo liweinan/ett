@@ -13,7 +13,12 @@
        users = users.flatten
 
     %>
-    <%= select_tag('package[user_id]', options_from_collection_for_select(users, :id, :name)) %>
+    <% package||=nil %>
+    <% if package.blank? %>
+        <%= select_tag('package[user_id]', options_from_collection_for_select(users, :id, :name)) %>
+    <% else %>
+        <%= select_tag('package[user_id]', options_from_collection_for_select(users, :id, :name, package.user_id)) %>
+    <% end %>
 <% else %>
     <%= f.select :user_id, User.find(:all, :order => 'name').map { |u| [u.name, u.id] }, {:include_blank => " - "} %>
 <% end %>

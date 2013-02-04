@@ -56,6 +56,10 @@
         <% end %>
     <% end %>
 
+    <%= render :partial => 'layouts/sep' %>
+    <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "inline_editor_indicator", :msg => 'Inline editor loading...'} %>
+    <%= render :partial => 'layouts/sep' %>
+
     <div class='manage-tbl'>
       <%= render :partial => 'layouts/sep' %>
       <table>
@@ -75,53 +79,92 @@
         <% end %>
       </table>
     </div>
+
 <% end %>
+<%= render :partial => 'layouts/sep' %>
 
-<% content_for :js do %>
-    <script type="text/javascript">
-        function show_pac_editor(div) {
-            Element.hide(div + '_field');
-            Element.hide(div + '_btn');
-            Element.show(div + '_editor');
-            Element.setStyle(div + '_td', {'text-decoration':'none','background':'none'});
-            document.getElementById(div + "_switch").innerHTML = 'off';
-        }
+<% if logged_in? %>
+    <% content_for :js do %>
+        <script type="text/javascript">
+            function show_pac_editor(div, pac_id, field_name, field_type, is_xattr) {
+                Element.hide(div + '_field');
+                Element.hide(build_pac_btn_id(div, field_type, is_xattr));
+                new Ajax.Request('/toolbox/get_pac_form',
+                        {
+                            asynchronous:true,
+                            evalScripts:true,
+                            onLoading:function (request) {
+                                Element.show(div + '_indicator');
+                            },
+                            onSuccess:function (response) {
+                                Element.hide(div + '_indicator');
+                            },
+                            parameters:{
+                                'form_id':div + '_editor',
+                                'pac_id':pac_id,
+                                'field_name':field_name,
+                                'field_type':field_type,
+                                'is_xattr':is_xattr,
+                                'authenticity_token':'<%=form_authenticity_token%>'}
+                        });
+                Element.show(div + '_editor');
+                Element.setStyle(div + '_td', {'text-decoration':'none', 'background':'none'});
+                document.getElementById(div + "_switch").innerHTML = 'off';
+            }
 
-        function show_pac_btn(div) {
-            if (document.getElementById(div + "_switch").innerHTML == 'on')
-                Element.show(div + '_btn');
-        }
+            function hide_pac_editor(div, field_type, is_xattr) {
+                Element.show(div + '_field');
+                Element.show(build_pac_btn_id(div, field_type, is_xattr));
+                Element.hide(div + '_editor');
+                document.getElementById(div + "_switch").innerHTML = 'on';
+            }
 
-        function hide_pac_btn(div) {
-            if (document.getElementById(div + "_switch").innerHTML == 'on')
-                Element.hide(div + '_btn');
-        }
+            function show_pac_btn(div, field_type, is_xattr) {
+                if (document.getElementById(div + "_switch").innerHTML == 'on')
+                    Element.show(build_pac_btn_id(div, field_type, is_xattr));
+            }
 
-        var pacBtnSwitches = document.getElementsByRegex('^pac.*switch');
+            function hide_pac_btn(div, field_type, is_xattr) {
+                if (document.getElementById(div + "_switch").innerHTML == 'on')
+                    Element.hide(build_pac_btn_id(div, field_type, is_xattr));
+            }
 
-        Event.observe(window, 'load', function () {
-            new Ajax.Request('/toolbox/get_initial_pac_btn_switch',
-                    {
-                        asynchronous:true,
-                        evalScripts:true,
-                        parameters:{
-                            'ids':pacBtnSwitches.toString(),
-                            'authenticity_token':'<%=form_authenticity_token%>'}
-                    });
-        });
+            function build_pac_btn_id(div, field_type, is_xattr) {
+                return div + '_-' + field_type + '-' + is_xattr + '-_btn';
+            }
 
-        var pacBtns = document.getElementsByRegex('^pac.*btn');
-//            alert('found ' + pacBtns.length + ' matches - expected 3.');
 
-        Event.observe(window, 'load', function () {
-            new Ajax.Request('/toolbox/get_pac_btns',
-                    {
-                        asynchronous:true,
-                        evalScripts:true,
-                        parameters:{
-                            'ids':pacBtns.toString(),
-                            'authenticity_token':'<%=form_authenticity_token%>'}
-                    });
-        });
-    </script>
+            Event.observe(window, 'load', function () {
+                var pacBtnSwitches = document.getElementsByRegex('^pac.*switch');
+                new Ajax.Request('/toolbox/get_initial_pac_btn_switch',
+                        {
+                            asynchronous:true,
+                            evalScripts:true,
+                            parameters:{
+                                'ids':pacBtnSwitches.toString(),
+                                'authenticity_token':'<%=form_authenticity_token%>'}
+                        });
+            });
+
+
+            Event.observe(window, 'load', function () {
+                var pacBtns = document.getElementsByRegex('^pac.*btn');
+                new Ajax.Request('/toolbox/get_pac_btns',
+                        {
+                            asynchronous:true,
+                            evalScripts:true,
+                            onLoading:function (request) {
+                                Element.show('inline_editor_indicator');
+                            },
+                            onSuccess:function (response) {
+                                Element.hide('inline_editor_indicator');
+                            },
+                            parameters:{
+                                'ids':pacBtns.toString(),
+                                'authenticity_token':'<%=form_authenticity_token%>'}
+                        });
+            });
+
+        </script>
+    <% end %>
 <% end %>
