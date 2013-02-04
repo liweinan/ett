@@ -1,0 +1,49 @@
+body {
+    background-color: #fff;
+    color: #333;
+}
+
+body, p, ol, ul, td {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 13px;
+    line-height: 18px;
+    padding-right: 50px;
+}
+
+a {
+    color: #000;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #666;
+    text-decoration: none;
+
+}
+
+a:hover {
+    color: #fff;
+    background-color: #000;
+    text-decoration: none;
+}
+
+table {
+    border: 1px solid #dedede;
+    border-collapse: collapse;
+}
+
+th {
+    background: url('/images/th-bar.jpg') repeat-x;
+    height: 24.5px;
+    border: 1px solid #dedede;
+    color: #000;
+    white-space: nowrap;
+    font-size: 10px;
+}
+
+td {
+    padding: 8px;
+    border: 1px solid #dedede;
+    color: #000;
+    text-align: center;
+}

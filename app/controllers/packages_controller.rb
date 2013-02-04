@@ -1,7 +1,7 @@
 class PackagesController < ApplicationController
 #  helper :sparklines
   before_filter :check_tag, :only => [:new, :edit]
-  before_filter :check_tag_or_user, :only => [:index, :export_to_csv]
+  before_filter :check_tag_or_user, :only => [:export_to_csv]
   before_filter :user_view_index, :only => [:index]
   before_filter :check_can_manage, :only => [:destroy]
   before_filter :clone_form_validation, :only => :clone
@@ -9,11 +9,19 @@ class PackagesController < ApplicationController
   # GET /packages
   # GET /packages.xml
   def index
-
-    @packages = get_packages(unescape_url(params[:brew_tag_id]), unescape_url(params[:mark]), unescape_url(params[:label]), unescape_url(params[:user]))
+    unless params[:brew_tag_id].blank?
+      @packages = get_packages(unescape_url(params[:brew_tag_id]), unescape_url(params[:mark]), unescape_url(params[:label]), unescape_url(params[:user]))
+    end
 
     respond_to do |format|
-      format.html
+      params[:style] ||= nil
+      format.html {
+        if !params[:style].blank?
+          render params[:style], :layout => params[:style]
+        elsif params[:brew_tag_id].blank?
+          render 'layouts/welcome'
+        end
+      }
     end
   end
 

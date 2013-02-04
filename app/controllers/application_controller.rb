@@ -306,20 +306,20 @@ class ApplicationController < ActionController::Base
   end
 
   def home_page
-    unless has_tag?
-      unless Setting.system_settings.default_tag.blank?
-        default_tag = BrewTag.find_by_name(Setting.system_settings.default_tag)
-        unless default_tag.blank?
-          params[:brew_tag_id] = escape_url(default_tag.name)
-        else
-          params[:brew_tag_id] = escape_url(BrewTag.find(:first, :order => 'updated_at DESC').name)
-        end
-      else
-        params[:brew_tag_id] = escape_url(BrewTag.find(:first, :order => 'updated_at DESC').name)
-      end
-    end
+    #unless has_tag?
+    #  unless Setting.system_settings.default_tag.blank?
+    #    default_tag = BrewTag.find_by_name(Setting.system_settings.default_tag)
+    #    unless default_tag.blank?
+    #      params[:brew_tag_id] = escape_url(default_tag.name)
+    #    else
+    #      params[:brew_tag_id] = escape_url(BrewTag.find(:first, :order => 'updated_at DESC').name)
+    #    end
+    #  else
+    #    params[:brew_tag_id] = escape_url(BrewTag.find(:first, :order => 'updated_at DESC').name)
+    #  end
+    #end
 
-    redirect_to(:controller => :packages, :action => :index, :brew_tag_id => params[:brew_tag_id])
+    redirect_to(:controller => :packages, :action => :index)
 
   end
 

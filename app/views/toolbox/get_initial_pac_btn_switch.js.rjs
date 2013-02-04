@@ -1,0 +1,9 @@
+params[:ids].split(',').each do |pac|
+  pac_id = pac.split('_')[1]
+  package = Package.find(pac_id)
+  if logged_in? && (can_manage? || can_edit_package?(package))
+    page.replace_html pac, 'on'
+  else
+    page.replace_html pac, 'off'
+  end
+end

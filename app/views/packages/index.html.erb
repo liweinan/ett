@@ -14,7 +14,6 @@
     <% session[:not_cloned_packages] = nil %>
 <% end %>
 
-
 <% cache :action => 'index', :id => "#{params[:brew_tag_id]}#{params[:label]}#{params[:mark]}#{params[:user]}#{current_user_email}" do %>
     <% if has_tag? %>
         <% @brew_tag = BrewTag.find_by_name(unescape_url(params[:brew_tag_id])) %>
@@ -98,6 +97,18 @@
                 Element.hide(div + '_btn');
         }
 
+        var pacBtnSwitches = document.getElementsByRegex('^pac.*switch');
+
+        Event.observe(window, 'load', function () {
+            new Ajax.Request('/toolbox/get_initial_pac_btn_switch',
+                    {
+                        asynchronous:true,
+                        evalScripts:true,
+                        parameters:{
+                            'ids':pacBtnSwitches.toString(),
+                            'authenticity_token':'<%=form_authenticity_token%>'}
+                    });
+        });
 
         var pacBtns = document.getElementsByRegex('^pac.*btn');
 //            alert('found ' + pacBtns.length + ' matches - expected 3.');

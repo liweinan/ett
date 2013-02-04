@@ -2,7 +2,7 @@
 <% style||='' %>
 <% field_name = field_name.camelcase %>
 <td id="pac_<%= package.id %>_<%= field_name %>_td" style='font-size:10px;text-align:left;<%= style %>;' onmouseover="show_pac_btn('pac_<%= package.id %>_<%=field_name%>');" onmouseout="hide_pac_btn('pac_<%= package.id %>_<%=field_name%>');">
-  <span id='pac_<%= package.id %>_<%= field_name %>_switch' style="display:none;">on</span>
+  <span id='pac_<%= package.id %>_<%= field_name %>_switch' style="display:none;">&nbsp;</span>
   <%= render :partial => 'packages/index/field_col', :locals => {:partial => partial, :package => package, :field_name => field_name} %>
   <span id='pac_<%= package.id %>_<%= field_name %>_editor' style="display:none">
   <form action="/packages/<%= package.id %>"
