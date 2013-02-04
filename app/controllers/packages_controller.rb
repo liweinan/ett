@@ -100,6 +100,10 @@ class PackagesController < ApplicationController
 
     @package = Package.find(params[:id])
 
+    params[:package] ||= Hash.new
+    params[:package][:id] = @package.id
+
+
     if @package.created_by.blank?
       params[:package][:created_by] = current_user.id
     end
@@ -117,8 +121,8 @@ class PackagesController < ApplicationController
       Package.transaction do
         if @package.update_attributes(params[:package])
 
-
-          @package.marks = process_marks(params[:marks], params[:package][:brew_tag_id])
+          @package.reload
+          @package.marks = process_marks(params[:marks], @package.brew_tag_id)
 
           # label changed
           if Label.find_by_id(params[:package][:label_id].to_i) != last_label
@@ -148,16 +152,19 @@ class PackagesController < ApplicationController
           sync_marks if params[:sync_marks] == 'yes'
 
           flash[:notice] = 'Package was successfully updated.'
-          ### TODO HACK HACK! this should be fixed, ajax update call in list page should also be able to send notification!
-          unless params[:request_path].blank?
-            url = params[:request_path].sub(/\/edit$/, '')
 
-            if Setting.activated?(@package.brew_tag, Setting::ACTIONS[:updated])
-              Notify::Package.update(current_user, url, @package, Setting.all_recipients_of_package(@package, current_user, :edit))
-            end
+          if  Rails.env.production?
+            ### TODO HACK HACK! this should be fixed, ajax update call in list page should also be able to send notification!
+            unless params[:request_path].blank?
+              url = params[:request_path].sub(/\/edit$/, '')
 
-            unless params[:div_package_edit_notification_area].blank?
-              Notify::Package.update(current_user, url, @package, params[:div_package_edit_notification_area])
+              if Setting.activated?(@package.brew_tag, Setting::ACTIONS[:updated])
+                Notify::Package.update(current_user, url, @package, Setting.all_recipients_of_package(@package, current_user, :edit))
+              end
+
+              unless params[:div_package_edit_notification_area].blank?
+                Notify::Package.update(current_user, url, @package, params[:div_package_edit_notification_area])
+              end
             end
           end
 

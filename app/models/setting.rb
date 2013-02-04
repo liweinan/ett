@@ -20,7 +20,6 @@ class Setting < ActiveRecord::Base
   end
 
   def self.activated?(brew_tag, action)
-    debugger
     setting = enabled_in_brew_tag?(brew_tag) ? setting_of_brew_tag(brew_tag) : Setting.system_settings
     setting.actions & action > 0
   end

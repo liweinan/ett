@@ -1,9 +1,1 @@
-<td style='font-size:10px;<%= deleted_style(package) %>'>
-<% if package.marks.size > 0 %>
-	<% package.marks.each do |mark| %>
-		<%= mark.key %> /
-	<% end %>
-<% else %>
-	-
-<% end %>
-</td>
+<%= render :partial => 'packages/index/field_template', :locals => {:package => package, :field_name => 'marks', :field_type => 'marks/marks_selection', :partial => 'packages/index/marks_col', :style => ('text-align:center;' + deleted_style(package).to_s)} %>
