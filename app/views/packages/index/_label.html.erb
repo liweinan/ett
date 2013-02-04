@@ -1,13 +1,8 @@
-<% if package.label %>
-  <td style="font-size:10px;<%= package.label.style %>">
-	<span id='pac_<%=package.id%>_label'>
-	  <%= h package.label.name %>
-	</span>
-  </td>
-<% else %>
-  <td style='font-size:10px;<%= deleted_style(package) %>'>
-	<span id='pac_<%=package.id%>_label'>
-	-
-	</span>
-  </td>
-<% end %>
+<%
+   if package.label.blank?
+     style=''
+   else
+     style= package.label.style
+   end
+%>
+<%= render :partial => 'packages/index/field_template', :locals => {:package => package, :field_name => 'label_id', :field_type => 'labels/selection_for_tag', :partial => 'packages/index/label_id_col', :style => 'text-align:center;' + style} %>

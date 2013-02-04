@@ -10,13 +10,13 @@ end
 field_name = params[:div].split('_')[2]
 
 if @package.errors.blank?
-  page.replace_html(params[:div]+'_field', :partial => "packages/index/#{col_name}_col", :locals => {:package => @package, :field_name => field_name})
+  page.replace_html(params[:div]+'_field', :partial => "packages/index/#{col_name.underscore}_col", :locals => {:package => @package, :field_name => field_name})
   page.show(params[:div]+'_field')
   page.visual_effect :highlight, params[:div]+'_field'
 else
   errors = @package.errors.full_messages
   @package = Package.find(@package.id)
-  page.replace_html(params[:div]+'_field', :partial => "packages/index/#{col_name}_col", :locals => {:package => @package, :field_name => field_name})
+  page.replace_html(params[:div]+'_field', :partial => "packages/index/#{col_name.underscore}_col", :locals => {:package => @package, :field_name => field_name})
   page.show(params[:div]+'_field')
   page.alert("#{errors}")
 end

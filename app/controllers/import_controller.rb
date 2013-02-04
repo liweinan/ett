@@ -96,12 +96,12 @@ class ImportController < ApplicationController
       @brew_tag = BrewTag.find_by_name(unescape_url(params[:brew_tag_id]))
       
       @marks = process_marks(params[:marks], @brew_tag.id)
-      @label = Label.find(params[:label_id]) unless params[:label_id].blank?
+      @label = Label.find(params[:package][:label_id]) unless params[:package][:label_id].blank?
       
       @final_package_names.each do |name|
         package = Package.new
         package.name = name.strip
-        package.label_id = params[:label_id] unless params[:label_id].blank?
+        package.label_id = params[:package][:label_id] unless params[:package][:label_id].blank?
         package.marks = @marks unless @marks.blank?
         package.brew_tag_id = @brew_tag.id
         package.created_by = current_user.id

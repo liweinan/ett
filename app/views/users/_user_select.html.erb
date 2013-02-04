@@ -1,0 +1,19 @@
+<% f||=nil %>
+
+<% if f.blank? %>
+    <%
+
+       blank_user = Label.new
+       blank_user.id = ''
+       blank_user.name = '-'
+
+       users = []
+       users << blank_user
+       users << User.find(:all, :order => 'name')
+       users = users.flatten
+
+    %>
+    <%= select_tag('package[user_id]', options_from_collection_for_select(users, :id, :name)) %>
+<% else %>
+    <%= f.select :user_id, User.find(:all, :order => 'name').map { |u| [u.name, u.id] }, {:include_blank => " - "} %>
+<% end %>

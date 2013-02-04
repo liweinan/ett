@@ -1,7 +1,1 @@
-<td style='font-size:10px;<%= deleted_style(package) %>'>
-  <% if !package.user_id.blank? %>
-      <%= h package.user.name %>
-  <% else %>
-      -
-  <% end %>
-</td>
+<%= render :partial => 'packages/index/field_template', :locals => {:package => package, :field_name => 'user_id', :field_type => 'users/user_select', :partial => 'packages/index/user_id_col', :style=>deleted_style(package)} %>
