@@ -157,7 +157,9 @@
                                 Element.show('inline_editor_indicator');
                             },
                             onSuccess:function (response) {
-                                Element.hide('inline_editor_indicator');
+                                document.getElementById('inline_editor_indicator').innerHTML = 'Inline editor enabled.';
+                                new Effect.Highlight('inline_editor_indicator', { duration: 1 });
+                                new Effect.Fade('inline_editor_indicator',  { duration: 1 });
                             },
                             parameters:{
                                 'ids':pacBtns.toString(),
