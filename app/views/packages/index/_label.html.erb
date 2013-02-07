@@ -1,13 +1,8 @@
 <%
    color ||= 'yes'
-   if color == 'no'
-     style=''
-   else
-     if package.label.blank?
-       style=''
-     else
-       style= package.label.style
-     end
+   style ||= ''
+   if !package.label.blank? && !package.label.style.blank?
+     style = package.label.style
    end
 %>
 <%= render :partial => 'packages/index/field_template', :locals => {:package => package, :field_name => 'label_id', :field_type => 'labels/selection_for_tag', :partial => 'packages/index/label_id_col', :style => 'text-align:center;' + style} %>

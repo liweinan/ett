@@ -37,6 +37,7 @@ class Package < ActiveRecord::Base
 
   default_value_for :time_consumed, 0
   default_value_for :time_point, 0
+  default_value_for :label_changed_at, Time.now
 
   def self.per_page
     10

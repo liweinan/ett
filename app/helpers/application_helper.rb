@@ -44,4 +44,8 @@ module ApplicationHelper
     end
   end
 
+  def display_track_time_in_real_time(time_consumed, time_to_add=0)
+    display_track_time(time_consumed + time_to_add)
+  end
+
 end

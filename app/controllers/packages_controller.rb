@@ -144,7 +144,6 @@ class PackagesController < ApplicationController
 
               last_label_changed_at ||= @package.label_changed_at
               @tt.time_consumed ||= 0
-
               @tt.time_consumed += (@package.label_changed_at.to_i - last_label_changed_at.to_i)/60
               @tt.save
             end

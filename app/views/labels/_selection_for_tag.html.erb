@@ -2,8 +2,10 @@
 <% form ||= nil %>
 <%
    tag_id = -1
-   unless package.blank?
+   if !package.blank?
      tag_id = package.brew_tag.id
+   elsif !params[:brew_tag_id].blank?
+     tag_id = BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).id
    end
 
    blank_label = Label.new
@@ -16,7 +18,7 @@
    labels = labels.flatten
 %>
 <% if form.blank? %>
-    <% if package.blank? || package.label.blank?%>
+    <% if package.blank? || package.label.blank? %>
         <%= select_tag('package[label_id]', options_from_collection_for_select(labels, :id, :name)) %>
     <% else %>
         <%= select_tag('package[label_id]', options_from_collection_for_select(labels, :id, :name, package.label.id)) %>

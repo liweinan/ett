@@ -7,6 +7,7 @@ class Label < ActiveRecord::Base
   default_value_for :global, 'N'
   default_value_for :can_select, 'Yes'
   default_value_for :can_show, 'Yes'
+  default_value_for :style, ''
 
   def is_global?
     self.global == 'Y'

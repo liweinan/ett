@@ -2,11 +2,44 @@
 <% auto_track_times=TrackTime.all(:conditions => "package_id = #{@package.id}", :order => "label_id") %>
 AUTOMATIC TIME TRACK-
 <% auto_track_times.each do |tt| %>
-    <span style="<%= default_style(tt.label.style) %>">&nbsp;</span> <%= tt.label.name %>: <%= display_track_time(tt.time_consumed) %>
+    <%
+       time_to_add = 0
+       if (@package.label.id == tt.label.id) && !@package.label_changed_at.blank?
+         time_to_add = (Time.now.to_i - @package.label_changed_at.to_i)/60
+       end
+    %>
+    <%= render :partial => 'packages/fields/auto_track_time_display', :locals => {:label => tt.label, :time_consumed => tt.time_consumed, :time_to_add => time_to_add} %>
 <% end %>
+
+<% unless @package.label.blank? %>
+    <%
+       label_ids = []
+       auto_track_times.each do |tt|
+         label_ids << tt.label.id
+       end
+
+       current_label_id = @package.label.id
+    %>
+    <% if !label_ids.include?(current_label_id) %>
+        <% time_to_add = 0 %>
+        <% if @package.label_changed_at.blank? %>
+            <% time_to_add = (Time.now.to_i - @package.created_at.to_i)/60 %>
+        <% else %>
+            <% time_to_add = (Time.now.to_i - @package.label_changed_at.to_i)/60 %>
+        <% end %>
+        <%= render :partial => 'packages/fields/auto_track_time_display', :locals => {:label => @package.label, :time_consumed => 0, :time_to_add => time_to_add} %>
+    <% end %>
+<% end %>
+
 <%= render :partial => 'layouts/sep_tiny' %>
-MANUAL TIME TRACK- <span id="manual_tracked_time"><%= display_track_time(@package.time_consumed) %></span>
+MANUAL TIME TRACK-
+<span id="manual_tracked_time">
+  <% if @package.time_point == 0 %>
+      <%= display_track_time(@package.time_consumed) %>
+  <% else %>
+  <%= display_track_time_in_real_time(@package.time_consumed, (Time.now.to_i - @package.time_point.to_i)/60) %>
+  <% end %>
+</span>
 <%= render :partial => 'layouts/sep_tiny' %>
 <span id="manual_time_track_component">&nbsp;</span> <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'manual_time_track_component_indicator'} %>
 <%= render :partial => 'layouts/sep' %>
-
