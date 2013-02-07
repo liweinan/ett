@@ -1,6 +1,9 @@
 <% content_for :js do %>
     <script type="text/javascript">
-        function startProgress(pac_id) {
+        function startProgress(pac_id, style, div) {
+            style = typeof style !== 'undefined' ? style : 'default';
+            div = typeof div !== 'undefined' ? div : 'default';
+
             new Ajax.Request("/packages/start_progress/" + pac_id,
                     {
                         asynchronous:true,
@@ -13,11 +16,15 @@
                             new Effect.Highlight('manual_time_track_component');
                         },
                         parameters:{
+                            'style' : style,
+                            'div' : div,
                             'authenticity_token':'<%=form_authenticity_token%>'}
                     });
         }
 
-        function stopProgress(pac_id) {
+        function stopProgress(pac_id, style, div) {
+            style = typeof style !== 'undefined' ? style : 'default';
+            div = typeof div !== 'undefined' ? div : 'default';
             new Ajax.Request("/packages/stop_progress/" + pac_id,
                     {
                         asynchronous:true,
@@ -31,19 +38,11 @@
                             new Effect.Highlight('manual_tracked_time');
                         },
                         parameters:{
+                            'style': style,
+                            'div' : div,
                             'authenticity_token':'<%=form_authenticity_token%>'}
                     });
         }
 
-        Event.observe(window, 'load', function () {
-            new Ajax.Request('/toolbox/get_manual_time_track_component',
-                    {
-                        asynchronous:true,
-                        evalScripts:true,
-                        parameters:{
-                            'pac_id':'<%=@package.id%>',
-                            'authenticity_token':'<%=form_authenticity_token%>'}
-                    });
-        });
     </script>
 <% end %>

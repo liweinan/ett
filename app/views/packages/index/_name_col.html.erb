@@ -1,3 +1,9 @@
+<% @show_progress ||= false %>
+
+<% if @show_progress %>
+    <span id="manual_time_track_component_<%= package.id %>_btn"></span>
+<% end %>
+
 <% if params[:user] %>
     <%= link_to "#{package.name}", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :brew_tag_id => escape_url(package.brew_tag.name), :user => params[:user] %>
 <% else %>

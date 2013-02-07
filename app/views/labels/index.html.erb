@@ -13,12 +13,12 @@
       <th>Tag</th>
       <th>Can Show</th>
       <th>Can Select</th>
+      <th>Track Time</th>
       <th>CSS Style</th>
       <% if can_manage? %>
           <th>Operation</th>
       <% end %>
     </tr>
-
     <% @labels.each do |label| %>
         <tr>
           <td><%= label.id %></td>
@@ -36,6 +36,10 @@
           <td>
             <%= label.can_select %>
           </td>
+          <td>
+            <%= label.is_track_time %>
+          </td>
+
           <td style="<%= label.style %>">
             Example
           </td>

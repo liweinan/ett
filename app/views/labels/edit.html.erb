@@ -12,6 +12,7 @@
         <%= render :partial => 'labels/fields/style', :locals => {:f => f} %>
         <%= render :partial => 'labels/fields/can_show', :locals => {:f => f} %>
         <%= render :partial => 'labels/fields/can_select', :locals => {:f => f} %>
+        <%= render :partial => 'labels/fields/is_track_time', :locals => {:f => f} %>
         <% unless is_global?(@label) %>
             <%= render :partial => 'labels/fields/brew_tag', :locals => {:f => f} %>
         <% end %>

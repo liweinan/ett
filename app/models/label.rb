@@ -7,10 +7,22 @@ class Label < ActiveRecord::Base
   default_value_for :global, 'N'
   default_value_for :can_select, 'Yes'
   default_value_for :can_show, 'Yes'
+  default_value_for :is_track_time, 'Yes'
   default_value_for :style, ''
 
   def is_global?
     self.global == 'Y'
+  end
+
+  def is_time_tracked?
+    return is_track_time?
+  end
+
+  def is_track_time?
+    if is_track_time.blank?
+      return false
+    end
+    return is_track_time == 'Yes'
   end
 
   def can_show?

@@ -1,1 +1,2 @@
-<span style="color: #228b22;">WORKING IN PROGRESS-</span>  <a href="javascript:void(0);" onclick="stopProgress(<%=package.id%>);"><span style="color:#dc143c;">[STOP PROGRESS]</span></a>
+<% style ||= '' %>
+<a href="javascript:void(0);" onclick="stopProgress(<%=package.id%>);<%=style%>">[STOP MANUAL TIME TRACKING]</a>

@@ -66,6 +66,10 @@ class Package < ActiveRecord::Base
     end
   end
 
+  def in_progress?
+    return !time_point.blank? && time_point > 0
+  end
+
   def set_deleted
     self.label = Label.deleted_label
     self.save

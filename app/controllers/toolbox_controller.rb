@@ -23,4 +23,11 @@ class ToolboxController < ApplicationController
       format.js
     end
   end
+
+  def get_manual_time_track_components
+    respond_to do |format|
+      format.js
+    end
+  end
+
 end

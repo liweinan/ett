@@ -136,7 +136,7 @@ class PackagesController < ApplicationController
           if Label.find_by_id(params[:package][:label_id].to_i) != last_label
             @package.label_changed_at = Time.now
 
-            unless last_label.blank?
+            if !last_label.blank? && last_label.is_time_tracked?
               @tt = TrackTime.all(:conditions => ["package_id=? and label_id=?", @package.id, last_label.id])[0]
               @tt = TrackTime.new if @tt.blank?
               @tt.package_id=@package.id

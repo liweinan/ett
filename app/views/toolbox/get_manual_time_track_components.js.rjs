@@ -1,0 +1,18 @@
+btns = params[:ids].split(',')
+btns.each do |btn|
+  package = Package.find(btn.split('_')[4].to_i)
+  if logged_in? && (can_manage? || can_edit_package?(package))
+    if package.in_progress?
+      page.replace_html btn, :partial => 'packages/fields/bar_stop_progress', :locals => {:package => package, :div => btn}
+    else
+      page.replace_html btn, :partial => 'packages/fields/bar_start_progress', :locals => {:package => package, :div => btn}
+    end
+  else
+    if package.in_progress?
+      page.replace_html btn, '<span style="background-color:#91f59e;">&nbsp;</span>'
+    else
+      page.replace_html btn, '<span style="background-color:#db4e56;">&nbsp;</span>'
+    end
+  end
+end
+
