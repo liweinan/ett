@@ -178,37 +178,48 @@
                         });
             }
 
-            function getTimeTrackingComponents() {
-                var comps = document.getElementsByRegex('^manual_time_track_component_.*btn');
-                new Ajax.Request('/toolbox/get_manual_time_track_components',
-                        {
-                            asynchronous:true,
-                            evalScripts:true,
-                            parameters:{
-                                'ids':comps.toString(),
-                                'authenticity_token':'<%=form_authenticity_token%>'}
-                        });
-            }
-
             Event.observe(window, 'load', function () {
-                getTimeTrackingComponents();
                 Element.show('inline_editor_switch');
             });
         </script>
 
-        <%= render :partial => 'time_tracking_js' %>
+
     <% end %>
 <% else %>
+    <% content_for :js do %>
+        <script type="text/javascript">
+            function show_pac_editor(div, pac_id, field_name, field_type, is_xattr) {
+            }
+            function hide_pac_editor(div, field_type, is_xattr) {
+            }
+            function show_pac_btn(div, field_type, is_xattr) {
+            }
+            function hide_pac_btn(div, field_type, is_xattr) {
+            }
+            function build_pac_btn_id(div, field_type, is_xattr) {
+            }
+        </script>
+    <% end %>
+<% end %>
+
+<% content_for :js do %>
     <script type="text/javascript">
-        function show_pac_editor(div, pac_id, field_name, field_type, is_xattr) {
+        function getTimeTrackingComponents() {
+            var comps = document.getElementsByRegex('^manual_time_track_component_.*btn');
+            new Ajax.Request('/toolbox/get_manual_time_track_components',
+                    {
+                        asynchronous:true,
+                        evalScripts:true,
+                        parameters:{
+                            'ids':comps.toString(),
+                            'authenticity_token':'<%=form_authenticity_token%>'}
+                    });
         }
-        function hide_pac_editor(div, field_type, is_xattr) {
-        }
-        function show_pac_btn(div, field_type, is_xattr) {
-        }
-        function hide_pac_btn(div, field_type, is_xattr) {
-        }
-        function build_pac_btn_id(div, field_type, is_xattr) {
-        }
+
+        Event.observe(window, 'load', function () {
+            getTimeTrackingComponents();
+        });
     </script>
+
+    <%= render :partial => 'time_tracking_js' %>
 <% end %>
