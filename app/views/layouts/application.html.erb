@@ -11,7 +11,7 @@
   <%= stylesheet_link_tag '/javascripts/syntaxHighlighter/styles/shThemeDefault.css' %>
 </head>
 <body>
-<%= image_tag 'confidential.jpg' %>
+<%# image_tag 'confidential.jpg' %>
 <%= render :partial => 'layouts/sep_tiny' %>
 <h1>EAP Build Tracking Tool (ETT)</h1>
 <%= render :partial => 'layouts/line' %>
@@ -32,6 +32,7 @@
 <%= render :partial => 'layouts/sep' %>
 
 <%= javascript_include_tag :defaults %>
+<%= render :partial => 'layouts/regexp' %>
 <%= yield :js %>
 <%= javascript_include_tag 'syntaxHighlighter/scripts/shCore.js' %>
 <%= javascript_include_tag 'syntaxHighlighter/scripts/shBrushJava.js' %>

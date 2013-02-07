@@ -1,19 +1,18 @@
 <% unless session[:cloned_packages].blank? %>
-Cloned Packages:
-<% session[:cloned_packages].each do |pack| %>
-<%= pack %> /
-<% end %>
-<% session[:cloned_packages] = nil %>
+    Cloned Packages:
+    <% session[:cloned_packages].each do |pack| %>
+        <%= pack %> /
+    <% end %>
+    <% session[:cloned_packages] = nil %>
 <% end %>
 <%= render :partial => 'layouts/sep' %>
 <% unless session[:not_cloned_packages].blank? %>
-Not Cloned Packages:
-<% session[:not_cloned_packages].keys.each do |key| %>
-<%= key %><%#session[:clone_reports][key]%> /
+    Not Cloned Packages:
+    <% session[:not_cloned_packages].keys.each do |key| %>
+        <%= key %><%#session[:clone_reports][key]%> /
+    <% end %>
+    <% session[:not_cloned_packages] = nil %>
 <% end %>
-<% session[:not_cloned_packages] = nil %>
-<% end %>
-
 
 <% cache :action => 'index', :id => "#{params[:brew_tag_id]}#{params[:label]}#{params[:mark]}#{params[:user]}#{current_user_email}" do %>
     <% if has_tag? %>
@@ -57,115 +56,143 @@ Not Cloned Packages:
         <% end %>
     <% end %>
 
+    <%= render :partial => 'layouts/sep' %>
+    <span id="inline_editor_switch" style="display:none;">
+      <a href="javascript:void(0);" onclick="getPacBtns();">
+        [ENABLE INLINE EDITOR]
+      </a>
+    </span>
+    <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "inline_editor_indicator"} %>
+
+
     <div class='manage-tbl'>
-      <%= render :partial=>'layouts/sep' %>
+      <%= render :partial => 'layouts/sep' %>
       <table>
-        <tr>
-          <th class='content-list-head'>Name</th>
-          <th class='content-list-head'>Label</th>
-          <th class='content-list-head'>Marks</th>
-          <th class='content-list-head'>Assignee</th>
-
-          <% get_xattrs(@brew_tag, true, false) do |attr| %>
-              <th class='content-list-head'><%= attr.camelcase %></th>
-          <% end %>
-
-          <% if logged_in? %>
-              <th class='content-list-head'>
-                Operations
-              </th>
-          <% end %>
-        </tr>
+        <%= render :partial => 'packages/index/header', :locals => {:col => 'th'} %>
         <% @packages.each_with_index do |package, i| %>
             <% if i % 25 == 0 && i > 0 %>
-                <tr>
-                  <td class='content-list-head'>Name</td>
-                  <td class='content-list-head'>Label</td>
-                  <td class='content-list-head'>Marks</td>
-                  <td class='content-list-head'>Assignee</td>
-
-                  <% get_xattrs(@brew_tag, true, false) do |attr| %>
-                      <td class='content-list-head'><%= attr.camelcase %></td>
-                  <% end %>
-
-
-                  <% if logged_in? %>
-                      <td class='content-list-head'>
-                        Operations
-                      </td>
-                  <% end %>
-                </tr>
+                <%= render :partial => 'packages/index/header', :locals => {:col => 'td'} %>
             <% end %>
             <tr>
-              <td style='font-size:10px;text-align:left;<%= deleted_style(package) %>'>
-                <% if params[:user] %>
-                    <%= link_to "#{package.name}", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :brew_tag_id => escape_url(package.brew_tag.name), :user => params[:user] %>
-                <% else %>
-                    <%= link_to "#{package.name}", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :brew_tag_id => escape_url(package.brew_tag.name) %>
-                <% end %>
-              </td>
-
-
-              <% if package.label %>
-                  <td style="font-size:10px;<%= package.label.style %>">
-                    <%= h package.label.name %>
-                  </td>
-              <% else %>
-                  <td style='font-size:10px;<%= deleted_style(package) %>'>
-                    -
-                  </td>
-              <% end %>
-
-              <td style='font-size:10px;<%= deleted_style(package) %>'>
-                <% if package.marks.size > 0 %>
-                    <% package.marks.each do |mark| %>
-                        <%= mark.key %> /
-                    <% end %>
-                <% else %>
-                    -
-                <% end %>
-              </td>
-
-              <td style='font-size:10px;<%= deleted_style(package) %>'>
-                <% if !package.user_id.blank? %>
-                    <%= h package.user.name %>
-                <% else %>
-                    -
-                <% end %>
-              </td>
-
-              <% get_xattrs(@brew_tag, true, false) do |attr| %>
-                  <td style='font-size:10px;<%= deleted_style(package) %>'>
-                    <% if package.read_attribute(attr).blank? %>
-                        -
-                    <% else %>
-                        <%= Extractor.extract_url(package.read_attribute(attr)) %>
-                    <% end %>
-                  </td>
-              <% end %>
-
-              <% if logged_in? %>
-                  <td style='font-size:10px;'>
-                    <% unless package.deleted? %>
-                        <% if can_manage? %>
-                            <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(package.name), :brew_tag_id => escape_url(package.brew_tag.name) %>
-                            /
-                            <%= link_to 'Delete', package, :confirm => "Are you sure to delete #{escape_url(package.name)}?", :method => :delete %>
-                            /
-                        <% elsif package.user_id == nil %>
-                            <%= link_to 'Take', :controller => 'actions', :action => 'take', :id => escape_url(package.name), :brew_tag_id => escape_url(package.brew_tag.name) %>
-                            /
-                        <% end %>
-                    <% end %>
-
-                    <% if can_edit_package? package %>
-                        <%= link_to 'Edit', :controller => 'packages', :action => 'edit', :id => escape_url(package.name), :brew_tag_id => escape_url(package.brew_tag.name) %>
-                    <% end %>
-
-                  </td>
-              <% end %>
+              <%= render :partial => 'packages/index/name', :locals => {:package => package} %>
+              <%= render :partial => 'packages/index/label', :locals => {:package => package} %>
+              <%= render :partial => 'packages/index/mark', :locals => {:package => package} %>
+              <%= render :partial => 'packages/index/user', :locals => {:package => package} %>
+              <%= render :partial => 'packages/index/xattr', :locals => {:package => package} %>
+              <%= render :partial => 'packages/index/ops', :locals => {:package => package} %>
             </tr>
         <% end %>
       </table>
     </div>
+
+<% end %>
+<%= render :partial => 'layouts/sep' %>
+
+
+<% if logged_in? %>
+    <!--The following codes are all for inline editors-->
+    <% content_for :js do %>
+        <script type="text/javascript">
+            function show_pac_editor(div, pac_id, field_name, field_type, is_xattr) {
+                Element.hide(div + '_field');
+                Element.hide(build_pac_btn_id(div, field_type, is_xattr));
+                new Ajax.Request('/toolbox/get_pac_form',
+                        {
+                            asynchronous:true,
+                            evalScripts:true,
+                            onLoading:function (request) {
+                                Element.show(div + '_indicator');
+                            },
+                            onSuccess:function (response) {
+                                Element.hide(div + '_indicator');
+                            },
+                            parameters:{
+                                'form_id':div + '_editor',
+                                'pac_id':pac_id,
+                                'field_name':field_name,
+                                'field_type':field_type,
+                                'is_xattr':is_xattr,
+                                'authenticity_token':'<%=form_authenticity_token%>'}
+                        });
+                Element.show(div + '_editor');
+                Element.setStyle(div + '_td', {'text-decoration':'none', 'background':'none'});
+                document.getElementById(div + "_switch").innerHTML = 'off';
+            }
+
+            function hide_pac_editor(div, field_type, is_xattr) {
+                Element.show(div + '_field');
+                Element.show(build_pac_btn_id(div, field_type, is_xattr));
+                Element.hide(div + '_editor');
+                document.getElementById(div + "_switch").innerHTML = 'on';
+            }
+
+            function show_pac_btn(div, field_type, is_xattr) {
+                if (document.getElementById(div + "_switch").innerHTML == 'on')
+                    Element.show(build_pac_btn_id(div, field_type, is_xattr));
+            }
+
+            function hide_pac_btn(div, field_type, is_xattr) {
+                if (document.getElementById(div + "_switch").innerHTML == 'on')
+                    Element.hide(build_pac_btn_id(div, field_type, is_xattr));
+            }
+
+            function build_pac_btn_id(div, field_type, is_xattr) {
+                return div + '_-' + field_type + '-' + is_xattr + '-_btn';
+            }
+
+            function getPacBtns() {
+                // get the [EDIT] link, and inject each editable columns
+                var pacBtns = document.getElementsByRegex('^pac.*btn');
+
+                // inject [EDIT] link switch
+                var pacBtnSwitches = document.getElementsByRegex('^pac.*switch');
+                new Ajax.Request('/toolbox/get_initial_pac_btn_switch',
+                        {
+                            asynchronous:true,
+                            evalScripts:true,
+                            onLoading:function (request) {
+                                document.getElementById('inline_editor_switch').innerHTML = "LOADING INLINE EDITOR...";
+                                Element.show('inline_editor_indicator');
+                            },
+                            parameters:{
+                                'ids':pacBtnSwitches.toString(),
+                                'authenticity_token':'<%=form_authenticity_token%>'}
+                        });
+
+                new Ajax.Request('/toolbox/get_pac_btns',
+                        {
+                            asynchronous:true,
+                            evalScripts:true,
+                            onSuccess:function (response) {
+                                Element.hide('inline_editor_indicator');
+                                document.getElementById('inline_editor_switch').innerHTML = '<span style="color:#228b22;">[INLINE EDITOR ENABLED]</span>';
+                                new Effect.Highlight('inline_editor_switch', { duration:1 });
+
+                            },
+                            parameters:{
+                                'ids':pacBtns.toString(),
+                                'authenticity_token':'<%=form_authenticity_token%>'}
+                        });
+            }
+
+
+            Event.observe(window, 'load', function () {
+                Element.show('inline_editor_switch');
+            });
+
+        </script>
+    <% end %>
+<% else %>
+    <script type="text/javascript">
+        function show_pac_editor(div, pac_id, field_name, field_type, is_xattr) {
+        }
+        function hide_pac_editor(div, field_type, is_xattr) {
+        }
+        function show_pac_btn(div, field_type, is_xattr) {
+        }
+        function hide_pac_btn(div, field_type, is_xattr) {
+        }
+        function build_pac_btn_id(div, field_type, is_xattr) {
+        }
+    </script>
 <% end %>

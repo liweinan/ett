@@ -1,0 +1,81 @@
+<script language="javascript">
+    // Called as: document.getElementsByRegex("pattern").
+    // Returns an array of all elements matching a given regular expression on id.
+    // 'pattern' argument is a regular expression string.
+    //
+    document['getElementsByRegex'] = function (pattern, div) {
+        if (div == undefined) {
+            div = document;
+        }
+
+        var arrElements = [];   // to accumulate matching elements
+        var re = new RegExp(pattern);   // the regex to match with
+
+        function findRecursively(aNode) { // recursive function to traverse DOM
+            if (!aNode)
+                return;
+            if (aNode.id !== undefined && isFunction(aNode.id.search) && aNode.id.search(re) != -1)
+                arrElements.push(aNode.id.toString());  // FOUND ONE!
+            for (var idx in aNode.childNodes) // search children...
+                findRecursively(aNode.childNodes[idx]);
+        }
+
+        ;
+
+        findRecursively(div); // initiate recursive matching
+        return arrElements; // return matching elements
+    };
+
+
+    document['getObjectsByRegex'] = function (clazz, div) {
+        if (div == undefined) {
+            div = document;
+        }
+
+        var arrElements = [];   // to accumulate matching elements
+
+        function findRecursively(aNode) { // recursive function to traverse DOM
+            if (!aNode)
+                return;
+            if (aNode.id !== undefined && aNode instanceof clazz) {
+                arrElements.push(aNode);  // FOUND ONE!
+            }
+            for (var idx in aNode.childNodes) // search children...
+                findRecursively(aNode.childNodes[idx]);
+        }
+
+        ;
+
+        findRecursively(div); // initiate recursive matching
+        return arrElements; // return matching elements
+    };
+
+    document['getTagsByName'] = function (name, div) {
+        if (div == undefined) {
+            div = document;
+        }
+
+        var arrElements = [];   // to accumulate matching elements
+
+        function findRecursively(aNode) { // recursive function to traverse DOM
+            if (!aNode)
+                return;
+            if (aNode.id !== undefined && aNode.tagName == name.toUpperCase()) {
+                arrElements.push(aNode);  // FOUND ONE!
+            }
+            for (var idx in aNode.childNodes) // search children...
+                findRecursively(aNode.childNodes[idx]);
+        }
+
+        ;
+
+        findRecursively(div); // initiate recursive matching
+        return arrElements; // return matching elements
+    };
+
+    function isFunction(functionToCheck) {
+        var getType = {};
+        return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
+    }
+
+</script>

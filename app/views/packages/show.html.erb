@@ -20,6 +20,7 @@ Assignee:
 
 <% unless @package.label.blank? %>
     Label:
+    <span style="<%= default_style(@package.label.style) %>">&nbsp;</span>
     <%= h @package.label.name %>
     <%= render :partial => 'layouts/sep_tiny' %>
 <% end %>
@@ -38,14 +39,8 @@ Assignee:
     <% end %>
 <% end %>
 
-<%= render :partial => 'layouts/sep_tiny' %>
-Time Consumed:
+<%= render :partial => 'packages/fields/track_time' %>
 
-<% TrackTime.all(:conditions => "package_id = #{@package.id}", :order => "label_id").each do |tt| %>
-    <%= tt.label.name %>: <%= tt.time_consumed / 60 %> min  /
-<% end %>
-
-<%= render :partial => 'layouts/sep' %>
 <% if can_edit_package? @package %>
     <%= link_to 'Edit', :controller => 'packages', :action => 'edit', :id => escape_url(@package.name) %>
 <% end %>
@@ -74,4 +69,4 @@ Time Consumed:
     <%= render :partial => "comments/new" %>
 <% end %>
 
-<%# link_to 'Back', :controller => 'packages', :action => 'index', :brew_tag_id => params[:brew_tag_id] %>
+<%= render :partial => 'time_tracking_js' %>

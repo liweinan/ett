@@ -1,7 +1,7 @@
 class PackagesController < ApplicationController
 #  helper :sparklines
   before_filter :check_tag, :only => [:new, :edit]
-  before_filter :check_tag_or_user, :only => [:index, :export_to_csv]
+  before_filter :check_tag_or_user, :only => [:export_to_csv]
   before_filter :user_view_index, :only => [:index]
   before_filter :check_can_manage, :only => [:destroy]
   before_filter :clone_form_validation, :only => :clone
@@ -9,11 +9,19 @@ class PackagesController < ApplicationController
   # GET /packages
   # GET /packages.xml
   def index
-
-    @packages = get_packages(unescape_url(params[:brew_tag_id]), unescape_url(params[:mark]), unescape_url(params[:label]), unescape_url(params[:user]))
+    unless params[:brew_tag_id].blank?
+      @packages = get_packages(unescape_url(params[:brew_tag_id]), unescape_url(params[:mark]), unescape_url(params[:label]), unescape_url(params[:user]))
+    end
 
     respond_to do |format|
-      format.html
+      params[:style] ||= nil
+      format.html {
+        if !params[:style].blank?
+          render params[:style], :layout => params[:style]
+        elsif params[:brew_tag_id].blank?
+          render 'layouts/welcome'
+        end
+      }
     end
   end
 
@@ -93,13 +101,16 @@ class PackagesController < ApplicationController
   # PUT /packages/1
   # PUT /packages/1.xml
   def update
-    expire_all_fragments
 
     # for Changelog.package_updated
     @orig_package = Package.find(params[:id])
     @orig_marks = @orig_package.marks.clone
 
     @package = Package.find(params[:id])
+
+    params[:package] ||= Hash.new
+    params[:package][:id] = @package.id
+
 
     if @package.created_by.blank?
       params[:package][:created_by] = current_user.id
@@ -118,13 +129,14 @@ class PackagesController < ApplicationController
       Package.transaction do
         if @package.update_attributes(params[:package])
 
-          @package.marks = process_marks(params[:marks], params[:package][:brew_tag_id])
+          @package.reload
+          @package.marks = process_marks(params[:marks], @package.brew_tag_id)
 
           # label changed
           if Label.find_by_id(params[:package][:label_id].to_i) != last_label
             @package.label_changed_at = Time.now
 
-            if !last_label.blank? && last_label.is_track_time == 'Yes'
+            unless last_label.blank?
               @tt = TrackTime.all(:conditions => ["package_id=? and label_id=?", @package.id, last_label.id])[0]
               @tt = TrackTime.new if @tt.blank?
               @tt.package_id=@package.id
@@ -133,7 +145,7 @@ class PackagesController < ApplicationController
               last_label_changed_at ||= @package.label_changed_at
               @tt.time_consumed ||= 0
 
-              @tt.time_consumed += @package.label_changed_at.to_i - last_label_changed_at.to_i
+              @tt.time_consumed += (@package.label_changed_at.to_i - last_label_changed_at.to_i)/60
               @tt.save
             end
           end
@@ -149,24 +161,40 @@ class PackagesController < ApplicationController
 
           flash[:notice] = 'Package was successfully updated.'
 
-          url = params[:request_path].sub(/\/edit$/, '')
+          if  Rails.env.production?
+            ### TODO HACK HACK! this should be fixed, ajax update call in list page should also be able to send notification!
+            unless params[:request_path].blank?
+              url = params[:request_path].sub(/\/edit$/, '')
 
-          if Setting.activated?(@package.brew_tag, Setting::ACTIONS[:updated])
-            Notify::Package.update(current_user, url, @package, Setting.all_recipients_of_package(@package, current_user, :edit))
+              if Setting.activated?(@package.brew_tag, Setting::ACTIONS[:updated])
+                Notify::Package.update(current_user, url, @package, Setting.all_recipients_of_package(@package, current_user, :edit))
+              end
+
+              unless params[:div_package_edit_notification_area].blank?
+                Notify::Package.update(current_user, url, @package, params[:div_package_edit_notification_area])
+              end
+            end
           end
 
-          unless params[:div_package_edit_notification_area].blank?
-            Notify::Package.update(current_user, url, @package, params[:div_package_edit_notification_area])
-          end
-
-          format.html { redirect_to(:controller => :packages, :action => :show, :id => escape_url(@package.name), :brew_tag_id => escape_url(@package.brew_tag.name), :user => params[:user]) }
+          @output = true
         else
           unless @package.errors[:name].blank?
             @error_message = "Package #{@package.name} already exists. Here's the <a href='/brew_tags/#{escape_url(@package.brew_tag.name)}/packages/#{unescape_url(@package.name)}' target='_blank'>link</a>."
           end
           @user = params[:user]
-          format.html { render :action => :edit }
+          @output = false
+
         end
+      end
+
+
+      if @output == true
+        expire_all_fragments
+        format.html { redirect_to(:controller => :packages, :action => :show, :id => escape_url(@package.name), :brew_tag_id => escape_url(@package.brew_tag.name), :user => params[:user]) }
+        format.js
+      else
+        format.html { render :action => :edit }
+        format.js
       end
     end
   end
@@ -311,6 +339,27 @@ class PackagesController < ApplicationController
               :disposition => "attachment; filename=packages_#{Time.now.to_i}.csv"
   end
 
+  def start_progress
+    @package = Package.find(params[:id])
+    @package.time_point = Time.now.to_i
+    @package.save
+    respond_to do |format|
+      format.js
+    end
+  end
+
+
+  def stop_progress
+    @package = Package.find(params[:id])
+
+    @package.time_consumed += ((Time.now.to_i - @package.time_point) / 60)
+    @package.time_point = 0
+    @package.save
+
+    respond_to do |format|
+      format.js
+    end
+  end
 
   protected
 

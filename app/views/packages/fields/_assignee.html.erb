@@ -3,7 +3,7 @@
     Assignee
   </td>
   <td style="text-align:left;">
-    <%= f.select :user_id, User.find(:all, :order => 'name').map { |u| [u.name, u.id] }, {:include_blank => " - "} %>
+    <%= render :partial => 'users/user_select', :locals => {:f => f} %>
     <%= render :partial => 'sync', :locals => {:key => 'assignee'} %>
   </td>
 </tr>

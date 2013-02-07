@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121221094737) do
+ActiveRecord::Schema.define(:version => 20130206164254) do
 
   create_table "assignments", :force => true do |t|
     t.integer  "mark_id"
@@ -129,6 +129,9 @@ ActiveRecord::Schema.define(:version => 20121221094737) do
     t.integer  "updated_by"
     t.datetime "label_changed_at"
     t.string   "external_scm"
+    t.string   "mead"
+    t.integer  "time_consumed"
+    t.integer  "time_point"
   end
 
   create_table "relationships", :force => true do |t|

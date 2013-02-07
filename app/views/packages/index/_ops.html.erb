@@ -1,0 +1,21 @@
+<% if logged_in? %>
+    <td style='font-size:10px;'>
+      <% unless package.deleted? %>
+          <% if can_manage? %>
+              <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(package.name), :brew_tag_id => escape_url(package.brew_tag.name) %>
+              /
+              <%= link_to 'Delete', package, :confirm => "Are you sure to delete #{escape_url(package.name)}?", :method => :delete %>
+              /
+          <% elsif package.user_id == nil %>
+              <%= link_to 'Take', :controller => 'actions', :action => 'take', :id => escape_url(package.name), :brew_tag_id => escape_url(package.brew_tag.name) %>
+              /
+          <% end %>
+      <% end %>
+
+      <% if can_edit_package?(package) %>
+          <%= link_to 'Edit', :controller => 'packages', :action => 'edit', :id => escape_url(package.name), :brew_tag_id => escape_url(package.brew_tag.name) %>
+      <% end %>
+
+    </td>
+<% end %>
+

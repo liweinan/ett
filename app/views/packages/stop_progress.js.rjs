@@ -1,0 +1,2 @@
+page.replace_html 'manual_time_track_component', :partial => '/packages/fields/start_progress', :locals => {:package => @package}
+page.replace_html 'manual_tracked_time', display_track_time(@package.time_consumed)

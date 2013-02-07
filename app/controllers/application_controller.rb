@@ -3,12 +3,12 @@
 class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
-  helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_tag?, :count_packages, :can_edit_package?, :current_user, :get_brew_tag, :has_label?, :has_mark?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :brew_tag_has_marks?, :get_xattrs, :background_style, :confirmed?
+  helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_tag?, :count_packages, :can_edit_package?, :current_user, :get_brew_tag, :has_label?, :has_mark?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :brew_tag_has_marks?, :get_xattrs, :background_style, :confirmed?, :default_style
   helper_method :btag, :ebtag, :uebtag
   before_filter :process_brew_tag_id
   before_filter :save_current_link
-  # Scrub sensitive parameters from your log
-	# filter_parameter_logging :password
+              # Scrub sensitive parameters from your log
+              # filter_parameter_logging :password
   def get_brew_tag(name)
     BrewTag.find_by_name(unescape_url(name))
   end
@@ -306,20 +306,20 @@ class ApplicationController < ActionController::Base
   end
 
   def home_page
-    unless has_tag?
-      unless Setting.system_settings.default_tag.blank?
-        default_tag = BrewTag.find_by_name(Setting.system_settings.default_tag)
-        unless default_tag.blank?
-          params[:brew_tag_id] = escape_url(default_tag.name)
-        else
-          params[:brew_tag_id] = escape_url(BrewTag.find(:first, :order => 'updated_at DESC').name)
-        end
-      else
-        params[:brew_tag_id] = escape_url(BrewTag.find(:first, :order => 'updated_at DESC').name)
-      end
-    end
+    #unless has_tag?
+    #  unless Setting.system_settings.default_tag.blank?
+    #    default_tag = BrewTag.find_by_name(Setting.system_settings.default_tag)
+    #    unless default_tag.blank?
+    #      params[:brew_tag_id] = escape_url(default_tag.name)
+    #    else
+    #      params[:brew_tag_id] = escape_url(BrewTag.find(:first, :order => 'updated_at DESC').name)
+    #    end
+    #  else
+    #    params[:brew_tag_id] = escape_url(BrewTag.find(:first, :order => 'updated_at DESC').name)
+    #  end
+    #end
 
-    redirect_to(:controller => :packages, :action => :index, :brew_tag_id => params[:brew_tag_id])
+    redirect_to(:controller => :packages, :action => :index)
 
   end
 
@@ -378,6 +378,15 @@ class ApplicationController < ActionController::Base
       nil
     else
       bt.id
+    end
+  end
+
+
+  def default_style(css)
+    if css.blank?
+      return "background:#808080;"
+    else
+      return css
     end
   end
 end

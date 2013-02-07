@@ -76,7 +76,7 @@
         <%= render :partial => 'layouts/sep_tiny' %>
         <span id='div_mark_selection'><input id="mark_select" name="mark_options[]" type="checkbox" value="selection"/><label for="mark_select">
           Add existing marks : </label>
-          <%= render :partial => 'layouts/marks_selection', :locals => {:brew_tag_id => params[:id]} %>
+          <%= render :partial => 'marks/marks_selection', :locals => {:brew_tag_id => params[:id]} %>
           <br/> </span>
         <%= render :partial => 'layouts/sep_tiny' %>
     <% end %>

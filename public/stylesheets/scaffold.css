@@ -74,6 +74,9 @@ a:hover {
     list-style: square;
 }
 
+.manage-tbl {
+}
+
 .manage-tbl table {
     border: 1px solid #dedede;
     border-collapse: collapse;
