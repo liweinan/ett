@@ -17,6 +17,7 @@
         <%= render :partial => 'packages/fields/label', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/marks', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/assignee', :locals => {:f => f} %>
+        <%= render :partial => 'packages/fields/track_time' %>
 
         <% get_xattrs(@package.brew_tag, false, true) do |attr| %>
             <%= render :partial => 'packages/fields/xattrs', :locals => {:f => f, :xattr => attr} %>
@@ -41,3 +42,5 @@
       </table>
     </div>
 <% end %>
+
+<%= render :partial => 'time_tracking_js' %>

@@ -1,0 +1,12 @@
+<%= render :partial => 'layouts/sep' %>
+<% auto_track_times=TrackTime.all(:conditions => "package_id = #{@package.id}", :order => "label_id") %>
+AUTOMATIC TIME TRACK-
+<% auto_track_times.each do |tt| %>
+    <span style="<%= default_style(tt.label.style) %>">&nbsp;</span> <%= tt.label.name %>: <%= display_track_time(tt.time_consumed) %>
+<% end %>
+<%= render :partial => 'layouts/sep_tiny' %>
+MANUAL TIME TRACK- <span id="manual_tracked_time"><%= display_track_time(@package.time_consumed) %></span>
+<%= render :partial => 'layouts/sep_tiny' %>
+<span id="manual_time_track_component">&nbsp;</span> <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'manual_time_track_component_indicator'} %>
+<%= render :partial => 'layouts/sep' %>
+

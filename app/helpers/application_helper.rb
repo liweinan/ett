@@ -19,4 +19,29 @@ module ApplicationHelper
     end
 
   end
+
+  def display_track_time(min)
+    if min < 60
+      return pluralize(min, 'minute')
+    elsif min < 1440
+      hrs = min / 60
+      mins = min % 60
+      return pluralize(hrs, 'hour') + " " + pluralize(mins, 'minute')
+    else
+      days = min / 1440
+      leftover = min % 1440
+      hrs = leftover / 60
+      mins = leftover % 60
+      time = ""
+      time << pluralize(days, 'day')
+      if hrs > 0
+        time << " " << pluralize(hrs, 'hour')
+      end
+      if mins > 0
+        time << " "<< pluralize(mins, 'minute')
+      end
+      time
+    end
+  end
+
 end

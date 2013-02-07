@@ -1,5 +1,6 @@
 <% @package ||= nil %>
 <% package ||= @package %>
+<% sep ||= '/' %>
 <%
    @brew_tag = nil
    if package.blank?
@@ -10,9 +11,9 @@
 %>
 <% @brew_tag.marks.each do |mark| %>
     <% if package.blank? %>
-        <label><%= mark.key %> - <%= check_box_tag("marks[]", mark.key, false) %></label> /
+        <label><%= mark.key %> - <%= check_box_tag("marks[]", mark.key, false) %></label> <%= sep %>
     <% else %>
         <% assignment = Assignment.find_by_package_id_and_mark_id(package.id, mark.id) %>
-        <label><%= mark.key %> - <%= check_box_tag("marks[]", mark.key, assignment != nil) %></label> /
+        <label><%= mark.key %> - <%= check_box_tag("marks[]", mark.key, assignment != nil) %></label> <%= sep %>
     <% end %>
 <% end %>

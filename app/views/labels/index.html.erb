@@ -13,7 +13,6 @@
       <th>Tag</th>
       <th>Can Show</th>
       <th>Can Select</th>
-      <th>Track Time</th>
       <th>CSS Style</th>
       <% if can_manage? %>
           <th>Operation</th>
@@ -36,9 +35,6 @@
           </td>
           <td>
             <%= label.can_select %>
-          </td>
-          <td>
-            <%= label.is_track_time %>
           </td>
           <td style="<%= label.style %>">
             Example

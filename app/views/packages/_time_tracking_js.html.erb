@@ -1,0 +1,49 @@
+<% content_for :js do %>
+    <script type="text/javascript">
+        function startProgress(pac_id) {
+            new Ajax.Request("/packages/start_progress/" + pac_id,
+                    {
+                        asynchronous:true,
+                        evalScripts:true,
+                        onLoading:function (request) {
+                            Element.show('manual_time_track_component_indicator');
+                        },
+                        onSuccess:function (response) {
+                            Element.hide('manual_time_track_component_indicator');
+                            new Effect.Highlight('manual_time_track_component');
+                        },
+                        parameters:{
+                            'authenticity_token':'<%=form_authenticity_token%>'}
+                    });
+        }
+
+        function stopProgress(pac_id) {
+            new Ajax.Request("/packages/stop_progress/" + pac_id,
+                    {
+                        asynchronous:true,
+                        evalScripts:true,
+                        onLoading:function (request) {
+                            Element.show('manual_time_track_component_indicator');
+                        },
+                        onSuccess:function (response) {
+                            Element.hide('manual_time_track_component_indicator');
+                            new Effect.Highlight('manual_time_track_component');
+                            new Effect.Highlight('manual_tracked_time');
+                        },
+                        parameters:{
+                            'authenticity_token':'<%=form_authenticity_token%>'}
+                    });
+        }
+
+        Event.observe(window, 'load', function () {
+            new Ajax.Request('/toolbox/get_manual_time_track_component',
+                    {
+                        asynchronous:true,
+                        evalScripts:true,
+                        parameters:{
+                            'pac_id':'<%=@package.id%>',
+                            'authenticity_token':'<%=form_authenticity_token%>'}
+                    });
+        });
+    </script>
+<% end %>

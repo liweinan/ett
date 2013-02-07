@@ -136,7 +136,7 @@ class PackagesController < ApplicationController
           if Label.find_by_id(params[:package][:label_id].to_i) != last_label
             @package.label_changed_at = Time.now
 
-            if !last_label.blank? && last_label.is_track_time == 'Yes'
+            unless last_label.blank?
               @tt = TrackTime.all(:conditions => ["package_id=? and label_id=?", @package.id, last_label.id])[0]
               @tt = TrackTime.new if @tt.blank?
               @tt.package_id=@package.id
@@ -145,7 +145,7 @@ class PackagesController < ApplicationController
               last_label_changed_at ||= @package.label_changed_at
               @tt.time_consumed ||= 0
 
-              @tt.time_consumed += @package.label_changed_at.to_i - last_label_changed_at.to_i
+              @tt.time_consumed += (@package.label_changed_at.to_i - last_label_changed_at.to_i)/60
               @tt.save
             end
           end
@@ -339,6 +339,27 @@ class PackagesController < ApplicationController
               :disposition => "attachment; filename=packages_#{Time.now.to_i}.csv"
   end
 
+  def start_progress
+    @package = Package.find(params[:id])
+    @package.time_point = Time.now.to_i
+    @package.save
+    respond_to do |format|
+      format.js
+    end
+  end
+
+
+  def stop_progress
+    @package = Package.find(params[:id])
+
+    @package.time_consumed += ((Time.now.to_i - @package.time_point) / 60)
+    @package.time_point = 0
+    @package.save
+
+    respond_to do |format|
+      format.js
+    end
+  end
 
   protected
 

@@ -1,18 +1,19 @@
 <% f||=nil %>
 
+<%
+
+   blank_user = User.new
+   blank_user.id = ''
+   blank_user.name = '-'
+
+   users = []
+   users << blank_user
+   users << User.find(:all, :order => 'name')
+   users = users.flatten
+
+%>
 <% if f.blank? %>
-    <%
 
-       blank_user = Label.new
-       blank_user.id = ''
-       blank_user.name = '-'
-
-       users = []
-       users << blank_user
-       users << User.find(:all, :order => 'name')
-       users = users.flatten
-
-    %>
     <% package||=nil %>
     <% if package.blank? %>
         <%= select_tag('package[user_id]', options_from_collection_for_select(users, :id, :name)) %>
@@ -20,5 +21,5 @@
         <%= select_tag('package[user_id]', options_from_collection_for_select(users, :id, :name, package.user_id)) %>
     <% end %>
 <% else %>
-    <%= f.select :user_id, User.find(:all, :order => 'name').map { |u| [u.name, u.id] }, {:include_blank => " - "} %>
+    <%= f.select :user_id, users.map { |u| [u.name, u.id] } %>
 <% end %>

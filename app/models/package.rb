@@ -35,6 +35,9 @@ class Package < ActiveRecord::Base
   validates_presence_of :created_by
   validates_presence_of :updated_by
 
+  default_value_for :time_consumed, 0
+  default_value_for :time_point, 0
+
   def self.per_page
     10
   end

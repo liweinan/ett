@@ -57,8 +57,13 @@
     <% end %>
 
     <%= render :partial => 'layouts/sep' %>
-    <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "inline_editor_indicator", :msg => 'Inline editor loading...'} %>
-    <%= render :partial => 'layouts/sep' %>
+    <span id="inline_editor_switch" style="display:none;">
+      <a href="javascript:void(0);" onclick="getPacBtns();">
+        [ENABLE INLINE EDITOR]
+      </a>
+    </span>
+    <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "inline_editor_indicator"} %>
+
 
     <div class='manage-tbl'>
       <%= render :partial => 'layouts/sep' %>
@@ -83,7 +88,9 @@
 <% end %>
 <%= render :partial => 'layouts/sep' %>
 
+
 <% if logged_in? %>
+    <!--The following codes are all for inline editors-->
     <% content_for :js do %>
         <script type="text/javascript">
             function show_pac_editor(div, pac_id, field_name, field_type, is_xattr) {
@@ -133,40 +140,59 @@
                 return div + '_-' + field_type + '-' + is_xattr + '-_btn';
             }
 
+            function getPacBtns() {
+                // get the [EDIT] link, and inject each editable columns
+                var pacBtns = document.getElementsByRegex('^pac.*btn');
 
-            Event.observe(window, 'load', function () {
+                // inject [EDIT] link switch
                 var pacBtnSwitches = document.getElementsByRegex('^pac.*switch');
                 new Ajax.Request('/toolbox/get_initial_pac_btn_switch',
                         {
                             asynchronous:true,
                             evalScripts:true,
+                            onLoading:function (request) {
+                                document.getElementById('inline_editor_switch').innerHTML = "LOADING INLINE EDITOR...";
+                                Element.show('inline_editor_indicator');
+                            },
                             parameters:{
                                 'ids':pacBtnSwitches.toString(),
                                 'authenticity_token':'<%=form_authenticity_token%>'}
                         });
-            });
 
-
-            Event.observe(window, 'load', function () {
-                var pacBtns = document.getElementsByRegex('^pac.*btn');
                 new Ajax.Request('/toolbox/get_pac_btns',
                         {
                             asynchronous:true,
                             evalScripts:true,
-                            onLoading:function (request) {
-                                Element.show('inline_editor_indicator');
-                            },
                             onSuccess:function (response) {
-                                document.getElementById('inline_editor_indicator').innerHTML = 'Inline editor enabled.';
-                                new Effect.Highlight('inline_editor_indicator', { duration: 1 });
-                                new Effect.Fade('inline_editor_indicator',  { duration: 1 });
+                                Element.hide('inline_editor_indicator');
+                                document.getElementById('inline_editor_switch').innerHTML = '<span style="color:#228b22;">[INLINE EDITOR ENABLED]</span>';
+                                new Effect.Highlight('inline_editor_switch', { duration:1 });
+
                             },
                             parameters:{
                                 'ids':pacBtns.toString(),
                                 'authenticity_token':'<%=form_authenticity_token%>'}
                         });
+            }
+
+
+            Event.observe(window, 'load', function () {
+                Element.show('inline_editor_switch');
             });
 
         </script>
     <% end %>
+<% else %>
+    <script type="text/javascript">
+        function show_pac_editor(div, pac_id, field_name, field_type, is_xattr) {
+        }
+        function hide_pac_editor(div, field_type, is_xattr) {
+        }
+        function show_pac_btn(div, field_type, is_xattr) {
+        }
+        function hide_pac_btn(div, field_type, is_xattr) {
+        }
+        function build_pac_btn_id(div, field_type, is_xattr) {
+        }
+    </script>
 <% end %>
