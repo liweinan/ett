@@ -15,42 +15,28 @@
       <table>
         <tr>
           <th class='content-list-head'>Name</th>
-          <th class='content-list-head'>Label</th>
           <th class='content-list-head'>Assignee</th>
-
+          <th class='content-list-head'>Label</th>
+          <th class='content-list-head'>Marks</th>
           <% get_xattrs(BrewTag.find_by_name(unescape_url(params[:id])), true, false) do |attr| %>
               <th class='content-list-head'><%= attr.camelcase %></th>
           <% end %>
+          <th class='content-list-head'>Notes</th>
         </tr>
-        <%
-           def diff_output(target_p, source_p, attr)
-               if attr == 'assignee'
-                   if target_p.user == source_p.user
-                       target_p.user.name
-                   elsif confirmed?
-                       "<span style='color:red;'>#{target_p.user.name}</span>"
-                   else
-                       "<span style='color:red;'>#{source_p.user.name} => #{target_p.user.name}</span>"
-                   end
-               elsif target_p.read_attribute(attr) == source_p.read_attribute(attr)
-                   target_p.read_attribute(attr)
-               elsif confirmed?
-                   "<span style='color:red;'>#{target_p.read_attribute(attr)}</span>"
-               else
-                   "<span style='color:red;'>#{source_p.read_attribute(attr)} => #{target_p.read_attribute(attr)}</span>"
-               end
-           end
-        %>
         <% @packages.each_with_index do |package, i| %>
             <tr>
               <td><%= package.name %></td>
-              <td><%= package.name %></td>
               <td><%= diff_output(package, @cloned_packages[i], 'assignee') %></td>
+              <td><%= diff_output(package, @cloned_packages[i], 'label') %></td>
+              <td><%= diff_output(package, @cloned_packages[i], 'marks') %></td>
               <% get_xattrs(BrewTag.find_by_name(unescape_url(params[:id])), true, false) do |attr| %>
                   <td>
                     <%= diff_output(package, @cloned_packages[i], attr) %>
                   </td>
               <% end %>
+              <td>
+                <%= diff_output(package, @cloned_packages[i], 'notes') %>
+              </td>
             </tr>
         <% end %>
       </table>
@@ -127,7 +113,7 @@
     </div>
 <% end %>
 
-<%= render :partial =>'layouts/sep_tiny' %>
+<%= render :partial => 'layouts/sep_tiny' %>
 
 <% if confirmed? %>
     <%= link_to "Go to #{params[:id]}", :controller => :packages, :action => :index, :brew_tag_id => escape_url(params[:id]) %>

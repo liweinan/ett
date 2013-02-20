@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
   helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_tag?, :count_packages, :can_edit_package?, :current_user, :get_brew_tag, :has_label?, :has_mark?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :brew_tag_has_marks?, :get_xattrs, :background_style, :confirmed?, :default_style
-  helper_method :btag, :ebtag, :uebtag
+  helper_method :btag, :ebtag, :uebtag, :truncate_u
   before_filter :process_brew_tag_id
   before_filter :save_current_link
               # Scrub sensitive parameters from your log
@@ -237,6 +237,44 @@ class ApplicationController < ActionController::Base
     false
   end
 
+
+  def truncate_u(text, length = 30, truncate_string = "...")
+    return '' if text.blank?
+    text = text.dup.strip
+
+    l = 0
+    char_array = text.unpack("U*")
+    # 32 and 12288 are spaces
+    char_array.delete_if { |c| [10, 13].include?(c) } # delete returns
+    char_array.each_with_index do |c, i|
+      if c < 127
+        l = l + 0.5
+        # For english words. We need to check whether we reach the end or not.
+        # We should truncate a whole word. If we reach the limit, and the word
+        # has left alphas to show, we rollback this word and mark 'l' as already
+        # reach limit
+        if l >= length && char_array.size > i+1 && ![32,12288].include?(char_array[i+1]) # word not end naturally
+          j = i; # start rollback from current position
+          while j >= 0
+            j = j - 1
+            if [32,12288].include?(char_array[j])  # match space
+              i = j-1 # mark rollback position
+              l = length # mark as reach limit
+              break
+            end
+          end
+        end
+      else
+        l = l + 1
+      end
+
+      if l >= length
+        return char_array[0..i].pack("U*") + (i < char_array.length - 1 ? truncate_string : "")
+      end
+    end
+    text
+  end
+
   protected
 
   def create_clone_relationship(source_package, target_package)
@@ -294,11 +332,11 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def process_marks(marks, brew_tag_id)
-    marks ||= []
+  def process_marks(mark_keys, brew_tag_id)
+    mark_keys ||= []
     new_marks = []
 
-    marks.each do |key|
+    mark_keys.each do |key|
       mark = Mark.find_by_key_and_brew_tag_id(key, brew_tag_id)
       new_marks << mark
     end

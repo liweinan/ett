@@ -30,9 +30,11 @@ class ImportController < ApplicationController
       packages_in_json_format = params[:packages].split("\r\n")
       packages_in_json_format.each do |package_json|
         package = Package.new
+
+        brew_tag_name = unescape_url(params[:id])
         begin
-          package.from_json(package_json)
-          orig_package = Package.find_by_name_and_brew_tag_id(package.name, BrewTag.find_by_name(unescape_url(params[:id])).id)
+          json_obj = JSON.parse(package_json)
+          orig_package = Package.find_by_name_and_brew_tag_id(json_obj['name'], BrewTag.find_by_name(brew_tag_name).id)
 
           # for Changelog.package_updated
           orig_package_clone = orig_package.clone
@@ -41,22 +43,78 @@ class ImportController < ApplicationController
           if orig_package.blank?
             @not_found_packages << package
           else
-            orig_package.label_id = package.label_id unless package.label_id.blank?
-            if package.notes != nil && !package.notes(:plain).blank?
-              package.notes(:plain).strip!
-
-              if package.notes(:plain).match /^\+/
-                str = package.notes(:plain)
-                package.notes = str[1..-1]
-                orig_package.notes = package.notes(:plain)+ "\r\n" + orig_package.notes(:plain)
+            #deal with assignee
+            if json_obj['assignee'] != nil
+              if json_obj['assignee'].blank?
+                orig_package.assignee = nil
               else
-                orig_package.notes = package.notes
+                assignee = User.find_by_name_or_email(json_obj['assignee'])
+                unless assignee.blank?
+                  orig_package.assignee = assignee
+                end
               end
             end
+            json_obj.delete(:assignee)
 
-            orig_package.group_id = package.group_id unless package.group_id == nil
-            orig_package.artifact_id = package.artifact_id unless package.artifact_id == nil
-            orig_package.ver = package.ver unless package.ver == nil
+            #deal with label
+            if json_obj['label'] != nil
+
+              if json_obj['label'].blank?
+                orig_package.label_id = nil
+              else
+                label = Label.find_in_global_scope(json_obj['label'], brew_tag_name)
+                unless label.blank?
+                  orig_package.label_id = label.id
+                end
+              end
+            end
+            json_obj.delete(:label)
+
+            #deal with marks
+            if json_obj['marks'] != nil
+
+              if json_obj['marks'].blank?
+                orig_package.marks = nil
+              else
+                marks = []
+
+                json_obj['marks'].each do |mark_name|
+
+                  unless mark_name.blank?
+                    mark = Mark.find_by_key(mark_name.strip)
+                    unless mark.blank?
+                      marks << mark
+                    end
+                  end
+                end
+
+                orig_package.marks = marks
+              end
+            end
+            json_obj.delete(:marks)
+
+            #deal with notes
+            unless json_obj['notes'] == nil
+              if json_obj['notes'].blank?
+                orig_package.notes=""
+              else
+                json_obj['notes'].strip!
+
+                if json_obj['notes'].match /^\+/
+                  orig_package.notes = json_obj['notes'][1..-1] + "\r\n" + orig_package.notes(:plain)
+                else
+                  orig_package.notes = json_obj['notes']
+                end
+              end
+            end
+            json_obj.delete(:notes)
+
+            #deal with xattrs
+            json_obj.keys.each do |k|
+              unless json_obj[k] == nil
+                orig_package[k] = json_obj[k]
+              end
+            end
 
             if orig_package.valid?
               if confirmed?
@@ -89,15 +147,15 @@ class ImportController < ApplicationController
         end
       end
     end
-    
-	  @packages = []
+
+    @packages = []
     @problem_packages = []
     Package.transaction do
       @brew_tag = BrewTag.find_by_name(unescape_url(params[:brew_tag_id]))
-      
+
       @marks = process_marks(params[:marks], @brew_tag.id)
       @label = Label.find(params[:package][:label_id]) unless params[:package][:label_id].blank?
-      
+
       @final_package_names.each do |name|
         package = Package.new
         package.name = name.strip
