@@ -54,7 +54,7 @@ class ImportController < ApplicationController
                 end
               end
             end
-            json_obj.delete(:assignee)
+            json_obj.delete(:assignee.to_s)
 
             #deal with label
             if json_obj['label'] != nil
@@ -68,7 +68,7 @@ class ImportController < ApplicationController
                 end
               end
             end
-            json_obj.delete(:label)
+            json_obj.delete(:label.to_s)
 
             #deal with marks
             if json_obj['marks'] != nil
@@ -91,7 +91,7 @@ class ImportController < ApplicationController
                 orig_package.marks = marks
               end
             end
-            json_obj.delete(:marks)
+            json_obj.delete(:marks.to_s)
 
             #deal with notes
             unless json_obj['notes'] == nil
@@ -107,7 +107,7 @@ class ImportController < ApplicationController
                 end
               end
             end
-            json_obj.delete(:notes)
+            json_obj.delete(:notes.to_s)
 
             #deal with xattrs
             json_obj.keys.each do |k|
