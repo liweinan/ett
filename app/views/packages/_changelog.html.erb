@@ -1,32 +1,34 @@
 <% unless @package.changelogs.blank? %>
     <h3>Changelog</h3>
+
     <%= render :partial => 'layouts/line' %>
+    <a href="javascript:void(0);" onclick="toggle_changelog()"><span id='toggle_changelog_btn'>[EXPAND]</span></a>
+    <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "toggle_changelog_indicator"} %>
+    <%= render :partial => 'layouts/sep' %>
+    <span id="toggle_changelog_area"></span>
 
-    <% @package.changelogs.each_with_index do |changelog, i| %>
-        <div style="background:<%=background_style(i)%>;">
-          <div class='comment-login' id='changelog-<%= changelog.id %>'>
-            <sup style="padding:2px;font-weight:normal;"><%= link_to "##{changelog.id}", "#changelog-#{changelog.id}" %></sup>
-            <%= changelog.changed_at.strftime("%Y-%m-%d %I:%M%p") %>
-          </div>
-          <div class="comment-comment">
-            <!--<span class="comment-date"></span>-->
-            <p><span>
-              <%= render_changelog(changelog) %>
-
-              <% if changelog.category == Changelog::CATEGORY[:update] %>
-                  <%= render :partial => 'layouts/sep_tiny' %>
-                  <% if changelog.references == 'notes' %>
-                      <%= Extractor.extract_url(changelog.to_value.gsub(/\n/, "<br/>")) %>
-                  <% else %>
-                    <%= changelog.references %>:
-                      <%= Extractor.extract_url(changelog.from_value) %>
-                      =>
-                      <%= Extractor.extract_url(changelog.to_value) %>
-                  <% end %>
-              <% end %>
-            </span></p>
-          </div>
-        </div>
+    <% content_for :js do %>
+        <script type="text/javascript">
+            //<![CDATA[
+            function toggle_changelog() {
+                var btn_val = document.getElementById('toggle_changelog_btn').innerHTML;
+                new Ajax.Request('/toolbox/toggle_changelog',
+                        {
+                            asynchronous: true,
+                            evalScripts: true,
+                            onLoading: function (request) {
+                                Element.show('toggle_changelog_indicator')
+                            },
+                            onSuccess: function (response) {
+                                Element.hide('toggle_changelog_indicator')
+                            },
+                            parameters: {
+                                'id': '<%=@package.id%>',
+                                'btn_val': btn_val,
+                                'authenticity_token': '<%=form_authenticity_token%>'}
+                        });
+            }
+            //]]>
+        </script>
     <% end %>
-
 <% end %>

@@ -2,6 +2,7 @@
 
 <% if @show_progress %>
     <span id="manual_time_track_component_<%= package.id %>_btn"></span>
+    <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "manual_time_track_component_#{package.id}_indicator"} %>
 <% end %>
 
 <% if params[:user] %>

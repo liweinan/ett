@@ -1,48 +1,76 @@
 <% content_for :js do %>
     <script type="text/javascript">
         function startProgress(pac_id, style, div) {
-            style = typeof style !== 'undefined' ? style : 'default';
-            div = typeof div !== 'undefined' ? div : 'default';
-
+            var style = typeof style !== 'undefined' ? style : 'default';
+            var div = typeof div !== 'undefined' ? div : 'default';
+            var indicator = document.getElementById('manual_time_track_component_indicator');
+            if (!indicator) {
+                indicator = document.getElementById('manual_time_track_component_' + pac_id + '_indicator');
+            }
             new Ajax.Request("/packages/start_progress/" + pac_id,
                     {
-                        asynchronous:true,
-                        evalScripts:true,
-                        onLoading:function (request) {
-                            Element.show('manual_time_track_component_indicator');
+                        asynchronous: true,
+                        evalScripts: true,
+                        onLoading: function (request) {
+                            if (indicator) {
+                                Element.show(indicator);
+                            }
                         },
-                        onSuccess:function (response) {
-                            Element.hide('manual_time_track_component_indicator');
-                            new Effect.Highlight('manual_time_track_component');
+                        onSuccess: function (response) {
+                            var div1 = document.getElementById('manual_time_track_component');
+                            if (div1) {
+                                new Effect.Highlight(div1);
+                            }
+                            if (indicator) {
+                                Element.hide(indicator);
+                            }
                         },
-                        parameters:{
-                            'style' : style,
-                            'div' : div,
-                            'authenticity_token':'<%=form_authenticity_token%>'}
+                        parameters: {
+                            'style': style,
+                            'div': div,
+                            'authenticity_token': '<%=form_authenticity_token%>'}
                     });
         }
 
         function stopProgress(pac_id, style, div) {
             style = typeof style !== 'undefined' ? style : 'default';
             div = typeof div !== 'undefined' ? div : 'default';
+            var indicator = document.getElementById('manual_time_track_component_indicator');
+            if (!indicator) {
+                indicator = document.getElementById('manual_time_track_component_' + pac_id + '_indicator');
+            }
+
             new Ajax.Request("/packages/stop_progress/" + pac_id,
                     {
-                        asynchronous:true,
-                        evalScripts:true,
-                        onLoading:function (request) {
-                            Element.show('manual_time_track_component_indicator');
+                        asynchronous: true,
+                        evalScripts: true,
+                        onLoading: function (request) {
+                            if (indicator) {
+                                Element.show(indicator);
+                            }
                         },
-                        onSuccess:function (response) {
-                            Element.hide('manual_time_track_component_indicator');
-                            new Effect.Highlight('manual_time_track_component');
-                            new Effect.Highlight('manual_tracked_time');
+                        onSuccess: function (response) {
+                            var div1 = document.getElementById('manual_time_track_component');
+                            var div2 = document.getElementById('manual_tracked_time');
+                            if (div1) {
+                                new Effect.Highlight(div1);
+                            }
+
+                            if (div2) {
+                                new Effect.Highlight(div2);
+                            }
+
+                            if (indicator) {
+                                Element.hide(indicator);
+                            }
                         },
-                        parameters:{
+                        parameters: {
                             'style': style,
-                            'div' : div,
-                            'authenticity_token':'<%=form_authenticity_token%>'}
+                            'div': div,
+                            'authenticity_token': '<%=form_authenticity_token%>'}
                     });
         }
+
 
     </script>
 <% end %>

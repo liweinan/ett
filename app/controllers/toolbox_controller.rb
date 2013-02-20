@@ -30,4 +30,10 @@ class ToolboxController < ApplicationController
     end
   end
 
+  def toggle_changelog
+    respond_to do |format|
+      format.js
+    end
+  end
+
 end
