@@ -4,10 +4,10 @@ btn_val = params[:btn_val]
 div = "toggle_changelog_area"
 @package = Package.find(pac_id)
 
-if btn_val == '[EXPAND]'
+if btn_val == '[SHOW]'
     page.replace_html div, :partial => 'packages/changelog/show'
-    page.replace_html btn, '[COLLAPSE]'
-elsif btn_val == '[COLLAPSE]'
+    page.replace_html btn, '[HIDE]'
+elsif btn_val == '[HIDE]'
     page.replace_html div, ''
-    page.replace_html btn, '[EXPAND]'
+    page.replace_html btn, '[SHOW]'
 end
