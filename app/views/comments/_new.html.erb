@@ -1,5 +1,7 @@
+<% package ||= @package %>
 <div id='send_comment'>
-  <% if @package.comments.size > 0 %>
+
+  <% if package.comments.size > 0 %>
       <div style="height:50px;clear:both;"></div>
   <% end %>
   <p>
@@ -20,6 +22,6 @@
           <td><span id="spinner-comment" style="display:none;"><%= image_tag 'ajax-loader1.gif' %></span></td>
         </tr>
       </table>
-      <%= hidden_field_tag :package_id, @package.id %>
+      <%= hidden_field_tag :package_id, package.id %>
   <% end %>
 </div>

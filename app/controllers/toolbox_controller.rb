@@ -36,4 +36,10 @@ class ToolboxController < ApplicationController
     end
   end
 
+  def show_comment_dialog
+    respond_to do |format|
+      format.js
+    end
+  end
+
 end

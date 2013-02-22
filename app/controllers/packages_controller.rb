@@ -79,12 +79,14 @@ class PackagesController < ApplicationController
 
         url = APP_CONFIG["site_prefix"] + "brew_tags/" + escape_url(@package.brew_tag.name) + "/packages/" + escape_url(@package.name)
 
-        if Setting.activated?(@package.brew_tag, Setting::ACTIONS[:created])
-          Notify::Package.create(current_user, url, @package, Setting.all_recipients_of_package(@package, nil, :create))
-        end
+        if Rails.env.production?
+          if Setting.activated?(@package.brew_tag, Setting::ACTIONS[:created])
+            Notify::Package.create(current_user, url, @package, Setting.all_recipients_of_package(@package, nil, :create))
+          end
 
-        unless params[:div_package_create_notification_area].blank?
-          Notify::Package.create(current_user, url, @package, params[:div_package_create_notification_area])
+          unless params[:div_package_create_notification_area].blank?
+            Notify::Package.create(current_user, url, @package, params[:div_package_create_notification_area])
+          end
         end
 
         format.html { redirect_to(:controller => :packages, :action => :show,

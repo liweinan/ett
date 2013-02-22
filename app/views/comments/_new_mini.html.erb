@@ -1,0 +1,17 @@
+<div id="comment_mini_form_<%= package.id %>">
+  <% form_remote_tag(
+             :url => {:controller => "comments", :action => "create"},
+             :loading => "Element.show('spinner_comment_#{package.id}');",
+             :success => "Element.hide('spinner_comment_#{package.id}');") do %>
+      <%= hidden_field_tag :package_id, package.id %>
+      <%= hidden_field_tag :pos, 'mini' %>
+      <div style="text-align: left;">
+        <textarea name="comment" rows="5" cols="22"></textarea>
+        <%= render :partial => 'layouts/sep_tiny' %>
+        <%# render :partial => 'layouts/notification', :locals => {:title => 'Notify the comment to:', :div_id => "comment_#{package.id}"} %>
+        <input type="button" value="Cancel" onclick="Element.hide('comment_mini_form_<%=package.id%>')"/>
+        <%= submit_tag 'Post' %> <%# render :partial => 'layouts/notification_link', :locals => {:div_id => 'comment'} %>
+        <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "spinner_comment_#{package.id}"} %>
+      </div>
+  <% end %>
+</div>

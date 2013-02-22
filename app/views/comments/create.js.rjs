@@ -1,10 +1,23 @@
+params[:pos] ||= 'default'
+
 unless @package.blank?
   div = 'added_comment'
-  count = Comment.count(:conditions => "commentable_type='Package' and commentable_id = #{@package.id}")
-  page.insert_html :bottom, div, :partial => '/comments/show', :locals => {:comment => @comment, :index => @comment.id}
+  if params[:pos] == 'default'
+    count = Comment.count(:conditions => "commentable_type='Package' and commentable_id = #{@package.id}")
+    page.insert_html :bottom, div, :partial => '/comments/show', :locals => {:comment => @comment, :index => @comment.id}
+  end
 end
 
-page.select('form').each { |f| f.reset }
-div = 'send_comment'
-page.replace_html(div, 'Comment posted.')
-page.visual_effect :highlight, div
+if params[:pos] == 'default'
+  page.select('form').each { |f| f.reset }
+  div = 'send_comment'
+  page.replace_html(div, 'Comment posted.')
+  page.visual_effect :highlight, div
+end
+
+if params[:pos] == 'mini'
+  div = "comment_mini_form_#{@package.id}"
+  page.replace_html div, 'Comment added!'
+  page.visual_effect :highlight, div
+  page.visual_effect :fade, div
+end

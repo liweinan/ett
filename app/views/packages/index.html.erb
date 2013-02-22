@@ -101,24 +101,24 @@
                 Element.hide(build_pac_btn_id(div, field_type, is_xattr));
                 new Ajax.Request('/toolbox/get_pac_form',
                         {
-                            asynchronous:true,
-                            evalScripts:true,
-                            onLoading:function (request) {
+                            asynchronous: true,
+                            evalScripts: true,
+                            onLoading: function (request) {
                                 Element.show(div + '_indicator');
                             },
-                            onSuccess:function (response) {
+                            onSuccess: function (response) {
                                 Element.hide(div + '_indicator');
                             },
-                            parameters:{
-                                'form_id':div + '_editor',
-                                'pac_id':pac_id,
-                                'field_name':field_name,
-                                'field_type':field_type,
-                                'is_xattr':is_xattr,
-                                'authenticity_token':'<%=form_authenticity_token%>'}
+                            parameters: {
+                                'form_id': div + '_editor',
+                                'pac_id': pac_id,
+                                'field_name': field_name,
+                                'field_type': field_type,
+                                'is_xattr': is_xattr,
+                                'authenticity_token': '<%=form_authenticity_token%>'}
                         });
                 Element.show(div + '_editor');
-                Element.setStyle(div + '_td', {'text-decoration':'none', 'background':'none'});
+                Element.setStyle(div + '_td', {'text-decoration': 'none', 'background': 'none'});
                 document.getElementById(div + "_switch").innerHTML = 'off';
             }
 
@@ -151,36 +151,55 @@
                 var pacBtnSwitches = document.getElementsByRegex('^pac.*switch');
                 new Ajax.Request('/toolbox/get_initial_pac_btn_switch',
                         {
-                            asynchronous:true,
-                            evalScripts:true,
-                            onLoading:function (request) {
+                            asynchronous: true,
+                            evalScripts: true,
+                            onLoading: function (request) {
                                 document.getElementById('inline_editor_switch').innerHTML = "LOADING INLINE EDITOR...";
                                 Element.show('inline_editor_indicator');
                             },
-                            parameters:{
-                                'ids':pacBtnSwitches.toString(),
-                                'authenticity_token':'<%=form_authenticity_token%>'}
+                            parameters: {
+                                'ids': pacBtnSwitches.toString(),
+                                'authenticity_token': '<%=form_authenticity_token%>'}
                         });
 
                 new Ajax.Request('/toolbox/get_pac_btns',
                         {
-                            asynchronous:true,
-                            evalScripts:true,
-                            onSuccess:function (response) {
+                            asynchronous: true,
+                            evalScripts: true,
+                            onSuccess: function (response) {
                                 Element.hide('inline_editor_indicator');
                                 document.getElementById('inline_editor_switch').innerHTML = '<span style="color:#228b22;">[INLINE EDITOR ENABLED]</span>';
-                                new Effect.Highlight('inline_editor_switch', { duration:1 });
+                                new Effect.Highlight('inline_editor_switch', { duration: 1 });
 
                             },
-                            parameters:{
-                                'ids':pacBtns.toString(),
-                                'authenticity_token':'<%=form_authenticity_token%>'}
+                            parameters: {
+                                'ids': pacBtns.toString(),
+                                'authenticity_token': '<%=form_authenticity_token%>'}
                         });
             }
 
             Event.observe(window, 'load', function () {
                 Element.show('inline_editor_switch');
             });
+
+            function showCommentDialog(pac_id) {
+                new Ajax.Request('/toolbox/show_comment_dialog',
+                        {
+                            asynchronous: true,
+                            evalScripts: true,
+                            onLoading: function (request) {
+                                Element.show('comment_area_indicator_' + pac_id);
+                            },
+                            onSuccess: function (response) {
+                                Element.hide('comment_area_indicator_' + pac_id);
+                                Element.show('comment_area_' + pac_id);
+                            },
+                            parameters: {
+                                'id': pac_id,
+                                'authenticity_token': '<%=form_authenticity_token%>'
+                            }
+                        });
+            }
         </script>
 
 
@@ -198,6 +217,9 @@
             }
             function build_pac_btn_id(div, field_type, is_xattr) {
             }
+            function showCommentDialog(pac_id) {
+
+            }
         </script>
     <% end %>
 <% end %>
@@ -208,11 +230,11 @@
             var comps = document.getElementsByRegex('^manual_time_track_component_.*btn');
             new Ajax.Request('/toolbox/get_manual_time_track_components',
                     {
-                        asynchronous:true,
-                        evalScripts:true,
-                        parameters:{
-                            'ids':comps.toString(),
-                            'authenticity_token':'<%=form_authenticity_token%>'}
+                        asynchronous: true,
+                        evalScripts: true,
+                        parameters: {
+                            'ids': comps.toString(),
+                            'authenticity_token': '<%=form_authenticity_token%>'}
                     });
         }
 

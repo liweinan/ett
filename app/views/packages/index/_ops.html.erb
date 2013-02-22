@@ -1,5 +1,5 @@
-<% if logged_in? %>
-    <td style='font-size:10px;'>
+<td style='font-size:10px;'>
+  <% if logged_in? %>
       <% unless package.deleted? %>
           <% if can_manage? %>
               <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(package.name), :brew_tag_id => escape_url(package.brew_tag.name) %>
@@ -13,9 +13,23 @@
       <% end %>
 
       <% if can_edit_package?(package) %>
+          <a href="javascript:void(0);" onclick="showCommentDialog('<%=package.id%>')">Comment</a>
+          <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "comment_area_indicator_#{package.id}"} %>
+          /
           <%= link_to 'Edit', :controller => 'packages', :action => 'edit', :id => escape_url(package.name), :brew_tag_id => escape_url(package.brew_tag.name) %>
+          /
       <% end %>
+  <% end %>
 
-    </td>
-<% end %>
+  <% if params[:user] %>
+      <%= link_to "Show", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :brew_tag_id => escape_url(package.brew_tag.name), :user => params[:user] %>
+  <% else %>
+      <%= link_to "Show", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :brew_tag_id => escape_url(package.brew_tag.name) %>
+  <% end %>
+
+  <div id="comment_area_<%= package.id %>" style="display:none;"></div>
+
+</td>
+
+
 
