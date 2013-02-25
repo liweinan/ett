@@ -1,5 +1,10 @@
 <tr>
-  <<%= col %> class='content-list-head'>Name</<%= col %>>
+  <% if logged_in? %>
+      <<%= col %> class='content-list-head'>
+  <% end %>
+  Operations
+</<%= col %>>
+<<%= col %> class='content-list-head'>Name</<%= col %>>
 <<%= col %> class='content-list-head'>Label</<%= col %>>
 <<%= col %> class='content-list-head'>Marks</<%= col %>>
 <<%= col %> class='content-list-head'>Assignee</<%= col %>>
@@ -8,7 +13,4 @@
     <<%= col %> class='content-list-head'><%= attr.camelcase %></<%= col %>>
 <% end %>
 
-<<%= col %> class='content-list-head'>
-Operations
-</<%= col %>>
 </tr>

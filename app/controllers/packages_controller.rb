@@ -63,7 +63,6 @@ class PackagesController < ApplicationController
   # POST /packages
   # POST /packages.xml
   def create
-    expire_all_fragments
     @package = Package.new(params[:package])
     cleanup_package_name(@package.name)
 
@@ -74,7 +73,7 @@ class PackagesController < ApplicationController
 
     respond_to do |format|
       if @package.save
-
+        expire_all_fragments
         flash[:notice] = 'Package was successfully created.'
 
         url = APP_CONFIG["site_prefix"] + "brew_tags/" + escape_url(@package.brew_tag.name) + "/packages/" + escape_url(@package.name)

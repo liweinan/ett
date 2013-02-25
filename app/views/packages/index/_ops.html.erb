@@ -17,14 +17,7 @@
           <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "comment_area_indicator_#{package.id}"} %>
           /
           <%= link_to 'Edit', :controller => 'packages', :action => 'edit', :id => escape_url(package.name), :brew_tag_id => escape_url(package.brew_tag.name) %>
-          /
       <% end %>
-  <% end %>
-
-  <% if params[:user] %>
-      <%= link_to "Show", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :brew_tag_id => escape_url(package.brew_tag.name), :user => params[:user] %>
-  <% else %>
-      <%= link_to "Show", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :brew_tag_id => escape_url(package.brew_tag.name) %>
   <% end %>
 
   <div id="comment_area_<%= package.id %>" style="display:none;"></div>

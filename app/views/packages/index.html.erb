@@ -77,12 +77,14 @@
             <% end %>
             <tr>
               <% @show_progress = true %>
+              <% if logged_in? %>
+                 <%= render :partial => 'packages/index/ops', :locals => {:package => package} %>
+              <% end %>
               <%= render :partial => 'packages/index/name', :locals => {:package => package} %>
               <%= render :partial => 'packages/index/label', :locals => {:package => package} %>
               <%= render :partial => 'packages/index/mark', :locals => {:package => package} %>
               <%= render :partial => 'packages/index/user', :locals => {:package => package} %>
               <%= render :partial => 'packages/index/xattr', :locals => {:package => package} %>
-              <%= render :partial => 'packages/index/ops', :locals => {:package => package} %>
             </tr>
         <% end %>
       </table>
