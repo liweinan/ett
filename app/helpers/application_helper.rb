@@ -88,4 +88,13 @@ module ApplicationHelper
     end
     mins
   end
+
+  def display_manual_track_time_in_real_time(package)
+    if package.time_point == 0
+      display_track_time(package.time_consumed)
+    else
+      display_track_time_in_real_time(package.time_consumed, (Time.now.to_i - package.time_point.to_i)/60)
+    end
+  end
+
 end

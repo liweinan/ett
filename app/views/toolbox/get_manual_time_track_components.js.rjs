@@ -14,6 +14,6 @@ btns.each do |btn|
       page.replace_html btn, '<span style="background-color:#db4e56;">&nbsp;</span>'
     end
   end
-  page.replace_html btn, '---'
+  page.replace_html btn.gsub('_btn', '_amt'), :partial => 'packages/fields/amt', :locals => {:package => package}
 end
 
