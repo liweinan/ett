@@ -16,12 +16,14 @@
           <a href="javascript:void(0);" onclick="showCommentDialog('<%=package.id%>')">Comment</a>
           <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "comment_area_indicator_#{package.id}"} %>
           /
+          <a href="javascript:void(0);" onclick="showLog('<%=package.id%>')">Log</a>
+          <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "log_area_indicator_#{package.id}"} %>
+          /
           <%= link_to 'Edit', :controller => 'packages', :action => 'edit', :id => escape_url(package.name), :brew_tag_id => escape_url(package.brew_tag.name) %>
       <% end %>
   <% end %>
-
+  <div id="log_area_<%= package.id %>" style="display:none;"></div>
   <div id="comment_area_<%= package.id %>" style="display:none;"></div>
-
 </td>
 
 

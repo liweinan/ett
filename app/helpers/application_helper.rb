@@ -56,4 +56,36 @@ module ApplicationHelper
     str
   end
 
+  def log_work_time(pac, worktime)
+    pac.time_consumed += convert_worktime(worktime)
+    pac.save
+    #((Time.now.to_i - @package.time_point) / 60)
+  end
+
+  def convert_worktime(worktime)
+    worktime ||= ""
+    worktime = worktime.to_s
+    mins = 0
+    worktime.split(",").each do |wt|
+      wt = wt.strip
+      unless wt =~ /^\d+[wdhm]$/
+        raise TypeError, "Time format incorrect: #{worktime}"
+      end
+
+      amount = wt.scan(/\d+/).join.to_i
+      scale = wt[-1].chr
+
+      case scale
+        when 'w'
+          mins += amount * 7 * 24 * 60
+        when 'd'
+          mins += amount * 24 * 60
+        when 'h'
+          mins += amount * 60
+        when 'm'
+          mins += amount
+      end
+    end
+    mins
+  end
 end

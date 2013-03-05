@@ -1,0 +1,10 @@
+pac = Package.find(params[:package_id])
+begin
+  log_work_time(pac, params[:work_time])
+  div = "log_form_#{pac.id}"
+  page.replace_html div, 'Work time recorded!'
+  page.visual_effect :highlight, div
+  page.visual_effect :fade, div
+rescue TypeError => e
+  page.alert(e.message)
+end

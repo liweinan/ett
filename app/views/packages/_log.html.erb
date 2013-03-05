@@ -1,0 +1,19 @@
+<div id="log_form_<%= package.id %>">
+  <% form_remote_tag(
+             :url => {:controller => "toolbox", :action => "log_work_done"},
+             :loading => "Element.show('spinner_log_#{package.id}');",
+             :success => "Element.hide('spinner_log_#{package.id}');") do %>
+      <%= hidden_field_tag :package_id, package.id %>
+      <div style="text-align: left;">
+        <%= render :partial => 'layouts/sep_tiny' %>
+        Work time: <input name="work_time">
+        <%= render :partial => 'layouts/sep_tiny' %>
+        (Example: 1w,2d,3h,4m)
+        <%= render :partial => 'layouts/sep_tiny' %>
+        <%= submit_tag 'Log' %>
+        <input type="button" value="Cancel" onclick="Element.hide('log_form_<%=package.id%>')"/>
+        <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "spinner_log_#{package.id}"} %>
+        <%= render :partial => 'layouts/sep_tiny' %>
+      </div>
+  <% end %>
+</div>

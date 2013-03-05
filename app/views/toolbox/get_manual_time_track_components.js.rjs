@@ -14,5 +14,6 @@ btns.each do |btn|
       page.replace_html btn, '<span style="background-color:#db4e56;">&nbsp;</span>'
     end
   end
+  page.replace_html btn, '---'
 end
 

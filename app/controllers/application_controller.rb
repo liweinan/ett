@@ -419,7 +419,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-
   def default_style(css)
     if css.blank?
       return "background:#808080;"
@@ -427,4 +426,5 @@ class ApplicationController < ActionController::Base
       return css
     end
   end
+
 end

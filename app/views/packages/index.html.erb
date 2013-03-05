@@ -78,7 +78,7 @@
             <tr>
               <% @show_progress = true %>
               <% if logged_in? %>
-                 <%= render :partial => 'packages/index/ops', :locals => {:package => package} %>
+                  <%= render :partial => 'packages/index/ops', :locals => {:package => package} %>
               <% end %>
               <%= render :partial => 'packages/index/name', :locals => {:package => package} %>
               <%= render :partial => 'packages/index/label', :locals => {:package => package} %>
@@ -183,6 +183,25 @@
             Event.observe(window, 'load', function () {
                 Element.show('inline_editor_switch');
             });
+
+            function showLog(pac_id) {
+                new Ajax.Request('/toolbox/show_log_dialog',
+                        {
+                            asynchronous: true,
+                            evalScripts: true,
+                            onLoading: function (request) {
+                                Element.show('log_area_indicator_' + pac_id);
+                            },
+                            onSuccess: function (response) {
+                                Element.hide('log_area_indicator_' + pac_id);
+                                Element.show('log_area_' + pac_id);
+                            },
+                            parameters: {
+                                'id': pac_id,
+                                'authenticity_token': '<%=form_authenticity_token%>'
+                            }
+                        });
+            }
 
             function showCommentDialog(pac_id) {
                 new Ajax.Request('/toolbox/show_comment_dialog',

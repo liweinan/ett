@@ -42,4 +42,16 @@ class ToolboxController < ApplicationController
     end
   end
 
+  def show_log_dialog
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def log_work_done
+    respond_to do |format|
+      format.js
+    end
+  end
+
 end

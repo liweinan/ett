@@ -1,16 +1,15 @@
 <tr>
   <% if logged_in? %>
-      <<%= col %> class='content-list-head'>
+      <<%= col %> class='content-list-head'>Operations</<%= col %>>
   <% end %>
-  Operations
-</<%= col %>>
-<<%= col %> class='content-list-head'>Name</<%= col %>>
-<<%= col %> class='content-list-head'>Label</<%= col %>>
-<<%= col %> class='content-list-head'>Marks</<%= col %>>
-<<%= col %> class='content-list-head'>Assignee</<%= col %>>
 
-<% get_xattrs(@brew_tag, true, false) do |attr| %>
-    <<%= col %> class='content-list-head'><%= attr.camelcase %></<%= col %>>
-<% end %>
+  <<%= col %> class='content-list-head'>Name</<%= col %>>
+  <<%= col %> class='content-list-head'>Label</<%= col %>>
+  <<%= col %> class='content-list-head'>Marks</<%= col %>>
+  <<%= col %> class='content-list-head'>Assignee</<%= col %>>
+
+  <% get_xattrs(@brew_tag, true, false) do |attr| %>
+      <<%= col %> class='content-list-head'><%= attr.camelcase %></<%= col %>>
+  <% end %>
 
 </tr>
