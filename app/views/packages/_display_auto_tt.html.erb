@@ -1,0 +1,34 @@
+<% auto_track_times=TrackTime.all(:conditions => "package_id = #{package.id}", :order => "label_id") %>
+<% auto_track_times.each do |tt| %>
+    <% if tt.label.is_track_time? %>
+        <%
+           time_to_add = 0
+           if (!package.label.blank? && package.label.id == tt.label.id) && !package.label_changed_at.blank?
+             time_to_add = (Time.now.to_i - package.label_changed_at.to_i)/60
+           end
+        %>
+
+        <%= render :partial => 'packages/fields/auto_track_time_display', :locals => {:label => tt.label, :time_consumed => tt.time_consumed, :time_to_add => time_to_add} %>
+    <% end %>
+<% end %>
+
+<%# Display the time tracking information of current label %>
+<% if !package.label.blank? && package.label.is_track_time? %>
+    <%
+       label_ids = []
+       auto_track_times.each do |tt|
+         label_ids << tt.label.id
+       end
+
+       current_label_id = package.label.id
+    %>
+    <% if !label_ids.include?(current_label_id) %>
+        <% time_to_add = 0 %>
+        <% if package.label_changed_at.blank? %>
+            <% time_to_add = (Time.now.to_i - package.created_at.to_i)/60 %>
+        <% else %>
+            <% time_to_add = (Time.now.to_i - package.label_changed_at.to_i)/60 %>
+        <% end %>
+        <%= render :partial => 'packages/fields/auto_track_time_display', :locals => {:label => package.label, :time_consumed => 0, :time_to_add => time_to_add} %>
+    <% end %>
+<% end %>

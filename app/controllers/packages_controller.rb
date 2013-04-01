@@ -15,9 +15,15 @@ class PackagesController < ApplicationController
 
     respond_to do |format|
       params[:style] ||= nil
+      params[:perspective] ||= nil
       format.html {
         if !params[:style].blank?
-          render params[:style], :layout => params[:style]
+          if layout_exist?(params[:style])
+            render params[:style], :layout => params[:style]
+          else
+            render params[:style]
+          end
+
         elsif params[:brew_tag_id].blank?
           render 'layouts/welcome'
         end

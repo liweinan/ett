@@ -427,4 +427,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def layout_exist?(layout)
+    File.exist?(RAILS_ROOT + "/app/views/layouts/" + layout + ".html.erb")
+  end
+
 end

@@ -1,0 +1,24 @@
+<% @brew_tag = BrewTag.find_by_name(unescape_url(params[:brew_tag_id])) %>
+<h2><%= @brew_tag.name %></h2>
+<div class='manage-tbl'>
+<table>
+  <tr>
+    <th class='content-list-head'>Name</th>
+    <th class='content-list-head'>Label</th>
+    <th class='content-list-head'>Marks</th>
+    <th class='content-list-head'>Assignee</th>
+    <th class='content-list-head'>Automatic Time Track</th>
+    <th class='content-list-head'>Manual Time Track</th>
+  </tr>
+  <% @packages.each do |package| %>
+      <tr>
+        <%= render :partial => 'packages/index/name', :locals => {:package => package} %>
+        <%= render :partial => 'packages/index/label', :locals => {:package => package, :color => 'no'} %>
+        <%= render :partial => 'packages/index/mark', :locals => {:package => package} %>
+        <%= render :partial => 'packages/index/user', :locals => {:package => package} %>
+        <%= render :partial => 'packages/index/auto_tt', :locals => {:package => package} %>
+        <%= render :partial => 'packages/index/manual_tt', :locals => {:package => package} %>
+      </tr>
+  <% end %>
+</table>
+</div>
