@@ -19,3 +19,5 @@
         <label><%= mark.key %> - <%= check_box_tag("marks[]", mark.key, assignment != nil) %></label> <%= sep %>
     <% end %>
 <% end %>
+
+<%=hidden_field_tag :process_marks, 'Yes'%>

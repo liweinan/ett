@@ -137,7 +137,10 @@ class PackagesController < ApplicationController
         if @package.update_attributes(params[:package])
 
           @package.reload
-          @package.marks = process_marks(params[:marks], @package.brew_tag_id)
+
+          if params[:process_marks] == 'Yes'
+            @package.marks = process_marks(params[:marks], @package.brew_tag_id)
+          end
 
           # label changed
           if Label.find_by_id(params[:package][:label_id].to_i) != last_label
