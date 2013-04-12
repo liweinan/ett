@@ -1,4 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :sandboxes
+
   map.resources :changelogs
   map.resources :components
   map.resources :package_relationships

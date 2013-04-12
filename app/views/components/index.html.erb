@@ -4,7 +4,8 @@
   <div class='manage-tbl'>
     <table>
       <tr>
-        <th style="text-align: center">Name</th>
+        <th style="text-align: center;">Name</th>
+        <th style="text-align: center;">Tags</th>
         <% if can_manage? %>
             <th style="text-align: center">Operation</th>
         <% end %>
@@ -12,9 +13,13 @@
       <% Component.all(:order => 'name').each do |component| %>
           <tr>
             <td><%= link_to "#{component.name}", :controller => :components, :action => :show, :id => escape_url(component.name) %>
+            <td><%component.brew_tags.each do |tag|%><%=tag.name %> / <%end%></td>
             </td>
             <% if can_manage? %>
-                <td>Edit Delete</td>
+                <td>
+                  <%= link_to 'Edit', :action => :edit, :id => escape_url(component.name) %> /
+                  <%= link_to 'Delete', component, :method => :delete, :confirm => "Are you sure to delete '#{component.name}'?" %>
+                </td>
             <% end %>
           </tr>
       <% end %>

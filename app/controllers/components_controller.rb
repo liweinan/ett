@@ -24,10 +24,8 @@ class ComponentsController < ApplicationController
     respond_to do |format|
       if @component.save
         format.html { redirect_to(:action => :show, :id => escape_url(@component.name), :notice => 'Component was successfully created.') }
-        format.xml { render :xml => @component, :status => :created, :location => @component }
       else
         format.html { render :action => "new" }
-        format.xml { render :xml => @component.errors, :status => :unprocessable_entity }
       end
     end
   end
@@ -41,13 +39,23 @@ class ComponentsController < ApplicationController
         @component.save
 
         flash[:notice] = 'Component was successfully updated.'
-        format.html { redirect_to(:action => :show, :id => escape_url(@component.name)) }
+        format.html { render :action => "updated" }
       else
         format.html { render :action => "edit" }
       end
     end
 
   end
+
+  def destroy
+    @component = Component.find(params[:id])
+    @component.destroy
+
+    respond_to do |format|
+      format.html { redirect_to(components_url) }
+    end
+  end
+
 
   def show
     @component = Component.find_by_name(unescape_url(params[:id]))
@@ -67,8 +75,9 @@ class ComponentsController < ApplicationController
       tag_names.each do |tag_name|
         brew_tags << BrewTag.find_by_name(tag_name)
       end
-      brew_tags
+      return brew_tags
     end
+    []
   end
 
 end
