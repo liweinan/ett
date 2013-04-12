@@ -1,11 +1,25 @@
 <div style="width:100%;text-align:left;">
   <h2>Components</h2>
-	<span style="padding-right:20px;">
+
+  <div class='manage-tbl'>
+    <table>
+      <tr>
+        <th style="text-align: center">Name</th>
+        <% if can_manage? %>
+            <th style="text-align: center">Operation</th>
+        <% end %>
+      </tr>
       <% Component.all(:order => 'name').each do |component| %>
-		<%= link_to "#{component.name}", :controller => :components, :action => :show, :id => escape_url(component.name) %>
-          /
-		<% end %>
-	</span>
+          <tr>
+            <td><%= link_to "#{component.name}", :controller => :components, :action => :show, :id => escape_url(component.name) %>
+            </td>
+            <% if can_manage? %>
+                <td>Edit Delete</td>
+            <% end %>
+          </tr>
+      <% end %>
+    </table>
+  </div>
   <%= render :partial => 'layouts/sep' %>
   <% if can_manage? %>
       <%= link_to 'Create New Components View', :controller => :components, :action => :new %>

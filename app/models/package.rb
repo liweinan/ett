@@ -147,7 +147,7 @@ class Package < ActiveRecord::Base
       end
     end
 
-    Package.all(:select => "distinct name", :conditions => ["brew_tag_id in (?) and label_id in (?)", brew_tag_ids, can_show_label_ids.uniq], :order => "name")
+    Package.all(:select => "distinct name", :conditions => ["brew_tag_id in (?) and (label_id in (?) or label_id is NULL)", brew_tag_ids, can_show_label_ids.uniq], :order => "name")
   end
 
   def validate
