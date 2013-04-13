@@ -171,19 +171,26 @@ class PackagesController < ApplicationController
 
           flash[:notice] = 'Package was successfully updated.'
 
-          #if Rails.env.production?
-            unless params[:request_path].blank?
+          if Rails.env.production?
+            url = ''
+
+            if params[:request_path].blank?
+              brew_tag_name = escape_url(@package.brew_tag.name)
+              package_name =  escape_url(@package.name)
+              frag = "#{brew_tag_name}/packages/#{package_name}"
+              url = generate_request_path(request, frag)
+            else
               url = params[:request_path].gsub('/edit', '')
-
-              if Setting.activated?(@package.brew_tag, Setting::ACTIONS[:updated])
-                Notify::Package.update(current_user, url, @package, Setting.all_recipients_of_package(@package, current_user, :edit))
-              end
-
-              unless params[:div_package_edit_notification_area].blank?
-                Notify::Package.update(current_user, url, @package, params[:div_package_edit_notification_area])
-              end
             end
-          #end
+
+            if Setting.activated?(@package.brew_tag, Setting::ACTIONS[:updated])
+              Notify::Package.update(current_user, url, @package, Setting.all_recipients_of_package(@package, current_user, :edit))
+            end
+
+            unless params[:div_package_edit_notification_area].blank?
+              Notify::Package.update(current_user, url, @package, params[:div_package_edit_notification_area])
+            end
+          end
 
           @output = true
         else
@@ -192,7 +199,6 @@ class PackagesController < ApplicationController
           end
           @user = params[:user]
           @output = false
-
         end
       end
 
@@ -208,8 +214,6 @@ class PackagesController < ApplicationController
     end
   end
 
-  #DELETE /packages/1
-  #DELETE /packages/1.xml
   def destroy
     expire_all_fragments
     @package = Package.find(params[:id])

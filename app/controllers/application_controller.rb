@@ -104,15 +104,23 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def generate_request_path(request)
+  def generate_request_path(request, frag=nil)
     if request.blank?
-      return ""
+      return ''
     end
 
     if request.port != 80
-      "http://#{request.host}:#{request.port}#{request.path}"
+      if frag.blank?
+        "http://#{request.host}:#{request.port}#{request.path}"
+      else
+        "http://#{request.host}:#{request.port}/#{frag}"
+      end
     else
-      "http://#{request.host}#{request.path}"
+      if frag.blank?
+        "http://#{request.host}#{request.path}"
+      else
+        "http://#{request.host}/#{frag}"
+      end
     end
   end
 
@@ -161,7 +169,6 @@ class ApplicationController < ActionController::Base
       end
     end
   end
-
 
   def validate_xattr_options(check_show_xattrs, check_enable_xattrs, brew_tag)
     if brew_tag.blank? || !Setting.enabled_in_brew_tag?(brew_tag) # check the system settings
@@ -257,11 +264,11 @@ class ApplicationController < ActionController::Base
         # We should truncate a whole word. If we reach the limit, and the word
         # has left alphas to show, we rollback this word and mark 'l' as already
         # reach limit
-        if l >= length && char_array.size > i+1 && ![32,12288].include?(char_array[i+1]) # word not end naturally
+        if l >= length && char_array.size > i+1 && ![32, 12288].include?(char_array[i+1]) # word not end naturally
           j = i; # start rollback from current position
           while j >= 0
             j = j - 1
-            if [32,12288].include?(char_array[j])  # match space
+            if [32, 12288].include?(char_array[j]) # match space
               i = j-1 # mark rollback position
               l = length # mark as reach limit
               break
