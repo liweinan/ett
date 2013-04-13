@@ -4,6 +4,7 @@ class BrewTag < ActiveRecord::Base
   validates_uniqueness_of :name
   
   default_value_for :can_show, 'Yes'
+  default_value_for :total_manual_track_time, 0
 
   has_many :marks, :dependent => :destroy
   has_many :packages, :dependent => :destroy
