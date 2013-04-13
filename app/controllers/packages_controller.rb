@@ -85,6 +85,7 @@ class PackagesController < ApplicationController
         url = APP_CONFIG["site_prefix"] + "brew_tags/" + escape_url(@package.brew_tag.name) + "/packages/" + escape_url(@package.name)
 
         if Rails.env.production?
+
           if Setting.activated?(@package.brew_tag, Setting::ACTIONS[:created])
             Notify::Package.create(current_user, url, @package, Setting.all_recipients_of_package(@package, nil, :create))
           end
@@ -170,10 +171,9 @@ class PackagesController < ApplicationController
 
           flash[:notice] = 'Package was successfully updated.'
 
-          if  Rails.env.production?
-            ### TODO HACK HACK! this should be fixed, ajax update call in list page should also be able to send notification!
+          #if Rails.env.production?
             unless params[:request_path].blank?
-              url = params[:request_path].sub(/\/edit$/, '')
+              url = params[:request_path].gsub('/edit', '')
 
               if Setting.activated?(@package.brew_tag, Setting::ACTIONS[:updated])
                 Notify::Package.update(current_user, url, @package, Setting.all_recipients_of_package(@package, current_user, :edit))
@@ -183,7 +183,7 @@ class PackagesController < ApplicationController
                 Notify::Package.update(current_user, url, @package, params[:div_package_edit_notification_area])
               end
             end
-          end
+          #end
 
           @output = true
         else

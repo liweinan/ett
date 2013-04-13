@@ -105,10 +105,14 @@ class ApplicationController < ActionController::Base
   end
 
   def generate_request_path(request)
+    if request.blank?
+      return ""
+    end
+
     if request.port != 80
-      "http://#{request.host}:#{request.port}#{request.path}?#{request.query_string}"
+      "http://#{request.host}:#{request.port}#{request.path}"
     else
-      "http://#{request.host}#{request.path}?#{request.query_string}"
+      "http://#{request.host}#{request.path}"
     end
   end
 
