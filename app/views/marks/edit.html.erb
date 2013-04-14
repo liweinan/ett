@@ -1,6 +1,6 @@
 <h1>Editing mark</h1>
 
-<% form_for(@mark) do |f| %>
+<%= form_for(@mark) do |f| %>
     <%= f.error_messages %>
 
     <%= render :partial => 'key', :locals => {:f => f} %>

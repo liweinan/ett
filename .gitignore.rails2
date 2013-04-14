@@ -1,0 +1,7 @@
+tmp
+.DS_Store
+.idea
+.svn
+development.log
+log
+cache

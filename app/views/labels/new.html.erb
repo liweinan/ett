@@ -5,7 +5,7 @@
 <% end %>
 
 <div class='manage-tbl'>
-  <% form_for(@label) do |f| %>
+  <%= form_for(@label) do |f| %>
       <%= f.error_messages %>
       <table>
         <% if params[:brew_tag_id].blank? %>

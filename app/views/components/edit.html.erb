@@ -2,7 +2,7 @@
 
 <div class='manage-tbl'>
 
-  <% form_for(@component) do |f| %>
+  <%= form_for(@component) do |f| %>
       <%= f.error_messages %>
       <%= f.hidden_field :id, :value => @component.id %>
       <table>

@@ -1,7 +1,7 @@
 <% if can_edit_package? @package %>
 <%= render :partial => 'layouts/line' %>
     <div class='manage-tbl' style="width:400px;">
-      <% form_for PAttachment.new, :html => {:multipart => true} do |f| %>
+      <%= form_for PAttachment.new, :html => {:multipart => true} do |f| %>
           <%= f.hidden_field :package_id, :value => @package.id %>
           <p>
             Add Attachment:

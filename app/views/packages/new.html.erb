@@ -7,7 +7,7 @@
 <h2>New package of <%= params[:brew_tag_id] %></h2>
 
 <div class='manage-tbl'>
-  <% form_for(@package) do |f| %>
+  <%= form_for(@package) do |f| %>
       <%= f.error_messages %>
 
       <table>

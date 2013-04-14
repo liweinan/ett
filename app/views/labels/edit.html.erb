@@ -4,7 +4,7 @@
     <h2>Editing system internal label</h2>
 <% end %>
 <div class='manage-tbl'>
-  <% form_for(@label) do |f| %>
+  <%= form_for(@label) do |f| %>
       <%= f.error_messages %>
       <table>
         <%= f.hidden_field :id, :value => @label.id %>

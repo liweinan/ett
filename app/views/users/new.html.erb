@@ -1,6 +1,6 @@
 <h2>New user</h2>
 <div class='manage-tbl'>
-  <% form_for(@user) do |f| %>
+  <%= form_for(@user) do |f| %>
       <%= f.error_messages %>
       <table>
         <%= render :partial => 'users/fields/name', :locals => {:f => f} %>

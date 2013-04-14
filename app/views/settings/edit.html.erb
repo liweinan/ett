@@ -4,7 +4,7 @@
     <h1>Edit Settings of <%= @setting.brew_tag.name %></h1>
 <% end %>
 <%= render :partial => 'layouts/sep' %>
-<% form_for(@setting) do |f| %>
+<%= form_for(@setting) do |f| %>
     <%= render :partial => 'settings/fields/enabled', :locals => {:f => f} %>
     <%= render :partial => 'layouts/sep' %>
 
