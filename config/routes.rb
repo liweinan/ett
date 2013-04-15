@@ -1,4 +1,5 @@
 Bq::Application.routes.draw do
+  match ':controller(/:action(/:id))(.:format)'
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

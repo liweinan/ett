@@ -36,3 +36,11 @@ gem 'jquery-rails'
 
 # To use debugger
 # gem 'debugger'
+
+
+gem 'RedCloth', "~> 4.0", :require => 'redcloth'
+
+group :development do
+  # Make sure that `gem install mongrel -v '1.1.5'` succeeds before bundling.
+  #gem 'mongrel'
+end
