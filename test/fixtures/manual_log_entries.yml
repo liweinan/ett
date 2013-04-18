@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  who: 1
+  from: 2013-04-17 23:14:24
+  to: 2013-04-17 23:14:24
+
+two:
+  who: 1
+  from: 2013-04-17 23:14:24
+  to: 2013-04-17 23:14:24

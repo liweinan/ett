@@ -1,0 +1,2 @@
+module ManualLogEntriesHelper
+end

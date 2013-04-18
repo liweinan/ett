@@ -1,0 +1,24 @@
+<h1>Listing manual_log_entries</h1>
+
+<table>
+  <tr>
+    <th>Who</th>
+    <th>From</th>
+    <th>To</th>
+  </tr>
+
+<% @manual_log_entries.each do |manual_log_entry| %>
+  <tr>
+    <td><%=h manual_log_entry.who %></td>
+    <td><%=h manual_log_entry.from %></td>
+    <td><%=h manual_log_entry.to %></td>
+    <td><%= link_to 'Show', manual_log_entry %></td>
+    <td><%= link_to 'Edit', edit_manual_log_entry_path(manual_log_entry) %></td>
+    <td><%= link_to 'Destroy', manual_log_entry, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New manual_log_entry', new_manual_log_entry_path %>

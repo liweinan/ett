@@ -176,7 +176,7 @@ class PackagesController < ApplicationController
 
             if params[:request_path].blank?
               brew_tag_name = escape_url(@package.brew_tag.name)
-              package_name =  escape_url(@package.name)
+              package_name = escape_url(@package.name)
               frag = "#{brew_tag_name}/packages/#{package_name}"
               url = generate_request_path(request, frag)
             else
@@ -346,7 +346,7 @@ class PackagesController < ApplicationController
       end
     end
 
-    # send it to the browsah
+    # send it to the browser
     send_data csv_string,
               :type => 'text/csv; charset=iso-8859-1; header=present',
               :disposition => "attachment; filename=packages_#{Time.now.to_i}.csv"
@@ -363,12 +363,20 @@ class PackagesController < ApplicationController
 
 
   def stop_progress
-    @package = Package.find(params[:id])
+    Package.transaction do
+      @package = Package.find(params[:id])
+      now = Time.now
+      from = @package.time_point
+      @package.time_consumed += ((now.to_i - @package.time_point) / 60)
+      @package.time_point = 0
+      @package.save
 
-    @package.time_consumed += ((Time.now.to_i - @package.time_point) / 60)
-    @package.time_point = 0
-    @package.save
-
+      log_entry = ManualLogEntry.new
+      log_entry.from = Time.at(from)
+      log_entry.to = Time.at(now)
+      log_entry.who = current_user
+      log_entry.save
+    end
     respond_to do |format|
       format.js
     end

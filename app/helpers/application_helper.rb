@@ -57,9 +57,16 @@ module ApplicationHelper
   end
 
   def log_work_time(pac, worktime)
-    pac.time_consumed += convert_worktime(worktime)
-    pac.save
-    #((Time.now.to_i - @package.time_point) / 60)
+    Package.transaction do
+      pac.time_consumed += convert_worktime(worktime)
+      pac.save
+
+      entry = ManualLogEntry.new
+      entry.to = Time.now
+      entry.from = Time.at(entry.to.to_i - convert_worktime(worktime) * 60)
+      entry.who = current_user
+      entry.save
+    end
   end
 
   def convert_worktime(worktime)

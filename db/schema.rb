@@ -9,13 +9,20 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130401134659) do
+ActiveRecord::Schema.define(:version => 20130417151825) do
 
   create_table "assignments", :force => true do |t|
     t.integer  "mark_id"
     t.integer  "package_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "auto_log_entries", :force => true do |t|
+    t.integer  "who_id"
+    t.integer  "label_id"
+    t.datetime "from"
+    t.datetime "to"
   end
 
   create_table "brew_tags", :force => true do |t|
@@ -79,6 +86,14 @@ ActiveRecord::Schema.define(:version => 20130401134659) do
     t.string   "code"
     t.text     "style"
     t.string   "is_track_time"
+  end
+
+  create_table "manual_log_entries", :force => true do |t|
+    t.integer  "who_id"
+    t.datetime "from"
+    t.datetime "to"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "marks", :force => true do |t|

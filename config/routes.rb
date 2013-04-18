@@ -1,4 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :manual_log_entries
+
   map.resources :sandboxes
 
   map.resources :changelogs

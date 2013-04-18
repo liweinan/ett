@@ -1,0 +1,18 @@
+<p>
+  <b>Who:</b>
+  <%=h @manual_log_entry.who %>
+</p>
+
+<p>
+  <b>From:</b>
+  <%=h @manual_log_entry.from %>
+</p>
+
+<p>
+  <b>To:</b>
+  <%=h @manual_log_entry.to %>
+</p>
+
+
+<%= link_to 'Edit', edit_manual_log_entry_path(@manual_log_entry) %> |
+<%= link_to 'Back', manual_log_entries_path %>
