@@ -65,6 +65,7 @@ module ApplicationHelper
       entry.to = Time.now
       entry.from = Time.at(entry.to.to_i - convert_worktime(worktime) * 60)
       entry.who = current_user
+      entry.package = pac
       entry.save
     end
   end

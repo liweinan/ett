@@ -158,6 +158,15 @@ class PackagesController < ApplicationController
               @tt.time_consumed += (@package.label_changed_at.to_i - last_label_changed_at.to_i)/60
               @tt.save
             end
+
+            log_entry = AutoLogEntry.new
+            last_label_changed_at ||= @package.label_changed_at
+            log_entry.from = last_label_changed_at
+            log_entry.to = @package.label_changed_at
+            log_entry.who = current_user
+            log_entry.package = @package
+            log_entry.label = last_label
+            log_entry.save
           end
 
           @package.save
@@ -375,6 +384,7 @@ class PackagesController < ApplicationController
       log_entry.from = Time.at(from)
       log_entry.to = Time.at(now)
       log_entry.who = current_user
+      log_entry.package = @package
       log_entry.save
     end
     respond_to do |format|
