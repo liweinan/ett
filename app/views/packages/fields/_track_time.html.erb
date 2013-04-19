@@ -7,8 +7,6 @@ MANUAL TIME TRACK-
   <%= display_manual_track_time_in_real_time(@package) %>
 </span>
 
-<%= render :partial => 'layouts/sep_tiny' %>
-
 <span id="manual_time_track_current_status">
 <% if @package.in_progress? %>
   <%= render :partial => 'packages/fields/progress_started' %>
@@ -16,6 +14,23 @@ MANUAL TIME TRACK-
   <%= render :partial => 'packages/fields/progress_stopped' %>
 <% end %>
 </span>
-<%= render :partial => 'layouts/sep_tiny' %>
 <span id="manual_time_track_component">&nbsp;</span> <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'manual_time_track_component_indicator'} %>
+<%= render :partial => 'layouts/sep_tiny' %>
+<% form_remote_tag(
+           :url => {:controller => "toolbox", :action => "log_work_done"},
+           :loading => "Element.show('spinner_log_#{@package.id}');",
+           :success => "Element.hide('spinner_log_#{@package.id}');
+           document.getElementById('work_time_col').value='';
+           ") do %>
+    <%= hidden_field_tag :package_id, @package.id %>
+    <%= hidden_field_tag :refresh_page, 'manual_tracked_time' %>
+    <div style="text-align: left;">
+      Log work time: <input id="work_time_col" name="work_time">
+      (Example: 1w,2d,3h,4m)
+      <%= submit_tag 'Log' %>
+      <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "spinner_log_#{@package.id}"} %>
+    </div>
+<% end %>
+
+
 <%= render :partial => 'layouts/sep' %>

@@ -1,10 +1,17 @@
 pac = Package.find(params[:package_id])
 begin
   log_work_time(pac, params[:work_time])
-  div = "log_form_#{pac.id}"
-  page.replace_html div, 'Work time recorded!'
-  page.visual_effect :highlight, div
-  page.visual_effect :fade, div
+
+  if params[:refresh_page].blank?
+    div = "log_form_#{pac.id}"
+    page.replace_html div, 'Work time recorded!'
+    page.visual_effect :highlight, div
+    page.visual_effect :fade, div
+  else
+    page.replace_html params[:refresh_page], display_track_time(pac.time_consumed)
+    page.visual_effect :highlight, params[:refresh_page]
+    page.alert('Work time recorded!');
+  end
 rescue TypeError => e
   page.alert(e.message)
 end
