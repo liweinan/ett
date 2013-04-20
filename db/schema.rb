@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130418111020) do
+ActiveRecord::Schema.define(:version => 20130420065423) do
 
   create_table "assignments", :force => true do |t|
     t.integer  "mark_id"
@@ -186,6 +186,11 @@ ActiveRecord::Schema.define(:version => 20130418111020) do
     t.string   "default_tag"
   end
 
+  create_table "time_zones", :force => true do |t|
+    t.float  "tz_offset"
+    t.string "text"
+  end
+
   create_table "track_times", :force => true do |t|
     t.integer "label_id"
     t.integer "package_id"
@@ -199,6 +204,7 @@ ActiveRecord::Schema.define(:version => 20130418111020) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "can_manage"
+    t.integer  "tz"
   end
 
   create_table "versions", :force => true do |t|

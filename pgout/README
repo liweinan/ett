@@ -1,0 +1,1 @@
+copy time_zones to '/Users/weinanli/projs/bq/pgout/out.txt' csv;

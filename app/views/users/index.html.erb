@@ -4,8 +4,9 @@
     <tr>
       <th class='content-list-head'>Name</th>
       <th class='content-list-head'>Email</th>
+      <th class='content-list-head'>Time Zone</th>
       <th class='content-list-head'>&nbsp;Can Manage&nbsp;</th>
-      <% if session[:current_user] %>
+      <% if logged_in? %>
           <th class='content-list-head'> Operation</th>
       <% end %>
     </tr>
@@ -14,10 +15,11 @@
         <tr>
           <td><%= h user.name %></td>
           <td><%= h user.email %></td>
+          <td><%= h user.zone_name %></td>
           <td><%= h user.can_manage %></td>
-          <% if session[:current_user] %>
+          <% if logged_in? %>
               <td>
-                <% if session[:current_user].email == user.email || session[:current_user].can_manage == 'Yes' %>
+                <% if  can_manage? || current_user.email == user.email %>
                     <%= link_to 'Edit', edit_user_path(user) %>
                 <% end %>
               </td>

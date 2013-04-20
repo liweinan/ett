@@ -2,7 +2,7 @@
     <div style="background:<%=background_style(i)%>;">
       <div class='comment-login' id='changelog-<%= changelog.id %>'>
         <sup style="padding:2px;font-weight:normal;"><%= link_to "##{changelog.id}", "#changelog-#{changelog.id}" %></sup>
-        <%= changelog.changed_at.strftime("%Y-%m-%d %I:%M%p") %>
+        <%= at_zone(changelog.changed_at) %>
       </div>
       <div class="comment-comment">
         <!--<span class="comment-date"></span>-->

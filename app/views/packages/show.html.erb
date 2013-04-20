@@ -17,6 +17,12 @@ Assignee:
     <%= h @package.user.name %>
 <% end %>
 <%= render :partial => 'layouts/sep_tiny' %>
+Created At:
+<%= at_zone(@package.created_at) %>
+/
+Last Modified At:
+<%= at_zone(@package.updated_at) %>
+<%= render :partial => 'layouts/sep_tiny' %>
 
 <% unless @package.label.blank? %>
     Label:

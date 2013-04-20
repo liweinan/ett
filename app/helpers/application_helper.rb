@@ -105,4 +105,11 @@ module ApplicationHelper
     end
   end
 
+  def at_zone(time)
+    if session[:current_user].blank?
+      time
+    else
+      session[:current_user].zone.at(time.to_i).strftime("%Y-%m-%d %I:%M%p")
+    end
+  end
 end

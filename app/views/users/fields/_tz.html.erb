@@ -1,0 +1,14 @@
+<tr>
+  <td align='right'>
+    <%= f.label :time_zone %>
+  </td>
+  <td align='left'>
+    <select name="time_zone" id="time_zone">
+      <% TimeZone.all(:order => 'tz_offset').each do |tz| %>
+          <option value="<%= tz.id %>"><%= tz.text %></option>
+      <% end %>
+    </select>
+  </td>
+</tr>
+
+

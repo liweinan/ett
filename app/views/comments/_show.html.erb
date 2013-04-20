@@ -8,7 +8,7 @@
           <sup style="padding:2px;font-weight:normal;"><%= link_to "##{comment.id}", "#comment-#{comment.id}" %></sup>
           <%= h comment.user.name %>
         </div>
-        <span class="comment-date"><sup style="padding:2px;">&nbsp;</sup><%= comment.created_at.strftime("%Y-%m-%d %I:%M%p") %></span>
+        <span class="comment-date"><sup style="padding:2px;">&nbsp;</sup><%= at_zone(comment.created_at) %></span>
 
         <p><span class="comment-body"><%= Extractor.extract_url(comment.comment) %></span></p>
 
