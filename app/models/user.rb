@@ -20,7 +20,7 @@ class User < ActiveRecord::Base
 
   def zone
     if tz.blank?
-      return ActiveSupport::TimeZone[0]
+      nil
     else
       ActiveSupport::TimeZone[tz.tz_offset]
     end
