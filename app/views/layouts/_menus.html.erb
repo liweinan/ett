@@ -14,7 +14,7 @@
 			<%= link_to 'Login', '/login' %> /
           <%= link_to 'Register', new_user_path %>
 		<% else %>
-			Welcome, <%= link_to current_user.name, :controller => :users, :action => :edit, :id => current_user.id %>
+			Welcome, <%= link_to current_user.name, :controller => :users, :action => :show, :id => current_user.id %>
           (<%= link_to 'All My Packages', :controller => :packages, :action => :index, :user => current_user.email, :brew_tag_id => nil %>
           )&nbsp;/&nbsp;<%= link_to 'Logout', '/logout' %>
 		<% end %>

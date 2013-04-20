@@ -13,7 +13,7 @@
 
     <% @users.each do |user| %>
         <tr>
-          <td><%= h user.name %></td>
+          <td><%= link_to user.name, :controller => :users, :action => :show, :id => user.id %></td>
           <td><%= h user.email %></td>
           <td><%= h user.zone_name %></td>
           <td><%= h user.can_manage %></td>
