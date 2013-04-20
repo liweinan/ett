@@ -19,7 +19,7 @@
           <td><%= h user.can_manage %></td>
           <% if logged_in? %>
               <td>
-                <% if  can_manage? || current_user.email == user.email %>
+                <% if its_me?(user) %>
                     <%= link_to 'Edit', edit_user_path(user) %>
                 <% end %>
               </td>

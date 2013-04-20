@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
   helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_tag?, :count_packages, :can_edit_package?, :current_user, :get_brew_tag, :has_label?, :has_mark?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :brew_tag_has_marks?, :get_xattrs, :background_style, :confirmed?, :default_style
-  helper_method :btag, :ebtag, :uebtag, :truncate_u
+  helper_method :btag, :ebtag, :uebtag, :truncate_u, :its_me?
   before_filter :process_brew_tag_id
   before_filter :save_current_link
               # Scrub sensitive parameters from your log
@@ -442,4 +442,9 @@ class ApplicationController < ActionController::Base
     File.exist?(RAILS_ROOT + "/app/views/layouts/" + layout + ".html.erb")
   end
 
+  def its_me?(user)
+    return false unless logged_in?
+    return false if user.blank?
+    can_manage? || current_user.email == user.email
+  end
 end

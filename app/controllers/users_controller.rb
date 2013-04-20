@@ -43,7 +43,7 @@ class UsersController < ApplicationController
   # GET /users/1/edit
   def edit
     @user = User.find(params[:id])
-    unless @user.id == session[:current_user].id || session[:current_user].can_manage == 'Yes'
+    unless its_me?(@user)
       redirect_to('/packages')
     end
   end
@@ -73,13 +73,12 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       respond_to do |format|
         params[:user][:email].downcase!
-
-        unless params[:time_zone].blank?
+        if its_me?(@user) && !params[:time_zone].blank?
           @user.tz = TimeZone.find(params[:time_zone])
           @user.save
         end
 
-        if @user.update_attributes(params[:user])
+        if its_me?(@user) && @user.update_attributes(params[:user])
           flash[:notice] = 'User was successfully updated.'
           format.html { redirect_to(@user) }
         else
