@@ -69,16 +69,22 @@ class UsersController < ApplicationController
   # PUT /users/1
   # PUT /users/1.xml
   def update
-    @user = User.find(params[:id])
-    respond_to do |format|
-      params[:user][:email].downcase!
-      if @user.update_attributes(params[:user])
-        flash[:notice] = 'User was successfully updated.'
-        format.html { redirect_to(@user) }
-        format.xml { head :ok }
-      else
-        format.html { render :action => "edit" }
-        format.xml { render :xml => @user.errors, :status => :unprocessable_entity }
+    User.transaction do
+      @user = User.find(params[:id])
+      respond_to do |format|
+        params[:user][:email].downcase!
+
+        unless params[:time_zone].blank?
+          @user.tz = TimeZone.find(params[:time_zone])
+          @user.save
+        end
+
+        if @user.update_attributes(params[:user])
+          flash[:notice] = 'User was successfully updated.'
+          format.html { redirect_to(@user) }
+        else
+          format.html { render :action => "edit" }
+        end
       end
     end
   end

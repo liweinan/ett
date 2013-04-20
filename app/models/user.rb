@@ -22,7 +22,7 @@ class User < ActiveRecord::Base
     if tz.blank?
       return ActiveSupport::TimeZone[0]
     else
-      ActiveSupport::TimeZone[tz.offset]
+      ActiveSupport::TimeZone[tz.tz_offset]
     end
   end
 
