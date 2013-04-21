@@ -5,7 +5,7 @@
   <td align='left'>
     <select name="time_zone" id="time_zone">
       <% TimeZone.all(:order => 'tz_offset').each do |tz| %>
-          <option value="<%= tz.id %>"><%= tz.text %></option>
+          <option value="<%= tz.id %>" <% if tz == @user.tz %>selected<% end %>><%= tz.text %></option>
       <% end %>
     </select>
   </td>
