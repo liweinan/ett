@@ -3,8 +3,8 @@ class AutoLogEntry < ActiveRecord::Migration
     create_table :auto_log_entries do |t|
       t.integer :who_id
       t.integer :label_id
-      t.datetime :from
-      t.datetime :to
+      t.datetime :start_time
+      t.datetime :end_time
     end
 
   end

@@ -161,8 +161,8 @@ class PackagesController < ApplicationController
 
             log_entry = AutoLogEntry.new
             last_label_changed_at ||= @package.label_changed_at
-            log_entry.from = last_label_changed_at
-            log_entry.to = @package.label_changed_at
+            log_entry.start_time = last_label_changed_at
+            log_entry.end_time = @package.label_changed_at
             log_entry.who = current_user
             log_entry.package = @package
             log_entry.label = last_label
