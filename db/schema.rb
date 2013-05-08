@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130420065423) do
+ActiveRecord::Schema.define(:version => 20130507042527) do
 
   create_table "assignments", :force => true do |t|
     t.integer  "mark_id"
@@ -21,8 +21,8 @@ ActiveRecord::Schema.define(:version => 20130420065423) do
   create_table "auto_log_entries", :force => true do |t|
     t.integer  "who_id"
     t.integer  "label_id"
-    t.datetime "from"
-    t.datetime "to"
+    t.datetime "start_time"
+    t.datetime "end_time"
     t.integer  "package_id"
   end
 
@@ -76,6 +76,16 @@ ActiveRecord::Schema.define(:version => 20130420065423) do
     t.integer "package_id"
   end
 
+  create_table "label_stats", :force => true do |t|
+    t.integer  "package_stat_id"
+    t.integer  "label_id"
+    t.integer  "user_id"
+    t.integer  "minutes"
+    t.text     "time_span"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "labels", :force => true do |t|
     t.string   "name"
     t.integer  "brew_tag_id"
@@ -91,8 +101,8 @@ ActiveRecord::Schema.define(:version => 20130420065423) do
 
   create_table "manual_log_entries", :force => true do |t|
     t.integer  "who_id"
-    t.datetime "from"
-    t.datetime "to"
+    t.datetime "start_time"
+    t.datetime "end_time"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "package_id"
@@ -121,6 +131,14 @@ ActiveRecord::Schema.define(:version => 20130420065423) do
     t.integer  "from_package_id"
     t.integer  "to_package_id"
     t.integer  "relationship_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "package_stats", :force => true do |t|
+    t.integer  "workload_id"
+    t.integer  "package_id"
+    t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -204,7 +222,7 @@ ActiveRecord::Schema.define(:version => 20130420065423) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "can_manage"
-    t.integer  "tz"
+    t.integer  "tz_id"
   end
 
   create_table "versions", :force => true do |t|
@@ -226,5 +244,25 @@ ActiveRecord::Schema.define(:version => 20130420065423) do
   add_index "versions", ["user_id", "user_type"], :name => "index_versions_on_user_id_and_user_type"
   add_index "versions", ["user_name"], :name => "index_versions_on_user_name"
   add_index "versions", ["versioned_id", "versioned_type"], :name => "index_versions_on_versioned_id_and_versioned_type"
+
+  create_table "weekly_workloads", :force => true do |t|
+    t.integer  "brew_tag_id"
+    t.datetime "start_of_week"
+    t.datetime "end_of_week"
+    t.integer  "package_count"
+    t.integer  "auto_sum"
+    t.integer  "manual_sum"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "worktime_stats", :force => true do |t|
+    t.integer  "package_stat_id"
+    t.integer  "user_id"
+    t.integer  "minutes"
+    t.text     "time_span"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end

@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  week: MyString
+  package_count: 1
+  auto_sum: MyText
+  manual_sum: MyText
+
+two:
+  week: MyString
+  package_count: 1
+  auto_sum: MyText
+  manual_sum: MyText

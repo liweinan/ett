@@ -1,4 +1,8 @@
-<%= link_to "Time Report", :controller => :packages, :action => :index, :brew_tag_id => escape_url(params[:brew_tag_id]), :user => params[:user], :style => "time_report" %> / <%= link_to "Printable Page", :controller => :packages, :action => :index, :brew_tag_id => escape_url(params[:brew_tag_id]), :user => params[:user], :style => 'printable' %> / <%= link_to 'Export to CSV', "/packages/export_to_csv/-1?brew_tag_id=#{escape_url(params[:brew_tag_id])}&mark=#{escape_url(params[:mark])}&label=#{escape_url(params[:label])}&user=#{escape_url(params[:user])}" %>
+<%= link_to "Workload", :controller => :packages, :action => :index, :brew_tag_id => escape_url(params[:brew_tag_id]), :user => params[:user], :style => "workload" %>
+/
+<%= link_to "Time Report", :controller => :packages, :action => :index, :brew_tag_id => escape_url(params[:brew_tag_id]), :user => params[:user], :style => "time_report" %>
+/
+<%= link_to "Printable Page", :controller => :packages, :action => :index, :brew_tag_id => escape_url(params[:brew_tag_id]), :user => params[:user], :style => 'printable' %> / <%= link_to 'Export to CSV', "/packages/export_to_csv/-1?brew_tag_id=#{escape_url(params[:brew_tag_id])}&mark=#{escape_url(params[:mark])}&label=#{escape_url(params[:label])}&user=#{escape_url(params[:user])}" %>
 / <%= link_to 'Search Packages', "/search/packages?brew_tag_id=#{ebtag}" %>
 <% if logged_in? %>
     <% if has_tag? %>

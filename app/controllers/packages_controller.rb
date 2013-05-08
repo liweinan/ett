@@ -375,13 +375,13 @@ class PackagesController < ApplicationController
     Package.transaction do
       @package = Package.find(params[:id])
       now = Time.now
-      from = @package.time_point
+      start_time = @package.time_point
       @package.time_consumed += ((now.to_i - @package.time_point) / 60)
       @package.time_point = 0
       @package.save
 
       log_entry = ManualLogEntry.new
-      log_entry.from = Time.at(from)
+      log_entry.start_time = Time.at(start_time)
       log_entry.to = Time.at(now)
       log_entry.who = current_user
       log_entry.package = @package

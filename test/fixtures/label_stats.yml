@@ -1,0 +1,15 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  package_stat_id: 1
+  label_id: 1
+  start_time: 2013-05-07 12:25:26
+  end_time: 2013-05-07 12:25:26
+  user_id: 1
+
+two:
+  package_stat_id: 1
+  label_id: 1
+  start_time: 2013-05-07 12:25:26
+  end_time: 2013-05-07 12:25:26
+  user_id: 1
