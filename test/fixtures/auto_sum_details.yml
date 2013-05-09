@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  weekly_workload_id: 1
+  label_id: 1
+  minutes: 1
+
+two:
+  weekly_workload_id: 1
+  label_id: 1
+  minutes: 1

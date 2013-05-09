@@ -1,4 +1,27 @@
-<h2>Packages Built Per Week</h2>
+<h2>Workload Report</h2>
 
+<% wls = WeeklyWorkload.all(:conditions => ["brew_tag_id=?", BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).id], :order => "updated_at") %>
+
+
+<div class='manage-tbl'>
+  <table>
+    <tr>
+      <th class='content-list-head'>Operation</th>
+      <th class='content-list-head'>Start Of Week</th>
+      <th class='content-list-head'>End Of Week</th>
+      <th class='content-list-head'>Packages Built</th>
+      <th class='content-list-head'>Automatic Time Track</th>
+      <th class='content-list-head'>Manual Time Track</th>
+    </tr>
+    <% wls.each do |wl| %>
+        <tr>
+          <td style='font-size:10px;'>Detail</td>
+          <td style='font-size:10px;text-align:left;'><%= wl.start_of_week %></td>
+          <td style='font-size:10px;text-align:left;'><%= wl.end_of_week %></td>
+          <td style='font-size:10px;text-align:left;'><%= wl.package_count %></td>
+        </tr>
+    <% end %>
+  </table>
+</div>
 
 

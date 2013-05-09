@@ -5,9 +5,7 @@ class CreateWeeklyWorkloads < ActiveRecord::Migration
       t.datetime :start_of_week
       t.datetime :end_of_week
       t.integer :package_count
-      t.integer :auto_sum
       t.integer :manual_sum
-
       t.timestamps
     end
   end

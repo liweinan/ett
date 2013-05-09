@@ -1,7 +1,7 @@
 class CreatePackageStats < ActiveRecord::Migration
   def self.up
     create_table :package_stats do |t|
-      t.integer :workload_id
+      t.integer :weekly_workload_id
       t.integer :package_id
       t.integer :user_id
 

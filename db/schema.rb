@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130507042527) do
+ActiveRecord::Schema.define(:version => 20130509121046) do
 
   create_table "assignments", :force => true do |t|
     t.integer  "mark_id"
@@ -24,6 +24,15 @@ ActiveRecord::Schema.define(:version => 20130507042527) do
     t.datetime "start_time"
     t.datetime "end_time"
     t.integer  "package_id"
+    t.integer  "weekly_workload_id"
+  end
+
+  create_table "auto_sum_details", :force => true do |t|
+    t.integer  "weekly_workload_id"
+    t.integer  "label_id"
+    t.integer  "minutes"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "brew_tags", :force => true do |t|
@@ -106,6 +115,7 @@ ActiveRecord::Schema.define(:version => 20130507042527) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "package_id"
+    t.integer  "weekly_workload_id"
   end
 
   create_table "marks", :force => true do |t|
@@ -136,7 +146,7 @@ ActiveRecord::Schema.define(:version => 20130507042527) do
   end
 
   create_table "package_stats", :force => true do |t|
-    t.integer  "workload_id"
+    t.integer  "weekly_workload_id"
     t.integer  "package_id"
     t.integer  "user_id"
     t.datetime "created_at"
@@ -166,6 +176,7 @@ ActiveRecord::Schema.define(:version => 20130507042527) do
     t.datetime "label_changed_at"
     t.string   "external_scm"
     t.string   "mead"
+    t.string   "brew"
     t.integer  "time_consumed"
     t.integer  "time_point"
   end
@@ -250,7 +261,6 @@ ActiveRecord::Schema.define(:version => 20130507042527) do
     t.datetime "start_of_week"
     t.datetime "end_of_week"
     t.integer  "package_count"
-    t.integer  "auto_sum"
     t.integer  "manual_sum"
     t.datetime "created_at"
     t.datetime "updated_at"
