@@ -90,7 +90,6 @@ ActiveRecord::Schema.define(:version => 20130509121046) do
     t.integer  "label_id"
     t.integer  "user_id"
     t.integer  "minutes"
-    t.text     "time_span"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -149,6 +148,7 @@ ActiveRecord::Schema.define(:version => 20130509121046) do
     t.integer  "weekly_workload_id"
     t.integer  "package_id"
     t.integer  "user_id"
+    t.integer  "minutes"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

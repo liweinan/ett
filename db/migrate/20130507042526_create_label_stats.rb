@@ -5,7 +5,6 @@ class CreateLabelStats < ActiveRecord::Migration
       t.integer :label_id
       t.integer :user_id
       t.integer :minutes
-      t.text :time_span
       t.timestamps
     end
   end

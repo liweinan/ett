@@ -1,5 +1,9 @@
 class WorkloadController < ApplicationController
 
+  def show
+    @wl = WeeklyWorkload.find(params[:id])
+  end
+
   def generate_weekly_workload
     Package.transaction do
       brew_tags = BrewTag.all
@@ -26,19 +30,17 @@ class WorkloadController < ApplicationController
 
         # in case this is a rerun
         wl = WeeklyWorkload.find(:first, :conditions => ["start_of_week=? and end_of_week=? and brew_tag_id=?", begin_of_current_week, end_of_current_week, brew_tag.id])
+        unless wl.blank?
+          wl.destroy
+        end
 
         # or it's the first run
-        wl ||= WeeklyWorkload.new
+        wl = WeeklyWorkload.new
         wl.start_of_week = begin_of_current_week
         wl.end_of_week = end_of_current_week
         wl.package_count = candidates.size
         wl.brew_tag_id = brew_tag.id
         wl.save
-
-        # in case this is a rerun
-        wl.package_stats.each do |ps|
-          ps.destroy
-        end
 
         candidates.each do |package|
           ps = PackageStat.new
@@ -64,6 +66,16 @@ class WorkloadController < ApplicationController
             end
             ls.save
 
+            asd = AutoSumDetail.find(:first, :conditions => ["weekly_workload_id=? and label_id=?", wl.id, ls.label_id])
+            if asd.blank?
+              asd = AutoSumDetail.new
+              asd.weekly_workload_id = wl.id
+              asd.label_id = ls.label_id
+            end
+
+            asd.minutes += ls.minutes
+            asd.save
+
             entry.weekly_workload_id = wl.id
             entry.save
           end
@@ -84,8 +96,13 @@ class WorkloadController < ApplicationController
 
             entry.weekly_workload_id = wl.id
             entry.save
+
+            wl.manual_sum += ws.minutes
+            ps.minutes += (entry.end_time.to_i - entry.start_time.to_i) / 60
           end
+          ps.save
         end
+        wl.save
       end
     end
   end

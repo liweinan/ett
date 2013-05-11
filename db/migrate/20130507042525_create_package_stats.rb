@@ -4,6 +4,7 @@ class CreatePackageStats < ActiveRecord::Migration
       t.integer :weekly_workload_id
       t.integer :package_id
       t.integer :user_id
+      t.integer :minutes
 
       t.timestamps
     end

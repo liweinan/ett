@@ -15,10 +15,16 @@
     </tr>
     <% wls.each do |wl| %>
         <tr>
-          <td style='font-size:10px;'>Detail</td>
-          <td style='font-size:10px;text-align:left;'><%= wl.start_of_week %></td>
-          <td style='font-size:10px;text-align:left;'><%= wl.end_of_week %></td>
+          <td style='font-size:10px;'><%= link_to 'Detail', :controller => :workload, :action => :show, :id => wl.id %></td>
+          <td style='font-size:10px;text-align:left;'><%= at_zone(wl.start_of_week, '%Y-%m-%d') %></td>
+          <td style='font-size:10px;text-align:left;'><%= at_zone(wl.end_of_week, '%Y-%m-%d') %></td>
           <td style='font-size:10px;text-align:left;'><%= wl.package_count %></td>
+          <td style='font-size:10px;text-align:left;'>
+            <% wl.auto_sum_details.each do |asd| %>
+                <%= render :partial => 'packages/fields/auto_track_time_display', :locals => {:label => asd.label, :time_consumed => asd.minutes} %>
+            <% end %>
+          </td>
+          <td style='font-size:10px;text-align:left;'><%= display_track_time_in_real_time(wl.manual_sum) %></td>
         </tr>
     <% end %>
   </table>
