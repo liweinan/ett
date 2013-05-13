@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130509121046) do
+ActiveRecord::Schema.define(:version => 20130512025848) do
 
   create_table "assignments", :force => true do |t|
     t.integer  "mark_id"
@@ -213,6 +213,7 @@ ActiveRecord::Schema.define(:version => 20130509121046) do
     t.string   "enabled"
     t.string   "enable_xattrs"
     t.string   "default_tag"
+    t.integer  "close_label_id"
   end
 
   create_table "time_zones", :force => true do |t|

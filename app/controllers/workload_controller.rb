@@ -8,14 +8,14 @@ class WorkloadController < ApplicationController
     Package.transaction do
       brew_tags = BrewTag.all
       brew_tags.each do |brew_tag|
-        #brew_tag = BrewTag.find(params[:id])
-        begin_of_current_week = Date.today.at_beginning_of_week.to_datetime
-        end_of_current_week = Date.today.at_end_of_week.to_datetime
+        current_date = Date.today
 
-        #For test
-        #brew_tag = BrewTag.find(10)
-        #begin_of_current_week = Date.new(2012, 5, 2).to_datetime
-        #end_of_current_week = Date.today.at_end_of_week.to_datetime
+        if !params[:from].blank?
+          current_date = Date.parse(params[:from]) # format: 2012-1-1
+        end
+
+        begin_of_current_week = current_date.at_beginning_of_week.to_datetime
+        end_of_current_week = current_date.at_end_of_week.to_datetime
 
         packages = Package.find_by_sql(["select * from packages where brew_tag_id=? and label_id=(select id from labels where name='Finished' and global='Y') and updated_at >= ? and updated_at <= ?", brew_tag.id, begin_of_current_week, end_of_current_week])
         candidates = []

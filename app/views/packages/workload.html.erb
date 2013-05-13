@@ -1,6 +1,6 @@
 <h2>Workload Report</h2>
 
-<% wls = WeeklyWorkload.all(:conditions => ["brew_tag_id=?", BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).id], :order => "updated_at") %>
+<% wls = WeeklyWorkload.all(:conditions => ["brew_tag_id=?", BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).id], :order => "start_of_week DESC") %>
 
 
 <div class='manage-tbl'>
@@ -9,6 +9,7 @@
       <th class='content-list-head'>Operation</th>
       <th class='content-list-head'>Start Of Week</th>
       <th class='content-list-head'>End Of Week</th>
+      <th class='content-list-head'>Updated At</th>
       <th class='content-list-head'>Packages Built</th>
       <th class='content-list-head'>Automatic Time Track</th>
       <th class='content-list-head'>Manual Time Track</th>
@@ -18,6 +19,7 @@
           <td style='font-size:10px;'><%= link_to 'Detail', :controller => :workload, :action => :show, :id => wl.id %></td>
           <td style='font-size:10px;text-align:left;'><%= at_zone(wl.start_of_week, '%Y-%m-%d') %></td>
           <td style='font-size:10px;text-align:left;'><%= at_zone(wl.end_of_week, '%Y-%m-%d') %></td>
+          <td style='font-size:10px;text-align:left;'><%= at_zone(wl.updated_at) %></td>
           <td style='font-size:10px;text-align:left;'><%= wl.package_count %></td>
           <td style='font-size:10px;text-align:left;'>
             <% wl.auto_sum_details.each do |asd| %>
