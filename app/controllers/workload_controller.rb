@@ -17,7 +17,7 @@ class WorkloadController < ApplicationController
         begin_of_current_week = current_date.at_beginning_of_week.to_datetime
         end_of_current_week = current_date.at_end_of_week.to_datetime
 
-        packages = Package.find_by_sql(["select * from packages where brew_tag_id=? and label_id=(select id from labels where name='Finished' and global='Y') and updated_at >= ? and updated_at <= ?", brew_tag.id, begin_of_current_week, end_of_current_week])
+        packages = Package.find_by_sql(["select * from packages where brew_tag_id=? and label_id IN (select id from labels where is_finish_state='Yes') and updated_at >= ? and updated_at <= ?", brew_tag.id, begin_of_current_week, end_of_current_week])
         candidates = []
 
         packages.each do |package|

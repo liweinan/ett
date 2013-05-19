@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130512025848) do
+ActiveRecord::Schema.define(:version => 20130519141638) do
 
   create_table "assignments", :force => true do |t|
     t.integer  "mark_id"
@@ -105,6 +105,7 @@ ActiveRecord::Schema.define(:version => 20130512025848) do
     t.string   "code"
     t.text     "style"
     t.string   "is_track_time"
+    t.string   "is_finish_state"
   end
 
   create_table "manual_log_entries", :force => true do |t|

@@ -14,6 +14,7 @@
       <th>Can Show</th>
       <th>Can Select</th>
       <th>Track Time</th>
+      <th>Is Finish State</th>
       <th>CSS Style</th>
       <% if can_manage? %>
           <th>Operation</th>
@@ -39,7 +40,9 @@
           <td>
             <%= label.is_track_time %>
           </td>
-
+          <td>
+            <%= label.is_finish_state %>
+          </td>
           <td style="<%= label.style %>">
             Example
           </td>

@@ -9,6 +9,7 @@ class Label < ActiveRecord::Base
   default_value_for :can_show, 'Yes'
   default_value_for :is_track_time, 'Yes'
   default_value_for :style, ''
+  default_value_for :is_finish_state, 'No'
 
   def is_global?
     self.global == 'Y'
