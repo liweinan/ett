@@ -12,10 +12,26 @@
     </tr>
     <tr>
       <td>
-        Description:
+        Candidate Tag:
       </td>
       <td>
-        <%= h @brew_tag.description %>
+        <%= h @brew_tag.candidate_tag %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Target Release:
+      </td>
+      <td>
+        <%= h @brew_tag.target_release %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Description:
+      </td>
+      <td style="text-align: left;text-wrap:normal;white-space:normal;">
+        <%= @brew_tag.description %>
       </td>
     </tr>
 	<tr>

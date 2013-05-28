@@ -4,8 +4,10 @@
   <% form_for(@brew_tag) do |f| %>
       <%= f.error_messages %>
       <table>
-        <%= render :partial => 'name', :locals => {:f => f} %>
-        <%= render :partial => 'description', :locals => {:f => f} %>
+        <%= render :partial => 'brew_tags/fields/name', :locals => {:f => f} %>
+        <%= render :partial => 'brew_tags/fields/candidate_tag', :locals => {:f => f} %>
+        <%= render :partial => 'brew_tags/fields/target_release', :locals => {:f => f} %>
+        <%= render :partial => 'brew_tags/fields/description', :locals => {:f => f} %>
 		<%= render :partial => 'labels/fields/can_show', :locals => {:f => f} %>
         <tr>
           <td colspan='2'>

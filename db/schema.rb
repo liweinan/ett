@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130519141638) do
+ActiveRecord::Schema.define(:version => 20130528104417) do
 
   create_table "assignments", :force => true do |t|
     t.integer  "mark_id"
@@ -42,6 +42,8 @@ ActiveRecord::Schema.define(:version => 20130519141638) do
     t.text     "description"
     t.string   "can_show"
     t.integer  "total_manual_track_time"
+    t.string   "candidate_tag"
+    t.string   "target_release"
   end
 
   create_table "changelogs", :force => true do |t|
@@ -180,6 +182,9 @@ ActiveRecord::Schema.define(:version => 20130519141638) do
     t.string   "brew"
     t.integer  "time_consumed"
     t.integer  "time_point"
+    t.string   "sourceURL"
+    t.string   "RPM"
+    t.string   "MEAD"
   end
 
   create_table "relationships", :force => true do |t|
