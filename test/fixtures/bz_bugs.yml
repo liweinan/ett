@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  bz_id: MyString
+  package_id: 1
+  creator_id: 1
+
+two:
+  bz_id: MyString
+  package_id: 1
+  creator_id: 1

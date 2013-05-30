@@ -67,6 +67,9 @@ Last Modified At:
 <%= render :partial => 'packages/attachment' %>
 <%= render :partial => 'layouts/sep' %>
 
+<%= render :partial => 'packages/bz_bugs', :locals => { :package => @package} %>
+<%= render :partial => 'layouts/sep' %>
+
 <%= render :partial => 'changelog' %>
 <%= render :partial => 'layouts/sep' %>
 

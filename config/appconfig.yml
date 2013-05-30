@@ -1,1 +1,2 @@
 site_prefix: "http://ett.usersys.redhat.com/"
+bugzilla_prefix: "https://bugzilla.redhat.com/show_bug.cgi?id="

@@ -1,0 +1,59 @@
+<%= render :partial => 'layouts/line' %>
+<%= render :partial => 'layouts/sep' %>
+<h3>Related Bugzilla Bugs</h3>
+
+
+Link to an existing bug: <input id="input_bz_id"/>
+<button onclick="linkBugWithPackage();">Link</button> <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'bz_link_indicator'} %>
+or
+<button>Create a new bug</button>
+in Bugzilla
+<%= render :partial => 'layouts/sep' %>
+Current linked bugs:
+<%= render :partial => 'layouts/sep_tiny' %>
+<div class='manage-tbl'>
+  <table>
+    <tr>
+      <th class='content-list-head'>Bug ID</th>
+      <th class='content-list-head'>Operation</th>
+    </tr>
+    <% package.bz_bugs.each do |bz_bug| %>
+        <tr>
+          <td style='font-size:10px'>
+            <%= link_to "bz#{bz_bug.bz_id}", "#{APP_CONFIG['bugzilla_prefix']}#{bz_bug.bz_id}", :target => '_blank' %>
+          </td>
+          <td style='font-size:10px'>
+            Edit / Delete
+          </td>
+        </tr>
+    <% end %>
+
+  </table>
+</div>
+<%= render :partial => 'layouts/sep_tiny' %>
+
+<% content_for :js do %>
+    <script type="text/javascript">
+        function linkBugWithPackage() {
+            var bz_id = document.getElementById('input_bz_id').value;
+            bz_id = bz_id.replace(/^\s+|\s+$/g, '');
+            new Ajax.Request('/toolbox/link_bz_to_package',
+                    {
+                        asynchronous: true,
+                        evalScripts: true,
+                        onLoading: function () {
+                            Element.show('bz_link_indicator');
+                        },
+                        onSuccess: function () {
+                            Element.hide('bz_link_indicator');
+                        },
+                        parameters: {
+                            'bz_id': bz_id,
+                            'package_id': '<%=package.id%>',
+                            'authenticity_token': '<%=form_authenticity_token%>'}
+                    });
+        }
+
+    </script>
+    <%= render :partial => 'time_tracking_js' %>
+<% end %>
