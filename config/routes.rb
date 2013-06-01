@@ -18,6 +18,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :user_views
   map.resources :import
   map.resources :comments
+  map.resources :bz_bugs
   map.logout '/logout', :controller => 'sessions', :action => 'destroy'
   map.login '/login', :controller => 'sessions', :action => 'new'
   # The priority is based upon order of creation: first created -> highest priority.

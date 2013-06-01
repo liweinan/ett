@@ -3,8 +3,8 @@
 <h3>Related Bugzilla Bugs</h3>
 
 
-Link to an existing bug: <input id="input_bz_id"/>
-<button onclick="linkBugWithPackage();">Link</button> <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'bz_link_indicator'} %>
+Link to an existing bug (Bugzilla Bug ID): <input id="input_bz_id"/>
+<button onclick="createBzBugLink();">Link</button> <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'bz_link_indicator'} %>
 or
 <button>Create a new bug</button>
 in Bugzilla
@@ -12,7 +12,7 @@ in Bugzilla
 Current linked bugs:
 <%= render :partial => 'layouts/sep_tiny' %>
 <div class='manage-tbl'>
-  <table>
+  <table id='bz_list_tbl'>
     <tr>
       <th class='content-list-head'>Bug ID</th>
       <th class='content-list-head'>Operation</th>
@@ -23,7 +23,7 @@ Current linked bugs:
             <%= link_to "bz#{bz_bug.bz_id}", "#{APP_CONFIG['bugzilla_prefix']}#{bz_bug.bz_id}", :target => '_blank' %>
           </td>
           <td style='font-size:10px'>
-            Edit / Delete
+            Edit / <a href="javascript:void(0);" onclick="deleteBzBugLink('<%=bz_bug.id%>')">Delete</a>
           </td>
         </tr>
     <% end %>
@@ -34,17 +34,18 @@ Current linked bugs:
 
 <% content_for :js do %>
     <script type="text/javascript">
-        function linkBugWithPackage() {
+        function createBzBugLink() {
             var bz_id = document.getElementById('input_bz_id').value;
             bz_id = bz_id.replace(/^\s+|\s+$/g, '');
-            new Ajax.Request('/toolbox/link_bz_to_package',
+            new Ajax.Request('/bz_bugs',
                     {
+                        method: 'POST',
                         asynchronous: true,
                         evalScripts: true,
                         onLoading: function () {
                             Element.show('bz_link_indicator');
                         },
-                        onSuccess: function () {
+                        onSuccess: function (reply) {
                             Element.hide('bz_link_indicator');
                         },
                         parameters: {
@@ -54,6 +55,45 @@ Current linked bugs:
                     });
         }
 
+        function addBugToTable(bz_id) {
+            var tbl = document.getElementById('bz_list_tbl');
+            var rowCnt = tbl.rows.length;
+            var row = tbl.insertRow(rowCnt);
+            var cell_1 = row.insertCell(0);
+            cell_1.innerHTML = "<span class='small_font'><a target='_blank' href='<%=APP_CONFIG['bugzilla_prefix']%>" + bz_id + "'>" + bz_id + "</a></span>";
+        }
+
+        function deleteBzBugLink(id) {
+            var confirm = window.confirm("Are you sure to remove link to bz" + id + "?");
+            if (confirm == true) {
+                new Ajax.Request('/bz_bugs/' + id,
+                        {
+                            method: 'POST',
+                            asynchronous: true,
+                            evalScripts: true,
+                            onLoading: function () {
+                                Element.show('bz_link_indicator');
+                            },
+                            onSuccess: function () {
+                                Element.hide('bz_link_indicator');
+                            },
+                            parameters: {
+                                '_method': 'delete',
+                                'authenticity_token': '<%=form_authenticity_token%>'}
+                        });
+            }
+
+        }
+
     </script>
     <%= render :partial => 'time_tracking_js' %>
+<% end %>
+
+
+<% content_for :css do %>
+    <style type="text/css">
+        .small_font {
+            font-size: 10px;
+        }
+    </style>
 <% end %>
