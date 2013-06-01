@@ -109,6 +109,7 @@ a:hover {
     background-color: #f5f5f5;
     color: #000;
     font-size: 11px;
+    text-align: center;
 }
 
 .content-list-head a, .content-list-head a:visited {

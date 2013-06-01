@@ -1,1 +1,1 @@
-page << "addBzBugRow('#{@bz_bug.bz_id}', '#{@bz_bug.id}')"
+page << "addBzBugRow('#{@bz_bug.id}')"

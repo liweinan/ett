@@ -21,4 +21,12 @@ class BzBugsController < ApplicationController
   def destroy
     BzBug.find(params[:id]).destroy
   end
+
+  def render_partial
+    respond_to do |format|
+      format.js {
+        render(:partial => params[:partial], :locals => {:bz_bug => BzBug.find(params[:id].scan(/\d+/))[0]})
+      }
+    end
+  end
 end

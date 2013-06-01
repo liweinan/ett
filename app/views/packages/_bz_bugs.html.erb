@@ -2,14 +2,14 @@
 <%= render :partial => 'layouts/sep' %>
 <h3>Related Bugzilla Bugs</h3>
 
-
-Link to an existing bug (Bugzilla Bug ID): <input id="input_bz_id"/>
-<button onclick="createBzBugLink();">Link</button> <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'bz_link_indicator'} %>
-or
-<button>Create a new bug</button>
-in Bugzilla
-<%= render :partial => 'layouts/sep' %>
-Current linked bugs:
+<% if logged_in? %>
+    Link to an existing bug (Bugzilla Bug ID): <input id="input_bz_id"/>
+    <button onclick="createBzBugLink();">Link</button> <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'bz_link_indicator'} %>
+    or
+    <button>Create a new bug</button>
+    in Bugzilla
+    <%= render :partial => 'layouts/sep' %>
+<% end %>
 <%= render :partial => 'layouts/sep_tiny' %>
 <div class='manage-tbl'>
   <table id='bz_list_tbl'>
@@ -19,12 +19,11 @@ Current linked bugs:
     </tr>
     <% package.bz_bugs.each do |bz_bug| %>
         <tr id='bz_list_row_<%= bz_bug.id %>'>
-          <td id="bz_col_<%= bz_bug.id %>" class="small_font">
-            <%= link_to "bz#{bz_bug.bz_id}", "#{APP_CONFIG['bugzilla_prefix']}#{bz_bug.bz_id}", :target => '_blank' %>
+          <td id="col_bz_id_<%= bz_bug.id %>" class="small_font">
+            <%= render :partial => "bz_bugs/bz_id", :locals => {:bz_bug => bz_bug} %>
           </td>
-          <td style='font-size:10px'>
-            <a href="javascript:void(0);" onclick="editBzBugLink('bz_col_<%=bz_bug.id%>')">Edit</a> /
-            <a href="javascript:void(0);" onclick="deleteBzBugLink('<%=bz_bug.id%>')">Delete</a>
+          <td id="col_bz_ops_<%= bz_bug.id %>" style='font-size:10px'>
+            <%= render :partial => 'bz_bugs/ops', :locals => {:bz_bug => bz_bug} %>
           </td>
         </tr>
     <% end %>
@@ -36,7 +35,6 @@ Current linked bugs:
 
 <% content_for :js do %>
     <script type="text/javascript">
-
         function createBzBugLink() {
             var bz_id = document.getElementById('input_bz_id').value;
             bz_id = bz_id.replace(/^\s+|\s+$/g, '');
@@ -59,21 +57,21 @@ Current linked bugs:
                     });
         }
 
-
-        function editBzBugLink(id) {
-            getBzBugEditCol(id);
+        function renderBzBugLinkEditor(id) {
+            renderPartial(id, id, 'bz_bugs/edit');
         }
 
-        function getBzBugEditCol(id) {
-            new Ajax.Request('/toolbox/get_bz_bug_edit_col', {
+        function renderPartial(id, div_id, partial) {
+            new Ajax.Request('/bz_bugs/render_partial/' + id, {
                 method: 'get',
                 onSuccess: function (response) {
                     var content = response.responseText;
-                    var col = document.getElementById(id);
+                    var col = document.getElementById(div_id);
                     col.innerHTML = content;
                 },
                 parameters: {
-                    'id': id
+                    "id": id,
+                    'partial': partial
                 }
             });
         }
@@ -89,7 +87,7 @@ Current linked bugs:
                         },
                         onSuccess: function () {
                             Element.show("bz_id_" + id + "_indicator");
-                            var div = 'bz_col_' + id;
+                            var div = 'col_bz_id_' + id;
                             document.getElementById(div).innerHTML = "bz" + bz_id;
                             Element.highlight(div);
                         },
@@ -101,24 +99,35 @@ Current linked bugs:
                     });
         }
 
-
-        function addBzBugRow(bz_id, id) {
+        function addBzBugRow(id) {
             var tbl = document.getElementById('bz_list_tbl');
             var rowCnt = tbl.rows.length;
             var row = tbl.insertRow(rowCnt);
             row.id = 'bz_list_row_' + id;
 
-            var cell_1 = row.insertCell(0);
-            cell_1.id = 'bz_col_' + id;
-            cell_1.innerHTML = "<span class='small_font'><a target='_blank' href='<%=APP_CONFIG['bugzilla_prefix']%>" + bz_id + "'>bz" + bz_id + "</a></span>";
-            cell_1.className = 'small_font';
+            var colBzBugId = row.insertCell(0);
+            colBzBugId.id = 'col_bz_id_' + id;
 
-            var cell_2 = row.insertCell(1);
-            cell_2.innerHTML = "<span style='font-size:10px'>Edit / <a href='javascript:void(0);' onclick=\"deleteBzBugLink('" + id + "')\">Delete</a></span>"
+            renderBzBugId(id, colBzBugId);
+
+            var colOps = row.insertCell(1);
+            colOps.id = 'col_bz_ops_' + id;
+            renderOps(id, colOps);
 
             Element.highlight(row);
         }
 
+        function renderBzBugId(id, col) {
+            col.className = 'small_font';
+            renderPartial(id, col.id, 'bz_bugs/bz_id');
+
+        }
+
+        function renderOps(id, col) {
+            col.className = 'small_font';
+            renderPartial(id, col.id, 'bz_bugs/ops');
+
+        }
 
         function deleteRow(rowid) {
             var row = document.getElementById(rowid);
@@ -143,10 +152,8 @@ Current linked bugs:
                             asynchronous: true,
                             evalScripts: true,
                             onLoading: function () {
-//                                Element.show('bz_link_indicator');
                             },
                             onSuccess: function () {
-//                                Element.hide('bz_link_indicator');
                                 deleteBzBugRow(id);
                             },
                             parameters: {
@@ -158,7 +165,7 @@ Current linked bugs:
         }
 
     </script>
-    <%= render :partial => 'time_tracking_js' %>
+    <%= render :partial => 'packages/time_tracking_js' %>
 <% end %>
 
 

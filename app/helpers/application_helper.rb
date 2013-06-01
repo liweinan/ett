@@ -63,7 +63,7 @@ module ApplicationHelper
 
       entry = ManualLogEntry.new
       entry.end_time = Time.now
-      entry.start_time = Time.at(entry.to.to_i - convert_worktime(worktime) * 60)
+      entry.start_time = Time.at(entry.end_time.to_i - convert_worktime(worktime) * 60)
       entry.who = current_user
       entry.package = pac
       entry.save
