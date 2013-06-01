@@ -18,22 +18,25 @@ Current linked bugs:
       <th class='content-list-head'>Operation</th>
     </tr>
     <% package.bz_bugs.each do |bz_bug| %>
-        <tr>
-          <td style='font-size:10px'>
+        <tr id='bz_list_row_<%= bz_bug.id %>'>
+          <td id="bz_col_<%= bz_bug.id %>" class="small_font">
             <%= link_to "bz#{bz_bug.bz_id}", "#{APP_CONFIG['bugzilla_prefix']}#{bz_bug.bz_id}", :target => '_blank' %>
           </td>
           <td style='font-size:10px'>
-            Edit / <a href="javascript:void(0);" onclick="deleteBzBugLink('<%=bz_bug.id%>')">Delete</a>
+            <a href="javascript:void(0);" onclick="editBzBugLink('bz_col_<%=bz_bug.id%>')">Edit</a> /
+            <a href="javascript:void(0);" onclick="deleteBzBugLink('<%=bz_bug.id%>')">Delete</a>
           </td>
         </tr>
     <% end %>
 
   </table>
 </div>
+
 <%= render :partial => 'layouts/sep_tiny' %>
 
 <% content_for :js do %>
     <script type="text/javascript">
+
         function createBzBugLink() {
             var bz_id = document.getElementById('input_bz_id').value;
             bz_id = bz_id.replace(/^\s+|\s+$/g, '');
@@ -45,8 +48,9 @@ Current linked bugs:
                         onLoading: function () {
                             Element.show('bz_link_indicator');
                         },
-                        onSuccess: function (reply) {
+                        onSuccess: function () {
                             Element.hide('bz_link_indicator');
+                            document.getElementById('input_bz_id').value = '';
                         },
                         parameters: {
                             'bz_id': bz_id,
@@ -55,12 +59,79 @@ Current linked bugs:
                     });
         }
 
-        function addBugToTable(bz_id) {
+
+        function editBzBugLink(id) {
+            getBzBugEditCol(id);
+        }
+
+        function getBzBugEditCol(id) {
+            new Ajax.Request('/toolbox/get_bz_bug_edit_col', {
+                method: 'get',
+                onSuccess: function (response) {
+                    var content = response.responseText;
+                    var col = document.getElementById(id);
+                    col.innerHTML = content;
+                },
+                parameters: {
+                    'id': id
+                }
+            });
+        }
+
+        function updateBzBugLink(id, bz_id) {
+            new Ajax.Request('/bz_bugs/' + id,
+                    {
+                        method: 'POST',
+                        asynchronous: true,
+                        evalScripts: true,
+                        onLoading: function () {
+                            Element.show("bz_id_" + id + "_indicator");
+                        },
+                        onSuccess: function () {
+                            Element.show("bz_id_" + id + "_indicator");
+                            var div = 'bz_col_' + id;
+                            document.getElementById(div).innerHTML = "bz" + bz_id;
+                            Element.highlight(div);
+                        },
+                        parameters: {
+                            '_method': 'put',
+                            'bz_id': bz_id,
+                            'authenticity_token': '<%=form_authenticity_token%>'
+                        }
+                    });
+        }
+
+
+        function addBzBugRow(bz_id, id) {
             var tbl = document.getElementById('bz_list_tbl');
             var rowCnt = tbl.rows.length;
             var row = tbl.insertRow(rowCnt);
+            row.id = 'bz_list_row_' + id;
+
             var cell_1 = row.insertCell(0);
-            cell_1.innerHTML = "<span class='small_font'><a target='_blank' href='<%=APP_CONFIG['bugzilla_prefix']%>" + bz_id + "'>" + bz_id + "</a></span>";
+            cell_1.id = 'bz_col_' + id;
+            cell_1.innerHTML = "<span class='small_font'><a target='_blank' href='<%=APP_CONFIG['bugzilla_prefix']%>" + bz_id + "'>bz" + bz_id + "</a></span>";
+            cell_1.className = 'small_font';
+
+            var cell_2 = row.insertCell(1);
+            cell_2.innerHTML = "<span style='font-size:10px'>Edit / <a href='javascript:void(0);' onclick=\"deleteBzBugLink('" + id + "')\">Delete</a></span>"
+
+            Element.highlight(row);
+        }
+
+
+        function deleteRow(rowid) {
+            var row = document.getElementById(rowid);
+            var table = row.parentNode;
+            while (table && table.tagName != 'TABLE')
+                table = table.parentNode;
+            if (!table)
+                return;
+            table.deleteRow(row.rowIndex);
+        }
+
+        function deleteBzBugRow(id) {
+            deleteRow('bz_list_row_' + id);
         }
 
         function deleteBzBugLink(id) {
@@ -72,10 +143,11 @@ Current linked bugs:
                             asynchronous: true,
                             evalScripts: true,
                             onLoading: function () {
-                                Element.show('bz_link_indicator');
+//                                Element.show('bz_link_indicator');
                             },
                             onSuccess: function () {
-                                Element.hide('bz_link_indicator');
+//                                Element.hide('bz_link_indicator');
+                                deleteBzBugRow(id);
                             },
                             parameters: {
                                 '_method': 'delete',
@@ -95,5 +167,6 @@ Current linked bugs:
         .small_font {
             font-size: 10px;
         }
+
     </style>
 <% end %>

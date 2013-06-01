@@ -54,4 +54,12 @@ class ToolboxController < ApplicationController
     end
   end
 
+  def get_bz_bug_edit_col
+    respond_to do |format|
+      format.js {
+        render(:partial => 'bz_bugs/edit', :locals => {:bz_bug => BzBug.find(params[:id].scan(/\d+/))[0]})
+      }
+    end
+  end
+
 end

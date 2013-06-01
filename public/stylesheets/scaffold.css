@@ -94,7 +94,7 @@ a:hover {
     padding: 8px;
     border: 1px solid #dedede;
     color: #000;
-    text-align: center;
+    /*text-align: center;*/
     white-space: nowrap;
 }
 

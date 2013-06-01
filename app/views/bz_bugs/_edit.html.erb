@@ -1,0 +1,4 @@
+<% div = "bz_id_#{bz_bug.id}_input" %>
+<input id='<%= div %>' value="<%= bz_bug.bz_id %>"/>
+<input type="button" value="Update" onclick="updateBzBugLink('<%=bz_bug.id%>', document.getElementById('<%=div%>').value)"/>
+<%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "bz_id_#{bz_bug.id}_indicator"} %>
