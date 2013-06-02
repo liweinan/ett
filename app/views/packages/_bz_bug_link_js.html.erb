@@ -1,0 +1,132 @@
+
+<script type="text/javascript">
+    function createBzBugLink() {
+        var bz_id = document.getElementById('input_bz_id').value;
+        bz_id = bz_id.replace(/^\s+|\s+$/g, '');
+        new Ajax.Request('/bz_bugs',
+                {
+                    method: 'POST',
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function () {
+                        Element.show('bz_link_indicator');
+                    },
+                    onSuccess: function () {
+                        Element.hide('bz_link_indicator');
+                        document.getElementById('input_bz_id').value = '';
+                    },
+                    parameters: {
+                        'bz_id': bz_id,
+                        'package_id': '<%=package.id%>',
+                        'authenticity_token': '<%=form_authenticity_token%>'}
+                });
+    }
+
+    function renderBzBugLinkEditor(id) {
+        renderPartial(id, id, 'bz_bugs/edit');
+    }
+
+    function renderPartial(id, div_id, partial) {
+        new Ajax.Request('/bz_bugs/render_partial/' + id, {
+            method: 'get',
+            onSuccess: function (response) {
+                var content = response.responseText;
+                var col = document.getElementById(div_id);
+                col.innerHTML = content;
+            },
+            parameters: {
+                "id": id,
+                'partial': partial
+            }
+        });
+    }
+
+    function updateBzBugLink(id, bz_id) {
+        new Ajax.Request('/bz_bugs/' + id,
+                {
+                    method: 'POST',
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function () {
+                        Element.show("bz_id_" + id + "_indicator");
+                    },
+                    onSuccess: function () {
+                        Element.hide("bz_id_" + id + "_indicator");
+                        var div = 'col_bz_id_' + id;
+                        renderBzBugId(id, document.getElementById(div));
+                        Element.highlight(div);
+                    },
+                    parameters: {
+                        '_method': 'put',
+                        'bz_id': bz_id,
+                        'authenticity_token': '<%=form_authenticity_token%>'
+                    }
+                });
+    }
+
+    function addBzBugRow(id) {
+        var tbl = document.getElementById('bz_list_tbl');
+        var rowCnt = tbl.rows.length;
+        var row = tbl.insertRow(rowCnt);
+        row.id = 'bz_list_row_' + id;
+
+        var colBzBugId = row.insertCell(0);
+        colBzBugId.id = 'col_bz_id_' + id;
+
+        renderBzBugId(id, colBzBugId);
+
+        var colOps = row.insertCell(1);
+        colOps.id = 'col_bz_ops_' + id;
+        renderOps(id, colOps);
+
+        Element.highlight(row);
+    }
+
+    function renderBzBugId(id, col) {
+        col.className = 'small_font';
+        renderPartial(id, col.id, 'bz_bugs/bz_id');
+
+    }
+
+    function renderOps(id, col) {
+        col.className = 'small_font';
+        renderPartial(id, col.id, 'bz_bugs/ops');
+
+    }
+
+    function deleteRow(rowid) {
+        var row = document.getElementById(rowid);
+        var table = row.parentNode;
+        while (table && table.tagName != 'TABLE')
+            table = table.parentNode;
+        if (!table)
+            return;
+        table.deleteRow(row.rowIndex);
+    }
+
+    function deleteBzBugRow(id) {
+        deleteRow('bz_list_row_' + id);
+    }
+
+    function deleteBzBugLink(id) {
+        var confirm = window.confirm("Are you sure to remove link to bz" + id + "?");
+        if (confirm == true) {
+            new Ajax.Request('/bz_bugs/' + id,
+                    {
+                        method: 'POST',
+                        asynchronous: true,
+                        evalScripts: true,
+                        onLoading: function () {
+                        },
+                        onSuccess: function () {
+                            deleteBzBugRow(id);
+                        },
+                        parameters: {
+                            '_method': 'delete',
+                            'authenticity_token': '<%=form_authenticity_token%>'}
+                    });
+        }
+
+    }
+
+</script>
