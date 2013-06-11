@@ -22,6 +22,22 @@ pre {
     font-size: 11px;
 }
 
+input[type="button"] {
+    font-size: 10px;
+}
+
+input[type="submit"] {
+    font-size: 10px;
+}
+
+input[type="file"] {
+    font-size: 10px;
+}
+
+button {
+    font-size: 10px;
+}
+
 sup {
     color: #666;
 }
@@ -75,14 +91,17 @@ a:hover {
 }
 
 .manage-tbl {
+    font-size: 10px;
 }
 
 .manage-tbl table {
+    font-size: 10px;
     border: 1px solid #dedede;
     border-collapse: collapse;
 }
 
 .manage-tbl th {
+    font-size: 10px;
     background: url('/images/th-bar.jpg') repeat-x;
     height: 24.5px;
     border: 1px solid #dedede;
@@ -91,6 +110,7 @@ a:hover {
 }
 
 .manage-tbl td {
+    font-size: 10px;
     padding: 8px;
     border: 1px solid #dedede;
     color: #000;

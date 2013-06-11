@@ -4,13 +4,16 @@
 
 <form id="bz_link_form" onsubmit="return false;">
   <% if logged_in? %>
-      Link to an existing bug (Bugzilla Bug ID): <input id="input_bz_id"/>
-      <button onclick="createBzBugLink();">Link</button> <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'bz_link_indicator'} %>
+      <button onclick="showCreateBzBugLinkForm();">Link to an existing bug</button>
+      <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'link_bz_bug_form_indicator'} %>
       or
-      <button>Create a new bug</button>
+      <button onclick="showCreateBzBugForm()">Create a new bug</button>
+      <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'new_bz_bug_form_indicator'} %>
       in Bugzilla
       <%= render :partial => 'layouts/sep' %>
   <% end %>
+  <div id="link_bz_bug_form_div" style="display:none;"></div>
+  <div id="new_bz_bug_form_div" style="display:none;"></div>
   <%= render :partial => 'layouts/sep_tiny' %>
   <%= render :partial => 'packages/bz_bug_list', :locals => {:package => package} %>
   <%= render :partial => 'layouts/sep_tiny' %>

@@ -1,1 +1,10 @@
-page << "addBzBugRow('#{@bz_bug.id}')"
+if !@response.blank? && @response.class != Net::HTTPCreated
+  if @response.class == Net::HTTPUnauthorized
+     page.alert("Bugzilla account/password not correct.")
+  else
+    page.alert("Unknown error: #{@response.to_s}")
+  end
+else
+  page << "addBzBugRow('#{@bz_bug.id}')"
+end
+

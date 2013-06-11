@@ -1,5 +1,90 @@
-
 <script type="text/javascript">
+
+    function showCreateBzBugForm() {
+        new Ajax.Request('/bz_bugs/new_bz_bug/<%=package.id%>',
+                {
+                    method: 'GET',
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function () {
+                        Element.show('new_bz_bug_form_indicator');
+                    },
+                    onSuccess: function (response) {
+                        Element.hide('new_bz_bug_form_indicator');
+                        var content = response.responseText;
+                        var div = document.getElementById('new_bz_bug_form_div');
+                        div.innerHTML = content;
+                        Element.show(div);
+                        Element.highlight(div);
+                    }
+                });
+    }
+
+    function showCreateBzBugLinkForm() {
+        new Ajax.Request('/bz_bugs/link_bz_bug/<%=package.id%>',
+                {
+                    method: 'GET',
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function () {
+                        Element.show('link_bz_bug_form_indicator');
+                    },
+                    onSuccess: function (response) {
+                        Element.hide('link_bz_bug_form_indicator');
+                        var content = response.responseText;
+                        var div = document.getElementById('link_bz_bug_form_div');
+                        div.innerHTML = content;
+                        Element.show(div);
+                        Element.highlight(div);
+                    }
+                });
+    }
+
+    function hideNewBzBugForm() {
+        Element.hide('new_bz_bug_form_div');
+    }
+
+    function hideLinkBzBugForm() {
+        Element.hide('link_bz_bug_form_div');
+    }
+
+    function createBzBug() {
+        var nbb_rel = document.getElementById('nbb_rel').value;
+        var nbb_tver = document.getElementById('nbb_tver').value;
+        var nbb_ver = document.getElementById('nbb_ver').value;
+//        var nbb_sum = document.getElementById('nbb_sum').value;
+        var nbb_user = document.getElementById('nbb_user').value;
+        var nbb_pwd = document.getElementById('nbb_pwd').value;
+
+        new Ajax.Request('/bz_bugs',
+                {
+                    method: 'POST',
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function () {
+                        Element.show('create_bz_bug_indicator');
+                    },
+                    onSuccess: function () {
+                        var div = document.getElementById('new_bz_bug_form_div');
+                        Element.hide(div);
+                        div.innerHTML = "";
+                    },
+                    onFailure: function () {
+                        Element.hide('create_bz_bug_indicator');
+                    },
+                    parameters: {
+                        'package_id': '<%=package.id%>',
+                        'rel': nbb_rel,
+                        'tver': nbb_tver,
+                        'ver': nbb_ver,
+//                        'sum' : nbb_sum,
+                        'user': nbb_user,
+                        'pwd': nbb_pwd,
+                        'authenticity_token': '<%=form_authenticity_token%>'
+                    }
+                });
+    }
+
     function createBzBugLink() {
         var bz_id = document.getElementById('input_bz_id').value;
         bz_id = bz_id.replace(/^\s+|\s+$/g, '');
@@ -9,12 +94,17 @@
                     asynchronous: true,
                     evalScripts: true,
                     onLoading: function () {
-                        Element.show('bz_link_indicator');
+                        Element.show('create_bz_link_indicator');
                     },
                     onSuccess: function () {
-                        Element.hide('bz_link_indicator');
-                        document.getElementById('input_bz_id').value = '';
+                        var div = document.getElementById('link_bz_bug_form_div');
+                        Element.hide(div);
+                        div.innerHTML = '';
                     },
+                    onFailure: function () {
+                        Element.hide('create_bz_link_indicator');
+                    },
+
                     parameters: {
                         'bz_id': bz_id,
                         'package_id': '<%=package.id%>',
@@ -70,16 +160,19 @@
         var row = tbl.insertRow(rowCnt);
         row.id = 'bz_list_row_' + id;
 
-        var colBzBugId = row.insertCell(0);
-        colBzBugId.id = 'col_bz_id_' + id;
-
-        renderBzBugId(id, colBzBugId);
-
-        var colOps = row.insertCell(1);
+        var colOps = row.insertCell(0);
         colOps.id = 'col_bz_ops_' + id;
         renderOps(id, colOps);
 
+        var colBzBugId = row.insertCell(1);
+        colBzBugId.id = 'col_bz_id_' + id;
+        renderBzBugId(id, colBzBugId);
+
+        var colBzBugSummary = row.insertCell(2);
+        colBzBugSummary.id = 'col_bz_summary_' + id;
+        renderBzBugSummary(id, colBzBugSummary);
         Element.highlight(row);
+
     }
 
     function renderBzBugId(id, col) {
@@ -93,6 +186,12 @@
         renderPartial(id, col.id, 'bz_bugs/ops');
 
     }
+
+    function renderBzBugSummary(id, col) {
+        col.className = 'small_font';
+        renderPartial(id, col.id, 'bz_bugs/summary');
+    }
+
 
     function deleteRow(rowid) {
         var row = document.getElementById(rowid);
@@ -108,8 +207,8 @@
         deleteRow('bz_list_row_' + id);
     }
 
-    function deleteBzBugLink(id) {
-        var confirm = window.confirm("Are you sure to remove link to bz" + id + "?");
+    function deleteBzBugLink(id, bz_bug_id) {
+        var confirm = window.confirm("Are you sure to remove link to bz" + bz_bug_id + "?");
         if (confirm == true) {
             new Ajax.Request('/bz_bugs/' + id,
                     {

@@ -1,21 +1,25 @@
 <div class='manage-tbl'>
   <table id='bz_list_tbl'>
     <tr>
-      <th class='content-list-head'>Bug ID</th>
       <% if logged_in? %>
           <th class='content-list-head'>Operation</th>
       <% end %>
+      <th class='content-list-head'>Bug ID</th>
+      <th class='content-list-head'>Summary</th>
     </tr>
     <% package.bz_bugs.each do |bz_bug| %>
         <tr id='bz_list_row_<%= bz_bug.id %>'>
-          <td id="col_bz_id_<%= bz_bug.id %>" class="small_font">
-            <%= render :partial => "bz_bugs/bz_id", :locals => {:bz_bug => bz_bug} %>
-          </td>
           <% if logged_in? %>
-              <td id="col_bz_ops_<%= bz_bug.id %>" style='font-size:10px'>
+              <td id="col_bz_ops_<%= bz_bug.id %>" class="small_font">
                 <%= render :partial => 'bz_bugs/ops', :locals => {:bz_bug => bz_bug} %>
               </td>
           <% end %>
+          <td id="col_bz_id_<%= bz_bug.id %>" class="small_font">
+            <%= render :partial => "bz_bugs/bz_id", :locals => {:bz_bug => bz_bug} %>
+          </td>
+          <td id="col_bz_summary_<%= bz_bug.summary %>" class="small_font">
+            <%= render :partial => "bz_bugs/summary", :locals => {:bz_bug => bz_bug} %>
+          </td>
         </tr>
     <% end %>
 
