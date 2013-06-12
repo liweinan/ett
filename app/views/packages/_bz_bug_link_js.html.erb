@@ -74,6 +74,7 @@
                     },
                     parameters: {
                         'package_id': '<%=package.id%>',
+                        'type': 'create_bz',
                         'rel': nbb_rel,
                         'tver': nbb_tver,
                         'ver': nbb_ver,
@@ -86,7 +87,10 @@
     }
 
     function createBzBugLink() {
-        var bz_id = document.getElementById('input_bz_id').value;
+        var user = document.getElementById('lbb_user').value;
+        var pwd = document.getElementById('lbb_pwd').value;
+        var bz_id = document.getElementById('lbb_bz_id').value;
+
         bz_id = bz_id.replace(/^\s+|\s+$/g, '');
         new Ajax.Request('/bz_bugs',
                 {
@@ -94,7 +98,7 @@
                     asynchronous: true,
                     evalScripts: true,
                     onLoading: function () {
-                        Element.show('create_bz_link_indicator');
+                        Element.show('link_bz_bug_indicator');
                     },
                     onSuccess: function () {
                         var div = document.getElementById('link_bz_bug_form_div');
@@ -102,11 +106,14 @@
                         div.innerHTML = '';
                     },
                     onFailure: function () {
-                        Element.hide('create_bz_link_indicator');
+                        Element.hide('link_bz_bug_indicator');
                     },
 
                     parameters: {
                         'bz_id': bz_id,
+                        'type': 'create_bz_link',
+                        'user': user,
+                        'pwd': pwd,
                         'package_id': '<%=package.id%>',
                         'authenticity_token': '<%=form_authenticity_token%>'}
                 });
@@ -168,9 +175,14 @@
         colBzBugId.id = 'col_bz_id_' + id;
         renderBzBugId(id, colBzBugId);
 
-        var colBzBugSummary = row.insertCell(2);
+        var colBzBugCreator = row.insertCell(2);
+        colBzBugCreator.id = 'col_bz_creator_' + id;
+        renderBzBugCreator(id, colBzBugCreator);
+
+        var colBzBugSummary = row.insertCell(3);
         colBzBugSummary.id = 'col_bz_summary_' + id;
         renderBzBugSummary(id, colBzBugSummary);
+
         Element.highlight(row);
 
     }
@@ -185,6 +197,11 @@
         col.className = 'small_font';
         renderPartial(id, col.id, 'bz_bugs/ops');
 
+    }
+
+    function renderBzBugCreator(id, col) {
+        col.className = 'small_font';
+        renderPartial(id, col.id, 'bz_bugs/creator');
     }
 
     function renderBzBugSummary(id, col) {

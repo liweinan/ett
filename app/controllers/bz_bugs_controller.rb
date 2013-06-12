@@ -1,45 +1,108 @@
 class BzBugsController < ApplicationController
   def create
+    require 'net/http'
+    require 'json'
+
     package_id = params[:package_id].strip
     package = Package.find(package_id)
     bz_id = ''
 
-    if params[:bz_id].blank?
+    if params[:type] == 'create_bz'
       # create a bug in bugzilla
-      require 'net/http'
-      uri = URI.parse(APP_CONFIG["bz_bug_creation_url"])
+      begin
 
-      @response = Net::HTTP.post_form(uri,
-                                      'pkg' => package.name,
-                                      'version' => params[:ver],
-                                      'release' => params[:rel],
-                                      'tagversion' => params[:tver],
-                                      'userid' => extract_username(params[:user]),
-                                      'pwd' => params[:pwd])
+        uri = URI.parse(APP_CONFIG["bz_bug_creation_url"])
 
-      if @response.class == Net::HTTPCreated
-        #  @response.body
-        # "BZ#999999: Upgrade jboss-aggregator to 7.2.0.Final-redhat-7 (MOCK)"
-        bug_info = extract_bz_bug_info(@response.body)
-        @bz_bug = BzBug.new
-        @bz_bug.package_id = package_id
-        @bz_bug.bz_id = bug_info[:bz_id]
-        @bz_bug.summary = bug_info[:summary]
-        @bz_bug.creator_id = current_user.id
-        @bz_bug.save
+        @err_msg = ''
+
+        if params[:user].blank?
+          @err_msg << "Bugzilla account can't be empty.\n"
+        end
+
+        if params[:pwd].blank?
+          @err_msg << "Bugzilla account password can't be empty.\n"
+        end
+
+        if params[:ver].blank?
+          @err_msg << "Package Version (ver) can't be empty.\n"
+        end
+
+        unless @err_msg.blank?
+          raise ArgumentError, @err_msg
+        end
+
+        @response = Net::HTTP.post_form(uri,
+                                        'pkg' => package.name,
+                                        'version' => params[:ver],
+                                        'release' => params[:rel],
+                                        'tagversion' => params[:tver],
+                                        'userid' => extract_username(params[:user]),
+                                        'pwd' => params[:pwd])
+
+        if @response.class == Net::HTTPCreated
+          update_bz_pass(params[:pwd])
+          #  @response.body
+          # "BZ#999999: Upgrade jboss-aggregator to 7.2.0.Final-redhat-7 (MOCK)"
+          bug_info = extract_bz_bug_info(@response.body)
+          @bz_bug = BzBug.new
+          @bz_bug.package_id = package_id
+          @bz_bug.bz_id = bug_info[:bz_id]
+          @bz_bug.summary = bug_info[:summary]
+          @bz_bug.creator_id = current_user.id
+          @bz_bug.save
+        end
+      rescue => e
+        @error = e
       end
-    else
-      bz_id = params[:bz_id].strip
-      @bz_bug = BzBug.new
-      @bz_bug.package_id = package_id
-      @bz_bug.bz_id = bz_id
-      @bz_bug.creator_id = current_user.id
-      @bz_bug.save
+    elsif params[:type] == 'create_bz_link'
+      begin
+        @err_msg = ''
+
+        if params[:user].blank?
+          @err_msg << "Bugzilla account can't be empty.\n"
+        end
+
+        if params[:pwd].blank?
+          @err_msg << "Bugzilla account password can't be empty.\n"
+        end
+
+        if params[:bz_id].blank?
+          @err_msg << "Bugzilla Bug ID can't be empty.\n"
+        end
+
+        unless @err_msg.blank?
+          raise ArgumentError, @err_msg
+        end
+
+        bz_id = params[:bz_id].strip
+
+        @response = Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_query_url"]}#{bz_id}.json?userid=#{extract_username(params[:user])}&pwd=#{params[:pwd]}"))
+
+        if @response.class == Net::HTTPOK
+          summary = JSON.parse(@response.body)["summary"]
+          @bz_bug = BzBug.new
+          @bz_bug.package_id = package_id
+          @bz_bug.bz_id = bz_id
+          @bz_bug.summary = summary
+          @bz_bug.creator_id = current_user.id
+          @bz_bug.save
+        end
+      rescue => e
+        @error = e
+      end
     end
 
     respond_to do |format|
       format.js {
-        unless @response.blank?
+        unless @error.blank?
+          if @error.class == ArgumentError
+            # 400 Bad Request
+            render :status => 400
+          else
+            # 500 Internal Server Error
+            render :status => 500
+          end
+        else
           render :status => @response.code
         end
       }
@@ -88,11 +151,11 @@ class BzBugsController < ApplicationController
 
   def extract_bz_bug_info(body)
     #  @response.body
-    # "BZ#999999: Upgrade jboss-aggregator to 7.2.0.Final-redhat-7 (MOCK)"
+    # "999999: Upgrade jboss-aggregator to 7.2.0.Final-redhat-7 (MOCK)"
     bug_info = Hash.new
     unless body.blank?
-      bug_info[:bz_id] = body.scan(/^BZ#\d+/)[0].split('#')[1].to_i
-      bug_info[:summary] = body.split(/BZ#\d+:\s+/)[1]
+      bug_info[:bz_id] = body.scan(/^\d+/)[0].to_i
+      bug_info[:summary] = body.split(/^\d+:\s*/)[1]
     end
     bug_info
   end

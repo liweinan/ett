@@ -455,4 +455,10 @@ class ApplicationController < ActionController::Base
       email.split('@')[0]
     end
   end
+
+  def update_bz_pass(pwd)
+    if session[:bz_pass].blank? || session[:bz_pass] != pwd
+      session[:bz_pass] = pwd
+    end
+  end
 end

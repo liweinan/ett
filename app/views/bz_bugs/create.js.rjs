@@ -1,10 +1,23 @@
-if !@response.blank? && @response.class != Net::HTTPCreated
-  if @response.class == Net::HTTPUnauthorized
-     page.alert("Bugzilla account/password not correct.")
+unless @error.blank?
+  if @error.class == ArgumentError
+    # 400 Bad Request
+    page.alert("#{@error.to_s}")
+  else
+    # 500 Internal Server Error
+    page.alert("Internal error: #{@error.to_s}")
+  end
+else
+  if @response.class == Net::HTTPCreated || @response.class == Net::HTTPOK
+    page << "addBzBugRow('#{@bz_bug.id}')"
+  elsif @response.class == Net::HTTPUnauthorized
+    page.alert("Bugzilla account/password not correct.")
+  elsif @response.class == Net::HTTPNotFound
+    page.alert("Requested bug not found in Bugzilla.")
   else
     page.alert("Unknown error: #{@response.to_s}")
   end
-else
-  page << "addBzBugRow('#{@bz_bug.id}')"
 end
+
+
+
 
