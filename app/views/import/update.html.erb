@@ -18,7 +18,7 @@
           <th class='content-list-head'>Assignee</th>
           <th class='content-list-head'>Label</th>
           <th class='content-list-head'>Marks</th>
-          <% get_xattrs(BrewTag.find_by_name(unescape_url(params[:id])), true, false) do |attr| %>
+          <% get_xattrs(Product.find_by_name(unescape_url(params[:id])), true, false) do |attr| %>
               <th class='content-list-head'><%= attr.camelcase %></th>
           <% end %>
           <th class='content-list-head'>Notes</th>
@@ -29,7 +29,7 @@
               <td><%= diff_output(package, @cloned_packages[i], 'assignee') %></td>
               <td><%= diff_output(package, @cloned_packages[i], 'label') %></td>
               <td><%= diff_output(package, @cloned_packages[i], 'marks') %></td>
-              <% get_xattrs(BrewTag.find_by_name(unescape_url(params[:id])), true, false) do |attr| %>
+              <% get_xattrs(Product.find_by_name(unescape_url(params[:id])), true, false) do |attr| %>
                   <td>
                     <%= diff_output(package, @cloned_packages[i], attr) %>
                   </td>
@@ -116,7 +116,7 @@
 <%= render :partial => 'layouts/sep_tiny' %>
 
 <% if confirmed? %>
-    <%= link_to "Go to #{params[:id]}", :controller => :packages, :action => :index, :brew_tag_id => escape_url(params[:id]) %>
+    <%= link_to "Go to #{params[:id]}", :controller => :packages, :action => :index, :product_id => escape_url(params[:id]) %>
 <% else %>
     <form action="/import/<%= escape_url(params[:id]) %>" method="post">
       <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>

@@ -1,4 +1,4 @@
-class BrewTag < ActiveRecord::Base
+class Product < ActiveRecord::Base
 #  acts_as_tree
   validates_presence_of :name
   validates_uniqueness_of :name
@@ -13,22 +13,22 @@ class BrewTag < ActiveRecord::Base
   has_many :component_views
   has_many :components, :through => :component_views
 
-  has_one :setting, :class_name => "Setting", :foreign_key => "brew_tag_id"
+  has_one :setting, :class_name => "Setting", :foreign_key => "product_id"
 
   acts_as_textiled :description
 
   LINK = {:tag => 0, :package => 1}
 
-  def self.brew_tags_to_ids(brew_tags)
-    brew_tag_ids = []
-    brew_tags.each do |tag|
-      brew_tag_ids << tag.id
+  def self.products_to_ids(products)
+    product_ids = []
+    products.each do |tag|
+      product_ids << tag.id
     end
-    brew_tag_ids
+    product_ids
   end
 
   def self.all_that_have_package_with_name(name)
-    BrewTag.all(:conditions => ["id in (select brew_tag_id from packages where name = ?)", name])
+    Product.all(:conditions => ["id in (select product_id from packages where name = ?)", name])
   end
 
 end

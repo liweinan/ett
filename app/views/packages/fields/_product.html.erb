@@ -1,0 +1,12 @@
+<% if has_tag? %>
+    <%= f.hidden_field :product_id, :value => Product.find_by_name(unescape_url(params[:product_id])).id %>
+<% else %>
+    <tr>
+      <td colspan>
+        Tag
+      </td>
+      <td colspan style="text-align:left;">
+        <%= f.collection_select :product_id, Product.all(:order => "name"), :id, :name %>
+      </td>
+    </tr>
+<% end %>

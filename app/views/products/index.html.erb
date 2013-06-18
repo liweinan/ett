@@ -1,0 +1,44 @@
+<h2>Listing Tags</h2>
+
+<div class='manage-tbl'>
+  <table>
+    <tr>
+      <th>Name</th>
+      <th>Can Show</th>
+      <th>Candidate Tag</th>
+      <th>Target Release</th>
+      <% if can_manage? %>
+          <th>Operation</th>
+      <% end %>
+    </tr>
+
+    <% @products.each do |product| %>
+        <tr>
+          <td style="text-align:left;"><%= link_to product.name, :controller => :products, :action => :show, :id => escape_url(product.name) %></td>
+          <td><%= product.can_show %></td>
+          <td>
+            <% if product.candidate_tag.blank? %>
+                -
+            <% else %>
+                <%= product.candidate_tag %>
+            <% end %>
+          </td>
+          <td>
+            <% if product.target_release.blank? %>
+                -
+            <% else %>
+                <%= product.target_release %>
+            <% end %>
+          </td>
+          <% if can_manage? %>
+              <td><%= link_to 'Edit', :controller => :products, :action => :edit, :id => escape_url(product.name) %></td>
+          <% end %>
+        </tr>
+    <% end %>
+  </table>
+</div>
+<br/>
+
+<% if can_manage? %>
+    <%= link_to 'New Tag', new_product_path %>
+<% end %>

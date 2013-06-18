@@ -10,7 +10,7 @@ class SearchController < ApplicationController
       packages.each do |package|
         unless package.blank?
           package = package.strip
-          ps = Package.find_by_sql("select * from packages where name ilike '%#{package}%' and brew_tag_id = #{btagid}")
+          ps = Package.find_by_sql("select * from packages where name ilike '%#{package}%' and product_id = #{btagid}")
 
           if ps.blank?
             @not_found << package

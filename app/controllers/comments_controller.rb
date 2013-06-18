@@ -18,7 +18,7 @@ class CommentsController < ApplicationController
       @package.add_comment(@comment)
 
       if Rails.env.production?
-        if Setting.activated?(@package.brew_tag, Setting::ACTIONS[:commented])
+        if Setting.activated?(@package.product, Setting::ACTIONS[:commented])
           debugger
           Notify::Comment.create(current_user, params[:request_path], @package, @comment, Setting.all_recipients_of_package(@package, @comment.user, :comment))
         end

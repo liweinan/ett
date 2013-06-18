@@ -2,7 +2,7 @@
   <table>
     <tr>
       <td>Packages \ Tags</td>
-      <% @component.brew_tags.each do |tag| %>
+      <% @component.products.each do |tag| %>
           <td>
             <%= tag.name %>
           </td>
@@ -16,13 +16,13 @@
           </td>
 
           <%
-             package_tags = BrewTag.all_that_have_package_with_name(package.name)
+             package_tags = Product.all_that_have_package_with_name(package.name)
           %>
 
-          <% @component.brew_tags.each do |tag| %>
+          <% @component.products.each do |tag| %>
               <td style="text-align: left;vertical-align:text-top;">
                 <% if package_tags.include?(tag) %>
-                    <% package = Package.find_by_name_and_brew_tag_id(package.name, tag.id) %>
+                    <% package = Package.find_by_name_and_product_id(package.name, tag.id) %>
                     <% unless package.assignee.blank? %>
                         Assigned to: <%= package.assignee.name %>
                         <%= render :partial => 'layouts/sep_tiny' %>
@@ -46,7 +46,7 @@
                         <% end %>
                     <% end %>
 
-                    <a href="/brew_tags/<%= escape_url(tag.name) %>/packages/<%= escape_url(package.name) %>" target="_blank">Show</a>
+                    <a href="/products/<%= escape_url(tag.name) %>/packages/<%= escape_url(package.name) %>" target="_blank">Show</a>
                 <% end %>
               </td>
           <% end %>

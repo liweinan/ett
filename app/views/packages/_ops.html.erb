@@ -1,29 +1,29 @@
-<%= link_to "Workload", :controller => :packages, :action => :index, :brew_tag_id => escape_url(params[:brew_tag_id]), :user => params[:user], :style => "workload" %>
+<%= link_to "Workload", :controller => :packages, :action => :index, :product_id => escape_url(params[:product_id]), :user => params[:user], :style => "workload" %>
 /
-<%= link_to "Time Report", :controller => :packages, :action => :index, :brew_tag_id => escape_url(params[:brew_tag_id]), :user => params[:user], :style => "time_report" %>
+<%= link_to "Time Report", :controller => :packages, :action => :index, :product_id => escape_url(params[:product_id]), :user => params[:user], :style => "time_report" %>
 /
-<%= link_to "Printable Page", :controller => :packages, :action => :index, :brew_tag_id => escape_url(params[:brew_tag_id]), :user => params[:user], :style => 'printable' %> / <%= link_to 'Export to CSV', "/packages/export_to_csv/-1?brew_tag_id=#{escape_url(params[:brew_tag_id])}&mark=#{escape_url(params[:mark])}&label=#{escape_url(params[:label])}&user=#{escape_url(params[:user])}" %>
-/ <%= link_to 'Search Packages', "/search/packages?brew_tag_id=#{ebtag}" %>
+<%= link_to "Printable Page", :controller => :packages, :action => :index, :product_id => escape_url(params[:product_id]), :user => params[:user], :style => 'printable' %> / <%= link_to 'Export to CSV', "/packages/export_to_csv/-1?product_id=#{escape_url(params[:product_id])}&mark=#{escape_url(params[:mark])}&label=#{escape_url(params[:label])}&user=#{escape_url(params[:user])}" %>
+/ <%= link_to 'Search Packages', "/search/packages?product_id=#{ebtag}" %>
 <% if logged_in? %>
     <% if has_tag? %>
-        / <%= link_to 'New Package', :controller => :packages, :action => :new, :brew_tag_id => params[:brew_tag_id] %>
+        / <%= link_to 'New Package', :controller => :packages, :action => :new, :product_id => params[:product_id] %>
         <%# render :partial => 'packages/filter' %>
         <% if can_manage? %>
-            / <a href="/import/<%= escape_url(params[:brew_tag_id]) %>">Import Packages</a>
-            / <a href="/import/<%= escape_url(params[:brew_tag_id]) %>?ac=update">Update Packages</a>
+            / <a href="/import/<%= escape_url(params[:product_id]) %>">Import Packages</a>
+            / <a href="/import/<%= escape_url(params[:product_id]) %>?ac=update">Update Packages</a>
             <%
-               brew_tag_id = BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).id
-               setting = Setting.find_by_brew_tag_id(brew_tag_id)
+               product_id = Product.find_by_name(unescape_url(params[:product_id])).id
+               setting = Setting.find_by_product_id(product_id)
                setting_id = -1
                unless setting.blank?
                    setting_id = setting.id
                end
             %>
 
-            / <%= link_to "Settings", :controller => :settings, :action =>:show, :id => setting_id, :brew_tag_id => escape_url(params[:brew_tag_id]) %>
-            / <%= link_to "Labels", :controller => :labels, :action => :index, :brew_tag_id => escape_url(params[:brew_tag_id]) %>
-            / <%= link_to "Marks", :controller => :marks, :action => :index, :brew_tag_id => escape_url(params[:brew_tag_id]) %>
-            / <%= link_to "Clone", :controller => :brew_tags, :action => :clone, :id => escape_url(params[:brew_tag_id]) %>
+            / <%= link_to "Settings", :controller => :settings, :action =>:show, :id => setting_id, :product_id => escape_url(params[:product_id]) %>
+            / <%= link_to "Labels", :controller => :labels, :action => :index, :product_id => escape_url(params[:product_id]) %>
+            / <%= link_to "Marks", :controller => :marks, :action => :index, :product_id => escape_url(params[:product_id]) %>
+            / <%= link_to "Clone", :controller => :products, :action => :clone, :id => escape_url(params[:product_id]) %>
         <% end %>
     <% end %>
 <% end %>

@@ -6,8 +6,8 @@ class WorkloadController < ApplicationController
 
   def generate_weekly_workload
     Package.transaction do
-      brew_tags = BrewTag.all
-      brew_tags.each do |brew_tag|
+      products = Product.all
+      products.each do |product|
         current_date = Date.today
 
         if !params[:from].blank?
@@ -17,7 +17,7 @@ class WorkloadController < ApplicationController
         begin_of_current_week = current_date.at_beginning_of_week.to_datetime
         end_of_current_week = current_date.at_end_of_week.to_datetime
 
-        packages = Package.find_by_sql(["select * from packages where brew_tag_id=? and label_id IN (select id from labels where is_finish_state='Yes') and updated_at >= ? and updated_at <= ?", brew_tag.id, begin_of_current_week, end_of_current_week])
+        packages = Package.find_by_sql(["select * from packages where product_id=? and label_id IN (select id from labels where is_finish_state='Yes') and updated_at >= ? and updated_at <= ?", product.id, begin_of_current_week, end_of_current_week])
         candidates = []
 
         packages.each do |package|
@@ -29,7 +29,7 @@ class WorkloadController < ApplicationController
         end
 
         # in case this is a rerun
-        wl = WeeklyWorkload.find(:first, :conditions => ["start_of_week=? and end_of_week=? and brew_tag_id=?", begin_of_current_week, end_of_current_week, brew_tag.id])
+        wl = WeeklyWorkload.find(:first, :conditions => ["start_of_week=? and end_of_week=? and product_id=?", begin_of_current_week, end_of_current_week, product.id])
         unless wl.blank?
           wl.destroy
         end
@@ -39,7 +39,7 @@ class WorkloadController < ApplicationController
         wl.start_of_week = begin_of_current_week
         wl.end_of_week = end_of_current_week
         wl.package_count = candidates.size
-        wl.brew_tag_id = brew_tag.id
+        wl.product_id = product.id
         wl.save
 
         candidates.each do |package|

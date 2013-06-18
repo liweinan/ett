@@ -10,16 +10,16 @@ class ComponentsController < ApplicationController
 
   def edit
     @component = Component.find_by_name(unescape_url(params[:id]))
-    @brew_tag_names = []
-    @component.brew_tags.each do |tag|
-      @brew_tag_names << tag.name
+    @product_names = []
+    @component.products.each do |tag|
+      @product_names << tag.name
     end
   end
 
   def create
     expire_all_fragments
     @component = Component.new(params[:component])
-    @component.brew_tags = collect_brew_tags(params[:brew_tag_names])
+    @component.products = collect_products(params[:product_names])
 
     respond_to do |format|
       if @component.save
@@ -35,7 +35,7 @@ class ComponentsController < ApplicationController
     @component = Component.find(params[:id])
     respond_to do |format|
       if @component.update_attributes(params[:component])
-        @component.brew_tags = collect_brew_tags(params[:brew_tag_names])
+        @component.products = collect_products(params[:product_names])
         @component.save
 
         flash[:notice] = 'Component was successfully updated.'
@@ -62,20 +62,20 @@ class ComponentsController < ApplicationController
     if @component.blank?
       redirect_to(:action => :index)
     else
-      @packages = Package.distinct_in_tags_can_show(@component.brew_tags)
+      @packages = Package.distinct_in_tags_can_show(@component.products)
     end
 
   end
 
   protected
 
-  def collect_brew_tags(tag_names)
+  def collect_products(tag_names)
     unless tag_names.blank?
-      brew_tags = []
+      products = []
       tag_names.each do |tag_name|
-        brew_tags << BrewTag.find_by_name(tag_name)
+        products << Product.find_by_name(tag_name)
       end
-      return brew_tags
+      return products
     end
     []
   end

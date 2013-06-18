@@ -6,7 +6,7 @@
       /
       <%= link_to 'Label List', '/labels' %>
       /
-      <%= link_to 'Tag List', brew_tags_path %>
+      <%= link_to 'Tag List', products_path %>
       /
       <%= link_to 'User List', users_path %>
       /
@@ -15,7 +15,7 @@
           <%= link_to 'Register', new_user_path %>
 		<% else %>
 			Welcome, <%= link_to current_user.name, :controller => :users, :action => :show, :id => current_user.id %>
-          (<%= link_to 'All My Packages', :controller => :packages, :action => :index, :user => current_user.email, :brew_tag_id => nil %>
+          (<%= link_to 'All My Packages', :controller => :packages, :action => :index, :user => current_user.email, :product_id => nil %>
           )&nbsp;/&nbsp;<%= link_to 'Logout', '/logout' %>
 		<% end %>
 	</span>

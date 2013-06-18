@@ -31,10 +31,10 @@ class ImportController < ApplicationController
       packages_in_json_format.each do |package_json|
         package = Package.new
 
-        brew_tag_name = unescape_url(params[:id])
+        product_name = unescape_url(params[:id])
         begin
           json_obj = JSON.parse(package_json)
-          orig_package = Package.find_by_name_and_brew_tag_id(json_obj['name'], BrewTag.find_by_name(brew_tag_name).id)
+          orig_package = Package.find_by_name_and_product_id(json_obj['name'], Product.find_by_name(product_name).id)
 
           # for Changelog.package_updated
           orig_package_clone = orig_package.clone
@@ -62,7 +62,7 @@ class ImportController < ApplicationController
               if json_obj['label'].blank?
                 orig_package.label_id = nil
               else
-                label = Label.find_in_global_scope(json_obj['label'], brew_tag_name)
+                label = Label.find_in_global_scope(json_obj['label'], product_name)
                 unless label.blank?
                   orig_package.label_id = label.id
                 end
@@ -151,9 +151,9 @@ class ImportController < ApplicationController
     @packages = []
     @problem_packages = []
     Package.transaction do
-      @brew_tag = BrewTag.find_by_name(unescape_url(params[:brew_tag_id]))
+      @product = Product.find_by_name(unescape_url(params[:product_id]))
 
-      @marks = process_marks(params[:marks], @brew_tag.id)
+      @marks = process_marks(params[:marks], @product.id)
       @label = Label.find(params[:package][:label_id]) unless params[:package][:label_id].blank?
 
       @final_package_names.each do |name|
@@ -161,7 +161,7 @@ class ImportController < ApplicationController
         package.name = name.strip
         package.label_id = params[:package][:label_id] unless params[:package][:label_id].blank?
         package.marks = @marks unless @marks.blank?
-        package.brew_tag_id = @brew_tag.id
+        package.product_id = @product.id
         package.created_by = current_user.id
         package.updated_by = current_user.id
         result = package.save

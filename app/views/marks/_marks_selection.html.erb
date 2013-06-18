@@ -1,17 +1,17 @@
 <% @package ||= nil %>
-<% brew_tag_id ||= nil %>
+<% product_id ||= nil %>
 <% package ||= @package %>
 <% sep ||= '/' %>
 <%
-   @brew_tag = nil
-   if !brew_tag_id.blank?
-     @brew_tag = BrewTag.find_by_name(unescape_url(brew_tag_id))
+   @product = nil
+   if !product_id.blank?
+     @product = Product.find_by_name(unescape_url(product_id))
    elsif !package.blank?
-     @brew_tag = package.brew_tag
+     @product = package.product
    end
 %>
 
-<% @brew_tag.marks.each do |mark| %>
+<% @product.marks.each do |mark| %>
     <% if package.blank? %>
         <label><%= mark.key %> - <%= check_box_tag("marks[]", mark.key, false) %></label> <%= sep %>
     <% else %>

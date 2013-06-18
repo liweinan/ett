@@ -5,7 +5,7 @@ class MarksController < ApplicationController
   # GET /attributes
   # GET /attributes.xml
   def index
-    @marks = Mark.all(:conditions => ["brew_tag_id = ?", get_brew_tag(params[:brew_tag_id]).id])
+    @marks = Mark.all(:conditions => ["product_id = ?", get_product(params[:product_id]).id])
 
     respond_to do |format|
       format.html # index.html.erb
@@ -49,7 +49,7 @@ class MarksController < ApplicationController
     respond_to do |format|
       if @mark.save
         flash[:notice] = 'Mark was successfully created.'
-        format.html { redirect_to(:action => :show, :id => @mark.id, :brew_tag_id => escape_url(@mark.brew_tag.name)) }
+        format.html { redirect_to(:action => :show, :id => @mark.id, :product_id => escape_url(@mark.product.name)) }
       else
         format.html { render :action => :new }
       end
@@ -65,7 +65,7 @@ class MarksController < ApplicationController
     respond_to do |format|
       if @mark.update_attributes(params[:mark])
         flash[:notice] = 'Mark was successfully updated.'
-        format.html { redirect_to(:action => :show, :id => @mark.id, :brew_tag_id => @mark.brew_tag.name) }
+        format.html { redirect_to(:action => :show, :id => @mark.id, :product_id => @mark.product.name) }
       else
         format.html { render :action => :edit }
       end

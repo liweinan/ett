@@ -1,6 +1,6 @@
 <h2><%= @component.name %></h2>
 
-<% @component.brew_tags.each do |tag| %>
+<% @component.products.each do |tag| %>
     <%= tag.name %><br/>
 <% end %>
 <%= render :partial => 'layouts/sep' %>

@@ -9,8 +9,8 @@ class PackagesController < ApplicationController
   # GET /packages
   # GET /packages.xml
   def index
-    unless params[:brew_tag_id].blank?
-      @packages = get_packages(unescape_url(params[:brew_tag_id]), unescape_url(params[:mark]), unescape_url(params[:label]), unescape_url(params[:user]))
+    unless params[:product_id].blank?
+      @packages = get_packages(unescape_url(params[:product_id]), unescape_url(params[:mark]), unescape_url(params[:label]), unescape_url(params[:user]))
     end
 
     respond_to do |format|
@@ -24,7 +24,7 @@ class PackagesController < ApplicationController
             render params[:style]
           end
 
-        elsif params[:brew_tag_id].blank?
+        elsif params[:product_id].blank?
           render 'layouts/welcome'
         end
       }
@@ -37,10 +37,10 @@ class PackagesController < ApplicationController
   def show
     respond_to do |format|
       format.html {
-        @package = Package.find_by_name_and_brew_tag_id(unescape_url(params[:id]), BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).id, :include => :p_attachments)
+        @package = Package.find_by_name_and_product_id(unescape_url(params[:id]), Product.find_by_name(unescape_url(params[:product_id])).id, :include => :p_attachments)
         if @package.blank?
           flash[:notice] = 'Package not found.'
-          redirect_to("/brew_tags/#{escape_url(params[:brew_tag_id])}/packages")
+          redirect_to("/products/#{escape_url(params[:product_id])}/packages")
         end
       }
       format.xml { render :xml => @package }
@@ -59,7 +59,7 @@ class PackagesController < ApplicationController
 
   # GET /packages/1/edit
   def edit
-    @package = Package.find_by_name_and_brew_tag_id(unescape_url(params[:id]), BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).id)
+    @package = Package.find_by_name_and_product_id(unescape_url(params[:id]), Product.find_by_name(unescape_url(params[:product_id])).id)
     #@package.revert_to(params[:version].to_i) unless params[:version].blank?
     unless can_edit_package? @package
       redirect_to('/')
@@ -75,18 +75,18 @@ class PackagesController < ApplicationController
     @package.created_by = current_user.id
     @package.updated_by = current_user.id
 
-    @package.marks = process_marks(params[:marks], params[:package][:brew_tag_id])
+    @package.marks = process_marks(params[:marks], params[:package][:product_id])
 
     respond_to do |format|
       if @package.save
         expire_all_fragments
         flash[:notice] = 'Package was successfully created.'
 
-        url = APP_CONFIG["site_prefix"] + "brew_tags/" + escape_url(@package.brew_tag.name) + "/packages/" + escape_url(@package.name)
+        url = APP_CONFIG["site_prefix"] + "products/" + escape_url(@package.product.name) + "/packages/" + escape_url(@package.name)
 
         if Rails.env.production?
 
-          if Setting.activated?(@package.brew_tag, Setting::ACTIONS[:created])
+          if Setting.activated?(@package.product, Setting::ACTIONS[:created])
             Notify::Package.create(current_user, url, @package, Setting.all_recipients_of_package(@package, nil, :create))
           end
 
@@ -96,7 +96,7 @@ class PackagesController < ApplicationController
         end
 
         format.html { redirect_to(:controller => :packages, :action => :show,
-                                  :id => escape_url(@package.name), :brew_tag_id => escape_url(@package.brew_tag.name), :user => params[:user]) }
+                                  :id => escape_url(@package.name), :product_id => escape_url(@package.product.name), :user => params[:user]) }
       else
 
         @user = params[:user]
@@ -140,7 +140,7 @@ class PackagesController < ApplicationController
           @package.reload
 
           if params[:process_marks] == 'Yes'
-            @package.marks = process_marks(params[:marks], @package.brew_tag_id)
+            @package.marks = process_marks(params[:marks], @package.product_id)
           end
 
           # label changed
@@ -184,15 +184,15 @@ class PackagesController < ApplicationController
             url = ''
 
             if params[:request_path].blank?
-              brew_tag_name = escape_url(@package.brew_tag.name)
+              product_name = escape_url(@package.product.name)
               package_name = escape_url(@package.name)
-              frag = "#{brew_tag_name}/packages/#{package_name}"
+              frag = "#{product_name}/packages/#{package_name}"
               url = generate_request_path(request, frag)
             else
               url = params[:request_path].gsub('/edit', '')
             end
 
-            if Setting.activated?(@package.brew_tag, Setting::ACTIONS[:updated])
+            if Setting.activated?(@package.product, Setting::ACTIONS[:updated])
               Notify::Package.update(current_user, url, @package, Setting.all_recipients_of_package(@package, current_user, :edit))
             end
 
@@ -204,7 +204,7 @@ class PackagesController < ApplicationController
           @output = true
         else
           unless @package.errors[:name].blank?
-            @error_message = "Package #{@package.name} already exists. Here's the <a href='/brew_tags/#{escape_url(@package.brew_tag.name)}/packages/#{unescape_url(@package.name)}' target='_blank'>link</a>."
+            @error_message = "Package #{@package.name} already exists. Here's the <a href='/products/#{escape_url(@package.product.name)}/packages/#{unescape_url(@package.name)}' target='_blank'>link</a>."
           end
           @user = params[:user]
           @output = false
@@ -214,7 +214,7 @@ class PackagesController < ApplicationController
 
       if @output == true
         expire_all_fragments
-        format.html { redirect_to(:controller => :packages, :action => :show, :id => escape_url(@package.name), :brew_tag_id => escape_url(@package.brew_tag.name), :user => params[:user]) }
+        format.html { redirect_to(:controller => :packages, :action => :show, :id => escape_url(@package.name), :product_id => escape_url(@package.product.name), :user => params[:user]) }
         format.js
       else
         format.html { render :action => :edit }
@@ -232,12 +232,12 @@ class PackagesController < ApplicationController
     respond_to do |format|
       format.html {
         #if params[:user].blank?
-        #  redirect_to(:controller => :packages, :action => :index, :brew_tag_id => escape_url(@package.brew_tag.name))
+        #  redirect_to(:controller => :packages, :action => :index, :product_id => escape_url(@package.product.name))
         #else
-        #  redirect_to(:controller => :packages, :action => :index, :brew_tag_id => escape_url(@package.brew_tag.name), :user => params[:user])
+        #  redirect_to(:controller => :packages, :action => :index, :product_id => escape_url(@package.product.name), :user => params[:user])
         #end
 
-        redirect_to(:controller => :packages, :action => :show, :brew_tag_id => escape_url(@package.brew_tag.name), :id => escape_url(@package.name))
+        redirect_to(:controller => :packages, :action => :show, :product_id => escape_url(@package.product.name), :id => escape_url(@package.name))
       }
     end
   end
@@ -245,15 +245,15 @@ class PackagesController < ApplicationController
   def clone
     if request.post?
       Package.transaction do
-        source_tag = BrewTag.find_by_name(unescape_url(params[:brew_tag_id]))
-        @source_package = Package.find_by_name_and_brew_tag_id(unescape_url(params[:id]), source_tag.id)
+        source_tag = Product.find_by_name(unescape_url(params[:product_id]))
+        @source_package = Package.find_by_name_and_product_id(unescape_url(params[:id]), source_tag.id)
 
         @source_package.updated_by = current_user.id
         @source_package.save
 
         @target_package = @source_package.clone
-        target_tag = BrewTag.find_by_name(unescape_url(params[:target_tag_name]))
-        @target_package.brew_tag = target_tag
+        target_tag = Product.find_by_name(unescape_url(params[:target_tag_name]))
+        @target_package.product = target_tag
 
         if params[:clone_assignee_option] == 'Yes'
           @target_package.assignee = @source_package.assignee
@@ -264,7 +264,7 @@ class PackagesController < ApplicationController
           target_label = Label.find_in_global_scope(label_name, target_tag.name)
           unless target_label
             target_label = @source_package.label.clone
-            target_label.brew_tag = target_tag
+            target_label.product = target_tag
             target_label.save!
           end
           @target_package.label = target_label
@@ -274,10 +274,10 @@ class PackagesController < ApplicationController
 
         if params[:clone_marks_option] == 'Yes'
           @source_package.marks.each do |source_mark|
-            target_mark = Mark.find_by_key_and_brew_tag_id(source_mark.key, target_tag.id)
+            target_mark = Mark.find_by_key_and_product_id(source_mark.key, target_tag.id)
             unless target_mark
               target_mark = source_mark.clone
-              target_mark.brew_tag = target_tag
+              target_mark.product = target_tag
               target_mark.save!
             end
             @target_package.marks << target_mark
@@ -297,7 +297,7 @@ class PackagesController < ApplicationController
 
       flash[:notice] = "Clone completed."
 
-      redirect_to(:controller => :packages, :action => :show, :id => escape_url(@target_package.name), :brew_tag_id => escape_url(params[:target_tag_name]))
+      redirect_to(:controller => :packages, :action => :show, :id => escape_url(@target_package.name), :product_id => escape_url(params[:target_tag_name]))
     end
   end
 
@@ -305,15 +305,15 @@ class PackagesController < ApplicationController
 
     require 'faster_csv'
 
-    @packages = get_packages(unescape_url(params[:brew_tag_id]), unescape_url(params[:mark]), unescape_url(params[:label]), unescape_url(params[:user]))
+    @packages = get_packages(unescape_url(params[:product_id]), unescape_url(params[:mark]), unescape_url(params[:label]), unescape_url(params[:user]))
 
-    @brew_tag = BrewTag.find_by_name(unescape_url(params[:brew_tag_id]))
+    @product = Product.find_by_name(unescape_url(params[:product_id]))
 
     csv_string = FasterCSV.generate do |csv|
       # header row
       header_row = ["name", "label", "marks"]
 
-      get_xattrs(@brew_tag, true, false) do |attr|
+      get_xattrs(@product, true, false) do |attr|
         if attr.blank?
           header_row << ""
         else
@@ -343,7 +343,7 @@ class PackagesController < ApplicationController
           val << mark_val
         end
 
-        get_xattrs(@brew_tag, true, false) do |attr|
+        get_xattrs(@product, true, false) do |attr|
           if package.read_attribute(attr).blank?
             val << ""
           else
@@ -410,12 +410,12 @@ class PackagesController < ApplicationController
       unless @package.marks.blank?
         target_marks = []
         @package.marks.each do |source_mark|
-          target_mark = Mark.find_by_key_and_brew_tag_id(source_mark.key, target_package.brew_tag_id)
+          target_mark = Mark.find_by_key_and_product_id(source_mark.key, target_package.product_id)
           unless target_mark.blank?
             target_marks << target_mark
           else
             target_mark = source_mark.clone
-            target_mark.brew_tag_id = target_package.brew_tag_id
+            target_mark.product_id = target_package.product_id
             target_mark.save
             target_marks << target_mark
           end
@@ -432,13 +432,13 @@ class PackagesController < ApplicationController
   def sync_label
     @package.all_relationships_of('clone').each do |target_package|
       unless @package.label.blank?
-        target_label = Label.find_in_global_scope(@package.label.name, target_package.brew_tag.name)
+        target_label = Label.find_in_global_scope(@package.label.name, target_package.product.name)
         unless target_label.blank?
           target_package.label = target_label
           target_package.save
         else
           target_label = @package.label.clone
-          target_label.brew_tag = target_package.brew_tag
+          target_label.product = target_package.product
           target_label.save
           target_package.label = target_label
           target_package.save
@@ -457,20 +457,20 @@ class PackagesController < ApplicationController
 
     @error_message = []
 
-    target_tag = BrewTag.find_by_name(unescape_url(params[:target_tag_name]))
+    target_tag = Product.find_by_name(unescape_url(params[:target_tag_name]))
 
     if target_tag.blank?
       @error_message << "Target tag not found."
 
     else
 
-      if Package.find_by_name_and_brew_tag_id(unescape_url(params[:id]), target_tag.id)
+      if Package.find_by_name_and_product_id(unescape_url(params[:id]), target_tag.id)
         @error_message << "Package already exists in target tag."
       end
     end
 
     unless @error_message.blank?
-      render :controller => 'packages', :action => 'clone', :id => escape_url(params[:id]), :brew_tag_id => escape_url(params[:brew_tag_id])
+      render :controller => 'packages', :action => 'clone', :id => escape_url(params[:id]), :product_id => escape_url(params[:product_id])
     end
 
   end
@@ -483,22 +483,22 @@ class PackagesController < ApplicationController
   end
 
   def user_view_index
-    if !params[:user].blank? && params[:brew_tag_id].blank?
+    if !params[:user].blank? && params[:product_id].blank?
       redirect_to(:controller => :user_views, :action => :index, :user_id => User.find_by_email(params[:user]).name)
     end
   end
 
-  def get_packages(__brew_tag_name, __mark_key, __label_name, __user_email)
+  def get_packages(__product_name, __mark_key, __label_name, __user_email)
     order = "label_id, name"
 
-    hierarchy = "select id from brew_tags where name = '#{__brew_tag_name}'"
+    hierarchy = "select id from products where name = '#{__product_name}'"
 
-    __labels_can_show_sql = " AND (p.label_id IN (#{Label.ids_can_show_by_brew_tag_name_in_global_scope(__brew_tag_name)}) OR p.label_id IS NULL)"
+    __labels_can_show_sql = " AND (p.label_id IN (#{Label.ids_can_show_by_product_name_in_global_scope(__product_name)}) OR p.label_id IS NULL)"
 
-    @all_packages_count = Package.count_by_sql("select count(*) from packages p where p.brew_tag_id IN (#{hierarchy}) #{__labels_can_show_sql}")
+    @all_packages_count = Package.count_by_sql("select count(*) from packages p where p.product_id IN (#{hierarchy}) #{__labels_can_show_sql}")
 
     if logged_in?
-      @my_packages_count = Package.count_by_sql("select count(*) from packages p where p.brew_tag_id IN (#{hierarchy}) AND p.user_id = #{session[:current_user].id} #{__labels_can_show_sql}")
+      @my_packages_count = Package.count_by_sql("select count(*) from packages p where p.product_id IN (#{hierarchy}) AND p.user_id = #{session[:current_user].id} #{__labels_can_show_sql}")
     end
 
     opts = ''
@@ -509,16 +509,16 @@ class PackagesController < ApplicationController
     opts << __labels_can_show_sql
 
     if !__label_name.blank? && !__mark_key.blank?
-      mark = Mark.find_by_key_and_brew_tag_id(__mark_key, BrewTag.find_by_name(__brew_tag_name).id)
-      _label = Label.find_in_global_scope(__label_name, __brew_tag_name)
-      _packages = Package.find_by_sql("select p.* from packages p join assignments a on p.id = a.package_id and a.mark_id = #{mark.id} and label_id = #{_label.id} and p.brew_tag_id IN (#{hierarchy}) #{opts} order by #{order}")
+      mark = Mark.find_by_key_and_product_id(__mark_key, Product.find_by_name(__product_name).id)
+      _label = Label.find_in_global_scope(__label_name, __product_name)
+      _packages = Package.find_by_sql("select p.* from packages p join assignments a on p.id = a.package_id and a.mark_id = #{mark.id} and label_id = #{_label.id} and p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
     elsif !__label_name.blank?
-      _packages = Package.find_by_sql("select p.* from packages p where p.label_id = #{Label.find_in_global_scope(__label_name, __brew_tag_name).id} AND p.brew_tag_id IN (#{hierarchy}) #{opts} order by #{order}")
+      _packages = Package.find_by_sql("select p.* from packages p where p.label_id = #{Label.find_in_global_scope(__label_name, __product_name).id} AND p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
     elsif !__mark_key.blank?
-      mark = Mark.find_by_key_and_brew_tag_id(__mark_key, BrewTag.find_by_name(__brew_tag_name))
-      _packages = Package.find_by_sql("select p.* from packages p join assignments a on p.id = a.package_id and a.mark_id = #{mark.id} and p.brew_tag_id IN (#{hierarchy}) #{opts} order by #{order}")
+      mark = Mark.find_by_key_and_product_id(__mark_key, Product.find_by_name(__product_name))
+      _packages = Package.find_by_sql("select p.* from packages p join assignments a on p.id = a.package_id and a.mark_id = #{mark.id} and p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
     else
-      _packages = Package.find_by_sql("select p.* from packages p where p.brew_tag_id IN (#{hierarchy}) #{opts} order by #{order}")
+      _packages = Package.find_by_sql("select p.* from packages p where p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
     end
     _packages
   end

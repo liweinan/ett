@@ -14,11 +14,11 @@
     <% session[:not_cloned_packages] = nil %>
 <% end %>
 
-<% cache :action => 'index', :id => "#{params[:brew_tag_id]}#{params[:label]}#{params[:mark]}#{params[:user]}#{current_user_email}" do %>
+<% cache :action => 'index', :id => "#{params[:product_id]}#{params[:label]}#{params[:mark]}#{params[:user]}#{current_user_email}" do %>
     <% if has_tag? %>
-        <% @brew_tag = BrewTag.find_by_name(unescape_url(params[:brew_tag_id])) %>
+        <% @product = Product.find_by_name(unescape_url(params[:product_id])) %>
         <h2>
-          Listing packages of <%= unescape_url(params[:brew_tag_id]) %>
+          Listing packages of <%= unescape_url(params[:product_id]) %>
           <% if has_label? %>
               / <%= unescape_url(params[:label]) %>
           <% end %>
@@ -26,8 +26,8 @@
               / <%= unescape_url(params[:mark]) %>
           <% end %>
         </h2>
-        <% unless @brew_tag.description.blank? %>
-            <%= @brew_tag.description %>
+        <% unless @product.description.blank? %>
+            <%= @product.description %>
         <% end %>
     <% else %>
         <h2>Listing packages</h2>
@@ -38,21 +38,21 @@
     <%= render :partial => 'layouts/sep' %>
 
     Labels:
-    <%= link_to "All (#{@all_packages_count})", :controller => :packages, :action => :index, :brew_tag_id => params[:brew_tag_id] %> /
+    <%= link_to "All (#{@all_packages_count})", :controller => :packages, :action => :index, :product_id => params[:product_id] %> /
 
     <% if logged_in? %>
-        <%= link_to "My (#{@my_packages_count})", :controller => :packages, :action => :index, :brew_tag_id => params[:brew_tag_id], :user => session[:current_user].email %> /
+        <%= link_to "My (#{@my_packages_count})", :controller => :packages, :action => :index, :product_id => params[:product_id], :user => session[:current_user].email %> /
     <% end %>
 
-    <% Label.find_all_can_show_by_brew_tag_id_in_global_scope(BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).id).each do |label| %>
-        <%= link_to "#{label.name} (#{count_packages(unescape_url(params[:brew_tag_id]), label.name)})", :controller => :packages, :action => :index, :brew_tag_id => params[:brew_tag_id], :label => escape_url(label.name) %> /
+    <% Label.find_all_can_show_by_product_id_in_global_scope(Product.find_by_name(unescape_url(params[:product_id])).id).each do |label| %>
+        <%= link_to "#{label.name} (#{count_packages(unescape_url(params[:product_id]), label.name)})", :controller => :packages, :action => :index, :product_id => params[:product_id], :label => escape_url(label.name) %> /
     <% end %>
     <%= render :partial => 'layouts/sep' %>
-    <% marks = BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).marks %>
+    <% marks = Product.find_by_name(unescape_url(params[:product_id])).marks %>
     <% unless marks.blank? %>
         Marks:
         <% marks.each do |mark| %>
-            <%= link_to "#{mark.key} (#{mark.packages_can_show.size})", :controller => :packages, :action => :index, :brew_tag_id => params[:brew_tag_id], :mark => mark.key %> /
+            <%= link_to "#{mark.key} (#{mark.packages_can_show.size})", :controller => :packages, :action => :index, :product_id => params[:product_id], :mark => mark.key %> /
         <% end %>
     <% end %>
 

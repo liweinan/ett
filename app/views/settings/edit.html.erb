@@ -1,7 +1,7 @@
-<% if @setting.brew_tag.blank? %>
+<% if @setting.product.blank? %>
     <h1>Editing System Settings</h1>
 <% else %>
-    <h1>Edit Settings of <%= @setting.brew_tag.name %></h1>
+    <h1>Edit Settings of <%= @setting.product.name %></h1>
 <% end %>
 <%= render :partial => 'layouts/sep' %>
 <% form_for(@setting) do |f| %>

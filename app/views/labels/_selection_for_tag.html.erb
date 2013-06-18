@@ -3,9 +3,9 @@
 <%
    tag_id = -1
    if !package.blank?
-     tag_id = package.brew_tag.id
-   elsif !params[:brew_tag_id].blank?
-     tag_id = BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).id
+     tag_id = package.product.id
+   elsif !params[:product_id].blank?
+     tag_id = Product.find_by_name(unescape_url(params[:product_id])).id
    end
 
    blank_label = Label.new
@@ -14,7 +14,7 @@
 
    labels = []
    labels << blank_label
-   labels << Label.find_all_can_select_by_brew_tag_id_in_global_scope(tag_id)
+   labels << Label.find_all_can_select_by_product_id_in_global_scope(tag_id)
    labels = labels.flatten
 %>
 <% if form.blank? %>

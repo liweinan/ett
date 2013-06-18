@@ -1,7 +1,7 @@
 <% if logged_in? %>
     <% if params[:user] %>
-        <%= link_to 'All Packages', :controller => :packages, :action => :index, :brew_tag_id => params[:brew_tag_id] %>
+        <%= link_to 'All Packages', :controller => :packages, :action => :index, :product_id => params[:product_id] %>
     <% else %>
-        <%= link_to 'My Packages', :controller => :packages, :action => :index, :brew_tag_id => params[:brew_tag_id], :user => session[:current_user].email %>
+        <%= link_to 'My Packages', :controller => :packages, :action => :index, :product_id => params[:product_id], :user => session[:current_user].email %>
     <% end %>
 <% end %>

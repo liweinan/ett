@@ -1,12 +1,12 @@
-<% @brew_tag = BrewTag.find_by_name(unescape_url(params[:brew_tag_id])) %>
-<h2><%= @brew_tag.name %></h2>
+<% @product = Product.find_by_name(unescape_url(params[:product_id])) %>
+<h2><%= @product.name %></h2>
 <table>
   <tr>
     <th>Name</th>
     <th>Label</th>
     <th>Marks</th>
     <th>Assignee</th>
-    <% get_xattrs(@brew_tag, true, false) do |attr| %>
+    <% get_xattrs(@product, true, false) do |attr| %>
         <th><%= attr.camelcase %></th>
     <% end %>
   </tr>

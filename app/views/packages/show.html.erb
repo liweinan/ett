@@ -1,7 +1,7 @@
 <h2>
 <span style="<%= deleted_style(@package) %>">
 <%= h @package.name %>
-  @<%= link_to @package.brew_tag.name, :controller => 'packages', :action => 'index', :brew_tag_id => escape_url(@package.brew_tag.name) %>
+  @<%= link_to @package.product.name, :controller => 'packages', :action => 'index', :product_id => escape_url(@package.product.name) %>
 </span>
 </h2>
 
@@ -38,7 +38,7 @@ Last Modified At:
     <% end %>
 <% end %>
 
-<% get_xattrs(@package.brew_tag, true, false) do |attr| %>
+<% get_xattrs(@package.product, true, false) do |attr| %>
     <%= render :partial => 'layouts/sep_tiny' %>
     <% unless @package.read_attribute(attr).blank? %>
         <%= attr.camelcase %>: <%= Extractor.extract_url(@package.read_attribute(attr)) %>
@@ -53,7 +53,7 @@ Last Modified At:
 
 <% if can_manage? %>
     <% unless @package.deleted? %>
-        | <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(@package.name), :brew_tag_id => escape_url(@package.brew_tag.name) %>
+        | <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(@package.name), :product_id => escape_url(@package.product.name) %>
         | <%= link_to 'Delete', @package, :confirm => "Are you sure to delete #{escape_url(@package.name)}?", :method => :delete %>
     <% end %>
 <% end %>
@@ -66,7 +66,7 @@ Last Modified At:
 
 <%= render :partial => 'packages/attachment' %>
 <%= render :partial => 'layouts/sep' %>
-<% unless @package.brew_tag.target_release.blank? %>
+<% unless @package.product.target_release.blank? %>
     <%= render :partial => 'packages/bz_bugs', :locals => {:package => @package} %>
     <%= render :partial => 'layouts/sep' %>
 <% end %>
