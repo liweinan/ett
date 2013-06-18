@@ -1,7 +1,7 @@
 class Mark < ActiveRecord::Base
   validates_presence_of :key
-  validates_presence_of :brew_tag_id
-  belongs_to :brew_tag
+  validates_presence_of :product_id
+  belongs_to :product
   has_many :assignments
   has_many :packages, :through => :assignments
 

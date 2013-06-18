@@ -1,9 +1,9 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  offset: 1
+  tz_offset: 1
   text: MyString
 
 two:
-  offset: 1
+  tz_offset: 1
   text: MyString

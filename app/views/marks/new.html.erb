@@ -1,7 +1,7 @@
-<% if params[:brew_tag_id].blank? %>
+<% if params[:product_id].blank? %>
 <h2>New mark</h2>
 <% else %>
-<h2>New mark of <%= params[:brew_tag_id] %></h2>
+<h2>New mark of <%= params[:product_id] %></h2>
 <% end %>
 
 <% form_for(@mark) do |f| %>
@@ -9,7 +9,7 @@
 
     <%= render :partial => 'key', :locals => {:f => f} %>
     <%= render :partial => 'value', :locals => {:f => f} %>
-    <%= render :partial => 'brew_tag_id', :locals => {:f => f} %>
+    <%= render :partial => 'product_id', :locals => {:f => f} %>
 
     <p>
       <%= f.submit 'Create' %>

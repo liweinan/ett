@@ -1,7 +1,7 @@
-<% if params[:brew_tag_id].blank? %>
+<% if params[:product_id].blank? %>
     <h2>Listing marks</h2>
 <% else %>
-    <h2>Listing marks of <%= params[:brew_tag_id] %></h2>
+    <h2>Listing marks of <%= params[:product_id] %></h2>
 <% end %>
 
 <div class='manage-tbl'>
@@ -29,11 +29,11 @@
 </div>
 
 <br/>
-<% if params[:brew_tag_id].blank? %>
-    <%= link_to 'New mark', :controller => :marks, :action => :new, :brew_tag_id => params[:brew_tag_id] %>
+<% if params[:product_id].blank? %>
+    <%= link_to 'New mark', :controller => :marks, :action => :new, :product_id => params[:product_id] %>
 <% else %>
-    <%= link_to "New mark of #{unescape_url(params[:brew_tag_id])}", :controller => :marks, :action => :new, :brew_tag_id => params[:brew_tag_id] %>
+    <%= link_to "New mark of #{unescape_url(params[:product_id])}", :controller => :marks, :action => :new, :product_id => params[:product_id] %>
     <%= render :partial => 'layouts/sep_tiny' %>
-    <%= link_to "Back to #{unescape_url(params[:brew_tag_id])}", :controller => :packages, :action => :index, :brew_tag_id => escape_url(params[:brew_tag_id]) %>
+    <%= link_to "Back to #{unescape_url(params[:product_id])}", :controller => :packages, :action => :index, :product_id => escape_url(params[:product_id]) %>
 
 <% end %>

@@ -1,13 +1,13 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  week: MyString
   package_count: 1
-  auto_sum: MyText
-  manual_sum: MyText
+  manual_sum: 1
+  start_of_week: 2013-04-07 12:25:27
+  end_of_week: 2013-04-14 12:25:27
 
 two:
-  week: MyString
   package_count: 1
-  auto_sum: MyText
-  manual_sum: MyText
+  manual_sum: 1
+  start_of_week: 2013-04-07 12:25:27
+  end_of_week: 2013-04-14 12:25:27

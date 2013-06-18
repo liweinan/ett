@@ -1,8 +1,8 @@
 <h2>
-  <% if params[:brew_tag_id].blank? %>
+  <% if params[:product_id].blank? %>
       System internal label list
   <% else %>
-      Listing labels of <%= unescape_url(params[:brew_tag_id]) %>
+      Listing labels of <%= unescape_url(params[:product_id]) %>
   <% end %>
 </h2>
 <div class='manage-tbl'>
@@ -28,7 +28,7 @@
             <% if is_global?(label) %>
                 -
             <% else %>
-                <%= h label.brew_tag.name %>
+                <%= h label.product.name %>
             <% end %>
           </td>
           <td>
@@ -48,7 +48,7 @@
           </td>
           <% if can_manage? %>
               <td>
-                <%= link_to 'Edit', :controller => :labels, :action => :edit, :id => escape_url(label.name), :brew_tag_id => escape_url(params[:brew_tag_id]) %>
+                <%= link_to 'Edit', :controller => :labels, :action => :edit, :id => escape_url(label.name), :product_id => escape_url(params[:product_id]) %>
               </td>
           <% end %>
         </tr>
@@ -59,9 +59,9 @@
 
 <% if can_manage? %>
     <% if has_tag? %>
-        <%= link_to "New label of #{unescape_url(params[:brew_tag_id])}", :controller => :labels, :action => :new, :brew_tag_id => escape_url(params[:brew_tag_id]) %>
+        <%= link_to "New label of #{unescape_url(params[:product_id])}", :controller => :labels, :action => :new, :product_id => escape_url(params[:product_id]) %>
         <%= render :partial => 'layouts/sep_tiny' %>
-        <%= link_to "Back to #{unescape_url(params[:brew_tag_id])}", :controller => :packages, :action => :index, :brew_tag_id => escape_url(params[:brew_tag_id]) %>
+        <%= link_to "Back to #{unescape_url(params[:product_id])}", :controller => :packages, :action => :index, :product_id => escape_url(params[:product_id]) %>
 
     <% else %>
         <%= link_to 'New label', new_label_path %>

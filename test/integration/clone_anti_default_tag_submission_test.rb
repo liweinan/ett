@@ -13,7 +13,7 @@ class CloneAntiDefaultTagSubmissionTest < ActionController::IntegrationTest
     assert !session[:current_user].blank?
     assert session[:current_user].can_manage == 'Yes'
 
-    post "/packages/clone/default?brew_tag_id=default"
+    post "/packages/clone/default?product_id=default"
     assert_response :success
     assert_template :clone
 

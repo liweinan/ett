@@ -1,5 +1,5 @@
 class Setting < ActiveRecord::Base
-  #default_value_for :is_global, 'No' #Deprecated, we now use brew_tag_id to judge
+  #default_value_for :is_global, 'No' #Deprecated, we now use product_id to judge
   default_value_for :props, 0
   default_value_for :actions, 0
   default_value_for :enabled, 'No'
@@ -9,23 +9,23 @@ class Setting < ActiveRecord::Base
   PROPS = {:creator => 0b1, :commenter => 0b10, :assignee => 0b100}
   ACTIONS = {:created => 0b1, :updated => 0b10, :commented => 0b100}
 
-  belongs_to :brew_tag
+  belongs_to :product
 
   def self.system_settings
-    Setting.find(:first, :conditions => "brew_tag_id IS NULL")
+    Setting.find(:first, :conditions => "product_id IS NULL")
   end
 
   def is_system_setting?
-    self.brew_tag.blank?
+    self.product.blank?
   end
 
-  def self.activated?(brew_tag, action)
-    setting = enabled_in_brew_tag?(brew_tag) ? setting_of_brew_tag(brew_tag) : Setting.system_settings
+  def self.activated?(product, action)
+    setting = enabled_in_product?(product) ? setting_of_product(product) : Setting.system_settings
     setting.actions & action > 0
   end
 
   def self.all_recipients_of_package(package, editor, action)
-    setting = enabled_in_brew_tag?(package.brew_tag) ? setting_of_brew_tag(package.brew_tag) : Setting.system_settings
+    setting = enabled_in_product?(package.product) ? setting_of_product(package.product) : Setting.system_settings
     recipients = setting.recipients
     props = setting.props
 
@@ -131,16 +131,16 @@ class Setting < ActiveRecord::Base
     self.enabled == 'Yes'
   end
 
-  def self.enabled_in_brew_tag?(brew_tag)
-    setting = setting_of_brew_tag(brew_tag.id)
+  def self.enabled_in_product?(product)
+    setting = setting_of_product(product.id)
     !setting.blank? && setting.enabled == 'Yes'
   end
 
-  def self.setting_of_brew_tag(brew_tag)
-    if brew_tag.class == BrewTag
-      Setting.find_by_brew_tag_id(brew_tag.id)
+  def self.setting_of_product(product)
+    if product.class == Product
+      Setting.find_by_product_id(product.id)
     else
-      Setting.find_by_brew_tag_id(brew_tag.to_i)
+      Setting.find_by_product_id(product.to_i)
     end
   end
 end

@@ -18,11 +18,11 @@ class SettingsController < ApplicationController
     unless params[:id] == '-1'
       @setting = Setting.find(params[:id])
     else
-      brew_tag = BrewTag.find_by_name(unescape_url(params[:brew_tag_id]))
-      @setting = Setting.find_by_brew_tag_id(brew_tag.id)
+      product = Product.find_by_name(unescape_url(params[:product_id]))
+      @setting = Setting.find_by_product_id(product.id)
       if @setting.blank?
         @setting = Setting.new
-        @setting.brew_tag = brew_tag
+        @setting.product = product
         @setting.save
       end
 
@@ -115,7 +115,7 @@ class SettingsController < ApplicationController
   protected
 
   def triage
-    #if params[:id].blank? && params[:brew_tag_id].blank?
+    #if params[:id].blank? && params[:product_id].blank?
       redirect_to(:action => :show, :id => Setting.system_settings.id)
     #end
   end

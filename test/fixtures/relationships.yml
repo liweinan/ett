@@ -3,9 +3,9 @@
 #one:
 #  name: MyString
 #  is_global: MyString
-#  brew_tag_id: 1
+#  product_id: 1
 #
 #two:
 #  name: MyString
 #  is_global: MyString
-#  brew_tag_id: 1
+#  product_id: 1

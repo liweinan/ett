@@ -1,5 +1,5 @@
-<% @brew_tag = BrewTag.find_by_name(unescape_url(params[:brew_tag_id])) %>
-<h2><%= @brew_tag.name %></h2>
+<% @product = Product.find_by_name(unescape_url(params[:product_id])) %>
+<h2><%= @product.name %></h2>
 
 <%= render :partial => 'layouts/sep'%>
 

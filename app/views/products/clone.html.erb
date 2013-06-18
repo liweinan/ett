@@ -2,10 +2,10 @@
 <%= render :partial => 'layouts/error_messages' %>
 
 
-<form action="/brew_tags/clone/<%= escape_url(params[:id]) %>" method="post" onsubmit="return validateForm();">
+<form action="/products/clone/<%= escape_url(params[:id]) %>" method="post" onsubmit="return validateForm();">
   <input type='hidden' value='<%= escape_url(params[:id]) %>' name='source_tag_name'/>
   <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
-  <label for="target_tag_name_field">Clone <%= @brew_tag.name %> to:</label>
+  <label for="target_tag_name_field">Clone <%= @product.name %> to:</label>
   <input id='target_tag_name_field' name="target_tag_name"/> - (target tag name) <br/>
 
   <%= render :partial => 'layouts/sep' %>  
@@ -42,7 +42,7 @@
       <label for="label_select"> Set to existing label: </label>
         <select name="label_selection_value" onclick="select_label_option(false,false,true,false);">
           <option value=""> -</option>
-          <% Label.find_all_can_select_by_brew_tag_id(BrewTag.find_by_name(unescape_url(params[:id])).id).each do |label| %>
+          <% Label.find_all_can_select_by_product_id(Product.find_by_name(unescape_url(params[:id])).id).each do |label| %>
               <option value="<%= label.name %>"><%= label.name %></option>
           <% end %>
         </select>
@@ -70,13 +70,13 @@
   <div id='div_marks' style="display:none;">
     <%= render :partial => 'layouts/sep_tiny' %>
     <span style="font-weight: bold;">Set marks of cloned packages:</span><br/>
-    <% if brew_tag_has_marks?(unescape_url(params[:id])) %>
+    <% if product_has_marks?(unescape_url(params[:id])) %>
     <span id='div_mark_default'><input id="mark_default" name="mark_options[]" type="checkbox" value="default"/><label for="mark_default">
       Add currently assigned marks</label><br/> </span>
         <%= render :partial => 'layouts/sep_tiny' %>
         <span id='div_mark_selection'><input id="mark_select" name="mark_options[]" type="checkbox" value="selection"/><label for="mark_select">
           Add existing marks : </label>
-          <%= render :partial => 'marks/marks_selection', :locals => {:brew_tag_id => params[:id]} %>
+          <%= render :partial => 'marks/marks_selection', :locals => {:product_id => params[:id]} %>
           <br/> </span>
         <%= render :partial => 'layouts/sep_tiny' %>
     <% end %>
@@ -113,7 +113,7 @@
                     document.getElementById('div_label_selection').style.display = 'block';
                 }
 
-            <% if brew_tag_has_marks?(unescape_url(params[:id])) %>
+            <% if product_has_marks?(unescape_url(params[:id])) %>
                 if (!scope_mark.checked) {
                     document.getElementById('div_mark_default').style.display = 'none';
                     document.getElementById('div_mark_selection').style.display = 'none';

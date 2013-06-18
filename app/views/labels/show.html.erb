@@ -24,12 +24,12 @@
         <tr>
           <td>Tag</td>
           <td>
-            <%= h @label.brew_tag.name %>
+            <%= h @label.product.name %>
           </td>
         </tr>
     <% end %>
   </table>
 </div>
 <%= render :partial => 'layouts/sep' %>
-<%= link_to 'Edit', :controller => :labels, :action => :edit, :id => @label.name, :brew_tag_id => params[:brew_tag_id] %> |
-<%= link_to 'Back', :controller => :labels, :action => :index, :brew_tag_id => params[:brew_tag_id] %>
+<%= link_to 'Edit', :controller => :labels, :action => :edit, :id => @label.name, :product_id => params[:product_id] %> |
+<%= link_to 'Back', :controller => :labels, :action => :index, :product_id => params[:product_id] %>

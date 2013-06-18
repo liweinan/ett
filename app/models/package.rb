@@ -15,7 +15,7 @@ class Package < ActiveRecord::Base
   belongs_to :user #assignee
   belongs_to :assignee, :class_name => "User", :foreign_key => "user_id"
   belongs_to :creator, :class_name => "User", :foreign_key => "created_by"
-  belongs_to :brew_tag
+  belongs_to :product
   belongs_to :label
 
   has_many :assignments, :dependent => :destroy
@@ -32,7 +32,7 @@ class Package < ActiveRecord::Base
   has_many :changelogs, :class_name => "Changelog", :foreign_key => "package_id", :dependent => :destroy
 
   validates_presence_of :name
-  validates_presence_of :brew_tag_id
+  validates_presence_of :product_id
   validates_presence_of :created_by
   validates_presence_of :updated_by
 
@@ -104,7 +104,7 @@ class Package < ActiveRecord::Base
     str = "Name: " + name + "\n"
     str += "Created By: " + creator.name + "(#{creator.email})" + "\n"
     str += "Created At: " + created_at.to_s + "\n"
-    str += "Belongs To: " + brew_tag.name + "\n"
+    str += "Belongs To: " + product.name + "\n"
     unless assignee.blank?
       str += "Assignee: " + assignee.name + "(#{assignee.email})" + "\n"
     end
@@ -135,24 +135,24 @@ class Package < ActiveRecord::Base
     packages.flatten.uniq
   end
 
-  def self.distinct_in_tags(brew_tags)
-    Package.all(:select => "distinct name", :conditions => ["brew_tag_id in (?)", BrewTag.brew_tags_to_ids(brew_tags)], :order => "name")
+  def self.distinct_in_tags(products)
+    Package.all(:select => "distinct name", :conditions => ["product_id in (?)", Product.products_to_ids(products)], :order => "name")
   end
 
-  def self.distinct_in_tags_can_show(brew_tags)
-    brew_tag_ids = BrewTag.brew_tags_to_ids(brew_tags)
+  def self.distinct_in_tags_can_show(products)
+    product_ids = Product.products_to_ids(products)
     can_show_label_ids = []
-    brew_tag_ids.each do |tag_id|
-      Label.find_all_can_show_by_brew_tag_id_in_global_scope(tag_id).each do |label|
+    product_ids.each do |tag_id|
+      Label.find_all_can_show_by_product_id_in_global_scope(tag_id).each do |label|
         can_show_label_ids << label.id
       end
     end
 
-    Package.all(:select => "distinct name", :conditions => ["brew_tag_id in (?) and (label_id in (?) or label_id is NULL)", brew_tag_ids, can_show_label_ids.uniq], :order => "name")
+    Package.all(:select => "distinct name", :conditions => ["product_id in (?) and (label_id in (?) or label_id is NULL)", product_ids, can_show_label_ids.uniq], :order => "name")
   end
 
   def validate
-    p = Package.find_by_name_and_brew_tag_id(self.name.strip, self.brew_tag_id)
+    p = Package.find_by_name_and_product_id(self.name.strip, self.product_id)
     if p && p.id != self.id
       errors.add(:name, " - Package name cannot be duplicate under one tag!")
     end

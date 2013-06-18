@@ -10,8 +10,8 @@
 <% @manual_log_entries.each do |manual_log_entry| %>
   <tr>
     <td><%=h manual_log_entry.who %></td>
-    <td><%=h manual_log_entry.from %></td>
-    <td><%=h manual_log_entry.to %></td>
+    <td><%=h manual_log_entry.start_time %></td>
+    <td><%=h manual_log_entry.end_time %></td>
     <td><%= link_to 'Show', manual_log_entry %></td>
     <td><%= link_to 'Edit', edit_manual_log_entry_path(manual_log_entry) %></td>
     <td><%= link_to 'Destroy', manual_log_entry, :confirm => 'Are you sure?', :method => :delete %></td>

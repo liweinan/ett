@@ -68,6 +68,6 @@ Please review the clone action you are going to performed in below:
 <% end %>
 <%= render :partial => 'layouts/line' %>
 <%= render :partial => 'layouts/sep_tiny' %>
-<%= link_to "Confirm the setting and start the clone process", :controller =>:brew_tags, :action => :process_clone, :id => escape_url(session[:clone_review][:target_tag_name]) %>
+<%= link_to "Confirm the setting and start the clone process", :controller =>:products, :action => :process_clone, :id => escape_url(session[:clone_review][:target_tag_name]) %>
 <%= render :partial => 'layouts/sep_tiny' %>
 <%= link_to "Go back and review the setting" %>

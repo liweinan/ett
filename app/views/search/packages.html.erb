@@ -5,8 +5,8 @@
 <% end %>
 
 <div class='manage-tbl'>
-  <form action="/search/packages?brew_tag_id=<%= ebtag %>" method="post">
-    <%= hidden_field_tag 'brew_tag_id', ebtag %>
+  <form action="/search/packages?product_id=<%= ebtag %>" method="post">
+    <%= hidden_field_tag 'product_id', ebtag %>
     <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
     <textarea cols="50" rows="15" id="keyword" name="keyword"><%=@keyword%></textarea>
 
@@ -33,7 +33,7 @@
               </td>
               <td>
                 <% @found[found].each do |_p| %>
-                    <%= link_to _p.name, :controller => :packages, :action => :show, :id => escape_url(_p.name), :brew_tag_id =>ebtag %>
+                    <%= link_to _p.name, :controller => :packages, :action => :show, :id => escape_url(_p.name), :product_id =>ebtag %>
                     /
                 <% end %>
               </td>
