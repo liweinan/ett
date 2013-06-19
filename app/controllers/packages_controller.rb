@@ -382,7 +382,7 @@ class PackagesController < ApplicationController
 
       log_entry = ManualLogEntry.new
       log_entry.start_time = Time.at(start_time)
-      log_entry.to = Time.at(now)
+      log_entry.end_time = Time.at(now)
       log_entry.who = current_user
       log_entry.package = @package
       log_entry.save
