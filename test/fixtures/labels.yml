@@ -2,8 +2,8 @@
 #
 #one:
 #  name: MyString
-#  brew_tag_id: 1
+#  product_id: 1
 #
 #two:
 #  name: MyString
-#  brew_tag_id: 1
+#  product_id: 1

@@ -6,12 +6,12 @@ class PackageTest < ActiveSupport::TestCase
   #test "the truth" do
   #  package = Package.new
   #  package.name = "a"
-  #  package.brew_tag_id = 1
+  #  package.product_id = 1
   #  package.user_id = 1
   #  package.created_by = 1
   #  package.updated_by = 1
   #  package.save!
   #
-  #  assert package.brew_tag == BrewTag.find(1)
+  #  assert package.product == Product.find(1)
   #end
 end

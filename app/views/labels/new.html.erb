@@ -1,20 +1,20 @@
-<% if params[:brew_tag_id].blank? %>
+<% if params[:product_id].blank? %>
     <h2>New system internal label</h2>
 <% else %>
-    <h2>New label of <%= params[:brew_tag_id] %></h2>
+    <h2>New label of <%= params[:product_id] %></h2>
 <% end %>
 
 <div class='manage-tbl'>
   <% form_for(@label) do |f| %>
       <%= f.error_messages %>
       <table>
-        <% if params[:brew_tag_id].blank? %>
+        <% if params[:product_id].blank? %>
             <%= render :partial => 'labels/fields/global', :locals => {:f => f} %>
         <% end %>
         <%= render :partial => 'labels/fields/name', :locals => {:f => f} %>
         <%= render :partial => 'labels/fields/style', :locals => {:f => f} %>
-        <% unless params[:brew_tag_id].blank? %>
-            <%= render :partial => 'labels/fields/brew_tag', :locals => {:f => f} %>
+        <% unless params[:product_id].blank? %>
+            <%= render :partial => 'labels/fields/product', :locals => {:f => f} %>
         <% end %>
         <%= render :partial => 'labels/fields/can_show', :locals => {:f => f} %>
         <%= render :partial => 'labels/fields/can_select', :locals => {:f => f} %>

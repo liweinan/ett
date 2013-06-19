@@ -1,6 +1,6 @@
 class Label < ActiveRecord::Base
-  belongs_to :brew_tag
-#  validates_presence_of :brew_tag_id
+  belongs_to :product
+#  validates_presence_of :product_id
   validates_presence_of :name
   validates_uniqueness_of :code, :allow_nil => :true
 
@@ -38,12 +38,12 @@ class Label < ActiveRecord::Base
     Label.find(:all, :conditions => ["(global='Y') AND can_select='Yes'"], :order => "lower(name)")
   end
 
-  def self.find_all_can_show_by_brew_tag_id_in_global_scope(brew_tag_id)
-    Label.find(:all, :conditions => ["(brew_tag_id = ? OR global='Y') AND can_show='Yes'", brew_tag_id], :order => 'lower(name)')
+  def self.find_all_can_show_by_product_id_in_global_scope(product_id)
+    Label.find(:all, :conditions => ["(product_id = ? OR global='Y') AND can_show='Yes'", product_id], :order => 'lower(name)')
   end
 
-  def self.ids_can_show_by_brew_tag_name_in_global_scope(brew_tag_name)
-    labels = Label.find_all_can_show_by_brew_tag_id_in_global_scope(BrewTag.find_by_name(brew_tag_name).id)
+  def self.ids_can_show_by_product_name_in_global_scope(product_name)
+    labels = Label.find_all_can_show_by_product_id_in_global_scope(Product.find_by_name(product_name).id)
     __str = ""
     labels.each do |label|
       __str << "#{label.id} ,"
@@ -51,19 +51,19 @@ class Label < ActiveRecord::Base
     __str[0..__str.size - 2]
   end
 
-  def self.find_all_can_select_by_brew_tag_id_in_global_scope(brew_tag_id)
-    Label.find(:all, :conditions => ["(brew_tag_id = ? or global='Y') AND can_select='Yes'", brew_tag_id], :order => "lower(name)")
+  def self.find_all_can_select_by_product_id_in_global_scope(product_id)
+    Label.find(:all, :conditions => ["(product_id = ? or global='Y') AND can_select='Yes'", product_id], :order => "lower(name)")
   end
 
-  def self.find_all_can_select_by_brew_tag_id(brew_tag_id)
-    Label.find(:all, :conditions => ["(brew_tag_id = ?) AND can_select='Yes'", brew_tag_id], :order => "lower(name)")
+  def self.find_all_can_select_by_product_id(product_id)
+    Label.find(:all, :conditions => ["(product_id = ?) AND can_select='Yes'", product_id], :order => "lower(name)")
   end
 
-  def self.find_in_global_scope(label_name, brew_tag_name)
+  def self.find_in_global_scope(label_name, product_name)
     label_id = -1
     global_label = Label.find(:first, :conditions => ["name = ? and global='Y'", label_name])
     if global_label == nil
-      return Label.find_by_name_and_brew_tag_id(label_name, BrewTag.find_by_name(brew_tag_name).id)
+      return Label.find_by_name_and_product_id(label_name, Product.find_by_name(product_name).id)
     else
       return global_label
     end
@@ -72,7 +72,7 @@ class Label < ActiveRecord::Base
   protected
 
   def validate
-    label = Label.find_by_name_and_brew_tag_id(self.name.strip, self.brew_tag_id)
+    label = Label.find_by_name_and_product_id(self.name.strip, self.product_id)
     if label == nil
       label = Label.find(:first, :conditions => ["global='Y' and name = ?", self.name.strip])
     end

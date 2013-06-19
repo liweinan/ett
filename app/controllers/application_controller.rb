@@ -3,14 +3,14 @@
 class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
-  helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_tag?, :count_packages, :can_edit_package?, :current_user, :get_brew_tag, :has_label?, :has_mark?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :brew_tag_has_marks?, :get_xattrs, :background_style, :confirmed?, :default_style
+  helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_tag?, :count_packages, :can_edit_package?, :current_user, :get_product, :has_label?, :has_mark?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :product_has_marks?, :get_xattrs, :background_style, :confirmed?, :default_style
   helper_method :btag, :ebtag, :uebtag, :truncate_u, :its_me?, :extract_username
-  before_filter :process_brew_tag_id
+  before_filter :process_product_id
   before_filter :save_current_link
               # Scrub sensitive parameters from your log
               # filter_parameter_logging :password
-  def get_brew_tag(name)
-    BrewTag.find_by_name(unescape_url(name))
+  def get_product(name)
+    Product.find_by_name(unescape_url(name))
   end
 
   def escape_url(url)
@@ -37,11 +37,11 @@ class ApplicationController < ActionController::Base
     !session[:current_user].blank?
   end
 
-  def has_tag?(id = params[:brew_tag_id])
+  def has_tag?(id = params[:product_id])
     if id.blank?
       false
     else
-      if BrewTag.find_by_name(unescape_url(id)).blank?
+      if Product.find_by_name(unescape_url(id)).blank?
         false
       else
         true
@@ -68,14 +68,14 @@ class ApplicationController < ActionController::Base
     global_label = Label.find(:first, :conditions => ["global='Y' AND name=?", label_name])
     label_id = -1
     if global_label == nil
-      label_id = Label.find_by_name_and_brew_tag_id(label_name, BrewTag.find_by_name(bt).id).id
+      label_id = Label.find_by_name_and_product_id(label_name, Product.find_by_name(bt).id).id
     else
       label_id = global_label.id
     end
 
-#    children = "union select children.id as id from brew_tags parent join brew_tags children on parent.id = children.parent_id and parent.name = #{bt_quoted} "
-    hierarchy = "select id from brew_tags where name = #{bt_quoted}"
-    Package.count(:conditions => ["label_id = ? AND brew_tag_id IN (#{hierarchy})", label_id])
+#    children = "union select children.id as id from products parent join products children on parent.id = children.parent_id and parent.name = #{bt_quoted} "
+    hierarchy = "select id from products where name = #{bt_quoted}"
+    Package.count(:conditions => ["label_id = ? AND product_id IN (#{hierarchy})", label_id])
   end
 
   def current_user
@@ -150,9 +150,9 @@ class ApplicationController < ActionController::Base
 
   end
 
-  def get_xattrs(brew_tag = nil, check_show_xattrs = true, check_enable_xattrs = true)
-    if brew_tag.blank? || !Setting.enabled_in_brew_tag?(brew_tag) # check the system settings
-      if validate_xattr_options(check_show_xattrs, check_enable_xattrs, brew_tag)
+  def get_xattrs(product = nil, check_show_xattrs = true, check_enable_xattrs = true)
+    if product.blank? || !Setting.enabled_in_product?(product) # check the system settings
+      if validate_xattr_options(check_show_xattrs, check_enable_xattrs, product)
         Setting.system_settings.xattrs.split(',').each do |attr|
           unless attr.blank?
             yield attr.strip
@@ -160,8 +160,8 @@ class ApplicationController < ActionController::Base
         end
       end
     else #if the tag has local settings and set to show extended attributes, get all extended attributes name and display here.
-      if validate_xattr_options(check_show_xattrs, check_enable_xattrs, brew_tag)
-        brew_tag.setting.xattrs.split(',').each do |attr|
+      if validate_xattr_options(check_show_xattrs, check_enable_xattrs, product)
+        product.setting.xattrs.split(',').each do |attr|
           unless attr.blank?
             yield attr.strip
           end
@@ -170,8 +170,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def validate_xattr_options(check_show_xattrs, check_enable_xattrs, brew_tag)
-    if brew_tag.blank? || !Setting.enabled_in_brew_tag?(brew_tag) # check the system settings
+  def validate_xattr_options(check_show_xattrs, check_enable_xattrs, product)
+    if product.blank? || !Setting.enabled_in_product?(product) # check the system settings
       flag = true
       if check_show_xattrs == true
         if Setting.system_settings.show_xattrs?
@@ -201,7 +201,7 @@ class ApplicationController < ActionController::Base
     else #if the tag has local settings and set to show extended attributes, get all extended attributes name and display here.
       flag = true
       if check_show_xattrs == true
-        if brew_tag.setting.show_xattrs?
+        if product.setting.show_xattrs?
           flag = true
         else
           flag = false
@@ -215,7 +215,7 @@ class ApplicationController < ActionController::Base
       end
 
       if check_enable_xattrs == true
-        if brew_tag.setting.enable_xattrs?
+        if product.setting.enable_xattrs?
           flag = true
         else
           flag = false
@@ -237,8 +237,8 @@ class ApplicationController < ActionController::Base
     File.open('/tmp/ett_clone_in_progress_marker', 'w') { |f| f.write(status) }
   end
 
-  def brew_tag_has_marks?(brew_tag_name)
-    tag = BrewTag.find_by_name(brew_tag_name)
+  def product_has_marks?(product_name)
+    tag = Product.find_by_name(product_name)
     if tag
       if tag.marks.size > 0
         return true
@@ -343,12 +343,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def process_marks(mark_keys, brew_tag_id)
+  def process_marks(mark_keys, product_id)
     mark_keys ||= []
     new_marks = []
 
     mark_keys.each do |key|
-      mark = Mark.find_by_key_and_brew_tag_id(key, brew_tag_id)
+      mark = Mark.find_by_key_and_product_id(key, product_id)
       new_marks << mark
     end
     new_marks
@@ -357,14 +357,14 @@ class ApplicationController < ActionController::Base
   def home_page
     #unless has_tag?
     #  unless Setting.system_settings.default_tag.blank?
-    #    default_tag = BrewTag.find_by_name(Setting.system_settings.default_tag)
+    #    default_tag = Product.find_by_name(Setting.system_settings.default_tag)
     #    unless default_tag.blank?
-    #      params[:brew_tag_id] = escape_url(default_tag.name)
+    #      params[:product_id] = escape_url(default_tag.name)
     #    else
-    #      params[:brew_tag_id] = escape_url(BrewTag.find(:first, :order => 'updated_at DESC').name)
+    #      params[:product_id] = escape_url(Product.find(:first, :order => 'updated_at DESC').name)
     #    end
     #  else
-    #    params[:brew_tag_id] = escape_url(BrewTag.find(:first, :order => 'updated_at DESC').name)
+    #    params[:product_id] = escape_url(Product.find(:first, :order => 'updated_at DESC').name)
     #  end
     #end
 
@@ -372,9 +372,9 @@ class ApplicationController < ActionController::Base
 
   end
 
-  def process_brew_tag_id
-    unless params[:brew_tag_id].blank?
-      params[:brew_tag_id] = escape_url(params[:brew_tag_id])
+  def process_product_id
+    unless params[:product_id].blank?
+      params[:product_id] = escape_url(params[:product_id])
     end
   end
 
@@ -392,7 +392,7 @@ class ApplicationController < ActionController::Base
   #end
 
   def expire_all_fragments
-    expire_fragment(%r{brew_tags/.*})
+    expire_fragment(%r{products/.*})
     expire_fragment(%r{components/.*})
     expire_fragment(%r{packages/.*})
   end
@@ -410,19 +410,19 @@ class ApplicationController < ActionController::Base
   end
 
   def btag
-    params[:brew_tag_id]
+    params[:product_id]
   end
 
   def ebtag
-    escape_url(params[:brew_tag_id])
+    escape_url(params[:product_id])
   end
 
   def uebtag
-    unescape_url(params[:brew_tag_id])
+    unescape_url(params[:product_id])
   end
 
   def btagid
-    bt = BrewTag.find_by_name(uebtag)
+    bt = Product.find_by_name(uebtag)
     if bt.blank?
       nil
     else

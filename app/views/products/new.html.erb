@@ -1,0 +1,21 @@
+<h1>New Tag</h1>
+
+<div class='manage-tbl'>
+  <% form_for(@product) do |f| %>
+      <%= f.error_messages %>
+      <table>
+        <%= render :partial => 'products/fields/name', :locals => {:f => f} %>
+        <%= render :partial => 'products/fields/candidate_tag', :locals => {:f => f} %>
+        <%= render :partial => 'products/fields/target_release', :locals => {:f => f} %>
+        <%= render :partial => 'products/fields/description', :locals => {:f => f} %>
+		<%= render :partial => 'labels/fields/can_show', :locals => {:f => f} %>
+        <tr>
+          <td colspan='2'>
+            <%= f.submit 'Create' %>
+          </td>
+        </tr>
+      </table>
+  <% end %>
+</div>
+<br/>
+<%= link_to 'Back', products_path %>

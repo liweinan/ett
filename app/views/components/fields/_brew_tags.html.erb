@@ -1,8 +1,0 @@
-<% BrewTag.all(:order => 'lower(name)').each do |tag| %>
-<% if @brew_tag_names.blank? %>
-        <label><%= check_box_tag("brew_tag_names[]", tag.name, false) %> <%= tag.name %></label>
-<% else %>
-        <label><%= check_box_tag("brew_tag_names[]", tag.name, @brew_tag_names.include?(tag.name)) %> <%= tag.name %></label>
-<% end %>
-        <%= render :partial => 'layouts/sep_tiny' %>
-<% end %>

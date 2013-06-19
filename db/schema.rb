@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130611063746) do
+ActiveRecord::Schema.define(:version => 20130618132323) do
 
   create_table "assignments", :force => true do |t|
     t.integer  "mark_id"
@@ -33,17 +33,6 @@ ActiveRecord::Schema.define(:version => 20130611063746) do
     t.integer  "minutes"
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "brew_tags", :force => true do |t|
-    t.string   "name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.text     "description"
-    t.string   "can_show"
-    t.integer  "total_manual_track_time"
-    t.string   "candidate_tag"
-    t.string   "target_release"
   end
 
   create_table "bz_bugs", :force => true do |t|
@@ -82,7 +71,7 @@ ActiveRecord::Schema.define(:version => 20130611063746) do
 
   create_table "component_views", :force => true do |t|
     t.integer "component_id"
-    t.integer "brew_tag_id"
+    t.integer "product_id"
   end
 
   create_table "components", :force => true do |t|
@@ -107,7 +96,7 @@ ActiveRecord::Schema.define(:version => 20130611063746) do
 
   create_table "labels", :force => true do |t|
     t.string   "name"
-    t.integer  "brew_tag_id"
+    t.integer  "product_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "global"
@@ -134,7 +123,7 @@ ActiveRecord::Schema.define(:version => 20130611063746) do
     t.text     "value"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "brew_tag_id"
+    t.integer  "product_id"
   end
 
   create_table "p_attachments", :force => true do |t|
@@ -172,7 +161,7 @@ ActiveRecord::Schema.define(:version => 20130611063746) do
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "brew_tag_id"
+    t.integer  "product_id"
     t.integer  "label_id"
     t.integer  "created_by"
     t.string   "version"
@@ -196,10 +185,21 @@ ActiveRecord::Schema.define(:version => 20130611063746) do
     t.string   "MEAD"
   end
 
+  create_table "products", :force => true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.text     "description"
+    t.string   "can_show"
+    t.integer  "total_manual_track_time"
+    t.string   "candidate_tag"
+    t.string   "target_release"
+  end
+
   create_table "relationships", :force => true do |t|
     t.string   "from_name"
     t.string   "is_global"
-    t.integer  "brew_tag_id"
+    t.integer  "product_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "to_name"
@@ -221,7 +221,7 @@ ActiveRecord::Schema.define(:version => 20130611063746) do
     t.integer  "props"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "brew_tag_id"
+    t.integer  "product_id"
     t.integer  "actions"
     t.text     "xattrs"
     t.string   "show_xattrs"
@@ -273,7 +273,7 @@ ActiveRecord::Schema.define(:version => 20130611063746) do
   add_index "versions", ["versioned_id", "versioned_type"], :name => "index_versions_on_versioned_id_and_versioned_type"
 
   create_table "weekly_workloads", :force => true do |t|
-    t.integer  "brew_tag_id"
+    t.integer  "product_id"
     t.datetime "start_of_week"
     t.datetime "end_of_week"
     t.integer  "package_count"

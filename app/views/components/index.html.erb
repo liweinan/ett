@@ -13,7 +13,7 @@
       <% Component.all(:order => 'name').each do |component| %>
           <tr>
             <td><%= link_to "#{component.name}", :controller => :components, :action => :show, :id => escape_url(component.name) %>
-            <td><%component.brew_tags.each do |tag|%><%=tag.name %> / <%end%></td>
+            <td><%component.products.each do |tag|%><%=tag.name %> / <%end%></td>
             </td>
             <% if can_manage? %>
                 <td>

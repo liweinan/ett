@@ -15,7 +15,7 @@ Cloning in process, please standby...
 			function (req){
 				var progress = document.getElementById('div_test').innerHTML;
 				if (progress == 'Done') {
-					window.location = "/brew_tags/<%=escape_url(session[:clone_review][:target_tag_name])%>/packages";
+					window.location = "/products/<%=escape_url(session[:clone_review][:target_tag_name])%>/packages";
 				}
 			}
 		});

@@ -1,34 +1,34 @@
-class BrewTagsController < ApplicationController
+class ProductsController < ApplicationController
   before_filter :check_can_manage, :only => [:create, :update, :new, :edit, :clone, :clone_review]
   before_filter :clone_form_validation, :only => :clone
 
-  # GET /brew_tags
-  # GET /brew_tags.xml
+  # GET /products
+  # GET /products.xml
   def index
-    @brew_tags = BrewTag.all
+    @products = Product.all
 
     respond_to do |format|
       format.html # index.html.erb
-      format.xml { render :xml => @brew_tags }
+      format.xml { render :xml => @products }
     end
   end
 
-  # GET /brew_tags/1
-  # GET /brew_tags/1.xml
+  # GET /products/1
+  # GET /products/1.xml
   def show
-    @brew_tag = BrewTag.find_by_name(unescape_url(params[:id]))
+    @product = Product.find_by_name(unescape_url(params[:id]))
 
     respond_to do |format|
       format.html # show.html.erb
-      format.xml { render :xml => @brew_tag }
+      format.xml { render :xml => @product }
     end
   end
 
-  # GET /brew_tags/new
-  # GET /brew_tags/new.xml
+  # GET /products/new
+  # GET /products/new.xml
   def new
     if can_manage?
-      @brew_tag = BrewTag.new
+      @product = Product.new
     end
 
     respond_to do |format|
@@ -37,34 +37,34 @@ class BrewTagsController < ApplicationController
           redirect_to('/')
         end
       }
-      format.xml { render :xml => @brew_tag }
+      format.xml { render :xml => @product }
     end
   end
 
-  # GET /brew_tags/1/edit
+  # GET /products/1/edit
   def edit
     if can_manage?
-      @brew_tag = BrewTag.find_by_name(unescape_url(params[:id]))
+      @product = Product.find_by_name(unescape_url(params[:id]))
     else
       redirect_to('/')
     end
   end
 
-  # POST /brew_tags
-  # POST /brew_tags.xml
+  # POST /products
+  # POST /products.xml
   def create
     if can_manage?
-      @brew_tag = BrewTag.new(params[:brew_tag])
-      params[:brew_tag][:name].strip!
-      params[:brew_tag][:name].downcase!
+      @product = Product.new(params[:product])
+      params[:product][:name].strip!
+      params[:product][:name].downcase!
     end
 
     respond_to do |format|
       if can_manage?
-        if @brew_tag.save
+        if @product.save
           expire_all_fragments
-          flash[:notice] = 'BrewTag was successfully created.'
-          format.html { redirect_to(:controller => :brew_tags, :action => :show, :id => escape_url(@brew_tag.name)) }
+          flash[:notice] = 'Product was successfully created.'
+          format.html { redirect_to(:controller => :products, :action => :show, :id => escape_url(@product.name)) }
         else
           format.html {
             render :action => "new"
@@ -76,35 +76,35 @@ class BrewTagsController < ApplicationController
     end
   end
 
-  # PUT /brew_tags/1
-  # PUT /brew_tags/1.xml
+  # PUT /products/1
+  # PUT /products/1.xml
   def update
-    @brew_tag = BrewTag.find(params[:id])
-    params[:brew_tag][:name].strip!
-    params[:brew_tag][:name].downcase!
+    @product = Product.find(params[:id])
+    params[:product][:name].strip!
+    params[:product][:name].downcase!
 
     respond_to do |format|
-      if @brew_tag.update_attributes(params[:brew_tag])
+      if @product.update_attributes(params[:product])
         expire_all_fragments
-        flash[:notice] = 'BrewTag was successfully updated.'
-        format.html { redirect_to(:controller => :brew_tags, :action => :show, :id => escape_url(@brew_tag.name)) }
+        flash[:notice] = 'Product was successfully updated.'
+        format.html { redirect_to(:controller => :products, :action => :show, :id => escape_url(@product.name)) }
         format.xml { head :ok }
       else
         format.html { render :action => "edit" }
-        format.xml { render :xml => @brew_tag.errors, :status => :unprocessable_entity }
+        format.xml { render :xml => @product.errors, :status => :unprocessable_entity }
       end
     end
   end
 
-  # DELETE /brew_tags/1
-  # DELETE /brew_tags/1.xml
+  # DELETE /products/1
+  # DELETE /products/1.xml
   def destroy
-    @brew_tag = BrewTag.find(params[:id])
-    @brew_tag.destroy
+    @product = Product.find(params[:id])
+    @product.destroy
 
-    BrewTag.find_by_name(unescape_url(params[:id]))
+    Product.find_by_name(unescape_url(params[:id]))
     respond_to do |format|
-      format.html { redirect_to(brew_tags_url) }
+      format.html { redirect_to(products_url) }
       format.xml { head :ok }
     end
   end
@@ -132,7 +132,7 @@ class BrewTagsController < ApplicationController
 
       redirect_to :action => :clone_review, :id => escape_url(params[:source_tag_name])
     else
-      @brew_tag = BrewTag.find_by_name(unescape_url(params[:id]))
+      @product = Product.find_by_name(unescape_url(params[:id]))
     end
   end
 
@@ -160,8 +160,8 @@ class BrewTagsController < ApplicationController
     if params[:target_tag_name].blank?
       @error_message << "Target tag name not specified."
     #else
-    #  @brew_tag = BrewTag.find_by_name(unescape_url(params[:target_tag_name].downcase.strip))
-    #  if @brew_tag
+    #  @product = Product.find_by_name(unescape_url(params[:target_tag_name].downcase.strip))
+    #  if @product
     #    @error_message << "Target tag name already used."
     #  end
     end
@@ -192,8 +192,8 @@ class BrewTagsController < ApplicationController
     end
 
     unless @error_message.blank?
-      @brew_tag = BrewTag.find_by_name(unescape_url(params[:source_tag_name]))
-      render :controller =>'brew_tags', :action => 'clone', :id => escape_url(params[:source_tag_name])
+      @product = Product.find_by_name(unescape_url(params[:source_tag_name]))
+      render :controller =>'products', :action => 'clone', :id => escape_url(params[:source_tag_name])
     end
   end
 

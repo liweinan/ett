@@ -1,13 +1,13 @@
 <h2>Import packages into tag: <%= params[:id] %></h2>
 <form action="/import" method="post">
-	Intital label: <%= render :partial => "labels/selection_for_tag", :locals => { :tag_id => BrewTag.find_by_name(unescape_url(params[:id])).id }%>
+	Intital label: <%= render :partial => "labels/selection_for_tag", :locals => { :tag_id => Product.find_by_name(unescape_url(params[:id])).id }%>
 	<%= render :partial => "layouts/sep" %>
-	Initial marks: <%= render :partial => 'marks/marks_selection', :locals => { :brew_tag_id => params[:id] } %>
+	Initial marks: <%= render :partial => 'marks/marks_selection', :locals => { :product_id => params[:id] } %>
 	<%= render :partial => "layouts/sep" %>
 	One package name per line:
 	<div class='manage-tbl'>
 	    <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
-	    <input name="brew_tag_id" type="hidden" value="<%= escape_url(params[:id]) %>"/>
+	    <input name="product_id" type="hidden" value="<%= escape_url(params[:id]) %>"/>
 	    <textarea cols="40" rows="50" id="packages" name="packages"></textarea>
 	    <div style="height:10px;">&nbsp;</div>
 	    <input name="commit" type="submit" value="Import"/>

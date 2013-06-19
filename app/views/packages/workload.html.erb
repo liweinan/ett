@@ -1,6 +1,6 @@
 <h2>Workload Report</h2>
 
-<% wls = WeeklyWorkload.all(:conditions => ["brew_tag_id=?", BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).id], :order => "start_of_week DESC") %>
+<% wls = WeeklyWorkload.all(:conditions => ["product_id=?", Product.find_by_name(unescape_url(params[:product_id])).id], :order => "start_of_week DESC") %>
 
 
 <div class='manage-tbl'>

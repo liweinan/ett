@@ -9,7 +9,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :relationships
   map.resources :settings
   map.resources :p_attachments
-  map.resources :brew_tags, :has_many => [:packages, :labels, :marks, :settings]
+  map.resources :products, :has_many => [:packages, :labels, :marks, :settings]
   map.resources :marks
   map.resources :labels, :has_many => :packages
   map.resources :packages

@@ -5,10 +5,10 @@ class LabelsController < ApplicationController
   # GET /labels
   # GET /labels.xml
   def index
-    if params[:brew_tag_id].blank?
+    if params[:product_id].blank?
       @labels = Label.all(:conditions => "global = 'Y'")
     else
-      @labels = Label.all(:conditions => ["brew_tag_id = ?", BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).id])
+      @labels = Label.all(:conditions => ["product_id = ?", Product.find_by_name(unescape_url(params[:product_id])).id])
     end
 
     respond_to do |format|
@@ -20,10 +20,10 @@ class LabelsController < ApplicationController
   # GET /labels/1
   # GET /labels/1.xml
   def show
-    if params[:brew_tag_id].blank?
+    if params[:product_id].blank?
       @label = Label.find(:first, :conditions => ["global = 'Y' and name = ?", unescape_url(params[:id])])
     else
-      @label = Label.find_by_name_and_brew_tag_id(unescape_url(params[:id]), BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).id)
+      @label = Label.find_by_name_and_product_id(unescape_url(params[:id]), Product.find_by_name(unescape_url(params[:product_id])).id)
     end
 
     respond_to do |format|
@@ -45,10 +45,10 @@ class LabelsController < ApplicationController
 
   # GET /labels/1/edit
   def edit
-    if params[:brew_tag_id].blank?
+    if params[:product_id].blank?
       @label = Label.find(:first, :conditions => ["name = ? AND global='Y'", unescape_url(params[:id])])
     else
-      @label = Label.find_by_name_and_brew_tag_id(unescape_url(params[:id]), BrewTag.find_by_name(unescape_url(params[:brew_tag_id])).id)
+      @label = Label.find_by_name_and_product_id(unescape_url(params[:id]), Product.find_by_name(unescape_url(params[:product_id])).id)
     end
   end
 
@@ -65,7 +65,7 @@ class LabelsController < ApplicationController
           if is_global?(@label)
             redirect_to :controller => :labels, :action => :show, :id => escape_url(@label.name)
           else
-            redirect_to :controller => :labels, :action => :show, :id => escape_url(@label.name), :brew_tag_id => escape_url(@label.brew_tag.name)
+            redirect_to :controller => :labels, :action => :show, :id => escape_url(@label.name), :product_id => escape_url(@label.product.name)
           end
 
         }
@@ -86,7 +86,7 @@ class LabelsController < ApplicationController
         flash[:notice] = 'Label was successfully updated.'
         format.html {
           unless is_global?(@label)
-            redirect_to :controller => :labels, :action => :show, :id => escape_url(@label.name), :brew_tag_id => escape_url(@label.brew_tag.name)
+            redirect_to :controller => :labels, :action => :show, :id => escape_url(@label.name), :product_id => escape_url(@label.product.name)
           else
             redirect_to :controller => :labels, :action => :show, :id => escape_url(@label.name)
           end

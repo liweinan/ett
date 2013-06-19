@@ -1,5 +1,5 @@
 <% unless is_global?(@label) %>
-    <h2>Editing label of <%= params[:brew_tag_id] %></h2>
+    <h2>Editing label of <%= params[:product_id] %></h2>
 <% else %>
     <h2>Editing system internal label</h2>
 <% end %>
@@ -15,7 +15,7 @@
         <%= render :partial => 'labels/fields/is_track_time', :locals => {:f => f} %>
         <%= render :partial => 'labels/fields/is_finish_state', :locals => {:f => f} %>
         <% unless is_global?(@label) %>
-            <%= render :partial => 'labels/fields/brew_tag', :locals => {:f => f} %>
+            <%= render :partial => 'labels/fields/product', :locals => {:f => f} %>
         <% end %>
         <tr>
           <td colspan=2 style='text-align:right;'><%= f.submit 'Update' %></td>
