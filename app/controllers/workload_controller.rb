@@ -34,7 +34,6 @@ class WorkloadController < ApplicationController
           wl.destroy
         end
 
-        # or it's the first run
         wl = WeeklyWorkload.new
         wl.start_of_week = begin_of_current_week
         wl.end_of_week = end_of_current_week
