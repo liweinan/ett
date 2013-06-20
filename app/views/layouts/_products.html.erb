@@ -1,0 +1,10 @@
+<div style="width:100%;text-align:left;">
+	<span style="padding-right:20px;"> 
+		Products:
+      <% Product.all(:order => 'name', :conditions => "can_show='Yes'").each do |product| %>
+		<%= link_to "#{product.name}", :controller => :packages, :action => :index, :product_id => escape_url(product.name), :user => params[:user] %>
+          /
+		<% end %>
+	</span>
+</div>
+<%= render :partial => 'layouts/line' %>
