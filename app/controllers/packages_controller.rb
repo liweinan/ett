@@ -1,7 +1,7 @@
 class PackagesController < ApplicationController
 #  helper :sparklines
-  before_filter :check_tag, :only => [:new, :edit]
-  before_filter :check_tag_or_user, :only => [:export_to_csv]
+  before_filter :check_product, :only => [:new, :edit]
+  before_filter :check_product_or_user, :only => [:export_to_csv]
   before_filter :user_view_index, :only => [:index]
   before_filter :check_can_manage, :only => [:destroy]
   before_filter :clone_form_validation, :only => :clone
