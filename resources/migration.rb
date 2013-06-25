@@ -13,21 +13,21 @@ dst_tag = BrewTag.new
 dst_tag.name = dst_tag_name
 dst_tag.save
 
-# Create the new initial label to use in cloned tag
-label = Label.new
-label.name = "Open"
-label.can_select = "Yes"
-label.can_show = "Yes"
-label.global = "N"
-label.brew_tag = dst_tag
-label.save
+# Create the new initial status to use in cloned tag
+status = Status.new
+status.name = "Open"
+status.can_select = "Yes"
+status.can_show = "Yes"
+status.global = "N"
+status.brew_tag = dst_tag
+status.save
 
 # Now we begin to clone all the packages to new tag
 src_tag = BrewTag.find_by_name(src_tag_name)
 src_tag.packages.each do |src_package|
  dst_package = src_package.clone #
  dst_package.brew_tag = dst_tag
- dst_package.label = label # Initialize label to 'Open'
+ dst_package.status = status # Initialize status to 'Open'
  dst_package.marks = [] # clear all marks
  dst_package.assignee = nil
  dst_package.p_attachments = []
@@ -41,4 +41,4 @@ src_tag.packages.each do |src_package|
 end
 
 ####Don't forget to add an option: whether or not to clone 'deleted' packages!
-####And: clone global labels as-is.
+####And: clone global statuses as-is.

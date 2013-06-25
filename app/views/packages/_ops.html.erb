@@ -2,7 +2,7 @@
 /
 <%= link_to "Time Report", :controller => :packages, :action => :index, :product_id => escape_url(params[:product_id]), :user => params[:user], :style => "time_report" %>
 /
-<%= link_to "Printable Page", :controller => :packages, :action => :index, :product_id => escape_url(params[:product_id]), :user => params[:user], :style => 'printable' %> / <%= link_to 'Export to CSV', "/packages/export_to_csv/-1?product_id=#{escape_url(params[:product_id])}&mark=#{escape_url(params[:mark])}&label=#{escape_url(params[:label])}&user=#{escape_url(params[:user])}" %>
+<%= link_to "Printable Page", :controller => :packages, :action => :index, :product_id => escape_url(params[:product_id]), :user => params[:user], :style => 'printable' %> / <%= link_to 'Export to CSV', "/packages/export_to_csv/-1?product_id=#{escape_url(params[:product_id])}&mark=#{escape_url(params[:mark])}&status=#{escape_url(params[:status])}&user=#{escape_url(params[:user])}" %>
 / <%= link_to 'Search Packages', "/search/packages?product_id=#{ebtag}" %>
 <% if logged_in? %>
     <% if has_product? %>
@@ -21,7 +21,7 @@
             %>
 
             / <%= link_to "Settings", :controller => :settings, :action =>:show, :id => setting_id, :product_id => escape_url(params[:product_id]) %>
-            / <%= link_to "Labels", :controller => :labels, :action => :index, :product_id => escape_url(params[:product_id]) %>
+            / <%= link_to "Statuses", :controller => :statuses, :action => :index, :product_id => escape_url(params[:product_id]) %>
             / <%= link_to "Marks", :controller => :marks, :action => :index, :product_id => escape_url(params[:product_id]) %>
             / <%= link_to "Clone", :controller => :products, :action => :clone, :id => escape_url(params[:product_id]) %>
         <% end %>

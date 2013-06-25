@@ -10,7 +10,7 @@ class PackagesController < ApplicationController
   # GET /packages.xml
   def index
     unless params[:product_id].blank?
-      @packages = get_packages(unescape_url(params[:product_id]), unescape_url(params[:mark]), unescape_url(params[:label]), unescape_url(params[:user]))
+      @packages = get_packages(unescape_url(params[:product_id]), unescape_url(params[:mark]), unescape_url(params[:status]), unescape_url(params[:user]))
     end
 
     respond_to do |format|
@@ -126,8 +126,8 @@ class PackagesController < ApplicationController
 
     params[:package][:updated_by] = current_user.id
 
-    last_label_changed_at = @package.label_changed_at
-    last_label = Label.find_by_id(@package.label_id)
+    last_status_changed_at = @package.status_changed_at
+    last_status = Status.find_by_id(@package.status_id)
 
     unless params[:package][:name].blank?
       cleanup_package_name(params[:package][:name])
@@ -143,29 +143,29 @@ class PackagesController < ApplicationController
             @package.marks = process_marks(params[:marks], @package.product_id)
           end
 
-          # label changed
-          if Label.find_by_id(params[:package][:label_id].to_i) != last_label
-            @package.label_changed_at = Time.now
+          # status changed
+          if Status.find_by_id(params[:package][:status_id].to_i) != last_status
+            @package.status_changed_at = Time.now
 
-            if !last_label.blank? && last_label.is_time_tracked?
-              @tt = TrackTime.all(:conditions => ["package_id=? and label_id=?", @package.id, last_label.id])[0]
+            if !last_status.blank? && last_status.is_time_tracked?
+              @tt = TrackTime.all(:conditions => ["package_id=? and status_id=?", @package.id, last_status.id])[0]
               @tt = TrackTime.new if @tt.blank?
               @tt.package_id=@package.id
-              @tt.label_id=last_label.id
+              @tt.status_id=last_status.id
 
-              last_label_changed_at ||= @package.label_changed_at
+              last_status_changed_at ||= @package.status_changed_at
               @tt.time_consumed ||= 0
-              @tt.time_consumed += (@package.label_changed_at.to_i - last_label_changed_at.to_i)/60
+              @tt.time_consumed += (@package.status_changed_at.to_i - last_status_changed_at.to_i)/60
               @tt.save
             end
 
             log_entry = AutoLogEntry.new
-            last_label_changed_at ||= @package.label_changed_at
-            log_entry.start_time = last_label_changed_at
-            log_entry.end_time = @package.label_changed_at
+            last_status_changed_at ||= @package.status_changed_at
+            log_entry.start_time = last_status_changed_at
+            log_entry.end_time = @package.status_changed_at
             log_entry.who = current_user
             log_entry.package = @package
-            log_entry.label = last_label
+            log_entry.status = last_status
             log_entry.save
           end
 
@@ -175,7 +175,7 @@ class PackagesController < ApplicationController
 
           do_sync(["name", "notes", "ver", "assignee", "brew_link", "group_id", "artifact_id", "project_name", "project_url", "license", "scm"])
 
-          sync_label if params[:sync_label] == 'yes'
+          sync_status if params[:sync_status] == 'yes'
           sync_marks if params[:sync_marks] == 'yes'
 
           flash[:notice] = 'Package was successfully updated.'
@@ -259,17 +259,17 @@ class PackagesController < ApplicationController
           @target_package.assignee = @source_package.assignee
         end
 
-        if params[:clone_label_option] == 'Yes'
-          label_name = @source_package.label.name
-          target_label = Label.find_in_global_scope(label_name, target_product.name)
-          unless target_label
-            target_label = @source_package.label.clone
-            target_label.product = target_product
-            target_label.save!
+        if params[:clone_status_option] == 'Yes'
+          status_name = @source_package.status.name
+          target_status = Status.find_in_global_scope(status_name, target_product.name)
+          unless target_status
+            target_status = @source_package.status.clone
+            target_status.product = target_product
+            target_status.save!
           end
-          @target_package.label = target_label
+          @target_package.status = target_status
         else
-          @target_package.label = nil
+          @target_package.status = nil
         end
 
         if params[:clone_marks_option] == 'Yes'
@@ -305,13 +305,13 @@ class PackagesController < ApplicationController
 
     require 'faster_csv'
 
-    @packages = get_packages(unescape_url(params[:product_id]), unescape_url(params[:mark]), unescape_url(params[:label]), unescape_url(params[:user]))
+    @packages = get_packages(unescape_url(params[:product_id]), unescape_url(params[:mark]), unescape_url(params[:status]), unescape_url(params[:user]))
 
     @product = Product.find_by_name(unescape_url(params[:product_id]))
 
     csv_string = FasterCSV.generate do |csv|
       # header row
-      header_row = ["name", "label", "marks"]
+      header_row = ["name", "status", "marks"]
 
       get_xattrs(@product, true, false) do |attr|
         if attr.blank?
@@ -327,10 +327,10 @@ class PackagesController < ApplicationController
       @packages.each do |package|
 
         val = [package.name]
-        if package.label.blank?
+        if package.status.blank?
           val << ""
         else
-          val << package.label.name
+          val << package.status.name
         end
 
         if package.marks.blank?
@@ -429,22 +429,22 @@ class PackagesController < ApplicationController
     end
   end
 
-  def sync_label
+  def sync_status
     @package.all_relationships_of('clone').each do |target_package|
-      unless @package.label.blank?
-        target_label = Label.find_in_global_scope(@package.label.name, target_package.product.name)
-        unless target_label.blank?
-          target_package.label = target_label
+      unless @package.status.blank?
+        target_status = Status.find_in_global_scope(@package.status.name, target_package.product.name)
+        unless target_status.blank?
+          target_package.status = target_status
           target_package.save
         else
-          target_label = @package.label.clone
-          target_label.product = target_package.product
-          target_label.save
-          target_package.label = target_label
+          target_status = @package.status.clone
+          target_status.product = target_package.product
+          target_status.save
+          target_package.status = target_status
           target_package.save
         end
-      else # User has unset the label of source package, so we unset all the labels assigned to target packages.
-        target_package.label = nil
+      else # User has unset the status of source package, so we unset all the statuses assigned to target packages.
+        target_package.status = nil
         target_package.save
       end
     end
@@ -488,17 +488,17 @@ class PackagesController < ApplicationController
     end
   end
 
-  def get_packages(__product_name, __mark_key, __label_name, __user_email)
-    order = "label_id, name"
+  def get_packages(__product_name, __mark_key, __status_name, __user_email)
+    order = "status_id, name"
 
     hierarchy = "select id from products where name = '#{__product_name}'"
 
-    __labels_can_show_sql = " AND (p.label_id IN (#{Label.ids_can_show_by_product_name_in_global_scope(__product_name)}) OR p.label_id IS NULL)"
+    __statuses_can_show_sql = " AND (p.status_id IN (#{Status.ids_can_show_by_product_name_in_global_scope(__product_name)}) OR p.status_id IS NULL)"
 
-    @all_packages_count = Package.count_by_sql("select count(*) from packages p where p.product_id IN (#{hierarchy}) #{__labels_can_show_sql}")
+    @all_packages_count = Package.count_by_sql("select count(*) from packages p where p.product_id IN (#{hierarchy}) #{__statuses_can_show_sql}")
 
     if logged_in?
-      @my_packages_count = Package.count_by_sql("select count(*) from packages p where p.product_id IN (#{hierarchy}) AND p.user_id = #{session[:current_user].id} #{__labels_can_show_sql}")
+      @my_packages_count = Package.count_by_sql("select count(*) from packages p where p.product_id IN (#{hierarchy}) AND p.user_id = #{session[:current_user].id} #{__statuses_can_show_sql}")
     end
 
     opts = ''
@@ -506,14 +506,14 @@ class PackagesController < ApplicationController
       opts = "AND p.user_id = #{User.find_by_email(__user_email).id} "
     end
 
-    opts << __labels_can_show_sql
+    opts << __statuses_can_show_sql
 
-    if !__label_name.blank? && !__mark_key.blank?
+    if !__status_name.blank? && !__mark_key.blank?
       mark = Mark.find_by_key_and_product_id(__mark_key, Product.find_by_name(__product_name).id)
-      _label = Label.find_in_global_scope(__label_name, __product_name)
-      _packages = Package.find_by_sql("select p.* from packages p join assignments a on p.id = a.package_id and a.mark_id = #{mark.id} and label_id = #{_label.id} and p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
-    elsif !__label_name.blank?
-      _packages = Package.find_by_sql("select p.* from packages p where p.label_id = #{Label.find_in_global_scope(__label_name, __product_name).id} AND p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
+      _status = Status.find_in_global_scope(__status_name, __product_name)
+      _packages = Package.find_by_sql("select p.* from packages p join assignments a on p.id = a.package_id and a.mark_id = #{mark.id} and status_id = #{_status.id} and p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
+    elsif !__status_name.blank?
+      _packages = Package.find_by_sql("select p.* from packages p where p.status_id = #{Status.find_in_global_scope(__status_name, __product_name).id} AND p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
     elsif !__mark_key.blank?
       mark = Mark.find_by_key_and_product_id(__mark_key, Product.find_by_name(__product_name))
       _packages = Package.find_by_sql("select p.* from packages p join assignments a on p.id = a.package_id and a.mark_id = #{mark.id} and p.product_id IN (#{hierarchy}) #{opts} order by #{order}")

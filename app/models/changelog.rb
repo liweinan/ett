@@ -63,23 +63,23 @@ class Changelog < ActiveRecord::Base
       changelog.category = Changelog::CATEGORY[:update]
       changelog.changed_at = Time.now
 
-      if attr == 'label_id'
-        from_label = Label.find_by_id(orig_package.read_attribute(attr).to_i)
-        to_label = Label.find_by_id(package.read_attribute(attr).to_i)
+      if attr == 'status_id'
+        from_status = Status.find_by_id(orig_package.read_attribute(attr).to_i)
+        to_status = Status.find_by_id(package.read_attribute(attr).to_i)
 
-        if from_label.blank?
+        if from_status.blank?
           changelog.from_value = '-'
         else
-          changelog.from_value = from_label.name
+          changelog.from_value = from_status.name
         end
 
-        if to_label.blank?
+        if to_status.blank?
           changelog.to_value = '-'
         else
-          changelog.to_value = to_label.name
+          changelog.to_value = to_status.name
         end
 
-        changelog.references = 'label'
+        changelog.references = 'status'
       elsif attr == 'user_id'
         from_assignee = orig_package.assignee
         to_assignee = package.assignee

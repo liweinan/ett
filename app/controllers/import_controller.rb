@@ -56,19 +56,19 @@ class ImportController < ApplicationController
             end
             json_obj.delete(:assignee.to_s)
 
-            #deal with label
-            if json_obj['label'] != nil
+            #deal with status
+            if json_obj['status'] != nil
 
-              if json_obj['label'].blank?
-                orig_package.label_id = nil
+              if json_obj['status'].blank?
+                orig_package.status_id = nil
               else
-                label = Label.find_in_global_scope(json_obj['label'], product_name)
-                unless label.blank?
-                  orig_package.label_id = label.id
+                status = Status.find_in_global_scope(json_obj['status'], product_name)
+                unless status.blank?
+                  orig_package.status_id = status.id
                 end
               end
             end
-            json_obj.delete(:label.to_s)
+            json_obj.delete(:status.to_s)
 
             #deal with marks
             if json_obj['marks'] != nil
@@ -154,12 +154,12 @@ class ImportController < ApplicationController
       @product = Product.find_by_name(unescape_url(params[:product_id]))
 
       @marks = process_marks(params[:marks], @product.id)
-      @label = Label.find(params[:package][:label_id]) unless params[:package][:label_id].blank?
+      @status = Status.find(params[:package][:status_id]) unless params[:package][:status_id].blank?
 
       @final_package_names.each do |name|
         package = Package.new
         package.name = name.strip
-        package.label_id = params[:package][:label_id] unless params[:package][:label_id].blank?
+        package.status_id = params[:package][:status_id] unless params[:package][:status_id].blank?
         package.marks = @marks unless @marks.blank?
         package.product_id = @product.id
         package.created_by = current_user.id

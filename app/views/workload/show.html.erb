@@ -4,7 +4,7 @@ Packages Built: <%= @wl.package_count %>
 <%= render :partial => 'layouts/sep_tiny' %>
 Automatic Time Track:
 <% @wl.auto_sum_details.each do |asd| %>
-    <%= render :partial => 'packages/fields/auto_track_time_display', :locals => {:label => asd.label, :time_consumed => asd.minutes} %>
+    <%= render :partial => 'packages/fields/auto_track_time_display', :locals => {:status => asd.status, :time_consumed => asd.minutes} %>
 <% end %>
 <%= render :partial => 'layouts/sep_tiny' %>
 Manual Time Track:
@@ -16,7 +16,7 @@ Manual Time Track:
       <th class='content-list-head'>Package Name</th>
       <th class='content-list-head'>Assignee (Was)</th>
       <th class='content-list-head'>Assignee (Current)</th>
-      <th class='content-list-head'>Current Label</th>
+      <th class='content-list-head'>Current Status</th>
       <th class='content-list-head'>Automatic Time Track</th>
       <th class='content-list-head'>Manual Time Track</th>
     </tr>
@@ -37,10 +37,10 @@ Manual Time Track:
                 <%= ps.package.assignee.name %>
             <% end %>
           </td>
-          <td style="font-size:10px;<%= ps.package.label.style %>"><%= ps.package.label.name %></td>
+          <td style="font-size:10px;<%= ps.package.status.style %>"><%= ps.package.status.name %></td>
           <td style='font-size:10px;text-align: left;'>
-            <% ps.label_stats.each do |ls| %>
-                <%= render :partial => 'packages/fields/auto_track_time_display', :locals => {:label => ls.label, :time_consumed => ls.minutes} %>
+            <% ps.status_stats.each do |ls| %>
+                <%= render :partial => 'packages/fields/auto_track_time_display', :locals => {:status => ls.status, :time_consumed => ls.minutes} %>
             <% end %>
           </td>
           <td style='font-size:10px;'><%= display_track_time_in_real_time(ps.minutes) %></td>

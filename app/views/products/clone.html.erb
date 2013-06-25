@@ -10,8 +10,8 @@
 
   <%= render :partial => 'layouts/sep' %>  
 
-  <input id='scope_label' name="scopes[]" type="checkbox" value="label" onclick="refresh_form();"/>
-  <label for="scope_label">Clone Labels</label>
+  <input id='scope_status' name="scopes[]" type="checkbox" value="status" onclick="refresh_form();"/>
+  <label for="scope_status">Clone Statuses</label>
   <%= render :partial => 'layouts/sep_tiny' %>
   <input id='scope_mark' name="scopes[]" type="checkbox" value="mark" onclick="refresh_form();"/>
   <label for="scope_mark">Clone Marks</label>
@@ -26,42 +26,42 @@
   <%= render :partial => 'layouts/sep' %>
 
 
-  <div id='div_label' style="display:none;">
-    <span style="font-weight: bold;">Set label of cloned packages:</span><br/>
+  <div id='div_status' style="display:none;">
+    <span style="font-weight: bold;">Set status of cloned packages:</span><br/>
     <%= render :partial => 'layouts/sep_tiny' %>
-    <input id="label_no_label" type="radio" name="label_option" value="no_label" checked/>
-    <label for="label_no_label"> Do not assign label</label>
+    <input id="status_no_status" type="radio" name="status_option" value="no_status" checked/>
+    <label for="status_no_status"> Do not assign status</label>
     <%= render :partial => 'layouts/sep_tiny' %>
-    <span id='div_label_default'>
-      <input id="label_default" type="radio" name="label_option" value="default"/>
-      <label for="label_default"> Set to currently assigned label</label>
+    <span id='div_status_default'>
+      <input id="status_default" type="radio" name="status_option" value="default"/>
+      <label for="status_default"> Set to currently assigned status</label>
       <%= render :partial => 'layouts/sep_tiny' %>
       </span>
-    <span id='div_label_selection'>
-      <input id="label_select" type="radio" name="label_option" value="selection"/>
-      <label for="label_select"> Set to existing label: </label>
-        <select name="label_selection_value" onclick="select_label_option(false,false,true,false);">
+    <span id='div_status_selection'>
+      <input id="status_select" type="radio" name="status_option" value="selection"/>
+      <label for="status_select"> Set to existing status: </label>
+        <select name="status_selection_value" onclick="select_status_option(false,false,true,false);">
           <option value=""> -</option>
-          <% Label.find_all_can_select_by_product_id(Product.find_by_name(unescape_url(params[:id])).id).each do |label| %>
-              <option value="<%= label.name %>"><%= label.name %></option>
+          <% Status.find_all_can_select_by_product_id(Product.find_by_name(unescape_url(params[:id])).id).each do |status| %>
+              <option value="<%= status.name %>"><%= status.name %></option>
           <% end %>
         </select>
       <%= render :partial => 'layouts/sep_tiny' %>
       </span>
 
-    <input id="label_select_global" type="radio" name="label_option" value="selection_global"/>
-    <label for="label_select_global"> Set to system internal label: </label>
-    <select name="label_selection_value_global" onclick="select_label_option(false,false,false,true);">
+    <input id="status_select_global" type="radio" name="status_option" value="selection_global"/>
+    <label for="status_select_global"> Set to system internal status: </label>
+    <select name="status_selection_value_global" onclick="select_status_option(false,false,false,true);">
       <option value=""> -</option>
-      <% Label.find_all_can_select_only_in_global_scope.each do |label| %>
-          <option value="<%= label.name %>"><%= label.name %></option>
+      <% Status.find_all_can_select_only_in_global_scope.each do |status| %>
+          <option value="<%= status.name %>"><%= status.name %></option>
       <% end %>
     </select>
     <%= render :partial => 'layouts/sep_tiny' %>
 
-    <input id="label_new_value" type="radio" name="label_option" value="new_value"/>
-    <label for='initial_label_value_field'> Set to new label: </label>
-    <input id='initial_label_value_field' name="initial_label_value" onclick="select_label_option(true,false,false,false);"/><br/>
+    <input id="status_new_value" type="radio" name="status_option" value="new_value"/>
+    <label for='initial_status_value_field'> Set to new status: </label>
+    <input id='initial_status_value_field' name="initial_status_value" onclick="select_status_option(true,false,false,false);"/><br/>
 
     <%= render :partial => 'layouts/sep' %>
 
@@ -91,26 +91,26 @@
 
 <% content_for :js do %>
     <script type="text/javascript">
-        function select_label_option(a, b, c, d) {
-            document.getElementById('label_new_value').checked = a;
-            document.getElementById('label_default').checked = b;
-            document.getElementById('label_select').checked = c;
-            document.getElementById('label_select_global').checked = d;
+        function select_status_option(a, b, c, d) {
+            document.getElementById('status_new_value').checked = a;
+            document.getElementById('status_default').checked = b;
+            document.getElementById('status_select').checked = c;
+            document.getElementById('status_select_global').checked = d;
         }
 
         function refresh_form() {
-            var scope_label = document.getElementById('scope_label');
+            var scope_status = document.getElementById('scope_status');
             var scope_mark = document.getElementById('scope_mark');
             var scope_package = document.getElementById('scope_package');
 
             if (scope_package.checked) {
 						document.getElementById('scope_assignee_div').style.display = 'block';
-                if (!scope_label.checked) {
-                    document.getElementById('div_label_default').style.display = 'none';
-                    document.getElementById('div_label_selection').style.display = 'none';
+                if (!scope_status.checked) {
+                    document.getElementById('div_status_default').style.display = 'none';
+                    document.getElementById('div_status_selection').style.display = 'none';
                 } else {
-                    document.getElementById('div_label_default').style.display = 'block';
-                    document.getElementById('div_label_selection').style.display = 'block';
+                    document.getElementById('div_status_default').style.display = 'block';
+                    document.getElementById('div_status_selection').style.display = 'block';
                 }
 
             <% if product_has_marks?(unescape_url(params[:id])) %>
@@ -122,11 +122,11 @@
                     document.getElementById('div_mark_selection').style.display = 'block';
                 }
             <% end %>
-                new Effect.SlideDown('div_label', {duration: 0.5});
+                new Effect.SlideDown('div_status', {duration: 0.5});
                 new Effect.SlideDown('div_marks', {duration: 0.5});
 
             } else {
-                document.getElementById('div_label').style.display = 'none';
+                document.getElementById('div_status').style.display = 'none';
                 document.getElementById('div_marks').style.display = 'none';
 				document.getElementById('scope_assignee_div').style.display = 'none';
             }

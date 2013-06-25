@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130625061138) do
+ActiveRecord::Schema.define(:version => 20130625202955) do
 
   create_table "assignments", :force => true do |t|
     t.integer  "mark_id"
@@ -20,7 +20,7 @@ ActiveRecord::Schema.define(:version => 20130625061138) do
 
   create_table "auto_log_entries", :force => true do |t|
     t.integer  "who_id"
-    t.integer  "label_id"
+    t.integer  "status_id"
     t.datetime "start_time"
     t.datetime "end_time"
     t.integer  "package_id"
@@ -29,7 +29,7 @@ ActiveRecord::Schema.define(:version => 20130625061138) do
 
   create_table "auto_sum_details", :force => true do |t|
     t.integer  "weekly_workload_id"
-    t.integer  "label_id"
+    t.integer  "status_id"
     t.integer  "minutes"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -86,29 +86,6 @@ ActiveRecord::Schema.define(:version => 20130625061138) do
     t.integer "package_id"
   end
 
-  create_table "label_stats", :force => true do |t|
-    t.integer  "package_stat_id"
-    t.integer  "label_id"
-    t.integer  "user_id"
-    t.integer  "minutes"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "labels", :force => true do |t|
-    t.string   "name"
-    t.integer  "product_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "global"
-    t.string   "can_select"
-    t.string   "can_show"
-    t.string   "code"
-    t.text     "style"
-    t.string   "is_track_time"
-    t.string   "is_finish_state"
-  end
-
   create_table "manual_log_entries", :force => true do |t|
     t.integer  "who_id"
     t.datetime "start_time"
@@ -163,7 +140,7 @@ ActiveRecord::Schema.define(:version => 20130625061138) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "product_id"
-    t.integer  "label_id"
+    t.integer  "status_id"
     t.integer  "created_by"
     t.string   "version"
     t.string   "ver"
@@ -175,7 +152,7 @@ ActiveRecord::Schema.define(:version => 20130625061138) do
     t.string   "license"
     t.string   "internal_scm"
     t.integer  "updated_by"
-    t.datetime "label_changed_at"
+    t.datetime "status_changed_at"
     t.string   "external_scm"
     t.string   "mead"
     t.string   "brew"
@@ -229,7 +206,30 @@ ActiveRecord::Schema.define(:version => 20130625061138) do
     t.string   "enabled"
     t.string   "enable_xattrs"
     t.string   "default_tag"
-    t.integer  "close_label_id"
+    t.integer  "close_status_id"
+  end
+
+  create_table "status_stats", :force => true do |t|
+    t.integer  "package_stat_id"
+    t.integer  "status_id"
+    t.integer  "user_id"
+    t.integer  "minutes"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "statuses", :force => true do |t|
+    t.string   "name"
+    t.integer  "product_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "global"
+    t.string   "can_select"
+    t.string   "can_show"
+    t.string   "code"
+    t.text     "style"
+    t.string   "is_track_time"
+    t.string   "is_finish_state"
   end
 
   create_table "time_zones", :force => true do |t|
@@ -238,7 +238,7 @@ ActiveRecord::Schema.define(:version => 20130625061138) do
   end
 
   create_table "track_times", :force => true do |t|
-    t.integer "label_id"
+    t.integer "status_id"
     t.integer "package_id"
     t.integer "time_consumed"
   end

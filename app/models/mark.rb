@@ -8,7 +8,7 @@ class Mark < ActiveRecord::Base
   def packages_can_show
     __packages = []
     self.packages.each do |package|
-      if package.label.blank? || package.label.can_show?
+      if package.status.blank? || package.status.can_show?
         __packages << package
       end
     end

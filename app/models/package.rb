@@ -16,7 +16,7 @@ class Package < ActiveRecord::Base
   belongs_to :assignee, :class_name => "User", :foreign_key => "user_id"
   belongs_to :creator, :class_name => "User", :foreign_key => "created_by"
   belongs_to :product
-  belongs_to :label
+  belongs_to :status
 
   has_many :assignments, :dependent => :destroy
   has_many :marks, :through => :assignments
@@ -38,7 +38,7 @@ class Package < ActiveRecord::Base
 
   default_value_for :time_consumed, 0
   default_value_for :time_point, 0
-  default_value_for :label_changed_at, Time.now
+  default_value_for :status_changed_at, Time.now
 
   def self.per_page
     10
@@ -60,8 +60,8 @@ class Package < ActiveRecord::Base
   end
 
   def deleted?
-    if self.label
-      self.label.name == Label.deleted_label.name
+    if self.status
+      self.status.name == Status.deleted_status.name
     else
       false
     end
@@ -72,7 +72,7 @@ class Package < ActiveRecord::Base
   end
 
   def set_deleted
-    self.label = Label.deleted_label
+    self.status = Status.deleted_status
     self.save
   end
 
@@ -141,14 +141,14 @@ class Package < ActiveRecord::Base
 
   def self.distinct_in_products_can_show(products)
     product_ids = Product.products_to_ids(products)
-    can_show_label_ids = []
+    can_show_status_ids = []
     product_ids.each do |product_id|
-      Label.find_all_can_show_by_product_id_in_global_scope(product_id).each do |label|
-        can_show_label_ids << label.id
+      Status.find_all_can_show_by_product_id_in_global_scope(product_id).each do |status|
+        can_show_status_ids << status.id
       end
     end
 
-    Package.all(:select => "distinct name", :conditions => ["product_id in (?) and (label_id in (?) or label_id is NULL)", product_ids, can_show_label_ids.uniq], :order => "name")
+    Package.all(:select => "distinct name", :conditions => ["product_id in (?) and (status_id in (?) or status_id is NULL)", product_ids, can_show_status_ids.uniq], :order => "name")
   end
 
   def validate
