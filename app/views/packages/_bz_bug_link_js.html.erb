@@ -179,7 +179,11 @@
         colBzBugCreator.id = 'col_bz_creator_' + id;
         renderBzBugCreator(id, colBzBugCreator);
 
-        var colBzBugSummary = row.insertCell(3);
+        var colBzBugStatus = row.insertCell(3);
+        colBzBugStatus.id = 'col_bz_status_' + id;
+        renderBzBugStatus(id, colBzBugStatus);
+
+        var colBzBugSummary = row.insertCell(4);
         colBzBugSummary.id = 'col_bz_summary_' + id;
         renderBzBugSummary(id, colBzBugSummary);
 
@@ -202,6 +206,11 @@
     function renderBzBugCreator(id, col) {
         col.className = 'small_font';
         renderPartial(id, col.id, 'bz_bugs/creator');
+    }
+
+    function renderBzBugStatus(id, col) {
+        col.className = 'small_font';
+        renderPartial(id, col.id, 'bz_bugs/bz_status');
     }
 
     function renderBzBugSummary(id, col) {

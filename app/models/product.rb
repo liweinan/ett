@@ -21,8 +21,8 @@ class Product < ActiveRecord::Base
 
   def self.products_to_ids(products)
     product_ids = []
-    products.each do |tag|
-      product_ids << tag.id
+    products.each do |product|
+      product_ids << product.id
     end
     product_ids
   end
