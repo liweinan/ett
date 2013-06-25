@@ -1,6 +1,6 @@
 class ActionsController < ApplicationController
   before_filter :check_logged_in
-  before_filter :check_tag, :only => :take
+  before_filter :check_product, :only => :take
   before_filter :check_can_manage, :only => [:check_clone_progress, :process_clone]
   before_filter :package_taken, :only => :take
 

@@ -1,5 +1,5 @@
 class SearchController < ApplicationController
-  before_filter :check_tag
+  before_filter :check_product
 
   def packages
     if request.post?
