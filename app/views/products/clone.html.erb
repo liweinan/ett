@@ -3,10 +3,10 @@
 
 
 <form action="/products/clone/<%= escape_url(params[:id]) %>" method="post" onsubmit="return validateForm();">
-  <input type='hidden' value='<%= escape_url(params[:id]) %>' name='source_tag_name'/>
+  <input type='hidden' value='<%= escape_url(params[:id]) %>' name='source_product_name'/>
   <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
-  <label for="target_tag_name_field">Clone <%= @product.name %> to:</label>
-  <input id='target_tag_name_field' name="target_tag_name"/> - (target tag name) <br/>
+  <label for="target_product_name_field">Clone <%= @product.name %> to:</label>
+  <input id='target_product_name_field' name="target_product_name"/> - (target tag name) <br/>
 
   <%= render :partial => 'layouts/sep' %>  
 

@@ -11,8 +11,8 @@ class ComponentsController < ApplicationController
   def edit
     @component = Component.find_by_name(unescape_url(params[:id]))
     @product_names = []
-    @component.products.each do |tag|
-      @product_names << tag.name
+    @component.products.each do |product|
+      @product_names << product.name
     end
   end
 
@@ -62,18 +62,18 @@ class ComponentsController < ApplicationController
     if @component.blank?
       redirect_to(:action => :index)
     else
-      @packages = Package.distinct_in_tags_can_show(@component.products)
+      @packages = Package.distinct_in_products_can_show(@component.products)
     end
 
   end
 
   protected
 
-  def collect_products(tag_names)
-    unless tag_names.blank?
+  def collect_products(product_names)
+    unless product_names.blank?
       products = []
-      tag_names.each do |tag_name|
-        products << Product.find_by_name(tag_name)
+      product_names.each do |product_name|
+        products << Product.find_by_name(product_name)
       end
       return products
     end

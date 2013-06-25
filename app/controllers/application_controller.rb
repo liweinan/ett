@@ -356,10 +356,10 @@ class ApplicationController < ActionController::Base
 
   def home_page
     #unless has_product?
-    #  unless Setting.system_settings.default_tag.blank?
-    #    default_tag = Product.find_by_name(Setting.system_settings.default_tag)
-    #    unless default_tag.blank?
-    #      params[:product_id] = escape_url(default_tag.name)
+    #  unless Setting.system_settings.default_product.blank?
+    #    default_product = Product.find_by_name(Setting.system_settings.default_tag)
+    #    unless default_product.blank?
+    #      params[:product_id] = escape_url(default_product.name)
     #    else
     #      params[:product_id] = escape_url(Product.find(:first, :order => 'updated_at DESC').name)
     #    end

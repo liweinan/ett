@@ -245,15 +245,15 @@ class PackagesController < ApplicationController
   def clone
     if request.post?
       Package.transaction do
-        source_tag = Product.find_by_name(unescape_url(params[:product_id]))
-        @source_package = Package.find_by_name_and_product_id(unescape_url(params[:id]), source_tag.id)
+        source_product = Product.find_by_name(unescape_url(params[:product_id]))
+        @source_package = Package.find_by_name_and_product_id(unescape_url(params[:id]), source_product.id)
 
         @source_package.updated_by = current_user.id
         @source_package.save
 
         @target_package = @source_package.clone
-        target_tag = Product.find_by_name(unescape_url(params[:target_tag_name]))
-        @target_package.product = target_tag
+        target_product = Product.find_by_name(unescape_url(params[:target_product_name]))
+        @target_package.product = target_product
 
         if params[:clone_assignee_option] == 'Yes'
           @target_package.assignee = @source_package.assignee
@@ -261,10 +261,10 @@ class PackagesController < ApplicationController
 
         if params[:clone_label_option] == 'Yes'
           label_name = @source_package.label.name
-          target_label = Label.find_in_global_scope(label_name, target_tag.name)
+          target_label = Label.find_in_global_scope(label_name, target_product.name)
           unless target_label
             target_label = @source_package.label.clone
-            target_label.product = target_tag
+            target_label.product = target_product
             target_label.save!
           end
           @target_package.label = target_label
@@ -274,10 +274,10 @@ class PackagesController < ApplicationController
 
         if params[:clone_marks_option] == 'Yes'
           @source_package.marks.each do |source_mark|
-            target_mark = Mark.find_by_key_and_product_id(source_mark.key, target_tag.id)
+            target_mark = Mark.find_by_key_and_product_id(source_mark.key, target_product.id)
             unless target_mark
               target_mark = source_mark.clone
-              target_mark.product = target_tag
+              target_mark.product = target_product
               target_mark.save!
             end
             @target_package.marks << target_mark
@@ -297,7 +297,7 @@ class PackagesController < ApplicationController
 
       flash[:notice] = "Clone completed."
 
-      redirect_to(:controller => :packages, :action => :show, :id => escape_url(@target_package.name), :product_id => escape_url(params[:target_tag_name]))
+      redirect_to(:controller => :packages, :action => :show, :id => escape_url(@target_package.name), :product_id => escape_url(params[:target_product_name]))
     end
   end
 
@@ -457,15 +457,15 @@ class PackagesController < ApplicationController
 
     @error_message = []
 
-    target_tag = Product.find_by_name(unescape_url(params[:target_tag_name]))
+    target_product = Product.find_by_name(unescape_url(params[:target_product_name]))
 
-    if target_tag.blank?
-      @error_message << "Target tag not found."
+    if target_product.blank?
+      @error_message << "Target product not found."
 
     else
 
-      if Package.find_by_name_and_product_id(unescape_url(params[:id]), target_tag.id)
-        @error_message << "Package already exists in target tag."
+      if Package.find_by_name_and_product_id(unescape_url(params[:id]), target_product.id)
+        @error_message << "Package already exists in target product."
       end
     end
 

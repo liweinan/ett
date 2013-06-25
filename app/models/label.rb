@@ -78,7 +78,7 @@ class Label < ActiveRecord::Base
     end
 
     if label && label.id != self.id
-      errors.add(:name, " - Label name cannot be duplicate under one tag!")
+      errors.add(:name, " - Label name cannot be duplicate under one product!")
     end
   end
 
