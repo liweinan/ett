@@ -6,6 +6,7 @@
       <% end %>
       <th class='content-list-head'>Bug ID</th>
       <th class='content-list-head'>Linked/Created By</th>
+      <th class='content-list-head'>Status</th>
       <th class='content-list-head'>Summary</th>
     </tr>
     <% package.bz_bugs.each do |bz_bug| %>
@@ -15,12 +16,14 @@
                 <%= render :partial => 'bz_bugs/ops', :locals => {:bz_bug => bz_bug} %>
               </td>
           <% end %>
-
           <td id="col_bz_id_<%= bz_bug.id %>" class="small_font">
             <%= render :partial => "bz_bugs/bz_id", :locals => {:bz_bug => bz_bug} %>
           </td>
           <td id="col_bz_creator_<%= bz_bug.creator_id %>" class="small_font">
             <%= render :partial => "bz_bugs/creator", :locals => {:bz_bug => bz_bug} %>
+          </td>
+          <td id="col_bz_status_<%= bz_bug.creator_id %>" class="small_font">
+            <%= render :partial => "bz_bugs/bz_status", :locals => {:bz_bug => bz_bug} %>
           </td>
           <td id="col_bz_summary_<%= bz_bug.summary %>" class="small_font">
             <%= render :partial => "bz_bugs/summary", :locals => {:bz_bug => bz_bug} %>

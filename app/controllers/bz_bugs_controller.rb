@@ -79,13 +79,8 @@ class BzBugsController < ApplicationController
         @response = Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_query_url"]}#{bz_id}.json?userid=#{extract_username(params[:user])}&pwd=#{params[:pwd]}"))
 
         if @response.class == Net::HTTPOK
-          summary = JSON.parse(@response.body)["summary"]
-          @bz_bug = BzBug.new
-          @bz_bug.package_id = package_id
-          @bz_bug.bz_id = bz_id
-          @bz_bug.summary = summary
-          @bz_bug.creator_id = current_user.id
-          @bz_bug.save
+          bz_info = JSON.parse(@response.body)
+          @bz_bug = BzBug.create_from_bz_info(bz_info, package_id, current_user)
         end
       rescue => e
         @error = e
