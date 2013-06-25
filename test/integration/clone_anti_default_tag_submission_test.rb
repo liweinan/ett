@@ -18,7 +18,7 @@ class CloneAntiDefaultTagSubmissionTest < ActionController::IntegrationTest
     assert_template :clone
 
     assert_select "div#errorExplanation" do
-      assert_select "li", "Target tag not found."
+      assert_select "li", "Target product not found."
     end
 
 
