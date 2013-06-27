@@ -48,12 +48,12 @@ class Notify
           prev = User.find(hashes[key][0]).name unless hashes[key][0].blank?
           now = User.find(hashes[key][1]).name unless hashes[key][1].blank?
           detail += "\nAssignee\n--------------------\n***Was***\n #{prev}\n\n***Now***\n #{now}\n\n"
-        elsif key == 'label_id'
+        elsif key == 'status_id'
           prev = nil
           now = nil
-          prev = Label.find(hashes[key][0]).name unless hashes[key][0].blank?
-          now = Label.find(hashes[key][1]).name unless hashes[key][1].blank?
-          detail += "\nLabel\n--------------------\n***Was***\n #{prev}\n\n***Now***\n #{now}\n\n"
+          prev = Status.find(hashes[key][0]).name unless hashes[key][0].blank?
+          now = Status.find(hashes[key][1]).name unless hashes[key][1].blank?
+          detail += "\nStatus\n--------------------\n***Was***\n #{prev}\n\n***Now***\n #{now}\n\n"
         end
       end
 

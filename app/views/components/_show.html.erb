@@ -27,8 +27,8 @@
                         Assigned to: <%= package.assignee.name %>
                         <%= render :partial => 'layouts/sep_tiny' %>
                     <% end %>
-                    <% unless package.label.blank? %>
-                        Label: <span style="<%= package.label.style %>"><%= package.label.name %></span>
+                    <% unless package.status.blank? %>
+                        Status: <span style="<%= package.status.style %>"><%= package.status.name %></span>
                         <%= render :partial => 'layouts/sep_tiny' %>
                     <% end %>
                     <% unless package.marks.blank? %>

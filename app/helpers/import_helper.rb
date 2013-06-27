@@ -16,20 +16,20 @@ module ImportHelper
         source_p.user ||= User.new
         "<span style='color:red;'>#{source_p.user.name} => #{target_p.user.name}</span>"
       end
-    elsif attr== 'label'
-      if target_p.label == source_p.label
-        if target_p.label.blank?
+    elsif attr== 'status'
+      if target_p.status == source_p.status
+        if target_p.status.blank?
           '-'
         else
-          target_p.label.name
+          target_p.status.name
         end
       elsif confirmed?
-        target_p.label ||= Label.new
-        "<span style='color:red;'>#{target_p.label.name}</span>"
+        target_p.status ||= Status.new
+        "<span style='color:red;'>#{target_p.status.name}</span>"
       else
-        target_p.label ||= Label.new
-        source_p.label ||= Label.new
-        "<span style='color:red;'>#{source_p.label.name} => #{target_p.label.name}</span>"
+        target_p.status ||= Status.new
+        source_p.status ||= Status.new
+        "<span style='color:red;'>#{source_p.status.name} => #{target_p.status.name}</span>"
       end
     elsif attr== 'marks'
       if target_p.marks == source_p.marks

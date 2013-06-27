@@ -16,7 +16,7 @@
         <tr>
           <th class='content-list-head'>Name</th>
           <th class='content-list-head'>Assignee</th>
-          <th class='content-list-head'>Label</th>
+          <th class='content-list-head'>Status</th>
           <th class='content-list-head'>Marks</th>
           <% get_xattrs(Product.find_by_name(unescape_url(params[:id])), true, false) do |attr| %>
               <th class='content-list-head'><%= attr.camelcase %></th>
@@ -27,7 +27,7 @@
             <tr>
               <td><%= package.name %></td>
               <td><%= diff_output(package, @cloned_packages[i], 'assignee') %></td>
-              <td><%= diff_output(package, @cloned_packages[i], 'label') %></td>
+              <td><%= diff_output(package, @cloned_packages[i], 'status') %></td>
               <td><%= diff_output(package, @cloned_packages[i], 'marks') %></td>
               <% get_xattrs(Product.find_by_name(unescape_url(params[:id])), true, false) do |attr| %>
                   <td>

@@ -17,12 +17,12 @@ class WorkloadController < ApplicationController
         begin_of_current_week = current_date.at_beginning_of_week.to_datetime
         end_of_current_week = current_date.at_end_of_week.to_datetime
 
-        packages = Package.find_by_sql(["select * from packages where product_id=? and label_id IN (select id from labels where is_finish_state='Yes') and updated_at >= ? and updated_at <= ?", product.id, begin_of_current_week, end_of_current_week])
+        packages = Package.find_by_sql(["select * from packages where product_id=? and status_id IN (select id from statuses where is_finish_state='Yes') and updated_at >= ? and updated_at <= ?", product.id, begin_of_current_week, end_of_current_week])
         candidates = []
 
         packages.each do |package|
-          # search for changelog, to see if the package has labels changed during this week.
-          cnt = Changelog.count_by_sql(["select * from changelogs where package_id=? and category='UPDATE' and 'references'='label' and changed_at >= ? and changed_at <= ?", package.id, begin_of_current_week, end_of_current_week])
+          # search for changelog, to see if the package has statuses changed during this week.
+          cnt = Changelog.count_by_sql(["select * from changelogs where package_id=? and category='UPDATE' and 'references'='status' and changed_at >= ? and changed_at <= ?", package.id, begin_of_current_week, end_of_current_week])
           unless cnt.blank?
             candidates << package
           end
@@ -51,13 +51,13 @@ class WorkloadController < ApplicationController
           # Collect data of auto log entires
           entries = AutoLogEntry.all(:conditions => ["package_id = ? and start_time >= ? and end_time <= ?", package.id, begin_of_current_week, end_of_current_week])
           entries.each do |entry|
-            #sum up the time spent on each label during this week
-            ls = LabelStat.find(:first, :conditions => ["package_stat_id=? and label_id=?", ps.id, entry.label_id])
+            #sum up the time spent on each status during this week
+            ls = StatusStat.find(:first, :conditions => ["package_stat_id=? and status_id=?", ps.id, entry.status_id])
 
             if ls.blank?
-              ls = LabelStat.new
+              ls = StatusStat.new
               ls.package_stat_id = ps.id
-              ls.label_id = entry.label_id
+              ls.status_id = entry.status_id
               ls.user_id = entry.who_id
               ls.minutes += (entry.end_time.to_i - entry.start_time.to_i) / 60
             else
@@ -65,11 +65,11 @@ class WorkloadController < ApplicationController
             end
             ls.save
 
-            asd = AutoSumDetail.find(:first, :conditions => ["weekly_workload_id=? and label_id=?", wl.id, ls.label_id])
+            asd = AutoSumDetail.find(:first, :conditions => ["weekly_workload_id=? and status_id=?", wl.id, ls.status_id])
             if asd.blank?
               asd = AutoSumDetail.new
               asd.weekly_workload_id = wl.id
-              asd.label_id = ls.label_id
+              asd.status_id = ls.status_id
             end
 
             asd.minutes += ls.minutes

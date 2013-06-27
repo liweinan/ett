@@ -123,12 +123,12 @@ class ProductsController < ApplicationController
       session[:clone_review][:scopes] = params[:scopes]
       session[:clone_review][:mark_options] = params[:mark_options]
       session[:clone_review][:mark_options] ||= []
-      session[:clone_review][:label_option] = params[:label_option]
+      session[:clone_review][:status_option] = params[:status_option]
       session[:clone_review][:initial_mark_values] = params[:initial_mark_values]
       session[:clone_review][:marks] = params[:marks]
-      session[:clone_review][:initial_label_value] = params[:initial_label_value]
-      session[:clone_review][:label_selection_value] = params[:label_selection_value]
-      session[:clone_review][:label_selection_value_global] = params[:label_selection_value_global]
+      session[:clone_review][:initial_status_value] = params[:initial_status_value]
+      session[:clone_review][:status_selection_value] = params[:status_selection_value]
+      session[:clone_review][:status_selection_value_global] = params[:status_selection_value_global]
 
       redirect_to :action => :clone_review, :id => escape_url(params[:source_product_name])
     else
@@ -174,11 +174,11 @@ class ProductsController < ApplicationController
       @error_message << "Nothing set to clone."
     else
       if params[:scopes].include? 'package'
-        if params[:label_option] == 'new_value'
-          if params[:initial_label_value].blank?
-            @error_message << "Initial label not set."
-          elsif Label.find_in_global_scope(params[:initial_label_value].downcase.strip, unescape_url(params[:target_product_name]).downcase.strip)
-            @error_message << "Initial label name already used."
+        if params[:status_option] == 'new_value'
+          if params[:initial_status_value].blank?
+            @error_message << "Initial status not set."
+          elsif Status.find_in_global_scope(params[:initial_status_value].downcase.strip, unescape_url(params[:target_product_name]).downcase.strip)
+            @error_message << "Initial status name already used."
 
           end
         end

@@ -3,7 +3,7 @@
 class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
-  helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_product?, :count_packages, :can_edit_package?, :current_user, :get_product, :has_label?, :has_mark?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :product_has_marks?, :get_xattrs, :background_style, :confirmed?, :default_style
+  helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_product?, :count_packages, :can_edit_package?, :current_user, :get_product, :has_status?, :has_mark?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :product_has_marks?, :get_xattrs, :background_style, :confirmed?, :default_style
   helper_method :btag, :ebtag, :uebtag, :truncate_u, :its_me?, :extract_username
   before_filter :process_product_id
   before_filter :save_current_link
@@ -49,8 +49,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def has_label?
-    !params[:label].blank?
+  def has_status?
+    !params[:status].blank?
   end
 
   def has_mark?
@@ -63,19 +63,19 @@ class ApplicationController < ActionController::Base
     (logged_in? && _package.user_id == session[:current_user].id) || can_manage?
   end
 
-  def count_packages(bt, label_name)
+  def count_packages(bt, status_name)
     bt_quoted = "'#{bt}'"
-    global_label = Label.find(:first, :conditions => ["global='Y' AND name=?", label_name])
-    label_id = -1
-    if global_label == nil
-      label_id = Label.find_by_name_and_product_id(label_name, Product.find_by_name(bt).id).id
+    global_status = Status.find(:first, :conditions => ["global='Y' AND name=?", status_name])
+    status_id = -1
+    if global_status == nil
+      status_id = Status.find_by_name_and_product_id(status_name, Product.find_by_name(bt).id).id
     else
-      label_id = global_label.id
+      status_id = global_status.id
     end
 
 #    children = "union select children.id as id from products parent join products children on parent.id = children.parent_id and parent.name = #{bt_quoted} "
     hierarchy = "select id from products where name = #{bt_quoted}"
-    Package.count(:conditions => ["label_id = ? AND product_id IN (#{hierarchy})", label_id])
+    Package.count(:conditions => ["status_id = ? AND product_id IN (#{hierarchy})", status_id])
   end
 
   def current_user
@@ -316,8 +316,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def is_global?(label)
-    label.global == 'Y'
+  def is_global?(status)
+    status.global == 'Y'
   end
 
   def check_user_id

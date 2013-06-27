@@ -2,10 +2,10 @@
 
 one:
   weekly_workload_id: 1
-  label_id: 1
+  status_id: 1
   minutes: 1
 
 two:
   weekly_workload_id: 1
-  label_id: 1
+  status_id: 1
   minutes: 1

@@ -1,8 +1,8 @@
 <h2>
   <% if params[:product_id].blank? %>
-      System internal label list
+      System internal status list
   <% else %>
-      Listing labels of <%= unescape_url(params[:product_id]) %>
+      Listing statuses of <%= unescape_url(params[:product_id]) %>
   <% end %>
 </h2>
 <div class='manage-tbl'>
@@ -20,35 +20,35 @@
           <th>Operation</th>
       <% end %>
     </tr>
-    <% @labels.each do |label| %>
+    <% @statuses.each do |status| %>
         <tr>
-          <td><%= label.id %></td>
-          <td><%= h label.name %></td>
+          <td><%= status.id %></td>
+          <td><%= h status.name %></td>
           <td>
-            <% if is_global?(label) %>
+            <% if is_global?(status) %>
                 -
             <% else %>
-                <%= h label.product.name %>
+                <%= h status.product.name %>
             <% end %>
           </td>
           <td>
-            <%= label.can_show %>
+            <%= status.can_show %>
           </td>
           <td>
-            <%= label.can_select %>
+            <%= status.can_select %>
           </td>
           <td>
-            <%= label.is_track_time %>
+            <%= status.is_track_time %>
           </td>
           <td>
-            <%= label.is_finish_state %>
+            <%= status.is_finish_state %>
           </td>
-          <td style="<%= label.style %>">
+          <td style="<%= status.style %>">
             Example
           </td>
           <% if can_manage? %>
               <td>
-                <%= link_to 'Edit', :controller => :labels, :action => :edit, :id => escape_url(label.name), :product_id => escape_url(params[:product_id]) %>
+                <%= link_to 'Edit', :controller => :statuses, :action => :edit, :id => escape_url(status.name), :product_id => escape_url(params[:product_id]) %>
               </td>
           <% end %>
         </tr>
@@ -59,11 +59,11 @@
 
 <% if can_manage? %>
     <% if has_product? %>
-        <%= link_to "New label of #{unescape_url(params[:product_id])}", :controller => :labels, :action => :new, :product_id => escape_url(params[:product_id]) %>
+        <%= link_to "New status of #{unescape_url(params[:product_id])}", :controller => :statuses, :action => :new, :product_id => escape_url(params[:product_id]) %>
         <%= render :partial => 'layouts/sep_tiny' %>
         <%= link_to "Back to #{unescape_url(params[:product_id])}", :controller => :packages, :action => :index, :product_id => escape_url(params[:product_id]) %>
 
     <% else %>
-        <%= link_to 'New label', new_label_path %>
+        <%= link_to 'New status', new_status_path %>
     <% end %>
 <% end %>

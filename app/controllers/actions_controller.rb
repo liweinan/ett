@@ -46,17 +46,17 @@ class ActionsController < ApplicationController
           @target_product.save
         end
 
-        # clone labels
-        if session[:clone_review][:scopes].include? 'label'
-          @source_product.labels.each do |label|
-            cloned_label = label.clone
-            cloned_label.product = @target_product
+        # clone statuses
+        if session[:clone_review][:scopes].include? 'status'
+          @source_product.statuses.each do |status|
+            cloned_status = status.clone
+            cloned_status.product = @target_product
             
-            _label = Label.find_by_name_and_product_id(cloned_label.name, cloned_label.product.id)
-            if _label
-              cloned_label = _label
+            _status = Status.find_by_name_and_product_id(cloned_status.name, cloned_status.product.id)
+            if _status
+              cloned_status = _status
             else
-              cloned_label.save
+              cloned_status.save
             end
           end
         end
@@ -77,20 +77,20 @@ class ActionsController < ApplicationController
 
         # clone packages
         if session[:clone_review][:scopes].include? 'package'
-          # Create new label if necessary
-          @new_label = nil
-          if session[:clone_review][:label_option] == 'new_value'
-            @new_label = Label.new
-            @new_label.name = session[:clone_review][:initial_label_value].strip
-            @new_label.can_select = "Yes"
-            @new_label.can_show = "Yes"
-            @new_label.global = "N"
-            @new_label.product = @target_product
-            _label = Label.find_by_name_and_product_id(@new_label.name, @new_label.product.id)
-            if _label
-              @new_label = _label
+          # Create new status if necessary
+          @new_status = nil
+          if session[:clone_review][:status_option] == 'new_value'
+            @new_status = Status.new
+            @new_status.name = session[:clone_review][:initial_status_value].strip
+            @new_status.can_select = "Yes"
+            @new_status.can_show = "Yes"
+            @new_status.global = "N"
+            @new_status.product = @target_product
+            _status = Status.find_by_name_and_product_id(@new_status.name, @new_status.product.id)
+            if _status
+              @new_status = _status
             else
-              @new_label.save
+              @new_status.save
             end
           end
 
@@ -117,18 +117,18 @@ class ActionsController < ApplicationController
               target_package.assignee = source_package.assignee
             end
 
-            if session[:clone_review][:label_option] == 'selection_global'
-              target_package.label = Label.find_in_global_scope(session[:clone_review][:label_selection_value_global].strip, target_package.product.name)
-            elsif session[:clone_review][:scopes].include?('label')
-              if session[:clone_review][:label_option] == 'default'
-                unless source_package.label.blank?
-                  target_package.label = Label.find_in_global_scope(source_package.label.name, target_package.product.name)
+            if session[:clone_review][:status_option] == 'selection_global'
+              target_package.status = Status.find_in_global_scope(session[:clone_review][:status_selection_value_global].strip, target_package.product.name)
+            elsif session[:clone_review][:scopes].include?('status')
+              if session[:clone_review][:status_option] == 'default'
+                unless source_package.status.blank?
+                  target_package.status = Status.find_in_global_scope(source_package.status.name, target_package.product.name)
                 end
-              elsif session[:clone_review][:label_option] == 'selection'
-                target_package.label = Label.find_in_global_scope(session[:clone_review][:label_selection_value].strip, target_package.product.name)
+              elsif session[:clone_review][:status_option] == 'selection'
+                target_package.status = Status.find_in_global_scope(session[:clone_review][:status_selection_value].strip, target_package.product.name)
               end
-            elsif session[:clone_review][:label_option] == 'new_value'
-              target_package.label = @new_label
+            elsif session[:clone_review][:status_option] == 'new_value'
+              target_package.status = @new_status
             end
 
             @target_marks = []

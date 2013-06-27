@@ -1,4 +1,4 @@
 <% time_to_add ||= 0 %>
-<span style="<%= default_style(label.style) %>">&nbsp;</span>
-<%= label.name %>:
+<span style="<%= default_style(status.style) %>">&nbsp;</span>
+<%= status.name %>:
 <%= display_track_time_in_real_time(time_consumed, time_to_add) %>

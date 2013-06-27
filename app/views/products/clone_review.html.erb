@@ -15,8 +15,8 @@ Please review the clone action you are going to performed in below:
 		Clone Assignee / 
 	<% end %>
 <% end %>
-<% if session[:clone_review][:scopes].include? 'label' %>
-    Clone labels /
+<% if session[:clone_review][:scopes].include? 'status' %>
+    Clone statuses /
 <% end %>
 <% if session[:clone_review][:scopes].include? 'mark' %>
     Clone marks /
@@ -24,7 +24,7 @@ Please review the clone action you are going to performed in below:
 
 <%= render :partial => 'layouts/sep_tiny' %>
 
-<% session[:clone_review][:label_option] %>
+<% session[:clone_review][:status_option] %>
 
 <% if session[:clone_review][:scopes].include? 'package' %>
     <%= render :partial => 'layouts/line' %>
@@ -48,19 +48,19 @@ Please review the clone action you are going to performed in below:
         <% end %>
     <% end %>
 
-    <% if session[:clone_review][:label_option] == 'default' %>
-        <strong>Set label of cloned packages to currently assigned one.</strong>
+    <% if session[:clone_review][:status_option] == 'default' %>
+        <strong>Set status of cloned packages to currently assigned one.</strong>
         <%= render :partial => 'layouts/sep_tiny' %>
 
-    <% elsif session[:clone_review][:label_option] == 'selection' %>
-        <strong>Set label of cloned packages to: <%= session[:clone_review][:label_selection_value].strip %> </strong>
+    <% elsif session[:clone_review][:status_option] == 'selection' %>
+        <strong>Set status of cloned packages to: <%= session[:clone_review][:status_selection_value].strip %> </strong>
         <%= render :partial => 'layouts/sep_tiny' %>
-    <% elsif session[:clone_review][:label_option] == 'selection_global' %>
-        <strong>Set label of cloned packages to: <%= session[:clone_review][:label_selection_value_global].strip %> </strong>
+    <% elsif session[:clone_review][:status_option] == 'selection_global' %>
+        <strong>Set status of cloned packages to: <%= session[:clone_review][:status_selection_value_global].strip %> </strong>
         <%= render :partial => 'layouts/sep_tiny' %>
 
-    <% elsif session[:clone_review][:label_option] == 'new_value' %>
-        <strong>Set label of cloned packages to: <%= session[:clone_review][:initial_label_value].strip %></strong>
+    <% elsif session[:clone_review][:status_option] == 'new_value' %>
+        <strong>Set status of cloned packages to: <%= session[:clone_review][:initial_status_value].strip %></strong>
         <%= render :partial => 'layouts/sep_tiny' %>
 
     <% end %>
