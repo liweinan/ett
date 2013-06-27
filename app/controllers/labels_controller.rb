@@ -1,5 +1,5 @@
 class LabelsController < ApplicationController
-#  before_filter :check_tag, :only => [:index]
+#  before_filter :check_product, :only => [:index]
   before_filter :check_can_manage, :only => [:new, :edit]
 
   # GET /labels

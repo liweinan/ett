@@ -1,6 +1,6 @@
 class ActionsController < ApplicationController
   before_filter :check_logged_in
-  before_filter :check_tag, :only => :take
+  before_filter :check_product, :only => :take
   before_filter :check_can_manage, :only => [:check_clone_progress, :process_clone]
   before_filter :package_taken, :only => :take
 
@@ -35,22 +35,22 @@ class ActionsController < ApplicationController
       Package.transaction do
         session[:not_cloned_packages] = Hash.new
         session[:cloned_packages] = []
-        @source_tag = Product.find_by_name(unescape_url(session[:clone_review][:source_tag_name]))
-        # 1. check the target tag name not duplicated
-        # 2. check the target tag name is same within session
-        target_tag_name = session[:clone_review][:target_tag_name].downcase.strip
-        @target_tag = Product.find_by_name(target_tag_name)
-        if !@target_tag
-          @target_tag = Product.new
-          @target_tag.name = target_tag_name
-          @target_tag.save
+        @source_product = Product.find_by_name(unescape_url(session[:clone_review][:source_product_name]))
+        # 1. check the target product name not duplicated
+        # 2. check the target product name is same within session
+        target_product_name = session[:clone_review][:target_product_name].downcase.strip
+        @target_product = Product.find_by_name(target_product_name)
+        if !@target_product
+          @target_product = Product.new
+          @target_product.name = target_product_name
+          @target_product.save
         end
 
         # clone labels
         if session[:clone_review][:scopes].include? 'label'
-          @source_tag.labels.each do |label|
+          @source_product.labels.each do |label|
             cloned_label = label.clone
-            cloned_label.product = @target_tag
+            cloned_label.product = @target_product
             
             _label = Label.find_by_name_and_product_id(cloned_label.name, cloned_label.product.id)
             if _label
@@ -63,9 +63,9 @@ class ActionsController < ApplicationController
 
         # clone marks
         if session[:clone_review][:scopes].include? 'mark'
-          @source_tag.marks.each do |mark|
+          @source_product.marks.each do |mark|
             clone_mark = mark.clone
-            clone_mark.product = @target_tag
+            clone_mark.product = @target_product
             _mark = Mark.find_by_key_and_product_id(clone_mark.key, clone_mark.product.id)
             if _mark
               clone_mark = _mark
@@ -85,7 +85,7 @@ class ActionsController < ApplicationController
             @new_label.can_select = "Yes"
             @new_label.can_show = "Yes"
             @new_label.global = "N"
-            @new_label.product = @target_tag
+            @new_label.product = @target_product
             _label = Label.find_by_name_and_product_id(@new_label.name, @new_label.product.id)
             if _label
               @new_label = _label
@@ -101,7 +101,7 @@ class ActionsController < ApplicationController
               text_to_array(session[:clone_review][:initial_mark_values]).each do |mark_value|
                 new_mark = Mark.new
                 new_mark.key = mark_value
-                new_mark.product = @target_tag
+                new_mark.product = @target_product
                 if new_mark.save
                   @new_marks << new_mark
                 end
@@ -109,9 +109,9 @@ class ActionsController < ApplicationController
             end
           end
 
-          @source_tag.packages.each do |source_package|
+          @source_product.packages.each do |source_package|
             target_package = source_package.clone
-            target_package.product = @target_tag
+            target_package.product = @target_product
 
             if session[:clone_review][:scopes].include? 'assignee'
               target_package.assignee = source_package.assignee

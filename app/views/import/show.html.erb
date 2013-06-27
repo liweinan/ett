@@ -1,6 +1,6 @@
-<h2>Import packages into tag: <%= params[:id] %></h2>
+<h2>Import packages into product: <%= params[:id] %></h2>
 <form action="/import" method="post">
-	Intital label: <%= render :partial => "labels/selection_for_tag", :locals => { :tag_id => Product.find_by_name(unescape_url(params[:id])).id }%>
+	Intital label: <%= render :partial => "labels/selection_for_tag", :locals => { :product_id => Product.find_by_name(unescape_url(params[:id])).id }%>
 	<%= render :partial => "layouts/sep" %>
 	Initial marks: <%= render :partial => 'marks/marks_selection', :locals => { :product_id => params[:id] } %>
 	<%= render :partial => "layouts/sep" %>

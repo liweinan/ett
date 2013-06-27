@@ -1,5 +1,5 @@
 class MarksController < ApplicationController
-  before_filter :check_tag, :only => [:index, :new]
+  before_filter :check_product, :only => [:index, :new]
   before_filter :check_can_manage, :only => [:new, :edit]
 
   # GET /attributes

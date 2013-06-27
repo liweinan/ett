@@ -15,9 +15,9 @@
 <% end %>
 <div id="link_bz_bug_form_div" style="display:none;"></div>
 <div id="new_bz_bug_form_div" style="display:none;"></div>
+<%= render :partial => 'packages/bz_bug_list', :locals => {:package => package} %>
 <%= render :partial => 'layouts/sep_tiny' %>
 <%= render :partial => 'packages/bz_bug_sync', :locals => {:package => package} %>
-<%= render :partial => 'packages/bz_bug_list', :locals => {:package => package} %>
 <%= render :partial => 'layouts/sep_tiny' %>
 
 <% content_for :js do %>

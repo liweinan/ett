@@ -112,12 +112,12 @@ class ProductsController < ApplicationController
   def clone
     if request.post?
       session[:clone_review] = Hash.new
-      unless params[:source_tag_name].blank?
-        session[:clone_review][:source_tag_name] = params[:source_tag_name].strip
+      unless params[:source_product_name].blank?
+        session[:clone_review][:source_product_name] = params[:source_product_name].strip
       end
       
-      unless params[:target_tag_name].blank?      
-        session[:clone_review][:target_tag_name] = params[:target_tag_name].strip
+      unless params[:target_product_name].blank?      
+        session[:clone_review][:target_product_name] = params[:target_product_name].strip
       end
       
       session[:clone_review][:scopes] = params[:scopes]
@@ -130,7 +130,7 @@ class ProductsController < ApplicationController
       session[:clone_review][:label_selection_value] = params[:label_selection_value]
       session[:clone_review][:label_selection_value_global] = params[:label_selection_value_global]
 
-      redirect_to :action => :clone_review, :id => escape_url(params[:source_tag_name])
+      redirect_to :action => :clone_review, :id => escape_url(params[:source_product_name])
     else
       @product = Product.find_by_name(unescape_url(params[:id]))
     end
@@ -153,21 +153,21 @@ class ProductsController < ApplicationController
 
     @error_message = []
 
-    if params[:source_tag_name].blank?
-      @error_message << "Source tag name not specified."
+    if params[:source_product_name].blank?
+      @error_message << "Source product name not specified."
     end
 
-    if params[:target_tag_name].blank?
-      @error_message << "Target tag name not specified."
+    if params[:target_product_name].blank?
+      @error_message << "Target product name not specified."
     #else
-    #  @product = Product.find_by_name(unescape_url(params[:target_tag_name].downcase.strip))
+    #  @product = Product.find_by_name(unescape_url(params[:target_product_name].downcase.strip))
     #  if @product
-    #    @error_message << "Target tag name already used."
+    #    @error_message << "Target product name already used."
     #  end
     end
     
-    if params[:source_tag_name].strip == params[:target_tag_name].strip
-      @error_message << "Tag cannot be cloned to itself."
+    if params[:source_product_name].strip == params[:target_product_name].strip
+      @error_message << "product cannot be cloned to itself."
     end
 
     if params[:scopes].blank?
@@ -177,7 +177,7 @@ class ProductsController < ApplicationController
         if params[:label_option] == 'new_value'
           if params[:initial_label_value].blank?
             @error_message << "Initial label not set."
-          elsif Label.find_in_global_scope(params[:initial_label_value].downcase.strip, unescape_url(params[:target_tag_name]).downcase.strip)
+          elsif Label.find_in_global_scope(params[:initial_label_value].downcase.strip, unescape_url(params[:target_product_name]).downcase.strip)
             @error_message << "Initial label name already used."
 
           end
@@ -192,8 +192,8 @@ class ProductsController < ApplicationController
     end
 
     unless @error_message.blank?
-      @product = Product.find_by_name(unescape_url(params[:source_tag_name]))
-      render :controller =>'products', :action => 'clone', :id => escape_url(params[:source_tag_name])
+      @product = Product.find_by_name(unescape_url(params[:source_product_name]))
+      render :controller =>'products', :action => 'clone', :id => escape_url(params[:source_product_name])
     end
   end
 

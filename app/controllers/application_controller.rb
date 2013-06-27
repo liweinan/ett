@@ -3,7 +3,7 @@
 class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
-  helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_tag?, :count_packages, :can_edit_package?, :current_user, :get_product, :has_label?, :has_mark?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :product_has_marks?, :get_xattrs, :background_style, :confirmed?, :default_style
+  helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_product?, :count_packages, :can_edit_package?, :current_user, :get_product, :has_label?, :has_mark?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :product_has_marks?, :get_xattrs, :background_style, :confirmed?, :default_style
   helper_method :btag, :ebtag, :uebtag, :truncate_u, :its_me?, :extract_username
   before_filter :process_product_id
   before_filter :save_current_link
@@ -37,7 +37,7 @@ class ApplicationController < ActionController::Base
     !session[:current_user].blank?
   end
 
-  def has_tag?(id = params[:product_id])
+  def has_product?(id = params[:product_id])
     if id.blank?
       false
     else
@@ -238,9 +238,9 @@ class ApplicationController < ActionController::Base
   end
 
   def product_has_marks?(product_name)
-    tag = Product.find_by_name(product_name)
-    if tag
-      if tag.marks.size > 0
+    product = Product.find_by_name(product_name)
+    if product
+      if product.marks.size > 0
         return true
       end
     end
@@ -302,15 +302,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def check_tag
-    unless has_tag?
+  def check_product
+    unless has_product?
       flash[:notice] = 'Tag must be specified.'
       home_page
     end
   end
 
-  def check_tag_or_user
-    if !has_tag? && params[:user].blank?
+  def check_product_or_user
+    if !has_product? && params[:user].blank?
       flash[:notice] = 'User or Tag must be specified.'
       home_page
     end
@@ -355,11 +355,11 @@ class ApplicationController < ActionController::Base
   end
 
   def home_page
-    #unless has_tag?
-    #  unless Setting.system_settings.default_tag.blank?
-    #    default_tag = Product.find_by_name(Setting.system_settings.default_tag)
-    #    unless default_tag.blank?
-    #      params[:product_id] = escape_url(default_tag.name)
+    #unless has_product?
+    #  unless Setting.system_settings.default_product.blank?
+    #    default_product = Product.find_by_name(Setting.system_settings.default_tag)
+    #    unless default_product.blank?
+    #      params[:product_id] = escape_url(default_product.name)
     #    else
     #      params[:product_id] = escape_url(Product.find(:first, :order => 'updated_at DESC').name)
     #    end

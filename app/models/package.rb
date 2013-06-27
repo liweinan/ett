@@ -135,15 +135,15 @@ class Package < ActiveRecord::Base
     packages.flatten.uniq
   end
 
-  def self.distinct_in_tags(products)
+  def self.distinct_in_products(products)
     Package.all(:select => "distinct name", :conditions => ["product_id in (?)", Product.products_to_ids(products)], :order => "name")
   end
 
-  def self.distinct_in_tags_can_show(products)
+  def self.distinct_in_products_can_show(products)
     product_ids = Product.products_to_ids(products)
     can_show_label_ids = []
-    product_ids.each do |tag_id|
-      Label.find_all_can_show_by_product_id_in_global_scope(tag_id).each do |label|
+    product_ids.each do |product_id|
+      Label.find_all_can_show_by_product_id_in_global_scope(product_id).each do |label|
         can_show_label_ids << label.id
       end
     end
@@ -154,7 +154,7 @@ class Package < ActiveRecord::Base
   def validate
     p = Package.find_by_name_and_product_id(self.name.strip, self.product_id)
     if p && p.id != self.id
-      errors.add(:name, " - Package name cannot be duplicate under one tag!")
+      errors.add(:name, " - Package name cannot be duplicate under one product!")
     end
   end
 

@@ -2,7 +2,7 @@ class ImportController < ApplicationController
   before_filter :check_can_manage
 
   def show
-    unless has_tag?(params[:id])
+    unless has_product?(params[:id])
       redirect_to '/'
     end
 
