@@ -41,7 +41,7 @@
 
                     <% get_xattrs(nil, false, false) do |attr| %>
                         <% unless package.read_attribute(attr).blank? %>
-                            <%= attr.camelcase %>: <%= package.read_attribute(attr) %>
+                            <%= attr.camelcase %>: <%= Extractor.extract_url(package.read_attribute(attr)) %>
                             <%= render :partial => 'layouts/sep_tiny' %>
                         <% end %>
                     <% end %>
