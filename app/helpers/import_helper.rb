@@ -31,25 +31,25 @@ module ImportHelper
         source_p.status ||= Status.new
         "<span style='color:red;'>#{source_p.status.name} => #{target_p.status.name}</span>"
       end
-    elsif attr== 'marks'
-      if target_p.marks == source_p.marks
-        if target_p.marks.blank?
+    elsif attr== 'tags'
+      if target_p.tags == source_p.tags
+        if target_p.tags.blank?
           '-'
         else
           str = ""
-          str += display_marks(target_p.marks)
+          str += display_tags(target_p.tags)
           str
         end
       elsif confirmed?
-        target_p.marks ||= []
+        target_p.tags ||= []
         str = "<span style='color:red;'>"
-        str += display_marks(target_p.marks)
+        str += display_tags(target_p.tags)
         str += "</span>"
         str
       else
-        target_p.marks ||= []
-        source_p.marks ||= []
-        "<span style='color:red;'>#{display_marks(source_p.marks)} => #{display_marks(target_p.marks)}</span>"
+        target_p.tags ||= []
+        source_p.tags ||= []
+        "<span style='color:red;'>#{display_tags(source_p.tags)} => #{display_tags(target_p.tags)}</span>"
       end
     elsif attr== 'notes'
       if target_p.notes == source_p.notes

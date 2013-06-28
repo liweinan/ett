@@ -9,10 +9,10 @@
 		<b>Initial Status:</b> <%= @status.name %>
 	<% end %>
 
-	<% unless @marks.blank? %>
+	<% unless @tags.blank? %>
 		<div style="height:10px;">&nbsp;</div>
-		<b>Initial Marks: </b>
-		<% @marks.each do |m| %>
+		<b>Initial Tags: </b>
+		<% @tags.each do |m| %>
 			<%= m.key %> / 
 		<% end %>
 	<% end %>

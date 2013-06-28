@@ -2,7 +2,7 @@
 <form action="/import" method="post">
 	Intital status: <%= render :partial => "statuses/selection_for_tag", :locals => { :product_id => Product.find_by_name(unescape_url(params[:id])).id }%>
 	<%= render :partial => "layouts/sep" %>
-	Initial marks: <%= render :partial => 'marks/marks_selection', :locals => { :product_id => params[:id] } %>
+	Initial tags: <%= render :partial => 'tags/tags_selection', :locals => { :product_id => params[:id] } %>
 	<%= render :partial => "layouts/sep" %>
 	One package name per line:
 	<div class='manage-tbl'>

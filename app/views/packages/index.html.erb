@@ -14,7 +14,7 @@
     <% session[:not_cloned_packages] = nil %>
 <% end %>
 
-<% cache :action => 'index', :id => "#{params[:product_id]}#{params[:status]}#{params[:mark]}#{params[:user]}#{current_user_email}" do %>
+<% cache :action => 'index', :id => "#{params[:product_id]}#{params[:status]}#{params[:tag]}#{params[:user]}#{current_user_email}" do %>
     <% if has_product? %>
         <% @product = Product.find_by_name(unescape_url(params[:product_id])) %>
         <h2>
@@ -22,8 +22,8 @@
           <% if has_status? %>
               / <%= unescape_url(params[:status]) %>
           <% end %>
-          <% if has_mark? %>
-              / <%= unescape_url(params[:mark]) %>
+          <% if has_tag? %>
+              / <%= unescape_url(params[:tag]) %>
           <% end %>
         </h2>
         <% unless @product.description.blank? %>
@@ -48,11 +48,11 @@
         <%= link_to "#{status.name} (#{count_packages(unescape_url(params[:product_id]), status.name)})", :controller => :packages, :action => :index, :product_id => params[:product_id], :status => escape_url(status.name) %> /
     <% end %>
     <%= render :partial => 'layouts/sep' %>
-    <% marks = Product.find_by_name(unescape_url(params[:product_id])).marks %>
-    <% unless marks.blank? %>
-        Marks:
-        <% marks.each do |mark| %>
-            <%= link_to "#{mark.key} (#{mark.packages_can_show.size})", :controller => :packages, :action => :index, :product_id => params[:product_id], :mark => mark.key %> /
+    <% tags = Product.find_by_name(unescape_url(params[:product_id])).tags %>
+    <% unless tags.blank? %>
+        Tags:
+        <% tags.each do |tag| %>
+            <%= link_to "#{tag.key} (#{tag.packages_can_show.size})", :controller => :packages, :action => :index, :product_id => params[:product_id], :tag => tag.key %> /
         <% end %>
     <% end %>
 
@@ -82,7 +82,7 @@
               <% end %>
               <%= render :partial => 'packages/index/name', :locals => {:package => package} %>
               <%= render :partial => 'packages/index/status', :locals => {:package => package} %>
-              <%= render :partial => 'packages/index/mark', :locals => {:package => package} %>
+              <%= render :partial => 'packages/index/tag', :locals => {:package => package} %>
               <%= render :partial => 'packages/index/user', :locals => {:package => package} %>
               <%= render :partial => 'packages/index/xattr', :locals => {:package => package} %>
             </tr>

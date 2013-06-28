@@ -6,7 +6,7 @@ class Product < ActiveRecord::Base
   default_value_for :can_show, 'Yes'
   default_value_for :total_manual_track_time, 0
 
-  has_many :marks, :dependent => :destroy
+  has_many :tags, :dependent => :destroy
   has_many :packages, :dependent => :destroy
   has_many :statuses, :dependent => :destroy
 

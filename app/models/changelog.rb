@@ -54,7 +54,7 @@ class Changelog < ActiveRecord::Base
     changelog.save
   end
 
-  def self.package_updated(orig_package, package, orig_marks)
+  def self.package_updated(orig_package, package, orig_tags)
 
     Changelog.diff_fields(orig_package, package) do |attr|
       changelog = Changelog.new
@@ -124,23 +124,23 @@ class Changelog < ActiveRecord::Base
       changelog.save
     end
 
-    unless orig_marks == package.marks
+    unless orig_tags == package.tags
       changelog = Changelog.new
       changelog.package_id = package.id
       changelog.changed_by = package.updated_by
       changelog.category = Changelog::CATEGORY[:update]
       changelog.changed_at = Time.now
 
-      changelog.references = 'marks'
+      changelog.references = 'tags'
 
       changelog.from_value = ''
-      orig_package.marks.each do |mark|
-        changelog.from_value <<  mark.key + " / "
+      orig_package.tags.each do |tag|
+        changelog.from_value <<  tag.key + " / "
       end
 
       changelog.to_value = ''
-      package.marks.each do |mark|
-        changelog.to_value << mark.key + " / "
+      package.tags.each do |tag|
+        changelog.to_value << tag.key + " / "
       end
 
       changelog.save

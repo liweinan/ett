@@ -1,55 +1,55 @@
-class MarksController < ApplicationController
+class TagsController < ApplicationController
   before_filter :check_product, :only => [:index, :new]
   before_filter :check_can_manage, :only => [:new, :edit]
 
   # GET /attributes
   # GET /attributes.xml
   def index
-    @marks = Mark.all(:conditions => ["product_id = ?", get_product(params[:product_id]).id])
+    @tags = Tag.all(:conditions => ["product_id = ?", get_product(params[:product_id]).id])
 
     respond_to do |format|
       format.html # index.html.erb
-      format.xml { render :xml => @marks }
+      format.xml { render :xml => @tags }
     end
   end
 
   # GET /attributes/1
   # GET /attributes/1.xml
   def show
-    @mark = Mark.find(params[:id])
+    @tag = Tag.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
-      format.xml { render :xml => @mark }
+      format.xml { render :xml => @tag }
     end
   end
 
   # GET /attributes/new
   # GET /attributes/new.xml
   def new
-    @mark = Mark.new
+    @tag = Tag.new
 
     respond_to do |format|
       format.html # new.html.erb
-      format.xml { render :xml => @mark }
+      format.xml { render :xml => @tag }
     end
   end
 
   # GET /attributes/1/edit
   def edit
-    @mark = Mark.find(params[:id])
+    @tag = Tag.find(params[:id])
   end
 
   # POST /attributes
   # POST /attributes.xml
   def create
     expire_all_fragments
-    @mark = Mark.new(params[:mark])
+    @tag = Tag.new(params[:tag])
 
     respond_to do |format|
-      if @mark.save
-        flash[:notice] = 'Mark was successfully created.'
-        format.html { redirect_to(:action => :show, :id => @mark.id, :product_id => escape_url(@mark.product.name)) }
+      if @tag.save
+        flash[:notice] = 'Tag was successfully created.'
+        format.html { redirect_to(:action => :show, :id => @tag.id, :product_id => escape_url(@tag.product.name)) }
       else
         format.html { render :action => :new }
       end
@@ -60,12 +60,12 @@ class MarksController < ApplicationController
   # PUT /attributes/1.xml
   def update
     expire_all_fragments
-    @mark = Mark.find(params[:id])
+    @tag = Tag.find(params[:id])
 
     respond_to do |format|
-      if @mark.update_attributes(params[:mark])
-        flash[:notice] = 'Mark was successfully updated.'
-        format.html { redirect_to(:action => :show, :id => @mark.id, :product_id => @mark.product.name) }
+      if @tag.update_attributes(params[:tag])
+        flash[:notice] = 'Tag was successfully updated.'
+        format.html { redirect_to(:action => :show, :id => @tag.id, :product_id => @tag.product.name) }
       else
         format.html { render :action => :edit }
       end
@@ -75,8 +75,8 @@ class MarksController < ApplicationController
   # DELETE /attributes/1
   # DELETE /attributes/1.xml
   def destroy
-    @mark = Mark.find(params[:id])
-    @mark.destroy
+    @tag = Tag.find(params[:id])
+    @tag.destroy
 
     respond_to do |format|
       format.html { redirect_to(attributes_url) }

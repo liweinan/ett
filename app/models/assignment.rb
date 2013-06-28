@@ -1,4 +1,4 @@
 class Assignment < ActiveRecord::Base
   belongs_to :package
-  belongs_to :mark
+  belongs_to :tag
 end
