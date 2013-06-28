@@ -18,8 +18,8 @@ Please review the clone action you are going to performed in below:
 <% if session[:clone_review][:scopes].include? 'status' %>
     Clone statuses /
 <% end %>
-<% if session[:clone_review][:scopes].include? 'mark' %>
-    Clone marks /
+<% if session[:clone_review][:scopes].include? 'tag' %>
+    Clone tags /
 <% end %>
 
 <%= render :partial => 'layouts/sep_tiny' %>
@@ -33,17 +33,17 @@ Please review the clone action you are going to performed in below:
 	<strong>Clone Assignee</strong>
 		<%= render :partial => 'layouts/sep_tiny' %>
 	<% end %>
-    <% if !session[:clone_review][:mark_options].blank? %>
-        <% if session[:clone_review][:mark_options].include? 'default' %>
-            <strong>Add currently assigned marks to cloned packages.</strong>
+    <% if !session[:clone_review][:tag_options].blank? %>
+        <% if session[:clone_review][:tag_options].include? 'default' %>
+            <strong>Add currently assigned tags to cloned packages.</strong>
             <%= render :partial => 'layouts/sep_tiny' %>
         <% end %>
-        <% if session[:clone_review][:mark_options].include? 'selection' %>
-            <strong>Add these marks to cloned packages: <%= session[:clone_review][:marks].inspect%></strong>
+        <% if session[:clone_review][:tag_options].include? 'selection' %>
+            <strong>Add these tags to cloned packages: <%= session[:clone_review][:tags].inspect%></strong>
             <%= render :partial => 'layouts/sep_tiny' %>
         <% end %>
-        <% if session[:clone_review][:mark_options].include? 'new_value' %>
-            <strong>Add these new marks to cloned packages: <%= session[:clone_review][:initial_mark_values] %></strong>
+        <% if session[:clone_review][:tag_options].include? 'new_value' %>
+            <strong>Add these new tags to cloned packages: <%= session[:clone_review][:initial_tag_values] %></strong>
             <%= render :partial => 'layouts/sep_tiny' %>
         <% end %>
     <% end %>

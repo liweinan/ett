@@ -19,7 +19,7 @@ class Package < ActiveRecord::Base
   belongs_to :status
 
   has_many :assignments, :dependent => :destroy
-  has_many :marks, :through => :assignments
+  has_many :tags, :through => :assignments
   has_many :bz_bugs, :class_name => "BzBug", :foreign_key => "package_id", :order => "created_at"
 
   #has_and_belongs_to_many :components

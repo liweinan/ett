@@ -38,7 +38,7 @@ class ImportController < ApplicationController
 
           # for Changelog.package_updated
           orig_package_clone = orig_package.clone
-          orig_marks_clone = orig_package_clone.marks.clone
+          orig_tags_clone = orig_package_clone.tags.clone
 
           if orig_package.blank?
             @not_found_packages << package
@@ -70,28 +70,28 @@ class ImportController < ApplicationController
             end
             json_obj.delete(:status.to_s)
 
-            #deal with marks
-            if json_obj['marks'] != nil
+            #deal with tags
+            if json_obj['tags'] != nil
 
-              if json_obj['marks'].blank?
-                orig_package.marks = nil
+              if json_obj['tags'].blank?
+                orig_package.tags = nil
               else
-                marks = []
+                tags = []
 
-                json_obj['marks'].each do |mark_name|
+                json_obj['tags'].each do |tag_name|
 
-                  unless mark_name.blank?
-                    mark = Mark.find_by_key(mark_name.strip)
-                    unless mark.blank?
-                      marks << mark
+                  unless tag_name.blank?
+                    tag = Tag.find_by_key(tag_name.strip)
+                    unless tag.blank?
+                      tags << tag
                     end
                   end
                 end
 
-                orig_package.marks = marks
+                orig_package.tags = tags
               end
             end
-            json_obj.delete(:marks.to_s)
+            json_obj.delete(:tags.to_s)
 
             #deal with notes
             unless json_obj['notes'] == nil
@@ -119,7 +119,7 @@ class ImportController < ApplicationController
             if orig_package.valid?
               if confirmed?
                 orig_package.save!
-                Changelog.package_updated(orig_package_clone, orig_package, orig_marks_clone)
+                Changelog.package_updated(orig_package_clone, orig_package, orig_tags_clone)
 
                 # TODO Add url for system notification
                 # notify_package_update_system_wide(url, orig_package)
@@ -153,14 +153,14 @@ class ImportController < ApplicationController
     Package.transaction do
       @product = Product.find_by_name(unescape_url(params[:product_id]))
 
-      @marks = process_marks(params[:marks], @product.id)
+      @tags = process_tags(params[:tags], @product.id)
       @status = Status.find(params[:package][:status_id]) unless params[:package][:status_id].blank?
 
       @final_package_names.each do |name|
         package = Package.new
         package.name = name.strip
         package.status_id = params[:package][:status_id] unless params[:package][:status_id].blank?
-        package.marks = @marks unless @marks.blank?
+        package.tags = @tags unless @tags.blank?
         package.product_id = @product.id
         package.created_by = current_user.id
         package.updated_by = current_user.id

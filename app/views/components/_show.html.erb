@@ -31,10 +31,10 @@
                         Status: <span style="<%= package.status.style %>"><%= package.status.name %></span>
                         <%= render :partial => 'layouts/sep_tiny' %>
                     <% end %>
-                    <% unless package.marks.blank? %>
-                        Marks:
-                        <% package.marks.each do |mark| %>
-                            <%= mark.key %> /
+                    <% unless package.tags.blank? %>
+                        Tags:
+                        <% package.tags.each do |tag| %>
+                            <%= tag.key %> /
                         <% end %>
                         <%= render :partial => 'layouts/sep_tiny' %>
                     <% end %>

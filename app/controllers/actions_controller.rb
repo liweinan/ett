@@ -51,7 +51,7 @@ class ActionsController < ApplicationController
           @source_product.statuses.each do |status|
             cloned_status = status.clone
             cloned_status.product = @target_product
-            
+
             _status = Status.find_by_name_and_product_id(cloned_status.name, cloned_status.product.id)
             if _status
               cloned_status = _status
@@ -61,16 +61,16 @@ class ActionsController < ApplicationController
           end
         end
 
-        # clone marks
-        if session[:clone_review][:scopes].include? 'mark'
-          @source_product.marks.each do |mark|
-            clone_mark = mark.clone
-            clone_mark.product = @target_product
-            _mark = Mark.find_by_key_and_product_id(clone_mark.key, clone_mark.product.id)
-            if _mark
-              clone_mark = _mark
+        # clone tags
+        if session[:clone_review][:scopes].include? 'tag'
+          @source_product.tags.each do |tag|
+            clone_tag = tag.clone
+            clone_tag.product = @target_product
+            _tag = Tag.find_by_key_and_product_id(clone_tag.key, clone_tag.product.id)
+            if _tag
+              clone_tag = _tag
             else
-              clone_mark.save
+              clone_tag.save
             end
           end
         end
@@ -94,16 +94,16 @@ class ActionsController < ApplicationController
             end
           end
 
-          # create new marks
-          @new_marks = []
-          unless session[:clone_review][:mark_options].blank?
-            if session[:clone_review][:mark_options].include?('new_value')
-              text_to_array(session[:clone_review][:initial_mark_values]).each do |mark_value|
-                new_mark = Mark.new
-                new_mark.key = mark_value
-                new_mark.product = @target_product
-                if new_mark.save
-                  @new_marks << new_mark
+          # create new tags
+          @new_tags = []
+          unless session[:clone_review][:tag_options].blank?
+            if session[:clone_review][:tag_options].include?('new_value')
+              text_to_array(session[:clone_review][:initial_tag_values]).each do |tag_value|
+                new_tag = Tag.new
+                new_tag.key = tag_value
+                new_tag.product = @target_product
+                if new_tag.save
+                  @new_tags << new_tag
                 end
               end
             end
@@ -131,41 +131,41 @@ class ActionsController < ApplicationController
               target_package.status = @new_status
             end
 
-            @target_marks = []
-            if session[:clone_review][:scopes].include?('mark') && product_has_marks?(source_package.product.name)
-              if session[:clone_review][:mark_options].include?('default')
-                source_package.marks.each do |source_mark|
-                  target_mark = Mark.find_by_key_and_product_id(source_mark.key, source_package.product.id)
-                  @target_marks << target_mark
+            @target_tags = []
+            if session[:clone_review][:scopes].include?('tag') && product_has_tags?(source_package.product.name)
+              if session[:clone_review][:tag_options].include?('default')
+                source_package.tags.each do |source_tag|
+                  target_tag = Tag.find_by_key_and_product_id(source_tag.key, source_package.product.id)
+                  @target_tags << target_tag
                 end
               end
 
-              if session[:clone_review][:mark_options].include?('selection')
-                @target_marks << process_marks(session[:clone_review][:marks], target_package.product.id)
+              if session[:clone_review][:tag_options].include?('selection')
+                @target_tags << process_tags(session[:clone_review][:tags], target_package.product.id)
               end
             end
 
-            if session[:clone_review][:mark_options].include?('new_value')
-              @target_marks << @new_marks
+            if session[:clone_review][:tag_options].include?('new_value')
+              @target_tags << @new_tags
             end
 
-            target_package.marks = @target_marks.flatten
-            target_package.p_attachments = []            
+            target_package.tags = @target_tags.flatten
+            target_package.p_attachments = []
             if target_package.save
               create_clone_relationship(source_package, target_package)
               session[:cloned_packages] << target_package.name
-            else              
-              session[:not_cloned_packages][target_package.name] = target_package.errors.full_messages              
+            else
+              session[:not_cloned_packages][target_package.name] = target_package.errors.full_messages
             end
           end
         end
 
       end
 
-      mark_clone_done
+      tag_clone_done
     rescue Exception => e
 
-      mark_clone_failed(e)
+      tag_clone_failed(e)
     ensure
       session[:clone_review] = nil
       render :text => 'ok'

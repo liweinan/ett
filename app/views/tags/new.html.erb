@@ -1,10 +1,10 @@
 <% if params[:product_id].blank? %>
-<h2>New mark</h2>
+<h2>New tag</h2>
 <% else %>
-<h2>New mark of <%= params[:product_id] %></h2>
+<h2>New tag of <%= params[:product_id] %></h2>
 <% end %>
 
-<% form_for(@mark) do |f| %>
+<% form_for(@tag) do |f| %>
     <%= f.error_messages %>
 
     <%= render :partial => 'key', :locals => {:f => f} %>
@@ -16,4 +16,4 @@
     </p>
 <% end %>
 
-<%= link_to 'Back', marks_path %>
+<%= link_to 'Back', tags_path %>

@@ -48,9 +48,9 @@ module ApplicationHelper
     display_track_time(time_consumed + time_to_add)
   end
 
-  def display_marks(marks)
+  def display_tags(tags)
     str = ''
-    marks.each do |mark|
+    tags.each do |mark|
       str += mark.key + ' / '
     end
     str

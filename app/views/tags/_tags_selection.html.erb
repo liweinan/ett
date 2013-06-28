@@ -1,0 +1,23 @@
+<% @package ||= nil %>
+<% product_id ||= nil %>
+<% package ||= @package %>
+<% sep ||= '/' %>
+<%
+   @product = nil
+   if !product_id.blank?
+     @product = Product.find_by_name(unescape_url(product_id))
+   elsif !package.blank?
+     @product = package.product
+   end
+%>
+
+<% @product.tags.each do |tag| %>
+    <% if package.blank? %>
+        <label><%= tag.key %> - <%= check_box_tag("tags[]", tag.key, false) %></label> <%= sep %>
+    <% else %>
+        <% assignment = Assignment.find_by_package_id_and_tag_id(package.id, tag.id) %>
+        <label><%= tag.key %> - <%= check_box_tag("tags[]", tag.key, assignment != nil) %></label> <%= sep %>
+    <% end %>
+<% end %>
+
+<%=hidden_field_tag :process_tags, 'Yes'%>

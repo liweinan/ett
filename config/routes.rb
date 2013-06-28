@@ -9,8 +9,8 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :relationships
   map.resources :settings
   map.resources :p_attachments
-  map.resources :products, :has_many => [:packages, :statuses, :marks, :settings]
-  map.resources :marks
+  map.resources :products, :has_many => [:packages, :statuses, :tags, :settings]
+  map.resources :tags
   map.resources :statuses, :has_many => :packages
   map.resources :packages
   map.resources :sessions

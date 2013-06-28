@@ -8,7 +8,7 @@
   <tr>
     <th class='content-list-head'>Name</th>
     <th class='content-list-head'>Status</th>
-    <th class='content-list-head'>Marks</th>
+    <th class='content-list-head'>Tags</th>
     <th class='content-list-head'>Assignee</th>
     <th class='content-list-head'>Automatic Time Track</th>
     <th class='content-list-head'>Manual Time Track</th>
@@ -17,7 +17,7 @@
     <tr>
       <%= render :partial => 'packages/index/name', :locals => {:package => package} %>
       <%= render :partial => 'packages/index/status', :locals => {:package => package, :color => 'no'} %>
-      <%= render :partial => 'packages/index/mark', :locals => {:package => package} %>
+      <%= render :partial => 'packages/index/tag', :locals => {:package => package} %>
       <%= render :partial => 'packages/index/user', :locals => {:package => package} %>
       <%= render :partial => 'packages/index/auto_tt', :locals => {:package => package} %>
       <%= render :partial => 'packages/index/manual_tt', :locals => {:package => package} %>
