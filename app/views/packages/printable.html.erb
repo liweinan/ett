@@ -4,7 +4,7 @@
   <tr>
     <th>Name</th>
     <th>Status</th>
-    <th>Marks</th>
+    <th>Tags</th>
     <th>Assignee</th>
     <% get_xattrs(@product, true, false) do |attr| %>
         <th><%= attr.camelcase %></th>
@@ -14,7 +14,7 @@
       <tr>
         <%= render :partial => 'packages/index/name', :locals => {:package => package} %>
         <%= render :partial => 'packages/index/status', :locals => {:package => package, :color => 'no'} %>
-        <%= render :partial => 'packages/index/mark', :locals => {:package => package} %>
+        <%= render :partial => 'packages/index/tag', :locals => {:package => package} %>
         <%= render :partial => 'packages/index/user', :locals => {:package => package} %>
         <%= render :partial => 'packages/index/xattr', :locals => {:package => package} %>
       </tr>

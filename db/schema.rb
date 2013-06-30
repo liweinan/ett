@@ -12,7 +12,7 @@
 ActiveRecord::Schema.define(:version => 20130630065655) do
 
   create_table "assignments", :force => true do |t|
-    t.integer  "mark_id"
+    t.integer  "tag_id"
     t.integer  "package_id"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -95,14 +95,6 @@ ActiveRecord::Schema.define(:version => 20130630065655) do
     t.datetime "updated_at"
     t.integer  "package_id"
     t.integer  "weekly_workload_id"
-  end
-
-  create_table "marks", :force => true do |t|
-    t.string   "key"
-    t.text     "value"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.integer  "product_id"
   end
 
   create_table "p_attachments", :force => true do |t|
@@ -231,6 +223,14 @@ ActiveRecord::Schema.define(:version => 20130630065655) do
     t.text     "style"
     t.string   "is_track_time"
     t.string   "is_finish_state"
+  end
+
+  create_table "tags", :force => true do |t|
+    t.string   "key"
+    t.text     "value"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "product_id"
   end
 
   create_table "time_zones", :force => true do |t|

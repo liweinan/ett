@@ -3,7 +3,7 @@
 class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
-  helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_product?, :count_packages, :can_edit_package?, :current_user, :get_product, :has_status?, :has_mark?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :product_has_marks?, :get_xattrs, :background_style, :confirmed?, :default_style
+  helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_product?, :count_packages, :can_edit_package?, :current_user, :get_product, :has_status?, :has_tag?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :product_has_tags?, :get_xattrs, :background_style, :confirmed?, :default_style
   helper_method :btag, :ebtag, :uebtag, :truncate_u, :its_me?, :extract_username
   before_filter :process_product_id
   before_filter :save_current_link
@@ -53,8 +53,8 @@ class ApplicationController < ActionController::Base
     !params[:status].blank?
   end
 
-  def has_mark?
-    !params[:mark].blank?
+  def has_tag?
+    !params[:tag].blank?
   end
 
   def can_edit_package?(package)
@@ -137,12 +137,12 @@ class ApplicationController < ActionController::Base
     File.open('/tmp/ett_clone_in_progress_marker').first.match(/^#{status}/)
   end
 
-  def mark_clone_in_progress
-    mark_clone_in_status('in_progress')
+  def tag_clone_in_progress
+    tag_clone_in_status('in_progress')
   end
 
-  def mark_clone_failed(e)
-    mark_clone_in_status('failed')
+  def tag_clone_failed(e)
+    tag_clone_in_status('failed')
     open('/tmp/ett_clone_in_progress_marker', 'a') { |f|
       f.puts e.message
       f.puts e.backtrace.inspect
@@ -229,18 +229,18 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def mark_clone_done
-    mark_clone_in_status('done')
+  def tag_clone_done
+    tag_clone_in_status('done')
   end
 
-  def mark_clone_in_status(status)
+  def tag_clone_in_status(status)
     File.open('/tmp/ett_clone_in_progress_marker', 'w') { |f| f.write(status) }
   end
 
-  def product_has_marks?(product_name)
+  def product_has_tags?(product_name)
     product = Product.find_by_name(product_name)
     if product
-      if product.marks.size > 0
+      if product.tags.size > 0
         return true
       end
     end
@@ -343,15 +343,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def process_marks(mark_keys, product_id)
-    mark_keys ||= []
-    new_marks = []
+  def process_tags(tag_keys, product_id)
+    tag_keys ||= []
+    new_tags = []
 
-    mark_keys.each do |key|
-      mark = Mark.find_by_key_and_product_id(key, product_id)
-      new_marks << mark
+    tag_keys.each do |key|
+      tag = Tag.find_by_key_and_product_id(key, product_id)
+      new_tags << tag
     end
-    new_marks
+    new_tags
   end
 
   def home_page

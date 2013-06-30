@@ -13,8 +13,8 @@
   <input id='scope_status' name="scopes[]" type="checkbox" value="status" onclick="refresh_form();"/>
   <label for="scope_status">Clone Statuses</label>
   <%= render :partial => 'layouts/sep_tiny' %>
-  <input id='scope_mark' name="scopes[]" type="checkbox" value="mark" onclick="refresh_form();"/>
-  <label for="scope_mark">Clone Marks</label>
+  <input id='scope_tag' name="scopes[]" type="checkbox" value="tag" onclick="refresh_form();"/>
+  <label for="scope_tag">Clone Tags</label>
   <%= render :partial => 'layouts/sep_tiny' %>
   <input id='scope_package' name="scopes[]" type="checkbox" value="package" onclick="refresh_form();"/>
   <label for="scope_package">Clone Packages</label>
@@ -67,23 +67,23 @@
 
   </div>
 
-  <div id='div_marks' style="display:none;">
+  <div id='div_tags' style="display:none;">
     <%= render :partial => 'layouts/sep_tiny' %>
-    <span style="font-weight: bold;">Set marks of cloned packages:</span><br/>
-    <% if product_has_marks?(unescape_url(params[:id])) %>
-    <span id='div_mark_default'><input id="mark_default" name="mark_options[]" type="checkbox" value="default"/><label for="mark_default">
-      Add currently assigned marks</label><br/> </span>
+    <span style="font-weight: bold;">Set tags of cloned packages:</span><br/>
+    <% if product_has_tags?(unescape_url(params[:id])) %>
+    <span id='div_tag_default'><input id="tag_default" name="tag_options[]" type="checkbox" value="default"/><label for="tag_default">
+      Add currently assigned tags</label><br/> </span>
         <%= render :partial => 'layouts/sep_tiny' %>
-        <span id='div_mark_selection'><input id="mark_select" name="mark_options[]" type="checkbox" value="selection"/><label for="mark_select">
-          Add existing marks : </label>
-          <%= render :partial => 'marks/marks_selection', :locals => {:product_id => params[:id]} %>
+        <span id='div_tag_selection'><input id="tag_select" name="tag_options[]" type="checkbox" value="selection"/><label for="tag_select">
+          Add existing tags : </label>
+          <%= render :partial => 'tags/tags_selection', :locals => {:product_id => params[:id]} %>
           <br/> </span>
         <%= render :partial => 'layouts/sep_tiny' %>
     <% end %>
-    <input id="mark_new_value" name="mark_options[]" type="checkbox" value="new_value"/><label for="mark_new_value"> Add
+    <input id="tag_new_value" name="tag_options[]" type="checkbox" value="new_value"/><label for="tag_new_value"> Add
     new
-    marks:</label>
-    <label for="initial_mark_values_field"></label><input id="initial_mark_values_field" name="initial_mark_values" onkeypress="document.getElementById('mark_new_value').checked=true;"/><br/>
+    tags:</label>
+    <label for="initial_tag_values_field"></label><input id="initial_tag_values_field" name="initial_tag_values" onkeypress="document.getElementById('tag_new_value').checked=true;"/><br/>
     <%= render :partial => 'layouts/sep' %>
   </div>
   <input type="submit"/>
@@ -100,7 +100,7 @@
 
         function refresh_form() {
             var scope_status = document.getElementById('scope_status');
-            var scope_mark = document.getElementById('scope_mark');
+            var scope_tag = document.getElementById('scope_tag');
             var scope_package = document.getElementById('scope_package');
 
             if (scope_package.checked) {
@@ -113,21 +113,21 @@
                     document.getElementById('div_status_selection').style.display = 'block';
                 }
 
-            <% if product_has_marks?(unescape_url(params[:id])) %>
-                if (!scope_mark.checked) {
-                    document.getElementById('div_mark_default').style.display = 'none';
-                    document.getElementById('div_mark_selection').style.display = 'none';
+            <% if product_has_tags?(unescape_url(params[:id])) %>
+                if (!scope_tag.checked) {
+                    document.getElementById('div_tag_default').style.display = 'none';
+                    document.getElementById('div_tag_selection').style.display = 'none';
                 } else {
-                    document.getElementById('div_mark_default').style.display = 'block';
-                    document.getElementById('div_mark_selection').style.display = 'block';
+                    document.getElementById('div_tag_default').style.display = 'block';
+                    document.getElementById('div_tag_selection').style.display = 'block';
                 }
             <% end %>
                 new Effect.SlideDown('div_status', {duration: 0.5});
-                new Effect.SlideDown('div_marks', {duration: 0.5});
+                new Effect.SlideDown('div_tags', {duration: 0.5});
 
             } else {
                 document.getElementById('div_status').style.display = 'none';
-                document.getElementById('div_marks').style.display = 'none';
+                document.getElementById('div_tags').style.display = 'none';
 				document.getElementById('scope_assignee_div').style.display = 'none';
             }
         }

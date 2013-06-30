@@ -10,7 +10,7 @@
       <th class='content-list-head' style="width:150px;">Name</th>
       <th class='content-list-head' style="width:100px;">Tag</th>
       <th class='content-list-head' style="width:100px;">Status</th>
-      <th class='content-list-head' style="width:100px;">Marks</th>
+      <th class='content-list-head' style="width:100px;">Tags</th>
     </tr>
     <% @packages.each do |package| %>
         <tr>
@@ -26,9 +26,9 @@
             <% end %>
           </td>
           <td style='font-size:10px'>
-            <% if package.marks.size > 0 %>
-                <% package.marks.each do |mark| %>
-                    <%= mark.key %> /
+            <% if package.tags.size > 0 %>
+                <% package.tags.each do |tag| %>
+                    <%= tag.key %> /
                 <% end %>
             <% else %>
                 -

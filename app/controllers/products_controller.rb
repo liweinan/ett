@@ -121,11 +121,11 @@ class ProductsController < ApplicationController
       end
       
       session[:clone_review][:scopes] = params[:scopes]
-      session[:clone_review][:mark_options] = params[:mark_options]
-      session[:clone_review][:mark_options] ||= []
+      session[:clone_review][:tag_options] = params[:tag_options]
+      session[:clone_review][:tag_options] ||= []
       session[:clone_review][:status_option] = params[:status_option]
-      session[:clone_review][:initial_mark_values] = params[:initial_mark_values]
-      session[:clone_review][:marks] = params[:marks]
+      session[:clone_review][:initial_tag_values] = params[:initial_tag_values]
+      session[:clone_review][:tags] = params[:tags]
       session[:clone_review][:initial_status_value] = params[:initial_status_value]
       session[:clone_review][:status_selection_value] = params[:status_selection_value]
       session[:clone_review][:status_selection_value_global] = params[:status_selection_value_global]
@@ -141,7 +141,7 @@ class ProductsController < ApplicationController
   end
 
   def process_clone
-    mark_clone_in_progress
+    tag_clone_in_progress
   end
 
   protected
@@ -183,9 +183,9 @@ class ProductsController < ApplicationController
           end
         end
 
-        if !params[:mark_options].blank? && params[:mark_options].include?('new_value')
-          if params[:initial_mark_values].blank?
-            @error_message << "Initial marks not set."
+        if !params[:tag_options].blank? && params[:tag_options].include?('new_value')
+          if params[:initial_tag_values].blank?
+            @error_message << "Initial tags not set."
           end
         end
       end

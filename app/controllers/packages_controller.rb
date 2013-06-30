@@ -10,7 +10,7 @@ class PackagesController < ApplicationController
   # GET /packages.xml
   def index
     unless params[:product_id].blank?
-      @packages = get_packages(unescape_url(params[:product_id]), unescape_url(params[:mark]), unescape_url(params[:status]), unescape_url(params[:user]))
+      @packages = get_packages(unescape_url(params[:product_id]), unescape_url(params[:tag]), unescape_url(params[:status]), unescape_url(params[:user]))
     end
 
     respond_to do |format|
@@ -75,7 +75,7 @@ class PackagesController < ApplicationController
     @package.created_by = current_user.id
     @package.updated_by = current_user.id
 
-    @package.marks = process_marks(params[:marks], params[:package][:product_id])
+    @package.tags = process_tags(params[:tags], params[:package][:product_id])
 
     respond_to do |format|
       if @package.save
@@ -112,7 +112,7 @@ class PackagesController < ApplicationController
 
     # for Changelog.package_updated
     @orig_package = Package.find(params[:id])
-    @orig_marks = @orig_package.marks.clone
+    @orig_tags = @orig_package.tags.clone
 
     @package = Package.find(params[:id])
 
@@ -139,8 +139,8 @@ class PackagesController < ApplicationController
 
           @package.reload
 
-          if params[:process_marks] == 'Yes'
-            @package.marks = process_marks(params[:marks], @package.product_id)
+          if params[:process_tags] == 'Yes'
+            @package.tags = process_tags(params[:tags], @package.product_id)
           end
 
           # status changed
@@ -171,12 +171,12 @@ class PackagesController < ApplicationController
 
           @package.save
 
-          Changelog.package_updated(@orig_package, @package, @orig_marks)
+          Changelog.package_updated(@orig_package, @package, @orig_tags)
 
           do_sync(["name", "notes", "ver", "assignee", "brew_link", "group_id", "artifact_id", "project_name", "project_url", "license", "scm"])
 
           sync_status if params[:sync_status] == 'yes'
-          sync_marks if params[:sync_marks] == 'yes'
+          sync_tags if params[:sync_tags] == 'yes'
 
           flash[:notice] = 'Package was successfully updated.'
 
@@ -272,19 +272,19 @@ class PackagesController < ApplicationController
           @target_package.status = nil
         end
 
-        if params[:clone_marks_option] == 'Yes'
-          @source_package.marks.each do |source_mark|
-            target_mark = Mark.find_by_key_and_product_id(source_mark.key, target_product.id)
-            unless target_mark
-              target_mark = source_mark.clone
-              target_mark.product = target_product
-              target_mark.save!
+        if params[:clone_tags_option] == 'Yes'
+          @source_package.tags.each do |source_tag|
+            target_tag = Tag.find_by_key_and_product_id(source_tag.key, target_product.id)
+            unless target_tag
+              target_tag = source_tag.clone
+              target_tag.product = target_product
+              target_tag.save!
             end
-            @target_package.marks << target_mark
+            @target_package.tags << target_tag
           end
 
         else
-          @target_package.marks = []
+          @target_package.tags = []
         end
 
         @target_package.updated_by = current_user.id
@@ -305,13 +305,13 @@ class PackagesController < ApplicationController
 
     require 'faster_csv'
 
-    @packages = get_packages(unescape_url(params[:product_id]), unescape_url(params[:mark]), unescape_url(params[:status]), unescape_url(params[:user]))
+    @packages = get_packages(unescape_url(params[:product_id]), unescape_url(params[:tag]), unescape_url(params[:status]), unescape_url(params[:user]))
 
     @product = Product.find_by_name(unescape_url(params[:product_id]))
 
     csv_string = FasterCSV.generate do |csv|
       # header row
-      header_row = ["name", "status", "marks"]
+      header_row = ["name", "status", "tags"]
 
       get_xattrs(@product, true, false) do |attr|
         if attr.blank?
@@ -333,14 +333,14 @@ class PackagesController < ApplicationController
           val << package.status.name
         end
 
-        if package.marks.blank?
+        if package.tags.blank?
           val << ""
         else
-          mark_val = ""
-          package.marks.each do |mark|
-            mark_val << mark.key + ", "
+          tag_val = ""
+          package.tags.each do |tag|
+            tag_val << tag.key + ", "
           end
-          val << mark_val
+          val << tag_val
         end
 
         get_xattrs(@product, true, false) do |attr|
@@ -405,25 +405,25 @@ class PackagesController < ApplicationController
     end
   end
 
-  def sync_marks
+  def sync_tags
     @package.all_relationships_of('clone').each do |target_package|
-      unless @package.marks.blank?
-        target_marks = []
-        @package.marks.each do |source_mark|
-          target_mark = Mark.find_by_key_and_product_id(source_mark.key, target_package.product_id)
-          unless target_mark.blank?
-            target_marks << target_mark
+      unless @package.tags.blank?
+        target_tags = []
+        @package.tags.each do |source_tag|
+          target_tag = Tag.find_by_key_and_product_id(source_tag.key, target_package.product_id)
+          unless target_tag.blank?
+            target_tags << target_tag
           else
-            target_mark = source_mark.clone
-            target_mark.product_id = target_package.product_id
-            target_mark.save
-            target_marks << target_mark
+            target_tag = source_tag.clone
+            target_tag.product_id = target_package.product_id
+            target_tag.save
+            target_tags << target_tag
           end
         end
-        target_package.marks = target_marks
+        target_package.tags = target_tags
         target_package.save
       else
-        target_package.marks = nil
+        target_package.tags = nil
         target_package.save
       end
     end
@@ -488,7 +488,7 @@ class PackagesController < ApplicationController
     end
   end
 
-  def get_packages(__product_name, __mark_key, __status_name, __user_email)
+  def get_packages(__product_name, __tag_key, __status_name, __user_email)
     order = "status_id, name"
 
     hierarchy = "select id from products where name = '#{__product_name}'"
@@ -508,15 +508,15 @@ class PackagesController < ApplicationController
 
     opts << __statuses_can_show_sql
 
-    if !__status_name.blank? && !__mark_key.blank?
-      mark = Mark.find_by_key_and_product_id(__mark_key, Product.find_by_name(__product_name).id)
+    if !__status_name.blank? && !__tag_key.blank?
+      tag = Tag.find_by_key_and_product_id(__tag_key, Product.find_by_name(__product_name).id)
       _status = Status.find_in_global_scope(__status_name, __product_name)
-      _packages = Package.find_by_sql("select p.* from packages p join assignments a on p.id = a.package_id and a.mark_id = #{mark.id} and status_id = #{_status.id} and p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
+      _packages = Package.find_by_sql("select p.* from packages p join assignments a on p.id = a.package_id and a.tag_id = #{tag.id} and status_id = #{_status.id} and p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
     elsif !__status_name.blank?
       _packages = Package.find_by_sql("select p.* from packages p where p.status_id = #{Status.find_in_global_scope(__status_name, __product_name).id} AND p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
-    elsif !__mark_key.blank?
-      mark = Mark.find_by_key_and_product_id(__mark_key, Product.find_by_name(__product_name))
-      _packages = Package.find_by_sql("select p.* from packages p join assignments a on p.id = a.package_id and a.mark_id = #{mark.id} and p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
+    elsif !__tag_key.blank?
+      tag = Tag.find_by_key_and_product_id(__tag_key, Product.find_by_name(__product_name))
+      _packages = Package.find_by_sql("select p.* from packages p join assignments a on p.id = a.package_id and a.tag_id = #{tag.id} and p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
     else
       _packages = Package.find_by_sql("select p.* from packages p where p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
     end
