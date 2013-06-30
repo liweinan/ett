@@ -6,3 +6,4 @@ development.log
 log
 cache
 .gitkeep
+db/schema.rb
