@@ -4,24 +4,39 @@
 
 <% if logged_in? %>
     <form onsubmit="return false;">
-      <button onclick="showCreateBzBugLinkForm();">Link to an existing bug</button>
-      <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'link_bz_bug_form_indicator'} %>
+      <button onclick="renderBzBugForm('link_bz_bug')">
+        Link to an existing bug
+      </button>
+      <%= render :partial => 'layouts/progress_indicator', 
+        :locals => {:progress_indicator_id => 'link_bz_bug_form_div_indicator'} %>
       or
-      <button onclick="showCreateBzBugForm()">Create a new bug</button>
-      <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'new_bz_bug_form_indicator'} %>
+      <button onclick="renderBzBugForm('new_bz_bug')">Create a new bug</button>
+      <%= render :partial => 'layouts/progress_indicator', 
+        :locals => {:progress_indicator_id => 'new_bz_bug_form_div_indicator'} %>
       in Bugzilla
       <%= render :partial => 'layouts/sep' %>
     </form>
 <% end %>
 <div id="link_bz_bug_form_div" style="display:none;"></div>
 <div id="new_bz_bug_form_div" style="display:none;"></div>
-<%= render :partial => 'packages/bz_bug_list', :locals => {:package => package} %>
-<%= render :partial => 'layouts/sep_tiny' %>
-<%= render :partial => 'packages/bz_bug_sync', :locals => {:package => package} %>
+<%= render :partial => 'packages/bz_bug_list', 
+  :locals => {:package => package} %>
+<% if logged_in? %>
+  <%= render :partial => 'layouts/sep' %>
+  <form onsubmit="return false;">
+    <button onclick="renderBzBugForm('sync_bz_bug')">
+      Sync bug information with Bugzilla
+    </button>
+    <%= render :partial => 'layouts/progress_indicator', 
+      :locals => {:progress_indicator_id => 'sync_bz_bug_form_div_indicator'} %>
+  </form>
+<% end %>
+<div id="sync_bz_bug_form_div" style="display:none;"></div>
 <%= render :partial => 'layouts/sep_tiny' %>
 
 <% content_for :js do %>
-    <%= render :partial => 'packages/bz_bug_link_js', :locals => {:package => package} %>
+    <%= render :partial => 'packages/bz_bug_link_js', 
+      :locals => {:package => package} %>
     <%= render :partial => 'packages/time_tracking_js' %>
 <% end %>
 
@@ -30,6 +45,5 @@
         .small_font {
             font-size: 10px;
         }
-
     </style>
 <% end %>

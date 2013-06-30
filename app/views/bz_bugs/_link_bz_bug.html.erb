@@ -1,3 +1,4 @@
+<%@package = Package.find(params[:package_id])%>
 <h3>Link to an existing bug</h3>
 <form onsubmit="return false;">
   <div class='manage-tbl'>
@@ -32,7 +33,7 @@
           <button onclick="createBzBugLink()">
             Link
           </button>
-          <button onclick="hideLinkBzBugForm()">
+          <button onclick="hideBzBugForm('link_bz_bug')">
             Cancel
           </button>
         </td>

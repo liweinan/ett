@@ -227,19 +227,12 @@
 <% else %>
     <% content_for :js do %>
         <script type="text/javascript">
-            function show_pac_editor(div, pac_id, field_name, field_type, is_xattr) {
-            }
-            function hide_pac_editor(div, field_type, is_xattr) {
-            }
-            function show_pac_btn(div, field_type, is_xattr) {
-            }
-            function hide_pac_btn(div, field_type, is_xattr) {
-            }
-            function build_pac_btn_id(div, field_type, is_xattr) {
-            }
-            function showCommentDialog(pac_id) {
-
-            }
+            function show_pac_editor(div, pac_id, field_name, field_type, is_xattr) {}
+            function hide_pac_editor(div, field_type, is_xattr) {}
+            function show_pac_btn(div, field_type, is_xattr) {}
+            function hide_pac_btn(div, field_type, is_xattr) {}
+            function build_pac_btn_id(div, field_type, is_xattr) {}
+            function showCommentDialog(pac_id) {}
         </script>
     <% end %>
 <% end %>
@@ -262,6 +255,5 @@
             getTimeTrackingComponents();
         });
     </script>
-
     <%= render :partial => 'time_tracking_js' %>
 <% end %>

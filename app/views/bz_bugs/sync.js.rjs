@@ -1,0 +1,19 @@
+if @error.blank?
+  if @response.class == Net::HTTPOK
+    page << "updateBzBugRow('#{@bz_bug.id}')"
+  elsif @response.class == Net::HTTPUnauthorized
+    page.alert("Bugzilla account/password not correct.")
+  elsif @response.class == Net::HTTPNotFound
+    page.alert("Requested bug: #{@bz_bug.bz_id} not found in Bugzilla.")
+  else
+    page.alert("Unknown error: #{@response.to_s}")
+  end
+else
+  if @error.class == ArgumentError
+    # 400 Bad Request
+    page.alert("#{@error.to_s}")
+  else
+    # 500 Internal Server Error
+    page.alert("Internal error: #{@error.to_s}")
+  end  
+end

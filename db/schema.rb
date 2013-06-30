@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130625202955) do
+ActiveRecord::Schema.define(:version => 20130630065655) do
 
   create_table "assignments", :force => true do |t|
     t.integer  "mark_id"
@@ -43,6 +43,7 @@ ActiveRecord::Schema.define(:version => 20130625202955) do
     t.datetime "updated_at"
     t.string   "summary"
     t.string   "bz_status"
+    t.datetime "last_synced_at"
   end
 
   create_table "changelogs", :force => true do |t|

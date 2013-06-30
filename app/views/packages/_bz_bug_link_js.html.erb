@@ -1,55 +1,44 @@
 <script type="text/javascript">
-
-    function syncBugInfoWithBz(package_id) {
-        
+    function syncAllBugInfoWithBz() {
+        var bz_bugs = document.getElementsByRegex('^col_bz_id_.+');        
+        syncBugInfoWithBz(bz_bugs);
     }
 
-    function showCreateBzBugForm() {
-        new Ajax.Request('/bz_bugs/new_bz_bug/<%=package.id%>',
-                {
-                    method: 'GET',
-                    asynchronous: true,
-                    evalScripts: true,
-                    onLoading: function () {
-                        Element.show('new_bz_bug_form_indicator');
-                    },
-                    onSuccess: function (response) {
-                        Element.hide('new_bz_bug_form_indicator');
-                        var content = response.responseText;
-                        var div = document.getElementById('new_bz_bug_form_div');
-                        div.innerHTML = content;
-                        Element.show(div);
-                        Element.highlight(div);
-                    }
-                });
-    }
+    function syncBugInfoWithBz(bz_bugs) {
+        if (bz_bugs.length == 0) {
+            // Element.hide('sync_bz_bug_button_indicator');
+            var sbb = document.getElementById('sync_bz_bug_form_div');
+            sbb.innerHTML = "Done!";
+            return;
+        }
 
-    function showCreateBzBugLinkForm() {
-        new Ajax.Request('/bz_bugs/link_bz_bug/<%=package.id%>',
-                {
-                    method: 'GET',
-                    asynchronous: true,
-                    evalScripts: true,
-                    onLoading: function () {
-                        Element.show('link_bz_bug_form_indicator');
-                    },
-                    onSuccess: function (response) {
-                        Element.hide('link_bz_bug_form_indicator');
-                        var content = response.responseText;
-                        var div = document.getElementById('link_bz_bug_form_div');
-                        div.innerHTML = content;
-                        Element.show(div);
-                        Element.highlight(div);
-                    }
-                });
-    }
+        bz_bug = bz_bugs.pop();
+        var sbb_user = document.getElementById('sbb_user').value;
+        var sbb_pwd = document.getElementById('sbb_pwd').value;
+        var bz_id = bz_bug.match(/\d+/)[0]
 
-    function hideNewBzBugForm() {
-        Element.hide('new_bz_bug_form_div');
-    }
-
-    function hideLinkBzBugForm() {
-        Element.hide('link_bz_bug_form_div');
+        new Ajax.Request('/bz_bugs/sync/' + bz_id,
+            {
+                method: 'GET',
+                asynchronous: true,
+                evalScripts: true,
+                onLoading: function () {
+                    Element.show("sync_bz_bug_button_indicator");
+                },
+                onFailure: function () {
+                    Element.hide('sync_bz_bug_button_indicator');
+                    syncBugInfoWithBz(bz_bugs);
+                },
+                onSuccess: function (response) {                    
+                    syncBugInfoWithBz(bz_bugs);
+                },
+                parameters: {
+                    'user': sbb_user,
+                    'pwd': sbb_pwd,                    
+                    'authenticity_token': '<%=form_authenticity_token%>'
+                }
+            }
+        );
     }
 
     function createBzBug() {
@@ -127,19 +116,42 @@
         renderPartial(id, id, 'bz_bugs/edit');
     }
 
-    function renderPartial(id, div_id, partial) {
+    function renderPartial(id, div_id, partial, package_id=-1) {
+        var indicator = document.getElementById(div_id + '_indicator');
+
         new Ajax.Request('/bz_bugs/render_partial/' + id, {
-            method: 'get',
+            method: 'GET',
+            asynchronous: true,
+            evalScripts: true,
+            onLoading: function () {
+                if (indicator) {
+                    Element.show(indicator);
+                }
+            },
             onSuccess: function (response) {
+                if (indicator) {
+                    Element.hide(indicator);
+                }
                 var content = response.responseText;
-                var col = document.getElementById(div_id);
-                col.innerHTML = content;
+                var div = document.getElementById(div_id);
+                div.innerHTML = content;
+                Element.show(div);
+                Element.highlight(div);
             },
             parameters: {
                 "id": id,
-                'partial': partial
+                'partial': partial,
+                'package_id': package_id
             }
         });
+    }
+
+    function renderBzBugForm(formType) {
+        renderPartial(formType, formType + "_form_div", formType, '<%=package.id%>');
+    }
+
+    function hideBzBugForm(formType) {
+        Element.hide(formType + '_form_div');
     }
 
     function updateBzBugLink(id, bz_id) {
@@ -165,6 +177,37 @@
                 });
     }
 
+    function updateBzBugRow(id) {    
+
+        var colOps = document.getElementById('col_bz_ops_' + id);
+        // alert("colOps: " + colOps);    
+        renderOps(id, colOps);
+
+        var colBzBugId = document.getElementById('col_bz_id_' + id);
+        // alert("colBzBugId: " + colBzBugId);
+        renderBzBugId(id, colBzBugId);
+
+        var colBzBugCreator = document.getElementById('col_bz_creator_' + id);
+        // alert("colBzBugCreator: " + colBzBugCreator);
+        renderBzBugCreator(id, colBzBugCreator);
+
+        var colBzLastSyncedAt = document.getElementById('col_bz_last_synced_at_' + id);
+        // alert("colBzLastSyncedAt: " + colBzLastSyncedAt);
+        renderBzBugLastSyncedAt(id, colBzLastSyncedAt);
+
+        var colBzBugStatus = document.getElementById('col_bz_status_' + id);
+        // alert("colBzBugStatus: " + colBzBugStatus);
+        renderBzBugStatus(id, colBzBugStatus);
+
+        var colBzBugSummary = document.getElementById('col_bz_summary_' + id);
+        // alert("colBzBugSummary: " + colBzBugSummary);
+        renderBzBugSummary(id, colBzBugSummary);
+
+        // var row = document.getElementById('bz_list_row_' + id);
+        // alert('row: ' + row);
+        // Element.highlight(row);
+    }
+
     function addBzBugRow(id) {
         var tbl = document.getElementById('bz_list_tbl');
         var rowCnt = tbl.rows.length;
@@ -183,16 +226,19 @@
         colBzBugCreator.id = 'col_bz_creator_' + id;
         renderBzBugCreator(id, colBzBugCreator);
 
-        var colBzBugStatus = row.insertCell(3);
+        var colBzLastSyncedAt = row.insertCell(3);
+        colBzLastSyncedAt.id = 'col_bz_last_synced_at_' + id;
+        renderBzBugLastSyncedAt(id, colBzLastSyncedAt);
+
+        var colBzBugStatus = row.insertCell(4);
         colBzBugStatus.id = 'col_bz_status_' + id;
         renderBzBugStatus(id, colBzBugStatus);
 
-        var colBzBugSummary = row.insertCell(4);
+        var colBzBugSummary = row.insertCell(5);
         colBzBugSummary.id = 'col_bz_summary_' + id;
         renderBzBugSummary(id, colBzBugSummary);
 
         Element.highlight(row);
-
     }
 
     function renderBzBugId(id, col) {
@@ -204,12 +250,16 @@
     function renderOps(id, col) {
         col.className = 'small_font';
         renderPartial(id, col.id, 'bz_bugs/ops');
-
     }
 
     function renderBzBugCreator(id, col) {
         col.className = 'small_font';
         renderPartial(id, col.id, 'bz_bugs/creator');
+    }
+
+    function renderBzBugLastSyncedAt(id, col) {
+        col.className = 'small_font';
+        renderPartial(id, col.id, 'bz_bugs/last_synced_at');
     }
 
     function renderBzBugStatus(id, col) {
@@ -221,7 +271,6 @@
         col.className = 'small_font';
         renderPartial(id, col.id, 'bz_bugs/summary');
     }
-
 
     function deleteRow(rowid) {
         var row = document.getElementById(rowid);
@@ -257,5 +306,4 @@
         }
 
     }
-
 </script>

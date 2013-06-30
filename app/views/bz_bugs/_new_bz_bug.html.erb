@@ -1,3 +1,4 @@
+<%@package = Package.find(params[:package_id])%>
 <h3>Create a new bug in Bugzilla</h3>
 <form onsubmit="return false;">
   <div class='manage-tbl'>
@@ -54,7 +55,7 @@
           <button onclick="createBzBug()">
             Create
           </button>
-          <button onclick="hideNewBzBugForm()">
+          <button onclick="hideBzBugForm('new_bz_bug')">
             Cancel
           </button>
         </td>
