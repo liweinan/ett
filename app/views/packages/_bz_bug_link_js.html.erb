@@ -116,7 +116,8 @@
         renderPartial(id, id, 'bz_bugs/edit');
     }
 
-    function renderPartial(id, div_id, partial, package_id=-1) {
+    function renderPartial(id, div_id, partial, package_id) {
+        package_id = typeof package_id !== 'undefined' ? package_id : 0;
         var indicator = document.getElementById(div_id + '_indicator');
 
         new Ajax.Request('/bz_bugs/render_partial/' + id, {

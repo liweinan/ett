@@ -4,13 +4,13 @@
 
 <% if logged_in? %>
     <form onsubmit="return false;">
-      <button onclick="renderBzBugForm('link_bz_bug')">
+      <button onclick="renderBzBugForm('link_bz_bug');">
         Link to an existing bug
       </button>
       <%= render :partial => 'layouts/progress_indicator', 
         :locals => {:progress_indicator_id => 'link_bz_bug_form_div_indicator'} %>
       or
-      <button onclick="renderBzBugForm('new_bz_bug')">Create a new bug</button>
+      <button onclick="renderBzBugForm('new_bz_bug');">Create a new bug</button>
       <%= render :partial => 'layouts/progress_indicator', 
         :locals => {:progress_indicator_id => 'new_bz_bug_form_div_indicator'} %>
       in Bugzilla
@@ -24,7 +24,7 @@
 <% if logged_in? %>
   <%= render :partial => 'layouts/sep' %>
   <form onsubmit="return false;">
-    <button onclick="renderBzBugForm('sync_bz_bug')">
+    <button onclick="renderBzBugForm('sync_bz_bug');">
       Sync bug information with Bugzilla
     </button>
     <%= render :partial => 'layouts/progress_indicator', 
