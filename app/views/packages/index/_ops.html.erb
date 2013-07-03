@@ -19,7 +19,9 @@
           <a href="javascript:void(0);" onclick="showLog('<%=package.id%>')">Log</a>
           <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "log_area_indicator_#{package.id}"} %>
           /
-          <%= link_to 'Edit', :controller => 'packages', :action => 'edit', :id => escape_url(package.name), :product_id => escape_url(package.product.name) %>
+          <%= link_to 'Edit', :controller => 'packages', :action => 'edit', 
+            :id => escape_url(package.name),
+            :product_id => escape_url(package.product.name) %>
       <% end %>
   <% end %>
   <div id="log_area_<%= package.id %>" style="display:none;"></div>

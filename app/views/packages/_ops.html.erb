@@ -1,29 +1,43 @@
-<%= link_to "Workload", :controller => :packages, :action => :index, :product_id => escape_url(params[:product_id]), :user => params[:user], :style => "workload" %>
-/
-<%= link_to "Time Report", :controller => :packages, :action => :index, :product_id => escape_url(params[:product_id]), :user => params[:user], :style => "time_report" %>
-/
-<%= link_to "Printable Page", :controller => :packages, :action => :index, :product_id => escape_url(params[:product_id]), :user => params[:user], :style => 'printable' %> / <%= link_to 'Export to CSV', "/packages/export_to_csv/-1?product_id=#{escape_url(params[:product_id])}&tag=#{escape_url(params[:tag])}&status=#{escape_url(params[:status])}&user=#{escape_url(params[:user])}" %>
-/ <%= link_to 'Search Packages', "/search/packages?product_id=#{ebtag}" %>
-<% if logged_in? %>
-    <% if has_product? %>
-        / <%= link_to 'New Package', :controller => :packages, :action => :new, :product_id => params[:product_id] %>
-        <%# render :partial => 'packages/filter' %>
-        <% if can_manage? %>
-            / <a href="/import/<%= escape_url(params[:product_id]) %>">Import Packages</a>
-            / <a href="/import/<%= escape_url(params[:product_id]) %>?ac=update">Update Packages</a>
-            <%
-               product_id = Product.find_by_name(unescape_url(params[:product_id])).id
-               setting = Setting.find_by_product_id(product_id)
-               setting_id = -1
-               unless setting.blank?
-                   setting_id = setting.id
-               end
-            %>
-
-            / <%= link_to "Settings", :controller => :settings, :action =>:show, :id => setting_id, :product_id => escape_url(params[:product_id]) %>
-            / <%= link_to "Statuses", :controller => :statuses, :action => :index, :product_id => escape_url(params[:product_id]) %>
-            / <%= link_to "Tags", :controller => :tags, :action => :index, :product_id => escape_url(params[:product_id]) %>
-            / <%= link_to "Clone", :controller => :products, :action => :clone, :id => escape_url(params[:product_id]) %>
-        <% end %>
-    <% end %>
+<% if logged_in? && has_product? %>
+      <%= link_to 'New Package', :controller => :packages, :action => :new, 
+        :product_id => params[:product_id] %> /
+      <%# render :partial => 'packages/filter' %>
 <% end %>
+<%= link_to 'Search Packages', "/search/packages?product_id=#{ebtag}" %> /
+<% if logged_in? && has_product? && can_manage? %>
+  <a href="/import/<%= escape_url(params[:product_id]) %>">Import Packages</a>
+  / <a href="/import/<%= escape_url(params[:product_id]) %>?ac=update">Update Packages</a>
+  /
+<% end %>
+
+<%= link_to "Workload", :controller => :packages, :action => :index, 
+  :product_id => escape_url(params[:product_id]), 
+  :user => params[:user], :style => "workload" %> /
+<%= link_to "Time Report", :controller => :packages, :action => :index, 
+  :product_id => escape_url(params[:product_id]), 
+  :user => params[:user], :style => "time_report" %> /
+<%= link_to "Printable Page", :controller => :packages, :action => :index, 
+  :product_id => escape_url(params[:product_id]), :user => params[:user], 
+  :style => 'printable' %> / 
+<%= link_to 'Export to CSV', "/packages/export_to_csv/-1?product_id=#{escape_url(params[:product_id])}&tag=#{escape_url(params[:tag])}&status=#{escape_url(params[:status])}&user=#{escape_url(params[:user])}" %>
+
+<% if logged_in? && has_product? && can_manage? %>
+  <%
+    product_id = Product.find_by_name(unescape_url(params[:product_id])).id
+    setting = Setting.find_by_product_id(product_id)
+    setting_id = -1
+    unless setting.blank?
+       setting_id = setting.id
+    end
+  %>
+  / <%= link_to "Clone Product", :controller => :products, :action => :clone, 
+      :id => escape_url(params[:product_id]) %>
+  / <%= link_to "Product Statuses", :controller => :statuses, 
+      :action => :index, :product_id => escape_url(params[:product_id]) %>
+  / <%= link_to "Product Tags", :controller => :tags, :action => :index, 
+      :product_id => escape_url(params[:product_id]) %>
+  / <%= link_to "Product Settings", :controller => :settings, :action =>:show, 
+      :id => setting_id, :product_id => escape_url(params[:product_id]) %>  
+<% end %>
+
+

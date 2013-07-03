@@ -1,8 +1,8 @@
 <%= render :partial => 'layouts/sep_tiny' %>
-AUTOMATIC TIME TRACK-
+Automatic Time Track:
 <%= render :partial => "packages/display_auto_tt", :locals => {:package => @package} %>
 <%= render :partial => 'layouts/sep_tiny' %>
-MANUAL TIME TRACK-
+Manual Time Track:
 <span id="manual_tracked_time">
   <%= display_manual_track_time_in_real_time(@package) %>
 </span>

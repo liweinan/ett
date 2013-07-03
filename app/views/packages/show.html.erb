@@ -24,15 +24,17 @@ Last Modified At:
 <%= at_zone(@package.updated_at) %>
 <%= render :partial => 'layouts/sep_tiny' %>
 
-<% unless @package.status.blank? %>
-    Status:
-    <span style="<%= default_style(@package.status.style) %>">&nbsp;</span>
-    <%= h @package.status.name %>
-    <%= render :partial => 'layouts/sep_tiny' %>
-<% end %>
 
-<% unless @package.tags.blank? %>
-    Tags:
+Status:
+<% unless @package.status.blank? %>
+    <span style="<%= default_style(@package.status.style) %>">&nbsp;</span>
+    <%= h @package.status.name %>    
+<% end %>
+<%= render :partial => 'layouts/sep_tiny' %>
+
+
+Tags:
+<% unless @package.tags.blank? %>    
     <% @package.tags.each do |tag| %>
         <%= tag.key %> /
     <% end %>
@@ -54,7 +56,9 @@ Last Modified At:
 <% if can_manage? %>
     <% unless @package.deleted? %>
         | <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(@package.name), :product_id => escape_url(@package.product.name) %>
-        | <%= link_to 'Delete', @package, :confirm => "Are you sure to delete #{escape_url(@package.name)}?", :method => :delete %>
+        | <%= link_to 'Delete', @package, 
+            :confirm => "Are you sure to delete #{escape_url(@package.name)}?", 
+            :method => :delete %>
     <% end %>
 <% end %>
 

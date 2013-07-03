@@ -1,11 +1,8 @@
 <tr>
   <td colspan=2 style="text-align: left;">
     Notes <%= render :partial => 'layouts/syntax_help' %>
-  </td>
-</tr>
-<tr>
-  <td colspan=2 style="text-align: left;">
-    <%= f.text_area :notes %>
-    <%= render :partial => 'sync', :locals => {:key => 'notes'} %>
+    <%=render :partial => 'layouts/sep' %>
+    <%= f.text_area :notes %>            
+    <%# render :partial => 'sync', :locals => {:key => 'notes'} %>        
   </td>
 </tr>
