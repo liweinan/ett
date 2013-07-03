@@ -15,7 +15,7 @@ class Package < ActiveRecord::Base
   belongs_to :user #assignee
   belongs_to :assignee, :class_name => "User", :foreign_key => "user_id"
   belongs_to :creator, :class_name => "User", :foreign_key => "created_by"
-  belongs_to :product
+  belongs_to :task
   belongs_to :status
 
   has_many :assignments, :dependent => :destroy
@@ -32,7 +32,7 @@ class Package < ActiveRecord::Base
   has_many :changelogs, :class_name => "Changelog", :foreign_key => "package_id", :dependent => :destroy
 
   validates_presence_of :name
-  validates_presence_of :product_id
+  validates_presence_of :task_id
   validates_presence_of :created_by
   validates_presence_of :updated_by
 
@@ -104,7 +104,7 @@ class Package < ActiveRecord::Base
     str = "Name: " + name + "\n"
     str += "Created By: " + creator.name + "(#{creator.email})" + "\n"
     str += "Created At: " + created_at.to_s + "\n"
-    str += "Belongs To: " + product.name + "\n"
+    str += "Belongs To: " + task.name + "\n"
     unless assignee.blank?
       str += "Assignee: " + assignee.name + "(#{assignee.email})" + "\n"
     end
@@ -135,26 +135,26 @@ class Package < ActiveRecord::Base
     packages.flatten.uniq
   end
 
-  def self.distinct_in_products(products)
-    Package.all(:select => "distinct name", :conditions => ["product_id in (?)", Product.products_to_ids(products)], :order => "name")
+  def self.distinct_in_tasks(tasks)
+    Package.all(:select => "distinct name", :conditions => ["task_id in (?)", Task.tasks_to_ids(tasks)], :order => "name")
   end
 
-  def self.distinct_in_products_can_show(products)
-    product_ids = Product.products_to_ids(products)
+  def self.distinct_in_tasks_can_show(tasks)
+    task_ids = Task.tasks_to_ids(tasks)
     can_show_status_ids = []
-    product_ids.each do |product_id|
-      Status.find_all_can_show_by_product_id_in_global_scope(product_id).each do |status|
+    task_ids.each do |task_id|
+      Status.find_all_can_show_by_task_id_in_global_scope(task_id).each do |status|
         can_show_status_ids << status.id
       end
     end
 
-    Package.all(:select => "distinct name", :conditions => ["product_id in (?) and (status_id in (?) or status_id is NULL)", product_ids, can_show_status_ids.uniq], :order => "name")
+    Package.all(:select => "distinct name", :conditions => ["task_id in (?) and (status_id in (?) or status_id is NULL)", task_ids, can_show_status_ids.uniq], :order => "name")
   end
 
   def validate
-    p = Package.find_by_name_and_product_id(self.name.strip, self.product_id)
+    p = Package.find_by_name_and_task_id(self.name.strip, self.task_id)
     if p && p.id != self.id
-      errors.add(:name, " - Package name cannot be duplicate under one product!")
+      errors.add(:name, " - Package name cannot be duplicate under one task!")
     end
   end
 

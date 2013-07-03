@@ -1,7 +1,7 @@
 <h2><%= @component.name %></h2>
 
-<% @component.products.each do |product| %>
-    <%= product.name %><br/>
+<% @component.tasks.each do |task| %>
+    <%= task.name %><br/>
 <% end %>
 <%= render :partial => 'layouts/sep' %>
 <%= link_to 'Back', components_path %>

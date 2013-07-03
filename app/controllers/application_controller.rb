@@ -3,14 +3,14 @@
 class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
-  helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_product?, :count_packages, :can_edit_package?, :current_user, :get_product, :has_status?, :has_tag?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :product_has_tags?, :get_xattrs, :background_style, :confirmed?, :default_style
+  helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_task?, :count_packages, :can_edit_package?, :current_user, :get_task, :has_status?, :has_tag?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :task_has_tags?, :get_xattrs, :background_style, :confirmed?, :default_style
   helper_method :btag, :ebtag, :uebtag, :truncate_u, :its_me?, :extract_username
-  before_filter :process_product_id
+  before_filter :process_task_id
   before_filter :save_current_link
               # Scrub sensitive parameters from your log
               # filter_parameter_logging :password
-  def get_product(name)
-    Product.find_by_name(unescape_url(name))
+  def get_task(name)
+    Task.find_by_name(unescape_url(name))
   end
 
   def escape_url(url)
@@ -37,11 +37,11 @@ class ApplicationController < ActionController::Base
     !session[:current_user].blank?
   end
 
-  def has_product?(id = params[:product_id])
+  def has_task?(id = params[:task_id])
     if id.blank?
       false
     else
-      if Product.find_by_name(unescape_url(id)).blank?
+      if Task.find_by_name(unescape_url(id)).blank?
         false
       else
         true
@@ -68,14 +68,14 @@ class ApplicationController < ActionController::Base
     global_status = Status.find(:first, :conditions => ["global='Y' AND name=?", status_name])
     status_id = -1
     if global_status == nil
-      status_id = Status.find_by_name_and_product_id(status_name, Product.find_by_name(bt).id).id
+      status_id = Status.find_by_name_and_task_id(status_name, Task.find_by_name(bt).id).id
     else
       status_id = global_status.id
     end
 
-#    children = "union select children.id as id from products parent join products children on parent.id = children.parent_id and parent.name = #{bt_quoted} "
-    hierarchy = "select id from products where name = #{bt_quoted}"
-    Package.count(:conditions => ["status_id = ? AND product_id IN (#{hierarchy})", status_id])
+#    children = "union select children.id as id from tasks parent join tasks children on parent.id = children.parent_id and parent.name = #{bt_quoted} "
+    hierarchy = "select id from tasks where name = #{bt_quoted}"
+    Package.count(:conditions => ["status_id = ? AND task_id IN (#{hierarchy})", status_id])
   end
 
   def current_user
@@ -150,9 +150,9 @@ class ApplicationController < ActionController::Base
 
   end
 
-  def get_xattrs(product = nil, check_show_xattrs = true, check_enable_xattrs = true)
-    if product.blank? || !Setting.enabled_in_product?(product) # check the system settings
-      if validate_xattr_options(check_show_xattrs, check_enable_xattrs, product)
+  def get_xattrs(task = nil, check_show_xattrs = true, check_enable_xattrs = true)
+    if task.blank? || !Setting.enabled_in_task?(task) # check the system settings
+      if validate_xattr_options(check_show_xattrs, check_enable_xattrs, task)
         Setting.system_settings.xattrs.split(',').each do |attr|
           unless attr.blank?
             yield attr.strip
@@ -160,8 +160,8 @@ class ApplicationController < ActionController::Base
         end
       end
     else #if the tag has local settings and set to show extended attributes, get all extended attributes name and display here.
-      if validate_xattr_options(check_show_xattrs, check_enable_xattrs, product)
-        product.setting.xattrs.split(',').each do |attr|
+      if validate_xattr_options(check_show_xattrs, check_enable_xattrs, task)
+        task.setting.xattrs.split(',').each do |attr|
           unless attr.blank?
             yield attr.strip
           end
@@ -170,8 +170,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def validate_xattr_options(check_show_xattrs, check_enable_xattrs, product)
-    if product.blank? || !Setting.enabled_in_product?(product) # check the system settings
+  def validate_xattr_options(check_show_xattrs, check_enable_xattrs, task)
+    if task.blank? || !Setting.enabled_in_task?(task) # check the system settings
       flag = true
       if check_show_xattrs == true
         if Setting.system_settings.show_xattrs?
@@ -201,7 +201,7 @@ class ApplicationController < ActionController::Base
     else #if the tag has local settings and set to show extended attributes, get all extended attributes name and display here.
       flag = true
       if check_show_xattrs == true
-        if product.setting.show_xattrs?
+        if task.setting.show_xattrs?
           flag = true
         else
           flag = false
@@ -215,7 +215,7 @@ class ApplicationController < ActionController::Base
       end
 
       if check_enable_xattrs == true
-        if product.setting.enable_xattrs?
+        if task.setting.enable_xattrs?
           flag = true
         else
           flag = false
@@ -237,10 +237,10 @@ class ApplicationController < ActionController::Base
     File.open('/tmp/ett_clone_in_progress_marker', 'w') { |f| f.write(status) }
   end
 
-  def product_has_tags?(product_name)
-    product = Product.find_by_name(product_name)
-    if product
-      if product.tags.size > 0
+  def task_has_tags?(task_name)
+    task = Task.find_by_name(task_name)
+    if task
+      if task.tags.size > 0
         return true
       end
     end
@@ -302,15 +302,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def check_product
-    unless has_product?
+  def check_task
+    unless has_task?
       flash[:notice] = 'Tag must be specified.'
       home_page
     end
   end
 
-  def check_product_or_user
-    if !has_product? && params[:user].blank?
+  def check_task_or_user
+    if !has_task? && params[:user].blank?
       flash[:notice] = 'User or Tag must be specified.'
       home_page
     end
@@ -343,28 +343,28 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def process_tags(tag_keys, product_id)
+  def process_tags(tag_keys, task_id)
     tag_keys ||= []
     new_tags = []
 
     tag_keys.each do |key|
-      tag = Tag.find_by_key_and_product_id(key, product_id)
+      tag = Tag.find_by_key_and_task_id(key, task_id)
       new_tags << tag
     end
     new_tags
   end
 
   def home_page
-    #unless has_product?
-    #  unless Setting.system_settings.default_product.blank?
-    #    default_product = Product.find_by_name(Setting.system_settings.default_tag)
-    #    unless default_product.blank?
-    #      params[:product_id] = escape_url(default_product.name)
+    #unless has_task?
+    #  unless Setting.system_settings.default_task.blank?
+    #    default_task = Task.find_by_name(Setting.system_settings.default_tag)
+    #    unless default_task.blank?
+    #      params[:task_id] = escape_url(default_task.name)
     #    else
-    #      params[:product_id] = escape_url(Product.find(:first, :order => 'updated_at DESC').name)
+    #      params[:task_id] = escape_url(Task.find(:first, :order => 'updated_at DESC').name)
     #    end
     #  else
-    #    params[:product_id] = escape_url(Product.find(:first, :order => 'updated_at DESC').name)
+    #    params[:task_id] = escape_url(Task.find(:first, :order => 'updated_at DESC').name)
     #  end
     #end
 
@@ -372,9 +372,9 @@ class ApplicationController < ActionController::Base
 
   end
 
-  def process_product_id
-    unless params[:product_id].blank?
-      params[:product_id] = escape_url(params[:product_id])
+  def process_task_id
+    unless params[:task_id].blank?
+      params[:task_id] = escape_url(params[:task_id])
     end
   end
 
@@ -392,7 +392,7 @@ class ApplicationController < ActionController::Base
   #end
 
   def expire_all_fragments
-    expire_fragment(%r{products/.*})
+    expire_fragment(%r{tasks/.*})
     expire_fragment(%r{components/.*})
     expire_fragment(%r{packages/.*})
   end
@@ -410,19 +410,19 @@ class ApplicationController < ActionController::Base
   end
 
   def btag
-    params[:product_id]
+    params[:task_id]
   end
 
   def ebtag
-    escape_url(params[:product_id])
+    escape_url(params[:task_id])
   end
 
   def uebtag
-    unescape_url(params[:product_id])
+    unescape_url(params[:task_id])
   end
 
   def btagid
-    bt = Product.find_by_name(uebtag)
+    bt = Task.find_by_name(uebtag)
     if bt.blank?
       nil
     else

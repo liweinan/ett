@@ -1,11 +1,11 @@
 class TagsController < ApplicationController
-  before_filter :check_product, :only => [:index, :new]
+  before_filter :check_task, :only => [:index, :new]
   before_filter :check_can_manage, :only => [:new, :edit]
 
   # GET /attributes
   # GET /attributes.xml
   def index
-    @tags = Tag.all(:conditions => ["product_id = ?", get_product(params[:product_id]).id])
+    @tags = Tag.all(:conditions => ["task_id = ?", get_task(params[:task_id]).id])
 
     respond_to do |format|
       format.html # index.html.erb
@@ -49,7 +49,7 @@ class TagsController < ApplicationController
     respond_to do |format|
       if @tag.save
         flash[:notice] = 'Tag was successfully created.'
-        format.html { redirect_to(:action => :show, :id => @tag.id, :product_id => escape_url(@tag.product.name)) }
+        format.html { redirect_to(:action => :show, :id => @tag.id, :task_id => escape_url(@tag.task.name)) }
       else
         format.html { render :action => :new }
       end
@@ -65,7 +65,7 @@ class TagsController < ApplicationController
     respond_to do |format|
       if @tag.update_attributes(params[:tag])
         flash[:notice] = 'Tag was successfully updated.'
-        format.html { redirect_to(:action => :show, :id => @tag.id, :product_id => @tag.product.name) }
+        format.html { redirect_to(:action => :show, :id => @tag.id, :task_id => @tag.task.name) }
       else
         format.html { render :action => :edit }
       end

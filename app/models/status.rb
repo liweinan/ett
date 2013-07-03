@@ -1,6 +1,6 @@
 class Status < ActiveRecord::Base
-  belongs_to :product
-#  validates_presence_of :product_id
+  belongs_to :task
+#  validates_presence_of :task_id
   validates_presence_of :name
   validates_uniqueness_of :code, :allow_nil => :true
 
@@ -38,12 +38,12 @@ class Status < ActiveRecord::Base
     Status.find(:all, :conditions => ["(global='Y') AND can_select='Yes'"], :order => "lower(name)")
   end
 
-  def self.find_all_can_show_by_product_id_in_global_scope(product_id)
-    Status.find(:all, :conditions => ["(product_id = ? OR global='Y') AND can_show='Yes'", product_id], :order => 'lower(name)')
+  def self.find_all_can_show_by_task_id_in_global_scope(task_id)
+    Status.find(:all, :conditions => ["(task_id = ? OR global='Y') AND can_show='Yes'", task_id], :order => 'lower(name)')
   end
 
-  def self.ids_can_show_by_product_name_in_global_scope(product_name)
-    statuses = Status.find_all_can_show_by_product_id_in_global_scope(Product.find_by_name(product_name).id)
+  def self.ids_can_show_by_task_name_in_global_scope(task_name)
+    statuses = Status.find_all_can_show_by_task_id_in_global_scope(Task.find_by_name(task_name).id)
     __str = ""
     statuses.each do |status|
       __str << "#{status.id} ,"
@@ -51,19 +51,19 @@ class Status < ActiveRecord::Base
     __str[0..__str.size - 2]
   end
 
-  def self.find_all_can_select_by_product_id_in_global_scope(product_id)
-    Status.find(:all, :conditions => ["(product_id = ? or global='Y') AND can_select='Yes'", product_id], :order => "lower(name)")
+  def self.find_all_can_select_by_task_id_in_global_scope(task_id)
+    Status.find(:all, :conditions => ["(task_id = ? or global='Y') AND can_select='Yes'", task_id], :order => "lower(name)")
   end
 
-  def self.find_all_can_select_by_product_id(product_id)
-    Status.find(:all, :conditions => ["(product_id = ?) AND can_select='Yes'", product_id], :order => "lower(name)")
+  def self.find_all_can_select_by_task_id(task_id)
+    Status.find(:all, :conditions => ["(task_id = ?) AND can_select='Yes'", task_id], :order => "lower(name)")
   end
 
-  def self.find_in_global_scope(status_name, product_name)
+  def self.find_in_global_scope(status_name, task_name)
     status_id = -1
     global_status = Status.find(:first, :conditions => ["name = ? and global='Y'", status_name])
     if global_status == nil
-      return Status.find_by_name_and_product_id(status_name, Product.find_by_name(product_name).id)
+      return Status.find_by_name_and_task_id(status_name, Task.find_by_name(task_name).id)
     else
       return global_status
     end
@@ -72,13 +72,13 @@ class Status < ActiveRecord::Base
   protected
 
   def validate
-    status = Status.find_by_name_and_product_id(self.name.strip, self.product_id)
+    status = Status.find_by_name_and_task_id(self.name.strip, self.task_id)
     if status == nil
       status = Status.find(:first, :conditions => ["global='Y' and name = ?", self.name.strip])
     end
 
     if status && status.id != self.id
-      errors.add(:name, " - Status name cannot be duplicate under one product!")
+      errors.add(:name, " - Status name cannot be duplicate under one task!")
     end
   end
 

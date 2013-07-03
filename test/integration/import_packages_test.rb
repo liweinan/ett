@@ -16,7 +16,7 @@ class ImportPackagesTest < ActionController::IntegrationTest
     # assert_template :show
 
 
-    # post "/import", {:packages => "import_package_test\r\nimport_package_test_a\r\nimport_package_test_duplicate_package\r\nimport_package_test_duplicate_package", :product_id => "default"}
+    # post "/import", {:packages => "import_package_test\r\nimport_package_test_a\r\nimport_package_test_duplicate_package\r\nimport_package_test_duplicate_package", :ptask_id => "default"}
     # assert_response :success
 
     # Package.all.each do |package|

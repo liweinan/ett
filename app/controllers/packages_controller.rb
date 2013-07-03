@@ -1,7 +1,7 @@
 class PackagesController < ApplicationController
 #  helper :sparklines
-  before_filter :check_product, :only => [:new, :edit]
-  before_filter :check_product_or_user, :only => [:export_to_csv]
+  before_filter :check_task, :only => [:new, :edit]
+  before_filter :check_task_or_user, :only => [:export_to_csv]
   before_filter :user_view_index, :only => [:index]
   before_filter :check_can_manage, :only => [:destroy]
   before_filter :clone_form_validation, :only => :clone
@@ -9,8 +9,8 @@ class PackagesController < ApplicationController
   # GET /packages
   # GET /packages.xml
   def index
-    unless params[:product_id].blank?
-      @packages = get_packages(unescape_url(params[:product_id]), unescape_url(params[:tag]), unescape_url(params[:status]), unescape_url(params[:user]))
+    unless params[:task_id].blank?
+      @packages = get_packages(unescape_url(params[:task_id]), unescape_url(params[:tag]), unescape_url(params[:status]), unescape_url(params[:user]))
     end
 
     respond_to do |format|
@@ -24,7 +24,7 @@ class PackagesController < ApplicationController
             render params[:style]
           end
 
-        elsif params[:product_id].blank?
+        elsif params[:task_id].blank?
           render 'layouts/welcome'
         end
       }
@@ -37,10 +37,10 @@ class PackagesController < ApplicationController
   def show
     respond_to do |format|
       format.html {
-        @package = Package.find_by_name_and_product_id(unescape_url(params[:id]), Product.find_by_name(unescape_url(params[:product_id])).id, :include => :p_attachments)
+        @package = Package.find_by_name_and_task_id(unescape_url(params[:id]), Task.find_by_name(unescape_url(params[:task_id])).id, :include => :p_attachments)
         if @package.blank?
           flash[:notice] = 'Package not found.'
-          redirect_to("/products/#{escape_url(params[:product_id])}/packages")
+          redirect_to("/tasks/#{escape_url(params[:task_id])}/packages")
         end
       }
       format.xml { render :xml => @package }
@@ -59,7 +59,7 @@ class PackagesController < ApplicationController
 
   # GET /packages/1/edit
   def edit
-    @package = Package.find_by_name_and_product_id(unescape_url(params[:id]), Product.find_by_name(unescape_url(params[:product_id])).id)
+    @package = Package.find_by_name_and_task_id(unescape_url(params[:id]), Task.find_by_name(unescape_url(params[:task_id])).id)
     #@package.revert_to(params[:version].to_i) unless params[:version].blank?
     unless can_edit_package? @package
       redirect_to('/')
@@ -75,18 +75,18 @@ class PackagesController < ApplicationController
     @package.created_by = current_user.id
     @package.updated_by = current_user.id
 
-    @package.tags = process_tags(params[:tags], params[:package][:product_id])
+    @package.tags = process_tags(params[:tags], params[:package][:task_id])
 
     respond_to do |format|
       if @package.save
         expire_all_fragments
         flash[:notice] = 'Package was successfully created.'
 
-        url = APP_CONFIG["site_prefix"] + "products/" + escape_url(@package.product.name) + "/packages/" + escape_url(@package.name)
+        url = APP_CONFIG["site_prefix"] + "tasks/" + escape_url(@package.task.name) + "/packages/" + escape_url(@package.name)
 
         if Rails.env.production?
 
-          if Setting.activated?(@package.product, Setting::ACTIONS[:created])
+          if Setting.activated?(@package.task, Setting::ACTIONS[:created])
             Notify::Package.create(current_user, url, @package, Setting.all_recipients_of_package(@package, nil, :create))
           end
 
@@ -96,7 +96,7 @@ class PackagesController < ApplicationController
         end
 
         format.html { redirect_to(:controller => :packages, :action => :show,
-                                  :id => escape_url(@package.name), :product_id => escape_url(@package.product.name), :user => params[:user]) }
+                                  :id => escape_url(@package.name), :task_id => escape_url(@package.task.name), :user => params[:user]) }
       else
 
         @user = params[:user]
@@ -140,7 +140,7 @@ class PackagesController < ApplicationController
           @package.reload
 
           if params[:process_tags] == 'Yes'
-            @package.tags = process_tags(params[:tags], @package.product_id)
+            @package.tags = process_tags(params[:tags], @package.task_id)
           end
 
           # status changed
@@ -184,15 +184,15 @@ class PackagesController < ApplicationController
             url = ''
 
             if params[:request_path].blank?
-              product_name = escape_url(@package.product.name)
+              task_name = escape_url(@package.task.name)
               package_name = escape_url(@package.name)
-              frag = "#{product_name}/packages/#{package_name}"
+              frag = "#{task_name}/packages/#{package_name}"
               url = generate_request_path(request, frag)
             else
               url = params[:request_path].gsub('/edit', '')
             end
 
-            if Setting.activated?(@package.product, Setting::ACTIONS[:updated])
+            if Setting.activated?(@package.task, Setting::ACTIONS[:updated])
               Notify::Package.update(current_user, url, @package, Setting.all_recipients_of_package(@package, current_user, :edit))
             end
 
@@ -204,7 +204,7 @@ class PackagesController < ApplicationController
           @output = true
         else
           unless @package.errors[:name].blank?
-            @error_message = "Package #{@package.name} already exists. Here's the <a href='/products/#{escape_url(@package.product.name)}/packages/#{unescape_url(@package.name)}' target='_blank'>link</a>."
+            @error_message = "Package #{@package.name} already exists. Here's the <a href='/tasks/#{escape_url(@package.task.name)}/packages/#{unescape_url(@package.name)}' target='_blank'>link</a>."
           end
           @user = params[:user]
           @output = false
@@ -214,7 +214,7 @@ class PackagesController < ApplicationController
 
       if @output == true
         expire_all_fragments
-        format.html { redirect_to(:controller => :packages, :action => :show, :id => escape_url(@package.name), :product_id => escape_url(@package.product.name), :user => params[:user]) }
+        format.html { redirect_to(:controller => :packages, :action => :show, :id => escape_url(@package.name), :task_id => escape_url(@package.task.name), :user => params[:user]) }
         format.js
       else
         format.html { render :action => :edit }
@@ -232,12 +232,12 @@ class PackagesController < ApplicationController
     respond_to do |format|
       format.html {
         #if params[:user].blank?
-        #  redirect_to(:controller => :packages, :action => :index, :product_id => escape_url(@package.product.name))
+        #  redirect_to(:controller => :packages, :action => :index, :task_id => escape_url(@package.task.name))
         #else
-        #  redirect_to(:controller => :packages, :action => :index, :product_id => escape_url(@package.product.name), :user => params[:user])
+        #  redirect_to(:controller => :packages, :action => :index, :task_id => escape_url(@package.task.name), :user => params[:user])
         #end
 
-        redirect_to(:controller => :packages, :action => :show, :product_id => escape_url(@package.product.name), :id => escape_url(@package.name))
+        redirect_to(:controller => :packages, :action => :show, :task_id => escape_url(@package.task.name), :id => escape_url(@package.name))
       }
     end
   end
@@ -245,15 +245,15 @@ class PackagesController < ApplicationController
   def clone
     if request.post?
       Package.transaction do
-        source_product = Product.find_by_name(unescape_url(params[:product_id]))
-        @source_package = Package.find_by_name_and_product_id(unescape_url(params[:id]), source_product.id)
+        source_task = Task.find_by_name(unescape_url(params[:task_id]))
+        @source_package = Package.find_by_name_and_task_id(unescape_url(params[:id]), source_task.id)
 
         @source_package.updated_by = current_user.id
         @source_package.save
 
         @target_package = @source_package.clone
-        target_product = Product.find_by_name(unescape_url(params[:target_product_name]))
-        @target_package.product = target_product
+        target_task = Task.find_by_name(unescape_url(params[:target_task_name]))
+        @target_package.task = target_task
 
         if params[:clone_assignee_option] == 'Yes'
           @target_package.assignee = @source_package.assignee
@@ -261,10 +261,10 @@ class PackagesController < ApplicationController
 
         if params[:clone_status_option] == 'Yes'
           status_name = @source_package.status.name
-          target_status = Status.find_in_global_scope(status_name, target_product.name)
+          target_status = Status.find_in_global_scope(status_name, target_task.name)
           unless target_status
             target_status = @source_package.status.clone
-            target_status.product = target_product
+            target_status.task = target_task
             target_status.save!
           end
           @target_package.status = target_status
@@ -274,10 +274,10 @@ class PackagesController < ApplicationController
 
         if params[:clone_tags_option] == 'Yes'
           @source_package.tags.each do |source_tag|
-            target_tag = Tag.find_by_key_and_product_id(source_tag.key, target_product.id)
+            target_tag = Tag.find_by_key_and_task_id(source_tag.key, target_task.id)
             unless target_tag
               target_tag = source_tag.clone
-              target_tag.product = target_product
+              target_tag.task = target_task
               target_tag.save!
             end
             @target_package.tags << target_tag
@@ -297,7 +297,7 @@ class PackagesController < ApplicationController
 
       flash[:notice] = "Clone completed."
 
-      redirect_to(:controller => :packages, :action => :show, :id => escape_url(@target_package.name), :product_id => escape_url(params[:target_product_name]))
+      redirect_to(:controller => :packages, :action => :show, :id => escape_url(@target_package.name), :task_id => escape_url(params[:target_task_name]))
     end
   end
 
@@ -305,15 +305,15 @@ class PackagesController < ApplicationController
 
     require 'faster_csv'
 
-    @packages = get_packages(unescape_url(params[:product_id]), unescape_url(params[:tag]), unescape_url(params[:status]), unescape_url(params[:user]))
+    @packages = get_packages(unescape_url(params[:task_id]), unescape_url(params[:tag]), unescape_url(params[:status]), unescape_url(params[:user]))
 
-    @product = Product.find_by_name(unescape_url(params[:product_id]))
+    @task = Task.find_by_name(unescape_url(params[:task_id]))
 
     csv_string = FasterCSV.generate do |csv|
       # header row
       header_row = ["name", "status", "tags"]
 
-      get_xattrs(@product, true, false) do |attr|
+      get_xattrs(@task, true, false) do |attr|
         if attr.blank?
           header_row << ""
         else
@@ -343,7 +343,7 @@ class PackagesController < ApplicationController
           val << tag_val
         end
 
-        get_xattrs(@product, true, false) do |attr|
+        get_xattrs(@task, true, false) do |attr|
           if package.read_attribute(attr).blank?
             val << ""
           else
@@ -410,12 +410,12 @@ class PackagesController < ApplicationController
       unless @package.tags.blank?
         target_tags = []
         @package.tags.each do |source_tag|
-          target_tag = Tag.find_by_key_and_product_id(source_tag.key, target_package.product_id)
+          target_tag = Tag.find_by_key_and_task_id(source_tag.key, target_package.task_id)
           unless target_tag.blank?
             target_tags << target_tag
           else
             target_tag = source_tag.clone
-            target_tag.product_id = target_package.product_id
+            target_tag.task_id = target_package.task_id
             target_tag.save
             target_tags << target_tag
           end
@@ -432,13 +432,13 @@ class PackagesController < ApplicationController
   def sync_status
     @package.all_relationships_of('clone').each do |target_package|
       unless @package.status.blank?
-        target_status = Status.find_in_global_scope(@package.status.name, target_package.product.name)
+        target_status = Status.find_in_global_scope(@package.status.name, target_package.task.name)
         unless target_status.blank?
           target_package.status = target_status
           target_package.save
         else
           target_status = @package.status.clone
-          target_status.product = target_package.product
+          target_status.task = target_package.task
           target_status.save
           target_package.status = target_status
           target_package.save
@@ -457,20 +457,20 @@ class PackagesController < ApplicationController
 
     @error_message = []
 
-    target_product = Product.find_by_name(unescape_url(params[:target_product_name]))
+    target_task = Task.find_by_name(unescape_url(params[:target_task_name]))
 
-    if target_product.blank?
-      @error_message << "Target product not found."
+    if target_task.blank?
+      @error_message << "Target task not found."
 
     else
 
-      if Package.find_by_name_and_product_id(unescape_url(params[:id]), target_product.id)
-        @error_message << "Package already exists in target product."
+      if Package.find_by_name_and_task_id(unescape_url(params[:id]), target_task.id)
+        @error_message << "Package already exists in target task."
       end
     end
 
     unless @error_message.blank?
-      render :controller => 'packages', :action => 'clone', :id => escape_url(params[:id]), :product_id => escape_url(params[:product_id])
+      render :controller => 'packages', :action => 'clone', :id => escape_url(params[:id]), :task_id => escape_url(params[:task_id])
     end
 
   end
@@ -483,22 +483,22 @@ class PackagesController < ApplicationController
   end
 
   def user_view_index
-    if !params[:user].blank? && params[:product_id].blank?
+    if !params[:user].blank? && params[:task_id].blank?
       redirect_to(:controller => :user_views, :action => :index, :user_id => User.find_by_email(params[:user]).name)
     end
   end
 
-  def get_packages(__product_name, __tag_key, __status_name, __user_email)
+  def get_packages(__task_name, __tag_key, __status_name, __user_email)
     order = "status_id, name"
 
-    hierarchy = "select id from products where name = '#{__product_name}'"
+    hierarchy = "select id from tasks where name = '#{__task_name}'"
 
-    __statuses_can_show_sql = " AND (p.status_id IN (#{Status.ids_can_show_by_product_name_in_global_scope(__product_name)}) OR p.status_id IS NULL)"
+    __statuses_can_show_sql = " AND (p.status_id IN (#{Status.ids_can_show_by_task_name_in_global_scope(__task_name)}) OR p.status_id IS NULL)"
 
-    @all_packages_count = Package.count_by_sql("select count(*) from packages p where p.product_id IN (#{hierarchy}) #{__statuses_can_show_sql}")
+    @all_packages_count = Package.count_by_sql("select count(*) from packages p where p.task_id IN (#{hierarchy}) #{__statuses_can_show_sql}")
 
     if logged_in?
-      @my_packages_count = Package.count_by_sql("select count(*) from packages p where p.product_id IN (#{hierarchy}) AND p.user_id = #{session[:current_user].id} #{__statuses_can_show_sql}")
+      @my_packages_count = Package.count_by_sql("select count(*) from packages p where p.task_id IN (#{hierarchy}) AND p.user_id = #{session[:current_user].id} #{__statuses_can_show_sql}")
     end
 
     opts = ''
@@ -509,16 +509,16 @@ class PackagesController < ApplicationController
     opts << __statuses_can_show_sql
 
     if !__status_name.blank? && !__tag_key.blank?
-      tag = Tag.find_by_key_and_product_id(__tag_key, Product.find_by_name(__product_name).id)
-      _status = Status.find_in_global_scope(__status_name, __product_name)
-      _packages = Package.find_by_sql("select p.* from packages p join assignments a on p.id = a.package_id and a.tag_id = #{tag.id} and status_id = #{_status.id} and p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
+      tag = Tag.find_by_key_and_task_id(__tag_key, Task.find_by_name(__task_name).id)
+      _status = Status.find_in_global_scope(__status_name, __task_name)
+      _packages = Package.find_by_sql("select p.* from packages p join assignments a on p.id = a.package_id and a.tag_id = #{tag.id} and status_id = #{_status.id} and p.task_id IN (#{hierarchy}) #{opts} order by #{order}")
     elsif !__status_name.blank?
-      _packages = Package.find_by_sql("select p.* from packages p where p.status_id = #{Status.find_in_global_scope(__status_name, __product_name).id} AND p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
+      _packages = Package.find_by_sql("select p.* from packages p where p.status_id = #{Status.find_in_global_scope(__status_name, __task_name).id} AND p.task_id IN (#{hierarchy}) #{opts} order by #{order}")
     elsif !__tag_key.blank?
-      tag = Tag.find_by_key_and_product_id(__tag_key, Product.find_by_name(__product_name))
-      _packages = Package.find_by_sql("select p.* from packages p join assignments a on p.id = a.package_id and a.tag_id = #{tag.id} and p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
+      tag = Tag.find_by_key_and_task_id(__tag_key, Task.find_by_name(__task_name))
+      _packages = Package.find_by_sql("select p.* from packages p join assignments a on p.id = a.package_id and a.tag_id = #{tag.id} and p.task_id IN (#{hierarchy}) #{opts} order by #{order}")
     else
-      _packages = Package.find_by_sql("select p.* from packages p where p.product_id IN (#{hierarchy}) #{opts} order by #{order}")
+      _packages = Package.find_by_sql("select p.* from packages p where p.task_id IN (#{hierarchy}) #{opts} order by #{order}")
     end
     _packages
   end

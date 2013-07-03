@@ -1,0 +1,44 @@
+<h2>Listing Tasks</h2>
+
+<div class='manage-tbl'>
+  <table>
+    <tr>
+      <th>Name</th>
+      <th>Can Show</th>
+      <th>Candidate Tag</th>
+      <th>Target Release</th>
+      <% if can_manage? %>
+          <th>Operation</th>
+      <% end %>
+    </tr>
+
+    <% @tasks.each do |task| %>
+        <tr>
+          <td style="text-align:left;"><%= link_to task.name, :controller => :tasks, :action => :show, :id => escape_url(task.name) %></td>
+          <td><%= task.can_show %></td>
+          <td>
+            <% if task.candidate_tag.blank? %>
+                -
+            <% else %>
+                <%= task.candidate_tag %>
+            <% end %>
+          </td>
+          <td>
+            <% if task.target_release.blank? %>
+                -
+            <% else %>
+                <%= task.target_release %>
+            <% end %>
+          </td>
+          <% if can_manage? %>
+              <td><%= link_to 'Edit', :controller => :tasks, :action => :edit, :id => escape_url(task.name) %></td>
+          <% end %>
+        </tr>
+    <% end %>
+  </table>
+</div>
+<br/>
+
+<% if can_manage? %>
+    <%= link_to 'New Task', new_task_path %>
+<% end %>

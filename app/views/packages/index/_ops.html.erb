@@ -2,12 +2,12 @@
   <% if logged_in? %>
       <% unless package.deleted? %>
           <% if can_manage? %>
-              <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(package.name), :product_id => escape_url(package.product.name) %>
+              <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(package.name), :task_id => escape_url(package.task.name) %>
               /
               <%= link_to 'Delete', package, :confirm => "Are you sure to delete #{escape_url(package.name)}?", :method => :delete %>
               /
           <% elsif package.user_id == nil %>
-              <%= link_to 'Take', :controller => 'actions', :action => 'take', :id => escape_url(package.name), :product_id => escape_url(package.product.name) %>
+              <%= link_to 'Take', :controller => 'actions', :action => 'take', :id => escape_url(package.name), :task_id => escape_url(package.task.name) %>
               /
           <% end %>
       <% end %>
@@ -21,7 +21,7 @@
           /
           <%= link_to 'Edit', :controller => 'packages', :action => 'edit', 
             :id => escape_url(package.name),
-            :product_id => escape_url(package.product.name) %>
+            :task_id => escape_url(package.task.name) %>
       <% end %>
   <% end %>
   <div id="log_area_<%= package.id %>" style="display:none;"></div>

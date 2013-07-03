@@ -1,8 +1,8 @@
 <h2>
-  <% if params[:product_id].blank? %>
+  <% if params[:task_id].blank? %>
       System internal status list
   <% else %>
-      Listing statuses of <%= unescape_url(params[:product_id]) %>
+      Listing statuses of <%= unescape_url(params[:task_id]) %>
   <% end %>
 </h2>
 <div class='manage-tbl'>
@@ -28,7 +28,7 @@
             <% if is_global?(status) %>
                 -
             <% else %>
-                <%= h status.product.name %>
+                <%= h status.task.name %>
             <% end %>
           </td>
           <td>
@@ -48,7 +48,7 @@
           </td>
           <% if can_manage? %>
               <td>
-                <%= link_to 'Edit', :controller => :statuses, :action => :edit, :id => escape_url(status.name), :product_id => escape_url(params[:product_id]) %>
+                <%= link_to 'Edit', :controller => :statuses, :action => :edit, :id => escape_url(status.name), :task_id => escape_url(params[:task_id]) %>
               </td>
           <% end %>
         </tr>
@@ -58,10 +58,10 @@
 <%= render :partial => 'layouts/sep' %>
 
 <% if can_manage? %>
-    <% if has_product? %>
-        <%= link_to "New status of #{unescape_url(params[:product_id])}", :controller => :statuses, :action => :new, :product_id => escape_url(params[:product_id]) %>
+    <% if has_task? %>
+        <%= link_to "New status of #{unescape_url(params[:task_id])}", :controller => :statuses, :action => :new, :task_id => escape_url(params[:task_id]) %>
         <%= render :partial => 'layouts/sep_tiny' %>
-        <%= link_to "Back to #{unescape_url(params[:product_id])}", :controller => :packages, :action => :index, :product_id => escape_url(params[:product_id]) %>
+        <%= link_to "Back to #{unescape_url(params[:task_id])}", :controller => :packages, :action => :index, :task_id => escape_url(params[:task_id]) %>
 
     <% else %>
         <%= link_to 'New status', new_status_path %>

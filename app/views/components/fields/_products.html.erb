@@ -1,8 +1,0 @@
-<% Product.all(:order => 'lower(name)').each do |product| %>
-<% if @product_names.blank? %>
-        <label><%= check_box_tag("product_names[]", product.name, false) %> <%= product.name %></label>
-<% else %>
-        <label><%= check_box_tag("product_names[]", product.name, @product_names.include?(product.name)) %> <%= product.name %></label>
-<% end %>
-        <%= render :partial => 'layouts/sep_tiny' %>
-<% end %>
