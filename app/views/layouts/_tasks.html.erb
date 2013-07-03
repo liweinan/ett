@@ -1,0 +1,10 @@
+<div style="width:100%;text-align:left;">
+	<span style="padding-right:20px;"> 
+		Tasks:
+      <% Task.all(:order => 'name', :conditions => "can_show='Yes'").each do |task| %>
+		<%= link_to "#{task.name}", :controller => :packages, :action => :index, :task_id => escape_url(task.name), :user => params[:user] %>
+          /
+		<% end %>
+	</span>
+</div>
+<%= render :partial => 'layouts/line' %>

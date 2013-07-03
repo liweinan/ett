@@ -4,14 +4,14 @@
   <tr>
     <th>Name</th>
     <th>Is global</th>
-    <th>Product</th>
+    <th>Task</th>
   </tr>
 
   <% @relationships.each do |relationship| %>
       <tr>
         <td><%= h relationship.name %></td>
         <td><%= h relationship.is_global %></td>
-        <td><%= h relationship.product_id %></td>
+        <td><%= h relationship.task_id %></td>
         <td><%= link_to 'Show', relationship %></td>
         <td><%= link_to 'Edit', edit_relationship_path(relationship) %></td>
         <td><%= link_to 'Destroy', relationship, :confirm => 'Are you sure?', :method => :delete %></td>

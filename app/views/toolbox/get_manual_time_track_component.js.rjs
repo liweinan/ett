@@ -1,8 +1,0 @@
-package = Package.find(params[:pac_id])
-if can_manage? || can_edit_package?(package)
-  if package.time_point > 0
-    page.replace_html 'manual_time_track_component', :partial => 'packages/fields/stop_progress', :locals => {:package => package}
-  else
-    page.replace_html 'manual_time_track_component', :partial => 'packages/fields/start_progress', :locals => {:package => package}
-  end
-end

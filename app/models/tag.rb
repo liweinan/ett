@@ -1,7 +1,7 @@
 class Tag < ActiveRecord::Base
   validates_presence_of :key
-  validates_presence_of :product_id
-  belongs_to :product
+  validates_presence_of :task_id
+  belongs_to :task
   has_many :assignments
   has_many :packages, :through => :assignments
 
