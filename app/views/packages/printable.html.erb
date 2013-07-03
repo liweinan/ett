@@ -1,12 +1,12 @@
-<% @product = Product.find_by_name(unescape_url(params[:product_id])) %>
-<h2><%= @product.name %></h2>
+<% @task = Task.find_by_name(unescape_url(params[:task_id])) %>
+<h2><%= @task.name %></h2>
 <table>
   <tr>
     <th>Name</th>
     <th>Status</th>
     <th>Tags</th>
     <th>Assignee</th>
-    <% get_xattrs(@product, true, false) do |attr| %>
+    <% get_xattrs(@task, true, false) do |attr| %>
         <th><%= attr.camelcase %></th>
     <% end %>
   </tr>

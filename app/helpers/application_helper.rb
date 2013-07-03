@@ -11,7 +11,7 @@ module ApplicationHelper
       Changelog::TEMPLATE[:delete] % changelog.user.name
     elsif changelog.category == Changelog::CATEGORY[:clone]
       to_package = Package.find(changelog.to_value)
-      Changelog::TEMPLATE[:clone] % [changelog.user.name, link_to("#{to_package.name}@#{to_package.product.name}", :controller => :packages, :action => :show, :id => escape_url(to_package.name), :product_id => escape_url(to_package.product.name))]
+      Changelog::TEMPLATE[:clone] % [changelog.user.name, link_to("#{to_package.name}@#{to_package.task.name}", :controller => :packages, :action => :show, :id => escape_url(to_package.name), :task_id => escape_url(to_package.task.name))]
     elsif changelog.category == Changelog::CATEGORY[:update]
       Changelog::TEMPLATE[:update] % changelog.user.name
     else

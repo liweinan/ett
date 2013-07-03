@@ -2,11 +2,11 @@
 <%= render :partial => 'layouts/error_messages' %>
 
 
-<form action="/products/clone/<%= escape_url(params[:id]) %>" method="post" onsubmit="return validateForm();">
-  <input type='hidden' value='<%= escape_url(params[:id]) %>' name='source_product_name'/>
+<form action="/tasks/clone/<%= escape_url(params[:id]) %>" method="post" onsubmit="return validateForm();">
+  <input type='hidden' value='<%= escape_url(params[:id]) %>' name='source_task_name'/>
   <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
-  <label for="target_product_name_field">Clone <%= @product.name %> to:</label>
-  <input id='target_product_name_field' name="target_product_name"/> - (target tag name) <br/>
+  <label for="target_task_name_field">Clone <%= @task.name %> to:</label>
+  <input id='target_task_name_field' name="target_task_name"/> - (target tag name) <br/>
 
   <%= render :partial => 'layouts/sep' %>  
 
@@ -14,7 +14,7 @@
   <label for="scope_status">Clone Statuses</label>
   <%= render :partial => 'layouts/sep_tiny' %>
   <input id='scope_tag' name="scopes[]" type="checkbox" value="tag" onclick="refresh_form();"/>
-  <label for="scope_tag">Clone Tags</label>
+  <label for="scope_tag">Clone Tasks</label>
   <%= render :partial => 'layouts/sep_tiny' %>
   <input id='scope_package' name="scopes[]" type="checkbox" value="package" onclick="refresh_form();"/>
   <label for="scope_package">Clone Packages</label>
@@ -42,7 +42,7 @@
       <label for="status_select"> Set to existing status: </label>
         <select name="status_selection_value" onclick="select_status_option(false,false,true,false);">
           <option value=""> -</option>
-          <% Status.find_all_can_select_by_product_id(Product.find_by_name(unescape_url(params[:id])).id).each do |status| %>
+          <% Status.find_all_can_select_by_task_id(Task.find_by_name(unescape_url(params[:id])).id).each do |status| %>
               <option value="<%= status.name %>"><%= status.name %></option>
           <% end %>
         </select>
@@ -70,13 +70,13 @@
   <div id='div_tags' style="display:none;">
     <%= render :partial => 'layouts/sep_tiny' %>
     <span style="font-weight: bold;">Set tags of cloned packages:</span><br/>
-    <% if product_has_tags?(unescape_url(params[:id])) %>
+    <% if task_has_tags?(unescape_url(params[:id])) %>
     <span id='div_tag_default'><input id="tag_default" name="tag_options[]" type="checkbox" value="default"/><label for="tag_default">
       Add currently assigned tags</label><br/> </span>
         <%= render :partial => 'layouts/sep_tiny' %>
         <span id='div_tag_selection'><input id="tag_select" name="tag_options[]" type="checkbox" value="selection"/><label for="tag_select">
           Add existing tags : </label>
-          <%= render :partial => 'tags/tags_selection', :locals => {:product_id => params[:id]} %>
+          <%= render :partial => 'tags/tags_selection', :locals => {:task_id => params[:id]} %>
           <br/> </span>
         <%= render :partial => 'layouts/sep_tiny' %>
     <% end %>
@@ -113,7 +113,7 @@
                     document.getElementById('div_status_selection').style.display = 'block';
                 }
 
-            <% if product_has_tags?(unescape_url(params[:id])) %>
+            <% if task_has_tags?(unescape_url(params[:id])) %>
                 if (!scope_tag.checked) {
                     document.getElementById('div_tag_default').style.display = 'none';
                     document.getElementById('div_tag_selection').style.display = 'none';

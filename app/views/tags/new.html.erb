@@ -1,7 +1,7 @@
-<% if params[:product_id].blank? %>
+<% if params[:task_id].blank? %>
 <h2>New tag</h2>
 <% else %>
-<h2>New tag of <%= params[:product_id] %></h2>
+<h2>New tag of <%= params[:task_id] %></h2>
 <% end %>
 
 <% form_for(@tag) do |f| %>
@@ -9,7 +9,7 @@
 
     <%= render :partial => 'key', :locals => {:f => f} %>
     <%= render :partial => 'value', :locals => {:f => f} %>
-    <%= render :partial => 'product_id', :locals => {:f => f} %>
+    <%= render :partial => 'task_id', :locals => {:f => f} %>
 
     <p>
       <%= f.submit 'Create' %>

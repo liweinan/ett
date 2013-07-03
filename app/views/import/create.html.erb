@@ -1,4 +1,4 @@
-<h2>Import Result Of <%= params[:product_id] %></h2>
+<h2>Import Result Of <%= params[:task_id] %></h2>
 
 <% if @packages.size > 0 %>
     <div style="height:10px;"></div>
@@ -54,4 +54,4 @@
     </div>
 <% end %>
 <%= render :partial =>'layouts/sep_tiny' %>
-<%= link_to "Go to #{params[:product_id]}", :controller => :packages, :action => :index, :product_id => escape_url(params[:product_id]) %>
+<%= link_to "Go to #{params[:task_id]}", :controller => :packages, :action => :index, :task_id => escape_url(params[:task_id]) %>

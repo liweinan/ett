@@ -1,4 +1,4 @@
-<h2>Workload detail report of <%= @wl.product.name %>: <%= at_zone(@wl.start_of_week, '%Y-%m-%d') %>
+<h2>Workload detail report of <%= @wl.task.name %>: <%= at_zone(@wl.start_of_week, '%Y-%m-%d') %>
   - <%= at_zone(@wl.end_of_week, '%Y-%m-%d') %></h2>
 Packages Built: <%= @wl.package_count %>
 <%= render :partial => 'layouts/sep_tiny' %>
@@ -22,7 +22,7 @@ Manual Time Track:
     </tr>
     <% @wl.package_stats.each do |ps| %>
         <tr>
-          <td style='font-size:10px;'><%= link_to ps.package.name, :controller => 'packages', :action => :show, :id => escape_url(ps.package.name), :product_id => escape_url(ps.package.product.name) %></td>
+          <td style='font-size:10px;'><%= link_to ps.package.name, :controller => 'packages', :action => :show, :id => escape_url(ps.package.name), :task_id => escape_url(ps.package.task.name) %></td>
           <td style='font-size:10px;'>
             <% if ps.assignee.blank? %>
                 -

@@ -1,7 +1,7 @@
 <% if logged_in? %>
     <% if params[:user] %>
-        <%= link_to 'All Packages', :controller => :packages, :action => :index, :product_id => params[:product_id] %>
+        <%= link_to 'All Packages', :controller => :packages, :action => :index, :task_id => params[:task_id] %>
     <% else %>
-        <%= link_to 'My Packages', :controller => :packages, :action => :index, :product_id => params[:product_id], :user => session[:current_user].email %>
+        <%= link_to 'My Packages', :controller => :packages, :action => :index, :task_id => params[:task_id], :user => session[:current_user].email %>
     <% end %>
 <% end %>

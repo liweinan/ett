@@ -2,7 +2,7 @@ class ImportController < ApplicationController
   before_filter :check_can_manage
 
   def show
-    unless has_product?(params[:id])
+    unless has_task?(params[:id])
       redirect_to '/'
     end
 
@@ -31,10 +31,10 @@ class ImportController < ApplicationController
       packages_in_json_format.each do |package_json|
         package = Package.new
 
-        product_name = unescape_url(params[:id])
+        task_name = unescape_url(params[:id])
         begin
           json_obj = JSON.parse(package_json)
-          orig_package = Package.find_by_name_and_product_id(json_obj['name'], Product.find_by_name(product_name).id)
+          orig_package = Package.find_by_name_and_task_id(json_obj['name'], Task.find_by_name(task_name).id)
 
           # for Changelog.package_updated
           orig_package_clone = orig_package.clone
@@ -62,7 +62,7 @@ class ImportController < ApplicationController
               if json_obj['status'].blank?
                 orig_package.status_id = nil
               else
-                status = Status.find_in_global_scope(json_obj['status'], product_name)
+                status = Status.find_in_global_scope(json_obj['status'], task_name)
                 unless status.blank?
                   orig_package.status_id = status.id
                 end
@@ -151,9 +151,9 @@ class ImportController < ApplicationController
     @packages = []
     @problem_packages = []
     Package.transaction do
-      @product = Product.find_by_name(unescape_url(params[:product_id]))
+      @task = Task.find_by_name(unescape_url(params[:task_id]))
 
-      @tags = process_tags(params[:tags], @product.id)
+      @tags = process_tags(params[:tags], @task.id)
       @status = Status.find(params[:package][:status_id]) unless params[:package][:status_id].blank?
 
       @final_package_names.each do |name|
@@ -161,7 +161,7 @@ class ImportController < ApplicationController
         package.name = name.strip
         package.status_id = params[:package][:status_id] unless params[:package][:status_id].blank?
         package.tags = @tags unless @tags.blank?
-        package.product_id = @product.id
+        package.task_id = @task.id
         package.created_by = current_user.id
         package.updated_by = current_user.id
         result = package.save

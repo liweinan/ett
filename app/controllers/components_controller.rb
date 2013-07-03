@@ -10,16 +10,16 @@ class ComponentsController < ApplicationController
 
   def edit
     @component = Component.find_by_name(unescape_url(params[:id]))
-    @product_names = []
-    @component.products.each do |product|
-      @product_names << product.name
+    @task_names = []
+    @component.tasks.each do |task|
+      @task_names << task.name
     end
   end
 
   def create
     expire_all_fragments
     @component = Component.new(params[:component])
-    @component.products = collect_products(params[:product_names])
+    @component.tasks = collect_tasks(params[:task_names])
 
     respond_to do |format|
       if @component.save
@@ -35,7 +35,7 @@ class ComponentsController < ApplicationController
     @component = Component.find(params[:id])
     respond_to do |format|
       if @component.update_attributes(params[:component])
-        @component.products = collect_products(params[:product_names])
+        @component.tasks = collect_tasks(params[:task_names])
         @component.save
 
         flash[:notice] = 'Component was successfully updated.'
@@ -62,20 +62,20 @@ class ComponentsController < ApplicationController
     if @component.blank?
       redirect_to(:action => :index)
     else
-      @packages = Package.distinct_in_products_can_show(@component.products)
+      @packages = Package.distinct_in_tasks_can_show(@component.tasks)
     end
 
   end
 
   protected
 
-  def collect_products(product_names)
-    unless product_names.blank?
-      products = []
-      product_names.each do |product_name|
-        products << Product.find_by_name(product_name)
+  def collect_tasks(task_names)
+    unless task_names.blank?
+      tasks = []
+      task_names.each do |task_name|
+        tasks << Task.find_by_name(task_name)
       end
-      return products
+      return tasks
     end
     []
   end

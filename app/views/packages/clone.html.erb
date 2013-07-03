@@ -2,15 +2,15 @@
 <%= render :partial => 'layouts/line' %>
 <%= render :partial => 'layouts/sep_tiny' %>
 <%= render :partial => 'layouts/error_messages' %>
-<form action="/packages/clone/<%= escape_url(params[:id]) %>?product_id=<%= escape_url(params[:product_id]) %>" method="post" onsubmit="return validateForm();">
-  <input type='hidden' value='<%= unescape_url(params[:product_id]) %>' name='source_product_name'/>
+<form action="/packages/clone/<%= escape_url(params[:id]) %>?task_id=<%= escape_url(params[:task_id]) %>" method="post" onsubmit="return validateForm();">
+  <input type='hidden' value='<%= unescape_url(params[:task_id]) %>' name='source_task_name'/>
   <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
 
-  Clone <%= unescape_url(params[:id]) %> @ <%= unescape_url(params[:product_id]) %> to:
-  <select name="target_product_name">
+  Clone <%= unescape_url(params[:id]) %> @ <%= unescape_url(params[:task_id]) %> to:
+  <select name="target_task_name">
     <option value="-"> - </option>
-    <% Product.find(:all, :conditions => ["name != ?", params[:product_id]], :order => 'lower(name)').each do |product| %>
-        <option value="<%= product.name %>"><%= product.name %></option>
+    <% Task.find(:all, :conditions => ["name != ?", params[:task_id]], :order => 'lower(name)').each do |task| %>
+        <option value="<%= task.name %>"><%= task.name %></option>
     <% end %>
   </select>
   <%= render :partial => 'layouts/sep_tiny' %>
@@ -18,11 +18,11 @@
   <label for="clone_assignee_option">Clone Assignee</label>
   <%= render :partial => 'layouts/sep_tiny' %>
   <input id='clone_status_option' name="clone_status_option" type="checkbox" value="Yes">
-  <label for="clone_status_option">Clone status (If the status doesn't exist in target product, it will be created
+  <label for="clone_status_option">Clone status (If the status doesn't exist in target task, it will be created
     automatically.)</label>
   <%= render :partial => 'layouts/sep_tiny' %>
   <input id='clone_tags_option' name="clone_tags_option" type="checkbox" value="Yes">
-  <label for="clone_tags_option"> Clone tags (If the tags don't exist in target product, it will be created automatically.)</label>
+  <label for="clone_tags_option"> Clone tags (If the tags don't exist in target task, it will be created automatically.)</label>
   <%= render :partial => 'layouts/sep' %>
   <input type="submit" value="Clone">
 
