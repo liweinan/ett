@@ -64,9 +64,6 @@
     </span>
     <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "inline_editor_indicator"} %>
 
-    <%= render :partial => 'layouts/sep' %>
-    <span style="background-color:#91f59e;">&nbsp;</span> - Manual time track started
-    <span style="background-color:#db4e56;">&nbsp;</span> - Manual time track stopped
     <div class='manage-tbl'>
       <%= render :partial => 'layouts/sep' %>
       <table>
@@ -235,25 +232,4 @@
             function showCommentDialog(pac_id) {}
         </script>
     <% end %>
-<% end %>
-
-<% content_for :js do %>
-    <script type="text/javascript">
-        function getTimeTrackingComponents() {
-            var comps = document.getElementsByRegex('^manual_time_track_component_.*btn');
-            new Ajax.Request('/toolbox/get_manual_time_track_components',
-                    {
-                        asynchronous: true,
-                        evalScripts: true,
-                        parameters: {
-                            'ids': comps.toString(),
-                            'authenticity_token': '<%=form_authenticity_token%>'}
-                    });
-        }
-
-        Event.observe(window, 'load', function () {
-            getTimeTrackingComponents();
-        });
-    </script>
-    <%= render :partial => 'time_tracking_js' %>
 <% end %>

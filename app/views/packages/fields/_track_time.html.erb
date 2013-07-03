@@ -7,14 +7,6 @@ Manual Time Track:
   <%= display_manual_track_time_in_real_time(@package) %>
 </span>
 
-<span id="manual_time_track_current_status">
-<% if @package.in_progress? %>
-  <%= render :partial => 'packages/fields/progress_started' %>
-<% else %>
-  <%= render :partial => 'packages/fields/progress_stopped' %>
-<% end %>
-</span>
-
 <span id="manual_time_track_component">&nbsp;</span> <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'manual_time_track_component_indicator'} %>
 <% if logged_in? %>
     <%= render :partial => 'layouts/sep_tiny' %>
