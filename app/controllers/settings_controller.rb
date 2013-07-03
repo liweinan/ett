@@ -18,11 +18,11 @@ class SettingsController < ApplicationController
     unless params[:id] == '-1'
       @setting = Setting.find(params[:id])
     else
-      product = Product.find_by_name(unescape_url(params[:product_id]))
-      @setting = Setting.find_by_product_id(product.id)
+      task = Task.find_by_name(unescape_url(params[:task_id]))
+      @setting = Setting.find_by_task_id(task.id)
       if @setting.blank?
         @setting = Setting.new
-        @setting.product = product
+        @setting.task = task
         @setting.save
       end
 
@@ -115,7 +115,7 @@ class SettingsController < ApplicationController
   protected
 
   def triage
-    #if params[:id].blank? && params[:product_id].blank?
+    #if params[:id].blank? && params[:task_id].blank?
       redirect_to(:action => :show, :id => Setting.system_settings.id)
     #end
   end

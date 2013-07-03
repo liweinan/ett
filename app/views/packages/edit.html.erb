@@ -16,13 +16,13 @@
     <div class='manage-tbl'>
       <table>
         <%= render :partial => 'packages/fields/name', :locals => {:f => f} %>
-        <%= render :partial => 'packages/fields/product', :locals => {:f => f} %>
+        <%= render :partial => 'packages/fields/task', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/status', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/tags', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/assignee', :locals => {:f => f} %>
         <%# render :partial => 'packages/fields/track_time' %>
 
-        <% get_xattrs(@package.product, false, true) do |attr| %>
+        <% get_xattrs(@package.task, false, true) do |attr| %>
             <%= render :partial => 'packages/fields/xattrs', :locals => {:f => f, :xattr => attr} %>
         <% end %>
 

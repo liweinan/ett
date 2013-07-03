@@ -63,10 +63,10 @@ class PAttachmentsController < ApplicationController
 
           if params[:user].blank?
             redirect_to(:controller => :packages, :action => :show,
-                        :id => escape_url(@package.name), :product_id => escape_url(@package.product.name))
+                        :id => escape_url(@package.name), :task_id => escape_url(@package.task.name))
           else
             redirect_to(:controller => :packages, :action => :show,
-                        :id => escape_url(@package.name), :product_id => escape_url(@package.product.name), :user => params[:user])
+                        :id => escape_url(@package.name), :task_id => escape_url(@package.task.name), :user => params[:user])
           end
         }
       end

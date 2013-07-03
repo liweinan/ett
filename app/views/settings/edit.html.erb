@@ -1,7 +1,7 @@
-<% if @setting.product.blank? %>
+<% if @setting.task.blank? %>
     <h1>Editing System Settings</h1>
 <% else %>
-    <h1>Edit Settings of <%= @setting.product.name %></h1>
+    <h1>Edit Settings of <%= @setting.task.name %></h1>
 <% end %>
 <%= render :partial => 'layouts/sep' %>
 <% form_for(@setting) do |f| %>

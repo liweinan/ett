@@ -1,12 +1,12 @@
-<% if params[:product_id].blank?
-    params[:product_id] = @package.product.name
+<% if params[:task_id].blank?
+    params[:task_id] = @package.task.name
 end %>
 <tr>
   <td>
     Status
   </td>
   <td style="text-align:left;">
-    <%= render :partial => "statuses/selection_for_tag", :locals => { :product_id => Product.find_by_name(unescape_url(params[:product_id])).id, :form => f }%>
+    <%= render :partial => "statuses/selection_for_tag", :locals => { :task_id => Task.find_by_name(unescape_url(params[:task_id])).id, :form => f }%>
     <%# render :partial => 'sync', :locals => {:key => 'status'} %>
   </td>
 </tr>

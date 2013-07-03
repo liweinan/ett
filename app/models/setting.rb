@@ -1,5 +1,5 @@
 class Setting < ActiveRecord::Base
-  #default_value_for :is_global, 'No' #Deprecated, we now use product_id to judge
+  #default_value_for :is_global, 'No' #Deprecated, we now use task_id to judge
   default_value_for :props, 0
   default_value_for :actions, 0
   default_value_for :enabled, 'No'
@@ -9,23 +9,23 @@ class Setting < ActiveRecord::Base
   PROPS = {:creator => 0b1, :commenter => 0b10, :assignee => 0b100}
   ACTIONS = {:created => 0b1, :updated => 0b10, :commented => 0b100}
 
-  belongs_to :product
+  belongs_to :task
 
   def self.system_settings
-    Setting.find(:first, :conditions => "product_id IS NULL")
+    Setting.find(:first, :conditions => "task_id IS NULL")
   end
 
   def is_system_setting?
-    self.product.blank?
+    self.task.blank?
   end
 
-  def self.activated?(product, action)
-    setting = enabled_in_product?(product) ? setting_of_product(product) : Setting.system_settings
+  def self.activated?(task, action)
+    setting = enabled_in_task?(task) ? setting_of_task(task) : Setting.system_settings
     setting.actions & action > 0
   end
 
   def self.all_recipients_of_package(package, editor, action)
-    setting = enabled_in_product?(package.product) ? setting_of_product(package.product) : Setting.system_settings
+    setting = enabled_in_task?(package.task) ? setting_of_task(package.task) : Setting.system_settings
     recipients = setting.recipients
     props = setting.props
 
@@ -131,16 +131,16 @@ class Setting < ActiveRecord::Base
     self.enabled == 'Yes'
   end
 
-  def self.enabled_in_product?(product)
-    setting = setting_of_product(product.id)
+  def self.enabled_in_task?(task)
+    setting = setting_of_task(task.id)
     !setting.blank? && setting.enabled == 'Yes'
   end
 
-  def self.setting_of_product(product)
-    if product.class == Product
-      Setting.find_by_product_id(product.id)
+  def self.setting_of_task(task)
+    if task.class == Task
+      Setting.find_by_task_id(task.id)
     else
-      Setting.find_by_product_id(product.to_i)
+      Setting.find_by_task_id(task.to_i)
     end
   end
 end
