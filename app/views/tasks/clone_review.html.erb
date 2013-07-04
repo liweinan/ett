@@ -3,9 +3,9 @@
 Please review the clone action you are going to performed in below:
 <%= render :partial => 'layouts/sep_tiny' %>
 
-<strong>Source Tag:</strong> <%= unescape_url(session[:clone_review][:source_product_name]) %>
+<strong>Source Task:</strong> <%= unescape_url(session[:clone_review][:source_task_name]) %>
 <%= render :partial => 'layouts/sep_tiny' %>
-<strong>Target Tag:</strong> <%= unescape_url(session[:clone_review][:target_product_name]) %>
+<strong>Target Task:</strong> <%= unescape_url(session[:clone_review][:target_task_name]) %>
 <%= render :partial => 'layouts/sep_tiny' %>
 <strong>Options:</strong>
 
@@ -68,6 +68,6 @@ Please review the clone action you are going to performed in below:
 <% end %>
 <%= render :partial => 'layouts/line' %>
 <%= render :partial => 'layouts/sep_tiny' %>
-<%= link_to "Confirm the setting and start the clone process", :controller =>:products, :action => :process_clone, :id => escape_url(session[:clone_review][:target_product_name]) %>
+<%= link_to "Confirm the setting and start the clone process", :controller =>:tasks, :action => :process_clone, :id => escape_url(session[:clone_review][:target_task_name]) %>
 <%= render :partial => 'layouts/sep_tiny' %>
 <%= link_to "Go back and review the setting" %>

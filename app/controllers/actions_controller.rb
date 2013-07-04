@@ -1,20 +1,20 @@
 class ActionsController < ApplicationController
   before_filter :check_logged_in
-  before_filter :check_product, :only => :take
+  before_filter :check_task, :only => :take
   before_filter :check_can_manage, :only => [:check_clone_progress, :process_clone]
   before_filter :package_taken, :only => :take
 
   def take
     expire_all_fragments
 
-    @package = Package.find_by_name_and_product_id(unescape_url(params[:id]), Product.find_by_name(unescape_url(params[:product_id])).id)
+    @package = Package.find_by_name_and_task_id(unescape_url(params[:id]), Task.find_by_name(unescape_url(params[:task_id])).id)
     @package.user_id = session[:current_user].id
     @package.save
 
     flash[:notice] = "You have taken #{@package.name} successfully."
 
     redirect_to(:controller => :packages, :action => :show,
-                :id => escape_url(@package.name), :product_id => escape_url(@package.product.name), :user => params[:user])
+                :id => escape_url(@package.name), :task_id => escape_url(@package.task.name), :user => params[:user])
   end
 
   def check_clone_progress
@@ -35,24 +35,24 @@ class ActionsController < ApplicationController
       Package.transaction do
         session[:not_cloned_packages] = Hash.new
         session[:cloned_packages] = []
-        @source_product = Product.find_by_name(unescape_url(session[:clone_review][:source_product_name]))
-        # 1. check the target product name not duplicated
-        # 2. check the target product name is same within session
-        target_product_name = session[:clone_review][:target_product_name].downcase.strip
-        @target_product = Product.find_by_name(target_product_name)
-        if !@target_product
-          @target_product = Product.new
-          @target_product.name = target_product_name
-          @target_product.save
+        @source_task = Task.find_by_name(unescape_url(session[:clone_review][:source_task_name]))
+        # 1. check the target task name not duplicated
+        # 2. check the target task name is same within session
+        target_task_name = session[:clone_review][:target_task_name].downcase.strip
+        @target_task = Task.find_by_name(target_task_name)
+        if !@target_task
+          @target_task = Task.new
+          @target_task.name = target_task_name
+          @target_task.save
         end
 
         # clone statuses
         if session[:clone_review][:scopes].include? 'status'
-          @source_product.statuses.each do |status|
+          @source_task.statuses.each do |status|
             cloned_status = status.clone
-            cloned_status.product = @target_product
+            cloned_status.task = @target_task
 
-            _status = Status.find_by_name_and_product_id(cloned_status.name, cloned_status.product.id)
+            _status = Status.find_by_name_and_task_id(cloned_status.name, cloned_status.task.id)
             if _status
               cloned_status = _status
             else
@@ -63,10 +63,10 @@ class ActionsController < ApplicationController
 
         # clone tags
         if session[:clone_review][:scopes].include? 'tag'
-          @source_product.tags.each do |tag|
+          @source_task.tags.each do |tag|
             clone_tag = tag.clone
-            clone_tag.product = @target_product
-            _tag = Tag.find_by_key_and_product_id(clone_tag.key, clone_tag.product.id)
+            clone_tag.task = @target_task
+            _tag = Tag.find_by_key_and_task_id(clone_tag.key, clone_tag.task.id)
             if _tag
               clone_tag = _tag
             else
@@ -85,8 +85,8 @@ class ActionsController < ApplicationController
             @new_status.can_select = "Yes"
             @new_status.can_show = "Yes"
             @new_status.global = "N"
-            @new_status.product = @target_product
-            _status = Status.find_by_name_and_product_id(@new_status.name, @new_status.product.id)
+            @new_status.task = @target_task
+            _status = Status.find_by_name_and_task_id(@new_status.name, @new_status.task.id)
             if _status
               @new_status = _status
             else
@@ -101,7 +101,7 @@ class ActionsController < ApplicationController
               text_to_array(session[:clone_review][:initial_tag_values]).each do |tag_value|
                 new_tag = Tag.new
                 new_tag.key = tag_value
-                new_tag.product = @target_product
+                new_tag.task = @target_task
                 if new_tag.save
                   @new_tags << new_tag
                 end
@@ -109,39 +109,39 @@ class ActionsController < ApplicationController
             end
           end
 
-          @source_product.packages.each do |source_package|
+          @source_task.packages.each do |source_package|
             target_package = source_package.clone
-            target_package.product = @target_product
+            target_package.task = @target_task
 
             if session[:clone_review][:scopes].include? 'assignee'
               target_package.assignee = source_package.assignee
             end
 
             if session[:clone_review][:status_option] == 'selection_global'
-              target_package.status = Status.find_in_global_scope(session[:clone_review][:status_selection_value_global].strip, target_package.product.name)
+              target_package.status = Status.find_in_global_scope(session[:clone_review][:status_selection_value_global].strip, target_package.task.name)
             elsif session[:clone_review][:scopes].include?('status')
               if session[:clone_review][:status_option] == 'default'
                 unless source_package.status.blank?
-                  target_package.status = Status.find_in_global_scope(source_package.status.name, target_package.product.name)
+                  target_package.status = Status.find_in_global_scope(source_package.status.name, target_package.task.name)
                 end
               elsif session[:clone_review][:status_option] == 'selection'
-                target_package.status = Status.find_in_global_scope(session[:clone_review][:status_selection_value].strip, target_package.product.name)
+                target_package.status = Status.find_in_global_scope(session[:clone_review][:status_selection_value].strip, target_package.task.name)
               end
             elsif session[:clone_review][:status_option] == 'new_value'
               target_package.status = @new_status
             end
 
             @target_tags = []
-            if session[:clone_review][:scopes].include?('tag') && product_has_tags?(source_package.product.name)
+            if session[:clone_review][:scopes].include?('tag') && task_has_tags?(source_package.task.name)
               if session[:clone_review][:tag_options].include?('default')
                 source_package.tags.each do |source_tag|
-                  target_tag = Tag.find_by_key_and_product_id(source_tag.key, source_package.product.id)
+                  target_tag = Tag.find_by_key_and_task_id(source_tag.key, source_package.task.id)
                   @target_tags << target_tag
                 end
               end
 
               if session[:clone_review][:tag_options].include?('selection')
-                @target_tags << process_tags(session[:clone_review][:tags], target_package.product.id)
+                @target_tags << process_tags(session[:clone_review][:tags], target_package.task.id)
               end
             end
 
@@ -174,7 +174,7 @@ class ActionsController < ApplicationController
 
   protected
   def package_taken
-    @package = Package.find_by_name_and_product_id(unescape_url(params[:id]), Product.find_by_name(unescape_url(params[:product_id])).id)
+    @package = Package.find_by_name_and_task_id(unescape_url(params[:id]), Task.find_by_name(unescape_url(params[:task_id])).id)
     if @package.user_id
       redirect_to('/')
     end

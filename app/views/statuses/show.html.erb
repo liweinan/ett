@@ -32,12 +32,12 @@
         <tr>
           <td>Tag</td>
           <td>
-            <%= h @status.product.name %>
+            <%= h @status.task.name %>
           </td>
         </tr>
     <% end %>
   </table>
 </div>
 <%= render :partial => 'layouts/sep' %>
-<%= link_to 'Edit', :controller => :statuses, :action => :edit, :id => @status.name, :product_id => params[:product_id] %> |
-<%= link_to 'Back', :controller => :statuses, :action => :index, :product_id => params[:product_id] %>
+<%= link_to 'Edit', :controller => :statuses, :action => :edit, :id => @status.name, :task_id => params[:task_id] %> |
+<%= link_to 'Back', :controller => :statuses, :action => :index, :task_id => params[:task_id] %>

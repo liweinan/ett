@@ -5,7 +5,7 @@
     <table>
       <tr>
         <th style="text-align: center;">Name</th>
-        <th style="text-align: center;">Products</th>
+        <th style="text-align: center;">Tasks</th>
         <% if can_manage? %>
             <th style="text-align: center">Operation</th>
         <% end %>
@@ -13,7 +13,7 @@
       <% Component.all(:order => 'name').each do |component| %>
           <tr>
             <td><%= link_to "#{component.name}", :controller => :components, :action => :show, :id => escape_url(component.name) %>
-            <td><%component.products.each do |product|%><%=product.name %> / <%end%></td>
+            <td><%component.tasks.each do |task|%><%=task.name %> / <%end%></td>
             </td>
             <% if can_manage? %>
                 <td>

@@ -14,11 +14,11 @@
     <% session[:not_cloned_packages] = nil %>
 <% end %>
 
-<% cache :action => 'index', :id => "#{params[:product_id]}#{params[:status]}#{params[:tag]}#{params[:user]}#{current_user_email}" do %>
-    <% if has_product? %>
-        <% @product = Product.find_by_name(unescape_url(params[:product_id])) %>
+<% cache :action => 'index', :id => "#{params[:task_id]}#{params[:status]}#{params[:tag]}#{params[:user]}#{current_user_email}" do %>
+    <% if has_task? %>
+        <% @task = Task.find_by_name(unescape_url(params[:task_id])) %>
         <h2>
-          Listing packages of <%= unescape_url(params[:product_id]) %>
+          Listing packages of <%= unescape_url(params[:task_id]) %>
           <% if has_status? %>
               / <%= unescape_url(params[:status]) %>
           <% end %>
@@ -26,8 +26,8 @@
               / <%= unescape_url(params[:tag]) %>
           <% end %>
         </h2>
-        <% unless @product.description.blank? %>
-            <%= @product.description %>
+        <% unless @task.description.blank? %>
+            <%= @task.description %>
         <% end %>
     <% else %>
         <h2>Listing packages</h2>
@@ -38,21 +38,21 @@
     <%= render :partial => 'layouts/sep' %>
 
     Statuses:
-    <%= link_to "All (#{@all_packages_count})", :controller => :packages, :action => :index, :product_id => params[:product_id] %> /
+    <%= link_to "All (#{@all_packages_count})", :controller => :packages, :action => :index, :task_id => params[:task_id] %> /
 
     <% if logged_in? %>
-        <%= link_to "My (#{@my_packages_count})", :controller => :packages, :action => :index, :product_id => params[:product_id], :user => session[:current_user].email %> /
+        <%= link_to "My (#{@my_packages_count})", :controller => :packages, :action => :index, :task_id => params[:task_id], :user => session[:current_user].email %> /
     <% end %>
 
-    <% Status.find_all_can_show_by_product_id_in_global_scope(Product.find_by_name(unescape_url(params[:product_id])).id).each do |status| %>
-        <%= link_to "#{status.name} (#{count_packages(unescape_url(params[:product_id]), status.name)})", :controller => :packages, :action => :index, :product_id => params[:product_id], :status => escape_url(status.name) %> /
+    <% Status.find_all_can_show_by_task_id_in_global_scope(Task.find_by_name(unescape_url(params[:task_id])).id).each do |status| %>
+        <%= link_to "#{status.name} (#{count_packages(unescape_url(params[:task_id]), status.name)})", :controller => :packages, :action => :index, :task_id => params[:task_id], :status => escape_url(status.name) %> /
     <% end %>
     <%= render :partial => 'layouts/sep' %>
-    <% tags = Product.find_by_name(unescape_url(params[:product_id])).tags %>
+    <% tags = Task.find_by_name(unescape_url(params[:task_id])).tags %>
     <% unless tags.blank? %>
         Tags:
         <% tags.each do |tag| %>
-            <%= link_to "#{tag.key} (#{tag.packages_can_show.size})", :controller => :packages, :action => :index, :product_id => params[:product_id], :tag => tag.key %> /
+            <%= link_to "#{tag.key} (#{tag.packages_can_show.size})", :controller => :packages, :action => :index, :task_id => params[:task_id], :tag => tag.key %> /
         <% end %>
     <% end %>
 
@@ -64,9 +64,6 @@
     </span>
     <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "inline_editor_indicator"} %>
 
-    <%= render :partial => 'layouts/sep' %>
-    <span style="background-color:#91f59e;">&nbsp;</span> - Manual time track started
-    <span style="background-color:#db4e56;">&nbsp;</span> - Manual time track stopped
     <div class='manage-tbl'>
       <%= render :partial => 'layouts/sep' %>
       <table>
@@ -235,25 +232,4 @@
             function showCommentDialog(pac_id) {}
         </script>
     <% end %>
-<% end %>
-
-<% content_for :js do %>
-    <script type="text/javascript">
-        function getTimeTrackingComponents() {
-            var comps = document.getElementsByRegex('^manual_time_track_component_.*btn');
-            new Ajax.Request('/toolbox/get_manual_time_track_components',
-                    {
-                        asynchronous: true,
-                        evalScripts: true,
-                        parameters: {
-                            'ids': comps.toString(),
-                            'authenticity_token': '<%=form_authenticity_token%>'}
-                    });
-        }
-
-        Event.observe(window, 'load', function () {
-            getTimeTrackingComponents();
-        });
-    </script>
-    <%= render :partial => 'time_tracking_js' %>
 <% end %>

@@ -1,14 +1,14 @@
 class StatusesController < ApplicationController
-#  before_filter :check_product, :only => [:index]
+#  before_filter :check_task, :only => [:index]
   before_filter :check_can_manage, :only => [:new, :edit]
 
   # GET /statuses
   # GET /statuses.xml
   def index
-    if params[:product_id].blank?
+    if params[:task_id].blank?
       @statuses = Status.all(:conditions => "global = 'Y'", :order => 'name')
     else
-      @statuses = Status.all(:conditions => ["product_id = ?", Product.find_by_name(unescape_url(params[:product_id])).id], , :order => 'name')
+      @statuses = Status.all(:conditions => ["task_id = ?", Task.find_by_name(unescape_url(params[:task_id])).id], :order => 'name')
     end
 
     respond_to do |format|
@@ -20,10 +20,10 @@ class StatusesController < ApplicationController
   # GET /statuses/1
   # GET /statuses/1.xml
   def show
-    if params[:product_id].blank?
+    if params[:task_id].blank?
       @status = Status.find(:first, :conditions => ["global = 'Y' and name = ?", unescape_url(params[:id])])
     else
-      @status = Status.find_by_name_and_product_id(unescape_url(params[:id]), Product.find_by_name(unescape_url(params[:product_id])).id)
+      @status = Status.find_by_name_and_task_id(unescape_url(params[:id]), Task.find_by_name(unescape_url(params[:task_id])).id)
     end
 
     respond_to do |format|
@@ -45,10 +45,10 @@ class StatusesController < ApplicationController
 
   # GET /statuses/1/edit
   def edit
-    if params[:product_id].blank?
+    if params[:task_id].blank?
       @status = Status.find(:first, :conditions => ["name = ? AND global='Y'", unescape_url(params[:id])])
     else
-      @status = Status.find_by_name_and_product_id(unescape_url(params[:id]), Product.find_by_name(unescape_url(params[:product_id])).id)
+      @status = Status.find_by_name_and_task_id(unescape_url(params[:id]), Task.find_by_name(unescape_url(params[:task_id])).id)
     end
   end
 
@@ -65,7 +65,7 @@ class StatusesController < ApplicationController
           if is_global?(@status)
             redirect_to :controller => :statuses, :action => :show, :id => escape_url(@status.name)
           else
-            redirect_to :controller => :statuses, :action => :show, :id => escape_url(@status.name), :product_id => escape_url(@status.product.name)
+            redirect_to :controller => :statuses, :action => :show, :id => escape_url(@status.name), :task_id => escape_url(@status.task.name)
           end
 
         }
@@ -86,7 +86,7 @@ class StatusesController < ApplicationController
         flash[:notice] = 'Status was successfully updated.'
         format.html {
           unless is_global?(@status)
-            redirect_to :controller => :statuses, :action => :show, :id => escape_url(@status.name), :product_id => escape_url(@status.product.name)
+            redirect_to :controller => :statuses, :action => :show, :id => escape_url(@status.name), :task_id => escape_url(@status.task.name)
           else
             redirect_to :controller => :statuses, :action => :show, :id => escape_url(@status.name)
           end

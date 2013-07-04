@@ -1,10 +1,10 @@
 <div class='manage-tbl'>
   <table>
     <tr>
-      <td>Packages \ Products</td>
-      <% @component.products.each do |product| %>
+      <td>Packages \ Tasks</td>
+      <% @component.tasks.each do |task| %>
           <td>
-            <%= product.name %>
+            <%= task.name %>
           </td>
       <% end %>
     </tr>
@@ -16,13 +16,13 @@
           </td>
 
           <%
-             package_products = Product.all_that_have_package_with_name(package.name)
+             package_tasks = Task.all_that_have_package_with_name(package.name)
           %>
 
-          <% @component.products.each do |product| %>
+          <% @component.tasks.each do |task| %>
               <td style="text-align: left;vertical-align:text-top;">
-                <% if package_products.include?(product) %>
-                    <% package = Package.find_by_name_and_product_id(package.name, product.id) %>
+                <% if package_tasks.include?(task) %>
+                    <% package = Package.find_by_name_and_task_id(package.name, task.id) %>
                     <% unless package.assignee.blank? %>
                         Assigned to: <%= package.assignee.name %>
                         <%= render :partial => 'layouts/sep_tiny' %>
@@ -46,7 +46,7 @@
                         <% end %>
                     <% end %>
 
-                    <a href="/products/<%= escape_url(product.name) %>/packages/<%= escape_url(package.name) %>" target="_blank">Show</a>
+                    <a href="/tasks/<%= escape_url(task.name) %>/packages/<%= escape_url(package.name) %>" target="_blank">Show</a>
                 <% end %>
               </td>
           <% end %>

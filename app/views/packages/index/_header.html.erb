@@ -8,7 +8,7 @@
   <<%= col %> class='content-list-head'>Tags</<%= col %>>
   <<%= col %> class='content-list-head'>Assignee</<%= col %>>
 
-  <% get_xattrs(@product, true, false) do |attr| %>
+  <% get_xattrs(@task, true, false) do |attr| %>
       <<%= col %> class='content-list-head'><%= attr.camelcase %></<%= col %>>
   <% end %>
 

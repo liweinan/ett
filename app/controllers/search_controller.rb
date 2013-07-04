@@ -1,5 +1,5 @@
 class SearchController < ApplicationController
-  before_filter :check_product
+  before_filter :check_task
 
   def packages
     if request.post?
@@ -10,7 +10,7 @@ class SearchController < ApplicationController
       packages.each do |package|
         unless package.blank?
           package = package.strip
-          ps = Package.find_by_sql("select * from packages where name ilike '%#{package}%' and product_id = #{btagid}")
+          ps = Package.find_by_sql("select * from packages where name ilike '%#{package}%' and task_id = #{btagid}")
 
           if ps.blank?
             @not_found << package

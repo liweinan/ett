@@ -1,5 +1,5 @@
-<% if has_product? %>
-    <%= link_to 'Back', :controller => :packages, :action => :index, :product_id => params[:product_id] %>
+<% if has_task? %>
+    <%= link_to 'Back', :controller => :packages, :action => :index, :task_id => params[:task_id] %>
 <% else %>
     <%= link_to 'Back', packages_path %>
 <% end %>

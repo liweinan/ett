@@ -9,7 +9,7 @@
 <% end %>
 
 <% if params[:user] %>
-    <%= link_to "#{package.name}", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :product_id => escape_url(package.product.name), :user => params[:user] %>
+    <%= link_to "#{package.name}", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :task_id => escape_url(package.task.name), :user => params[:user] %>
 <% else %>
-    <%= link_to "#{package.name}", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :product_id => escape_url(package.product.name) %>
+    <%= link_to "#{package.name}", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :task_id => escape_url(package.task.name) %>
 <% end %>

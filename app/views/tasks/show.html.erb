@@ -1,4 +1,4 @@
-<h2><%= h @product.name %></h2>
+<h2><%= h @task.name %></h2>
 
 <div class='manage-tbl'>
   <table>
@@ -7,7 +7,7 @@
         Name:
       </td>
       <td>
-        <%= h @product.name %>
+        <%= h @task.name %>
       </td>
     </tr>
     <tr>
@@ -15,7 +15,7 @@
         Candidate Tag:
       </td>
       <td>
-        <%= h @product.candidate_tag %>
+        <%= h @task.candidate_tag %>
       </td>
     </tr>
     <tr>
@@ -23,7 +23,7 @@
         Target Release:
       </td>
       <td>
-        <%= h @product.target_release %>
+        <%= h @task.target_release %>
       </td>
     </tr>
     <tr>
@@ -31,12 +31,12 @@
         Description:
       </td>
       <td style="text-align: left;text-wrap:normal;white-space:normal;">
-        <%= @product.description %>
+        <%= @task.description %>
       </td>
     </tr>
 	<tr>
       <td>Can Show</td>
-      <td><%= @product.can_show %></td>
+      <td><%= @task.can_show %></td>
     </tr>
   </table>
 </div>
@@ -45,6 +45,6 @@
 
 
 <% if can_manage? %>
-    <%= link_to 'Edit', :controller => :products, :action => :edit, :id => escape_url(@product.name) %> |
+    <%= link_to 'Edit', :controller => :tasks, :action => :edit, :id => escape_url(@task.name) %> |
 <% end %>
-<%= link_to 'Back', products_path %>
+<%= link_to 'Back', tasks_path %>

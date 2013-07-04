@@ -3,9 +3,9 @@
 #one:
 #  name: MyString
 #  is_global: MyString
-#  product_id: 1
+#  ptask_id: 1
 #
 #two:
 #  name: MyString
 #  is_global: MyString
-#  product_id: 1
+#  ptask_id: 1

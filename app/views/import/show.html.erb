@@ -1,13 +1,13 @@
-<h2>Import packages into product: <%= params[:id] %></h2>
+<h2>Import packages into task: <%= params[:id] %></h2>
 <form action="/import" method="post">
-	Intital status: <%= render :partial => "statuses/selection_for_tag", :locals => { :product_id => Product.find_by_name(unescape_url(params[:id])).id }%>
+	Intital status: <%= render :partial => "statuses/selection_for_tag", :locals => { :task_id => Task.find_by_name(unescape_url(params[:id])).id }%>
 	<%= render :partial => "layouts/sep" %>
-	Initial tags: <%= render :partial => 'tags/tags_selection', :locals => { :product_id => params[:id] } %>
+	Initial tags: <%= render :partial => 'tags/tags_selection', :locals => { :task_id => params[:id] } %>
 	<%= render :partial => "layouts/sep" %>
 	One package name per line:
 	<div class='manage-tbl'>
 	    <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
-	    <input name="product_id" type="hidden" value="<%= escape_url(params[:id]) %>"/>
+	    <input name="task_id" type="hidden" value="<%= escape_url(params[:id]) %>"/>
 	    <textarea cols="40" rows="50" id="packages" name="packages"></textarea>
 	    <div style="height:10px;">&nbsp;</div>
 	    <input name="commit" type="submit" value="Import"/>

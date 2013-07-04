@@ -20,8 +20,8 @@ class BzBugsController < ApplicationController
         @response = Net::HTTP.post_form(uri,
                                         'pkg' => package.name,
                                         'version' => params[:ver],
-                                        'release' => package.product.target_release,
-                                        'tagversion' => package.product.candidate_tag,
+                                        'release' => package.task.target_release,
+                                        'tagversion' => package.task.candidate_tag,
                                         'userid' => extract_username(params[:user]),
                                         'pwd' => params[:pwd])
 

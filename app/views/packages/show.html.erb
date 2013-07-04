@@ -1,7 +1,7 @@
 <h2>
 <span style="<%= deleted_style(@package) %>">
 <%= h @package.name %>
-  @<%= link_to @package.product.name, :controller => 'packages', :action => 'index', :product_id => escape_url(@package.product.name) %>
+  @<%= link_to @package.task.name, :controller => 'packages', :action => 'index', :task_id => escape_url(@package.task.name) %>
 </span>
 </h2>
 
@@ -40,7 +40,7 @@ Tags:
     <% end %>
 <% end %>
 
-<% get_xattrs(@package.product, true, false) do |attr| %>
+<% get_xattrs(@package.task, true, false) do |attr| %>
     <%= render :partial => 'layouts/sep_tiny' %>
     <% unless @package.read_attribute(attr).blank? %>
         <%= attr.camelcase %>: <%= Extractor.extract_url(@package.read_attribute(attr)) %>
@@ -55,7 +55,7 @@ Tags:
 
 <% if can_manage? %>
     <% unless @package.deleted? %>
-        | <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(@package.name), :product_id => escape_url(@package.product.name) %>
+        | <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(@package.name), :task_id => escape_url(@package.task.name) %>
         | <%= link_to 'Delete', @package, 
             :confirm => "Are you sure to delete #{escape_url(@package.name)}?", 
             :method => :delete %>
@@ -70,7 +70,7 @@ Tags:
 
 <%= render :partial => 'packages/attachment' %>
 <%= render :partial => 'layouts/sep' %>
-<% unless @package.product.target_release.blank? %>
+<% unless @package.task.target_release.blank? %>
     <%= render :partial => 'packages/bz_bugs', :locals => {:package => @package} %>
     <%= render :partial => 'layouts/sep' %>
 <% end %>
@@ -80,20 +80,4 @@ Tags:
 <%= render :partial => "comments/index" %>
 <% if logged_in? %>
     <%= render :partial => "comments/new" %>
-<% end %>
-
-<%= render :partial => 'time_tracking_js' %>
-<% content_for :js do %>
-    <script type="text/javascript">
-        Event.observe(window, 'load', function () {
-            new Ajax.Request('/toolbox/get_manual_time_track_component',
-                    {
-                        asynchronous: true,
-                        evalScripts: true,
-                        parameters: {
-                            'pac_id': '<%=@package.id%>',
-                            'authenticity_token': '<%=form_authenticity_token%>'}
-                    });
-        });
-    </script>
 <% end %>
