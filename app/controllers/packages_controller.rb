@@ -5,10 +5,12 @@ class PackagesController < ApplicationController
   before_filter :user_view_index, :only => [:index]
   before_filter :check_can_manage, :only => [:destroy]
   before_filter :clone_form_validation, :only => :clone
+  before_filter :deal_with_deprecated_brew_tag_id, :only => [:index, :show]
 
   # GET /packages
   # GET /packages.xml
   def index
+    
     unless params[:task_id].blank?
       @packages = get_packages(unescape_url(params[:task_id]), unescape_url(params[:tag]), unescape_url(params[:status]), unescape_url(params[:user]))
     end
@@ -35,6 +37,7 @@ class PackagesController < ApplicationController
   # GET /packages/1
   # GET /packages/1.xml
   def show
+
     respond_to do |format|
       format.html {
         @package = Package.find_by_name_and_task_id(unescape_url(params[:id]), Task.find_by_name(unescape_url(params[:task_id])).id, :include => :p_attachments)
@@ -521,6 +524,12 @@ class PackagesController < ApplicationController
       _packages = Package.find_by_sql("select p.* from packages p where p.task_id IN (#{hierarchy}) #{opts} order by #{order}")
     end
     _packages
+  end
+
+  def deal_with_deprecated_brew_tag_id
+    unless params[:brew_tag_id].blank?
+      params[:task_id] = params[:brew_tag_id]
+    end    
   end
 
 end

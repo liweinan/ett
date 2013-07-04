@@ -9,7 +9,8 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :relationships
   map.resources :settings
   map.resources :p_attachments
-  map.resources :tasks, :has_many => [:packages, :statuses, :tags, :settings]
+  map.resources :tasks, :has_many => [:packages, :statuses, :tags, :settings]  
+  map.resources :brew_tags, :has_many => [:packages]
   map.resources :tags
   map.resources :statuses, :has_many => :packages
   map.resources :packages
@@ -25,7 +26,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # Sample of regular route:
   #   map.connect 'tasks/:id', :controller => 'catalog', :action => 'view'
-  # Keep in mind you can assign values other than :controller and :action
+  # Keep in mind you can assign values other than :controller and :action  
 
   # Sample of named route:
   #   map.purchase 'tasks/:id/purchase', :controller => 'catalog', :action => 'purchase'
