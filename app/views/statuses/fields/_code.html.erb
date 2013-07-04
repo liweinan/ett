@@ -1,0 +1,5 @@
+<% disabled = (@status.can_change_code?)? false : 'disabled' %>
+<tr>
+  <td><%= f.label :code, 'Code' %></td>
+  <td><%= f.text_field :code, :disabled => disabled %></td>
+</tr>

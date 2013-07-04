@@ -9,9 +9,11 @@
       <table>
         <%= f.hidden_field :id, :value => @status.id %>
         <%= render :partial => 'statuses/fields/name', :locals => {:f => f} %>
+        <%= render :partial => 'statuses/fields/code', :locals => {:f => f} %>
         <%= render :partial => 'statuses/fields/style', :locals => {:f => f} %>
         <%= render :partial => 'statuses/fields/can_show', :locals => {:f => f} %>
         <%= render :partial => 'statuses/fields/can_select', :locals => {:f => f} %>
+        <%= render :partial => 'statuses/fields/can_change_code', :locals => {:f => f} %>
         <%= render :partial => 'statuses/fields/is_track_time', :locals => {:f => f} %>
         <%= render :partial => 'statuses/fields/is_finish_state', :locals => {:f => f} %>
         <% unless is_global?(@status) %>

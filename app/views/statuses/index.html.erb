@@ -10,9 +10,10 @@
     <tr>
       <th>Id</th>
       <th>Name</th>
-      <th>Tag</th>
+      <th>Code</th>
       <th>Can Show</th>
       <th>Can Select</th>
+      <th>Can Change Code</th>
       <th>Track Time</th>
       <th>Is Finish State</th>
       <th>CSS Style</th>
@@ -24,18 +25,15 @@
         <tr>
           <td><%= status.id %></td>
           <td><%= h status.name %></td>
-          <td>
-            <% if is_global?(status) %>
-                -
-            <% else %>
-                <%= h status.product.name %>
-            <% end %>
-          </td>
+          <td><%= h status.code %></td>
           <td>
             <%= status.can_show %>
           </td>
           <td>
             <%= status.can_select %>
+          </td>
+          <td>
+            <%= status.can_change_code %>
           </td>
           <td>
             <%= status.is_track_time %>

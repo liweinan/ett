@@ -2,11 +2,12 @@ class Status < ActiveRecord::Base
   belongs_to :product
 #  validates_presence_of :product_id
   validates_presence_of :name
-  validates_uniqueness_of :code, :allow_nil => :true
+  validates_uniqueness_of :code, :allow_nil => :true  
 
   default_value_for :global, 'N'
   default_value_for :can_select, 'Yes'
   default_value_for :can_show, 'Yes'
+  default_value_for :can_change_code, 'Yes'
   default_value_for :is_track_time, 'Yes'
   default_value_for :style, ''
   default_value_for :is_finish_state, 'No'
@@ -67,6 +68,10 @@ class Status < ActiveRecord::Base
     else
       return global_status
     end
+  end
+
+  def can_change_code?
+    can_change_code == 'Yes'
   end
 
   protected
