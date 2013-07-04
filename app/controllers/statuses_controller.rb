@@ -6,9 +6,9 @@ class StatusesController < ApplicationController
   # GET /statuses.xml
   def index
     if params[:product_id].blank?
-      @statuses = Status.all(:conditions => "global = 'Y'")
+      @statuses = Status.all(:conditions => "global = 'Y'", :order => 'name')
     else
-      @statuses = Status.all(:conditions => ["product_id = ?", Product.find_by_name(unescape_url(params[:product_id])).id])
+      @statuses = Status.all(:conditions => ["product_id = ?", Product.find_by_name(unescape_url(params[:product_id])).id], , :order => 'name')
     end
 
     respond_to do |format|
