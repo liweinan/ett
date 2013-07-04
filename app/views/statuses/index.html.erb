@@ -25,17 +25,7 @@
         <tr>
           <td><%= status.id %></td>
           <td><%= h status.name %></td>
-<<<<<<< HEAD
           <td><%= h status.code %></td>
-=======
-          <td>
-            <% if is_global?(status) %>
-                -
-            <% else %>
-                <%= h status.task.name %>
-            <% end %>
-          </td>
->>>>>>> 3032d4bbe128f6b250273d96f41fa8b38a7dfb88
           <td>
             <%= status.can_show %>
           </td>
