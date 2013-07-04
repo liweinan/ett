@@ -2,7 +2,7 @@ class Status < ActiveRecord::Base
   belongs_to :task
 #  validates_presence_of :task_id
   validates_presence_of :name
-  validates_uniqueness_of :code, :allow_nil => true
+#  validates_uniqueness_of :code, :allow_nil => true
 
   default_value_for :global, 'N'
   default_value_for :can_select, 'Yes'
