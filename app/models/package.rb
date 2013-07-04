@@ -36,9 +36,18 @@ class Package < ActiveRecord::Base
   validates_presence_of :created_by
   validates_presence_of :updated_by
 
+
+  validates_format_of :git_url, :with => /git:\/\/git\.app\.eng\.bos\.redhat\.com/,
+                      :message => "does not contain git://git.app.eng.bos.redhat.com",
+                      :allow_blank => true
+  validates_format_of :git_url, :with => /.*#[\w]{5,}/,
+                      :message => "should have format <git_url>#<commit_id>, <commit_id> should be at least 5 characters long",
+                      :allow_blank => true
+
   default_value_for :time_consumed, 0
   default_value_for :time_point, 0
   default_value_for :status_changed_at, Time.now
+  default_value_for :wrapper_build, 'No'
 
   def self.per_page
     10
