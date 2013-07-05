@@ -48,6 +48,7 @@
 //        var nbb_sum = document.getElementById('nbb_sum').value;
         var nbb_user = document.getElementById('nbb_user').value;
         var nbb_pwd = document.getElementById('nbb_pwd').value;
+        var nbb_see_also = document.getElementById('nbb_see_also').value;
 
         new Ajax.Request('/bz_bugs',
                 {
@@ -74,6 +75,7 @@
 //                        'sum' : nbb_sum,
                         'user': nbb_user,
                         'pwd': nbb_pwd,
+                        'see_also': nbb_see_also,
                         'authenticity_token': '<%=form_authenticity_token%>'
                     }
                 });
