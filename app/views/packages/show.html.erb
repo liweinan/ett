@@ -28,17 +28,24 @@ Last Modified At:
 Status:
 <% unless @package.status.blank? %>
     <span style="<%= default_style(@package.status.style) %>">&nbsp;</span>
-    <%= h @package.status.name %>    
+    <%= h @package.status.name %>
 <% end %>
 <%= render :partial => 'layouts/sep_tiny' %>
 
 
 Tags:
-<% unless @package.tags.blank? %>    
+<% unless @package.tags.blank? %>
     <% @package.tags.each do |tag| %>
         <%= tag.key %> /
     <% end %>
 <% end %>
+<%= render :partial => 'layouts/sep_tiny' %>
+
+Wrapper build:
+    <%= h @package.wrapper_build %>
+<%= render :partial => 'layouts/sep_tiny' %>
+
+<%= render :partial => 'packages/fields/build' %>
 
 <% get_xattrs(@package.task, true, false) do |attr| %>
     <%= render :partial => 'layouts/sep_tiny' %>
@@ -56,8 +63,8 @@ Tags:
 <% if can_manage? %>
     <% unless @package.deleted? %>
         | <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(@package.name), :task_id => escape_url(@package.task.name) %>
-        | <%= link_to 'Delete', @package, 
-            :confirm => "Are you sure to delete #{escape_url(@package.name)}?", 
+        | <%= link_to 'Delete', @package,
+            :confirm => "Are you sure to delete #{escape_url(@package.name)}?",
             :method => :delete %>
     <% end %>
 <% end %>
