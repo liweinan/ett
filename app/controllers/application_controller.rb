@@ -461,7 +461,7 @@ class ApplicationController < ActionController::Base
       session[:bz_pass] = pwd
     end
   end
-  
+
   def bz_bug_creation_uri
     if Rails.env.production?
       return URI.parse(APP_CONFIG['bz_bug_creation_url'])
@@ -469,5 +469,28 @@ class ApplicationController < ActionController::Base
       return URI.parse(APP_CONFIG['bz_bug_creation_url_mocked'])
     end
   end
-  
+
+   def get_mead_name(brew_pkg)
+      uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"] +
+            "/mead-brewbridge/pkg/wrapped/#{brew_pkg}"))
+      res = Net::HTTP.get_response(uri)
+     if res.code == "200" && !res.body.include?("ERROR")
+          res.body
+      else
+          nil
+      end
+  end
+
+   def get_brew_name(pac)
+      # TODO: make the tag more robust
+      tag = pac.task.candidate_tag + '-build'
+      uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"] +
+            "/mead-brewbridge/pkg/latest/#{tag}/#{pac.name}"))
+      res = Net::HTTP.get_response(uri)
+     if res.code == "200" && !res.body.include?("ERROR")
+          res.body
+      else
+          nil
+      end
+  end
 end

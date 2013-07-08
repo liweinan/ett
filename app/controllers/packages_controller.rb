@@ -178,6 +178,17 @@ class PackagesController < ApplicationController
             log_entry.save
           end
 
+          xattrs = @package.task.setting.xattrs.split(',')
+
+          if @package.status.code == 'finished' &&
+             xattrs.include?('mead') &&
+             xattrs.include?('brew')
+            brew_pkg = get_brew_name(@package)
+
+            @package.brew = brew_pkg unless brew_pkg.nil?
+            @package.mead = get_mead_name(brew_pkg) unless brew_pkg.nil?
+          end
+
           @package.save
 
           Changelog.package_updated(@orig_package, @package, @orig_tags)
