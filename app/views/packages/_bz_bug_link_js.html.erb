@@ -1,10 +1,12 @@
 <script type="text/javascript">
+    // global vars
+    var pending_bz_bugs = [];
 
     document.observe("dom:loaded", function() {
         Element.show('update_bz_bugs_checking_indicator');
         var bz_bug_actions = document.getObjectsByRegex(/^col_bz_action_.+/);
-        var pending_bz_bugs = [];
-        for (var i = 0; i < bz_bug_actions.length; i++) {            
+
+        for (var i = 0; i < bz_bug_actions.length; i++) {
              if (bz_bug_actions[i].value == '<%=BzBug::BZ_ACTIONS[:movetoassigned]%>' || bz_bug_actions[i].value == '<%=BzBug::BZ_ACTIONS[:movetomodified]%>') {
                 pending_bz_bug = {
                     'bz_bug_id' : bz_bug_actions[i].id.replace("col_bz_action_", ""),
@@ -13,18 +15,14 @@
                 pending_bz_bugs.push(pending_bz_bug);
              }
         }
+
         if (pending_bz_bugs.length > 0) {
             // send bz_bug_id is useless here, we just send the first one to avoid rending function crash
             renderPartial(pending_bz_bugs[0].bz_bug_id, 'update_bz_bugs_status_form_div', 'bz_bugs/update_bz_bug_status', '<%=package.id%>');
         }
 
         Element.hide('update_bz_bugs_checking_indicator');
-
-        // updateBzBugStatus(bz_bug_id, action);
-
     });
-
-
 
     function updateBzBugStatus(bz_bug_id, action) {
         new Ajax.Request('/bz_bugs/' + bz_bug_id,
@@ -49,8 +47,6 @@
             }
         );
     }
-
-
 
     function syncAllBugInfoWithBz() {
         var bz_bugs = document.getElementsByRegex('^col_bz_id_.+');        
@@ -300,7 +296,6 @@
     function renderBzBugId(id, col) {
         col.className = 'small_font';
         renderPartial(id, col.id, 'bz_bugs/bz_id');
-
     }
 
     function renderOps(id, col) {
@@ -360,6 +355,5 @@
                             'authenticity_token': '<%=form_authenticity_token%>'}
                     });
         }
-
     }
 </script>
