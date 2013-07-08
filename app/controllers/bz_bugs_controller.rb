@@ -16,13 +16,17 @@ class BzBugsController < ApplicationController
         check_param_ver(params)
         end_check_param
 
-        @response = Net::HTTP.post_form(bz_bug_creation_uri,
-                                        'pkg' => package.name,
-                                        'version' => params[:ver],
-                                        'release' => package.task.target_release,
-                                        'tagversion' => package.task.candidate_tag,
-                                        'userid' => extract_username(params[:user]),
-                                        'pwd' => params[:pwd])
+        uri = URI.parse(APP_CONFIG["bz_bug_creation_url"])
+        parameters = { 'pkg' => package.name,
+                       'version' => params[:ver],
+                       'release' => package.task.target_release,
+                       'tagversion' => package.task.candidate_tag,
+                       'userid' => extract_username(params[:user]),
+                       'pwd' => params[:pwd] }
+
+        parameters['see_also'] = params[:see_also] unless params[:see_also].blank?
+
+        @response = Net::HTTP.post_form(bz_bug_creation_uri, parameters)
 
         if @response.class == Net::HTTPCreated
           update_bz_pass(params[:pwd])

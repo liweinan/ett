@@ -54,5 +54,11 @@ class ToolboxController < ApplicationController
     end
   end
 
+  def build_package
+    respond_to do |format|
+      format.js
+    end
+  end
+
 
 end
