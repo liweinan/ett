@@ -15,6 +15,7 @@
           <% if logged_in? %>
               <td id="col_bz_ops_<%= bz_bug.id %>" class="small_font">
                 <%= render :partial => 'bz_bugs/ops', :locals => {:bz_bug => bz_bug} %>
+                <%= render :partial => 'bz_bugs/bz_action', :locals => {:bz_bug => bz_bug} %>
               </td>
           <% end %>
           <td id="col_bz_id_<%= bz_bug.id %>" class="small_font">

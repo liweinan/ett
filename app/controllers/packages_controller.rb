@@ -36,7 +36,6 @@ class PackagesController < ApplicationController
   # GET /packages/1
   # GET /packages/1.xml
   def show
-
     respond_to do |format|
       format.html {
         @package = Package.find_by_name_and_task_id(unescape_url(params[:id]), Task.find_by_name(unescape_url(params[:task_id])).id, :include => :p_attachments)
@@ -146,19 +145,27 @@ class PackagesController < ApplicationController
           end
 
           # status changed
-          if Status.find_by_id(params[:package][:status_id].to_i) != last_status
+          new_status = Status.find_by_id(params[:package][:status_id].to_i)
+          if new_status != last_status
             @package.status_changed_at = Time.now
 
             if !last_status.blank? && last_status.is_time_tracked?
               @tt = TrackTime.all(:conditions => ["package_id=? and status_id=?", @package.id, last_status.id])[0]
               @tt = TrackTime.new if @tt.blank?
-              @tt.package_id=@package.id
-              @tt.status_id=last_status.id
+              @tt.package_id = @package.id
+              @tt.status_id = last_status.id
 
               last_status_changed_at ||= @package.status_changed_at
               @tt.time_consumed ||= 0
               @tt.time_consumed += (@package.status_changed_at.to_i - last_status_changed_at.to_i)/60
               @tt.save
+            end
+
+            if new_status.code == Status::CODES[:inprogress]
+              @package.bz_bugs.each do |bz_bug|
+                bz_bug.bz_action = BzBug::BZ_ACTIONS[:movetoassigned]
+                bz_bug.save
+              end
             end
 
             log_entry = AutoLogEntry.new

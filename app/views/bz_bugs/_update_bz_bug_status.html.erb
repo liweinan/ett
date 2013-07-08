@@ -1,0 +1,70 @@
+<%@package = Package.find(params[:package_id])%>
+<h3>These bugs need to be updated in Bugzilla according to current package status</h3>
+<form onsubmit="return false;">
+  <div class='manage-tbl'>
+    <table id='pbb_tbl'>
+      <tr>
+        <th class='content-list-head'>Bug ID</th>
+        <th class='content-list-head'>Summary</th>
+        <th class='content-list-head'>Action</th>
+        <th class='content-list-head'>Action Status</th>
+      </tr>
+      <% @package.pending_bz_bugs.each do |bz_bug| %>
+        <tr>
+          <td id="pbb_col_bz_id_<%= bz_bug.id %>" class="small_font">
+            <%= render :partial => "bz_bugs/bz_id", :locals => {:bz_bug => bz_bug} %>
+          </td>          
+          <td id="pbb_col_bz_summary_<%= bz_bug.id %>" class="small_font">
+            <%= render :partial => "bz_bugs/summary", :locals => {:bz_bug => bz_bug} %>
+          </td>
+          <td id="pbb_col_bz_action_<%= bz_bug.id %>" class="small_font">
+            <% if bz_bug.bz_action == BzBug::BZ_ACTIONS[:movetoassigned] %>
+              Status change: Move bz from <%=bz_bug.bz_status%> to ASSIGNED (to <%=@package.assignee.email%>)
+            <% end %>
+          </td>
+          <td id="pbb_col_bz_action_status_<%= bz_bug.id %>" class="small_font"> 
+            Pending
+          </td>
+        </tr>
+      <% end %>
+    </table>
+    <%=render :partial => 'layouts/sep'%>
+    <table>
+      <tr>
+        <td style="text-align: right">
+          Bugzilla account
+        </td>
+        <td style="text-align: left">
+          <input id="ubbs_user" value="<%= current_user.email %>"/>
+        </td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+          Bugzilla account password
+        </td>
+        <td style="text-align: left">
+          <input id="ubbs_pwd" value="<%= session[:bz_pass] %>" type="password"/>
+        </td>
+      </tr>  
+      <tr>
+        <td colspan="2" style="text-align: right">
+            <%= render :partial => 'layouts/progress_indicator', 
+                :locals => {
+                    :progress_indicator_id => "update_bz_bug_status_indicator",
+                    :msg => "Be patient"
+                }
+             %>
+            <button onclick="">
+              Update
+            </button>
+<!--             <button onclick="hideBzBugForm('update_bz_bugs_status')">
+                Cancel
+            </button>
+ -->        </td>
+      </tr>
+    </table>
+  </div>
+</form>
+
+<%= render :partial => "layouts/sep" %>
+

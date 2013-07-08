@@ -16,8 +16,7 @@ class BzBugsController < ApplicationController
         check_param_ver(params)
         end_check_param
 
-        uri = URI.parse(APP_CONFIG["bz_bug_creation_url"])
-        @response = Net::HTTP.post_form(uri,
+        @response = Net::HTTP.post_form(bz_bug_creation_uri,
                                         'pkg' => package.name,
                                         'version' => params[:ver],
                                         'release' => package.task.target_release,
@@ -50,11 +49,11 @@ class BzBugsController < ApplicationController
 
         bz_id = params[:bz_id].strip
 
-        @response = Net::HTTP.get_response(
-          URI("#{APP_CONFIG["bz_bug_query_url"]}#{bz_id}.json?"\
-            "userid=#{extract_username(params[:user])}&"\
-            "pwd=#{params[:pwd]}"))
-
+        @response = Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_query_url"]}#{bz_id}.json?userid=#{extract_username(params[:user])}&pwd=#{params[:pwd]}"))
+        #debugger
+        #(rdb:2) @response.body
+        #{}"{\"id\":\"333\",\"summary\":\"edquota calls /usr/bin/vi, which does not exist\",\"status\":\"CLOSED\",\"release\":\"---\",\"milestone\":\"---\"}
+        
         if @response.class == Net::HTTPOK
           bz_info = JSON.parse(@response.body)
           @bz_bug = 
@@ -83,9 +82,13 @@ class BzBugsController < ApplicationController
   end
 
   def update
-    bz_bug = BzBug.find(params[:id])
-    bz_bug.bz_id = params[:bz_id]
-    bz_bug.save
+    if params[:action].blank?    
+      bz_bug = BzBug.find(params[:id])
+      bz_bug.bz_id = params[:bz_id]
+      bz_bug.save
+    else
+
+    end
   end
 
   def sync
@@ -97,9 +100,7 @@ class BzBugsController < ApplicationController
 
       @bz_bug = BzBug.find(params[:id])
       @response = Net::HTTP.get_response(
-        URI("#{APP_CONFIG["bz_bug_query_url"]}#{@bz_bug.bz_id}.json?"\
-          "userid=#{extract_username(params[:user])}&"\
-          "pwd=#{params[:pwd]}"))
+        URI("#{APP_CONFIG["bz_bug_query_url"]}#{@bz_bug.bz_id}.json?userid=#{extract_username(params[:user])}&pwd=#{params[:pwd]}"))
 
       if @response.class == Net::HTTPOK
         bz_info = JSON.parse(@response.body)        

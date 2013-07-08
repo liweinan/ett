@@ -111,6 +111,10 @@ class Package < ActiveRecord::Base
     str
   end
 
+  def pending_bz_bugs
+    BzBug.all(:conditions => ['package_id = ? and bz_action is not null', self.id])
+  end
+
   protected
 
   def all_from_packages_of(from_relationships, relationship_name)

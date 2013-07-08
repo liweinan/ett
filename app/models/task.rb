@@ -31,4 +31,8 @@ class Task < ActiveRecord::Base
     Task.all(:conditions => ["id in (select task_id from packages where name = ?)", name])
   end
 
+  def can_use_bz_integration?
+    !target_release.blank?    
+  end
+
 end

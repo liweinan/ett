@@ -3,6 +3,8 @@ class BzBug < ActiveRecord::Base
   belongs_to :package, :class_name => "Package", :foreign_key => "package_id"
   default_value_for :bz_status, 'NEW'
   default_value_for :last_synced_at, Time.now
+  
+  BZ_ACTIONS = {:movetoassigned => 'Move to assigned', :movetomodified => 'Move to modified'}
 
   def self.create_from_bz_info(bz_info, package_id, current_user)
     bz_id = bz_info["id"]

@@ -461,4 +461,13 @@ class ApplicationController < ActionController::Base
       session[:bz_pass] = pwd
     end
   end
+  
+  def bz_bug_creation_uri
+    if Rails.env.production?
+      return URI.parse(APP_CONFIG['bz_bug_creation_url'])
+    else
+      return URI.parse(APP_CONFIG['bz_bug_creation_url_mocked'])
+    end
+  end
+  
 end

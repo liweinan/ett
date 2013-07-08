@@ -29,9 +29,17 @@
     </button>
     <%= render :partial => 'layouts/progress_indicator', 
       :locals => {:progress_indicator_id => 'sync_bz_bug_form_div_indicator'} %>
+    <%= render :partial => 'layouts/progress_indicator', 
+        :locals => {
+            :progress_indicator_id => "update_bz_bugs_checking_indicator",
+            :msg => "Checking bugs need to be updated..."
+        }
+     %>      
   </form>
 <% end %>
 <div id="sync_bz_bug_form_div" style="display:none;"></div>
+<%= render :partial => 'layouts/sep_tiny' %>
+<div id="update_bz_bugs_status_form_div" style="display:none;"></div>
 <%= render :partial => 'layouts/sep_tiny' %>
 
 <% content_for :js do %>

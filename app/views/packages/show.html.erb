@@ -70,7 +70,7 @@ Tags:
 
 <%= render :partial => 'packages/attachment' %>
 <%= render :partial => 'layouts/sep' %>
-<% unless @package.task.target_release.blank? %>
+<% if @package.task.can_use_bz_integration? %>
     <%= render :partial => 'packages/bz_bugs', :locals => {:package => @package} %>
     <%= render :partial => 'layouts/sep' %>
 <% end %>

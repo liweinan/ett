@@ -26,8 +26,31 @@
         return arrElements; // return matching elements
     };
 
+    document['getObjectsByRegex'] = function (pattern, div) {
+        if (div == undefined) {
+            div = document;
+        }
 
-    document['getObjectsByRegex'] = function (clazz, div) {
+        var arrElements = [];   // to accumulate matching elements
+        var re = new RegExp(pattern);   // the regex to match with
+
+        function findRecursively(aNode) { // recursive function to traverse DOM
+            if (!aNode)
+                return;
+            if (aNode.id !== undefined && isFunction(aNode.id.search) && aNode.id.search(re) != -1)
+                arrElements.push(aNode);  // FOUND ONE!
+            for (var idx in aNode.childNodes) // search children...
+                findRecursively(aNode.childNodes[idx]);
+        }
+
+        ;
+
+        findRecursively(div); // initiate recursive matching
+        return arrElements; // return matching elements
+    };
+
+
+    document['getObjectsByClass'] = function (clazz, div) {
         if (div == undefined) {
             div = document;
         }

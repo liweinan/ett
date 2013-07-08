@@ -11,6 +11,8 @@ class Status < ActiveRecord::Base
   default_value_for :is_track_time, 'Yes'
   default_value_for :style, ''
   default_value_for :is_finish_state, 'No'
+  
+  CODES = {:open => 'open', :needupgrade => 'needupgrade', :inprogress => 'inprogress', :finished => 'finished', :needfix => 'needfix', :blocked => 'blocked'}
 
   def is_global?
     self.global == 'Y'
