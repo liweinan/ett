@@ -15,8 +15,12 @@
                 var bz_bug = document.getElementsByRegex('^col_bz_id_' + bz_bug_id);
                 syncBugInfoWithBz(bz_bug);
             } else if (action == '<%=BzBug::BZ_ACTIONS[:movetoassigned]%>') {
-                // todo
+                // todo: weinan will take this
+                // This is the sync way to update bug status to assigned
+                // write ajax call to update bz status, and show UI spinners and progressive information properly
+                // After the sync call to REST api finished, update the bz_bug list in the page
             } else if (action == '<%=BzBug::BZ_ACTIONS[:movetomodified]%>') {
+                // actions similiar to the above :movetoassigned
                 // Dustin: please updateBzBugStatus here
             }
         }
