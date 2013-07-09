@@ -10,7 +10,9 @@
             var action = vals[1];
 
             if (action == '<%=BzBug::BZ_ACTIONS[:accepted]%>') {
-                // TODO: sync bug info
+                // user has provided bz account and password info in package edit page, and the bz update request
+                // has been submitted to BZ asynchrously.
+                // Now it's time to sync bug info automatically to see if the bz request has been done.
                 document.getElementById('pbb_col_bz_ac_status_' + bz_bug_id).innerHTML = 'In progress...';
                 var bz_bug = document.getElementsByRegex('^col_bz_id_' + bz_bug_id);
                 syncBugInfoWithBz(bz_bug);
@@ -19,18 +21,23 @@
                 // This is the sync way to update bug status to assigned
                 // write ajax call to update bz status, and show UI spinners and progressive information properly
                 // After the sync call to REST api finished, update the bz_bug list in the page
+                // call moveBzBugStatusToModified()
             } else if (action == '<%=BzBug::BZ_ACTIONS[:movetomodified]%>') {
                 // actions similiar to the above :movetoassigned
-                // Dustin: please updateBzBugStatus here
+                // Dustin: please call moveBzBugStatusToModified here
             }
         }
 
     });
     <% end %>
 
+    function moveBzBugStatusToAssigned(bz_bug_id) {
+        //todo: weinan
+    }
 
-
-    function updateBzBugStatus(bz_bug_id, action) {
+    // Dustin, please use the bz_bugs/update properly to call necessary BZ and MEAD apis according to the requirement in https://docspace.corp.redhat.com/docs/DOC-148169
+    // Check '==> Finished' section in the doc
+    function moveBzBugStatusToModified(bz_bug_id) {
         new Ajax.Request('/bz_bugs/' + bz_bug_id,
                 {
                     method: 'POST',
@@ -46,7 +53,7 @@
                         // Element.hide('update_bz_bugs_indicator');
                     },
                     parameters: {
-                        'action': action,
+                        'action': <%=BzBug::BZ_ACTIONS[:movetomodified]%>,
                         'authenticity_token': '<%=form_authenticity_token%>',
                         '_method': 'put'
                     }
