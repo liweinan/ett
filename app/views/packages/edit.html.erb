@@ -1,6 +1,6 @@
 <%
    unless @user.blank?
-       params[:user] = @user
+     params[:user] = @user
    end
 %>
 
@@ -11,8 +11,16 @@
 <% form_for(@package) do |f| %>
     <%= f.error_messages %>
     <% if params[:user] %>
-            <input type="hidden" id="user" name="user" value="<%= params[:user] %>"/>
+        <input type="hidden" id="user" name="user" value="<%= params[:user] %>"/>
     <% end %>
+
+    <% if @package.task.can_use_bz_integration? %>
+        If you change the status of package, please provide your Bugzilla account and password:
+        <%= render :partial => 'layouts/sep' %>
+        <%= render :partial => 'bz_bugs/bz_auth' %>
+        <%= render :partial => 'layouts/sep' %>
+    <% end %>
+
     <div class='manage-tbl'>
       <table>
         <%= render :partial => 'packages/fields/name', :locals => {:f => f} %>
@@ -28,19 +36,19 @@
             <%= render :partial => 'packages/fields/xattrs', :locals => {:f => f, :xattr => attr} %>
         <% end %>
 
-        <%= render :partial => 'packages/fields/notes', :locals => {:f => f} %>        
+        <%= render :partial => 'packages/fields/notes', :locals => {:f => f} %>
         <tr>
           <td colspan=2 style="text-align:left;">
-            <%= render :partial => 'layouts/notification', :locals => 
-              {
-                :title => 'Notify the changes to:',
-                :div_id => 'package_edit'
-              }
+            <%= render :partial => 'layouts/notification', :locals =>
+                    {
+                            :title => 'Notify the changes to:',
+                            :div_id => 'package_edit'
+                    }
             %>
-            
+
             <%= f.submit 'Update' %>
-            <%= render :partial => 'layouts/notification_link', 
-              :locals => {:div_id => 'package_edit'} %>
+            <%= render :partial => 'layouts/notification_link',
+                       :locals => {:div_id => 'package_edit'} %>
           </td>
         </tr>
       </table>

@@ -1,5 +1,4 @@
-<%@package = Package.find(params[:package_id])%>
-<h3>These bugs need to be updated in Bugzilla according to current package status</h3>
+<h3>Bugs need to be updated in BZ</h3>
 <form onsubmit="return false;">
   <div class='manage-tbl'>
     <table id='pbb_tbl'>
@@ -9,26 +8,29 @@
         <th class='content-list-head'>Action</th>
         <th class='content-list-head'>Action Status</th>
       </tr>
-      <% @package.pending_bz_bugs.each do |bz_bug| %>
-        <tr>
-          <td id="pbb_col_bz_id_<%= bz_bug.id %>" class="small_font">
-            <%= render :partial => "bz_bugs/bz_id", :locals => {:bz_bug => bz_bug} %>
-          </td>          
-          <td id="pbb_col_bz_summary_<%= bz_bug.id %>" class="small_font">
-            <%= render :partial => "bz_bugs/summary", :locals => {:bz_bug => bz_bug} %>
-          </td>
-          <td id="pbb_col_bz_action_<%= bz_bug.id %>" class="small_font">
-            <% if bz_bug.bz_action == BzBug::BZ_ACTIONS[:movetoassigned] %>
-              Status change: Move bz from <%=bz_bug.bz_status%> to ASSIGNED (to <%=@package.assignee.email%>)
-            <% end %>
-          </td>
-          <td id="pbb_col_bz_action_status_<%= bz_bug.id %>" class="small_font"> 
-            Pending
-          </td>
-        </tr>
+      <% bz_bugs.each do |bz_bug| %>
+          <tr>
+            <td id="pbb_col_bz_id_<%= bz_bug.id %>" class="small_font">
+              <%= render :partial => "bz_bugs/bz_id", :locals => {:bz_bug => bz_bug} %>
+            </td>
+            <td id="pbb_col_bz_summary_<%= bz_bug.id %>" class="small_font">
+              <%= render :partial => "bz_bugs/summary", :locals => {:bz_bug => bz_bug} %>
+            </td>
+            <td id="pbb_col_bz_action_<%= bz_bug.id %>:<%= bz_bug.bz_action %>" class="small_font">
+              <% if bz_bug.bz_action == BzBug::BZ_ACTIONS[:movetoassigned] %>
+                  Update bug from <%= bz_bug.bz_status %> to ASSIGNED (to <%= package.assignee.email %>)
+              <% elsif bz_bug.bz_action == BzBug::BZ_ACTIONS[:accepted] %>
+                  Status update request submitted to BZ, waiting to sync bug info with BZ.
+                  <%# elsif %>
+              <% end %>
+            </td>
+            <td id="pbb_col_bz_ac_status_<%= bz_bug.id %>" class="small_font">
+              Pending
+            </td>
+          </tr>
       <% end %>
     </table>
-    <%=render :partial => 'layouts/sep'%>
+    <%= render :partial => 'layouts/sep' %>
     <table>
       <tr>
         <td style="text-align: right">
@@ -45,22 +47,18 @@
         <td style="text-align: left">
           <input id="ubbs_pwd" value="<%= session[:bz_pass] %>" type="password"/>
         </td>
-      </tr>  
+      </tr>
       <tr>
         <td colspan="2" style="text-align: right">
-            <%= render :partial => 'layouts/progress_indicator', 
-                :locals => {
-                    :progress_indicator_id => "update_bz_bug_status_indicator",
-                    :msg => "Be patient"
-                }
-             %>
-            <button onclick="">
-              Update
-            </button>
-<!--             <button onclick="hideBzBugForm('update_bz_bugs_status')">
-                Cancel
-            </button>
- -->        </td>
+          <%= render :partial => 'layouts/progress_indicator',
+                     :locals => {
+                             :progress_indicator_id => "update_bz_bug_status_indicator",
+                             :msg => "Be patient"
+                     }
+          %>
+          <button onclick="">
+            Update
+          </button>
       </tr>
     </table>
   </div>

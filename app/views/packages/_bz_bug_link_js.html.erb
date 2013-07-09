@@ -1,55 +1,57 @@
 <script type="text/javascript">
-    // global vars
-    var pending_bz_bugs = [];
-
-    document.observe("dom:loaded", function() {
-        Element.show('update_bz_bugs_checking_indicator');
-        var bz_bug_actions = document.getObjectsByRegex(/^col_bz_action_.+/);
+    // After page loaded, do some initial scannings and process package's bz bugs according to https://docspace.corp.redhat.com/docs/DOC-148169.
+    <% if has_bz_auth_info? %>
+    document.observe("dom:loaded", function () {
+        var bz_bug_actions = document.getObjectsByRegex(/^pbb_col_bz_action_(\d)+(.+)/);
 
         for (var i = 0; i < bz_bug_actions.length; i++) {
-             if (bz_bug_actions[i].value == '<%=BzBug::BZ_ACTIONS[:movetoassigned]%>' || bz_bug_actions[i].value == '<%=BzBug::BZ_ACTIONS[:movetomodified]%>') {
-                pending_bz_bug = {
-                    'bz_bug_id' : bz_bug_actions[i].id.replace("col_bz_action_", ""),
-                    'action' : bz_bug_actions[i].value
-                };
-                pending_bz_bugs.push(pending_bz_bug);
-             }
+            var vals = bz_bug_actions[i].id.split(':');
+            var bz_bug_id = vals[0].replace("pbb_col_bz_action_", "");
+            var action = vals[1];
+
+            if (action == '<%=BzBug::BZ_ACTIONS[:accepted]%>') {
+                // TODO: sync bug info
+                document.getElementById('pbb_col_bz_ac_status_' + bz_bug_id).innerHTML = 'In progress...';
+                var bz_bug = document.getElementsByRegex('^col_bz_id_' + bz_bug_id);
+                syncBugInfoWithBz(bz_bug);
+            } else if (action == '<%=BzBug::BZ_ACTIONS[:movetoassigned]%>') {
+                // todo
+            } else if (action == '<%=BzBug::BZ_ACTIONS[:movetomodified]%>') {
+                // Dustin: please updateBzBugStatus here
+            }
         }
 
-        if (pending_bz_bugs.length > 0) {
-            // send bz_bug_id is useless here, we just send the first one to avoid rending function crash
-            renderPartial(pending_bz_bugs[0].bz_bug_id, 'update_bz_bugs_status_form_div', 'bz_bugs/update_bz_bug_status', '<%=package.id%>');
-        }
-
-        Element.hide('update_bz_bugs_checking_indicator');
     });
+    <% end %>
+
+
 
     function updateBzBugStatus(bz_bug_id, action) {
         new Ajax.Request('/bz_bugs/' + bz_bug_id,
-            {
-                method: 'POST',
-                asynchronous: true,
-                evalScripts: true,
-                onLoading: function () {
-                    // Element.show('update_bz_bugs_indicator');
-                },
-                onFailure: function () {
-                    // Element.hide('update_bz_bugs_indicator');
-                },
-                onSuccess: function () {
-                    // Element.hide('update_bz_bugs_indicator');  
-                },
-                parameters: {                    
-                    'action' : action,                    
-                    'authenticity_token': '<%=form_authenticity_token%>',
-                    '_method': 'put'
+                {
+                    method: 'POST',
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function () {
+                        // Element.show('update_bz_bugs_indicator');
+                    },
+                    onFailure: function () {
+                        // Element.hide('update_bz_bugs_indicator');
+                    },
+                    onSuccess: function () {
+                        // Element.hide('update_bz_bugs_indicator');
+                    },
+                    parameters: {
+                        'action': action,
+                        'authenticity_token': '<%=form_authenticity_token%>',
+                        '_method': 'put'
+                    }
                 }
-            }
         );
     }
 
     function syncAllBugInfoWithBz() {
-        var bz_bugs = document.getElementsByRegex('^col_bz_id_.+');        
+        var bz_bugs = document.getElementsByRegex('^col_bz_id_.+');
         syncBugInfoWithBz(bz_bugs);
     }
 
@@ -62,31 +64,39 @@
         }
 
         bz_bug = bz_bugs.pop();
-        var sbb_user = document.getElementById('sbb_user').value;
-        var sbb_pwd = document.getElementById('sbb_pwd').value;
+        var sbb_user = '';
+        if (document.getElementById('sbb_user')) {
+            sbb_user = document.getElementById('sbb_user').value;
+        }
+
+        var sbb_pwd = '';
+        if (document.getElementById('sbb_pwd')) {
+            sbb_pwd = document.getElementById('sbb_pwd').value;
+        }
+
         var bz_id = bz_bug.match(/\d+/)[0]
 
         new Ajax.Request('/bz_bugs/sync/' + bz_id,
-            {
-                method: 'GET',
-                asynchronous: true,
-                evalScripts: true,
-                onLoading: function () {
-                    Element.show("sync_bz_bug_button_indicator");
-                },
-                onFailure: function () {
-                    Element.hide('sync_bz_bug_button_indicator');
-                    syncBugInfoWithBz(bz_bugs);
-                },
-                onSuccess: function (response) {                    
-                    syncBugInfoWithBz(bz_bugs);
-                },
-                parameters: {
-                    'user': sbb_user,
-                    'pwd': sbb_pwd,                    
-                    'authenticity_token': '<%=form_authenticity_token%>'
+                {
+                    method: 'GET',
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function () {
+                        Element.show("sync_bz_bug_button_indicator");
+                    },
+                    onFailure: function () {
+                        Element.hide('sync_bz_bug_button_indicator');
+                        syncBugInfoWithBz(bz_bugs);
+                    },
+                    onSuccess: function (response) {
+                        syncBugInfoWithBz(bz_bugs);
+                    },
+                    parameters: {
+                        'user': sbb_user,
+                        'pwd': sbb_pwd,
+                        'authenticity_token': '<%=form_authenticity_token%>'
+                    }
                 }
-            }
         );
     }
 
@@ -229,7 +239,7 @@
                 });
     }
 
-    function updateBzBugRow(id) {    
+    function updateBzBugRow(id) {
 
         var colOps = document.getElementById('col_bz_ops_' + id);
         // alert("colOps: " + colOps);    

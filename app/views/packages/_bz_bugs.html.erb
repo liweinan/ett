@@ -7,44 +7,44 @@
       <button onclick="renderBzBugForm('link_bz_bug');">
         Link to an existing bug
       </button>
-      <%= render :partial => 'layouts/progress_indicator', 
-        :locals => {:progress_indicator_id => 'link_bz_bug_form_div_indicator'} %>
+      <%= render :partial => 'layouts/progress_indicator',
+                 :locals => {:progress_indicator_id => 'link_bz_bug_form_div_indicator'} %>
       or
       <button onclick="renderBzBugForm('new_bz_bug');">Create a new bug</button>
-      <%= render :partial => 'layouts/progress_indicator', 
-        :locals => {:progress_indicator_id => 'new_bz_bug_form_div_indicator'} %>
+      <%= render :partial => 'layouts/progress_indicator',
+                 :locals => {:progress_indicator_id => 'new_bz_bug_form_div_indicator'} %>
       in Bugzilla
       <%= render :partial => 'layouts/sep' %>
     </form>
 <% end %>
 <div id="link_bz_bug_form_div" style="display:none;"></div>
 <div id="new_bz_bug_form_div" style="display:none;"></div>
-<%= render :partial => 'packages/bz_bug_list', 
-  :locals => {:package => package} %>
+<%= render :partial => 'packages/bz_bug_list',
+           :locals => {:package => package} %>
 <% if logged_in? %>
-  <%= render :partial => 'layouts/sep' %>
-  <form onsubmit="return false;">
-    <button onclick="renderBzBugForm('sync_bz_bug');">
-      Sync bug information with Bugzilla
-    </button>
-    <%= render :partial => 'layouts/progress_indicator', 
-      :locals => {:progress_indicator_id => 'sync_bz_bug_form_div_indicator'} %>
-    <%= render :partial => 'layouts/progress_indicator', 
-        :locals => {
-            :progress_indicator_id => "update_bz_bugs_checking_indicator",
-            :msg => "Checking bugs need to be updated..."
-        }
-     %>      
-  </form>
-<% end %>
-<div id="sync_bz_bug_form_div" style="display:none;"></div>
-<%= render :partial => 'layouts/sep_tiny' %>
-<div id="update_bz_bugs_status_form_div" style="display:none;"></div>
-<%= render :partial => 'layouts/sep_tiny' %>
+    <%= render :partial => 'layouts/sep' %>
+    <form onsubmit="return false;">
+      <button onclick="renderBzBugForm('sync_bz_bug');">
+        Sync bug information with Bugzilla
+      </button>
+      <%= render :partial => 'layouts/progress_indicator',
+                 :locals => {:progress_indicator_id => 'sync_bz_bug_form_div_indicator'} %>
+    </form>
 
+    <div id="sync_bz_bug_form_div" style="display:none;"></div>
+    <%= render :partial => 'layouts/sep' %>
+    <%= render :partial => 'layouts/line' %>
+
+    <% bz_bugs = package.pending_bz_bugs %>
+    <% unless bz_bugs.blank? %>
+        <%= render :partial => 'layouts/sep' %>
+        <%= render :partial => 'bz_bugs/update_bz_bug_status', :locals => {:package => package, :bz_bugs => bz_bugs} %>
+    <% end %>
+    <%= render :partial => 'layouts/sep_tiny' %>
+<% end %>
 <% content_for :js do %>
-    <%= render :partial => 'packages/bz_bug_link_js', 
-      :locals => {:package => package} %>
+    <%= render :partial => 'packages/bz_bug_link_js',
+               :locals => {:package => package} %>
     <%= render :partial => 'packages/time_tracking_js' %>
 <% end %>
 

@@ -16,7 +16,6 @@ class BzBugsController < ApplicationController
         check_param_ver(params)
         end_check_param
 
-        uri = URI.parse(APP_CONFIG["bz_bug_creation_url"])
         parameters = {'pkg' => package.name,
                       'version' => params[:ver],
                       'release' => package.task.target_release,
@@ -97,7 +96,13 @@ class BzBugsController < ApplicationController
         check_param_pwd(params)
         end_check_param
 
+        bz_bug = BzBug.find(params[:id])
+
         if params[:action] == BzBug::BZ_ACTIONS[:movetoassigned]
+          #generate_bug_status_update_uri(id, status, assignee, userid, pwd, oneway='false')
+          uri = generate_bug_status_update_uri(bz_bug.bz_id, params[:status], params[:assignee], params[:user], params[:pwd])
+          @response = Net::HTTP.post_form(uri)
+
         end
 
       end
@@ -107,8 +112,19 @@ class BzBugsController < ApplicationController
 
     respond_to do |format|
       format.js {
-        if params[:action] == BzBug::BZ_ACTIONS[:movetoassigned]
+        unless @error.blank?
+          if @error.class == ArgumentError
+            # 400 Bad Request
+            render :status => 400
+          else
+            # 500 Internal Server Error
+            render :status => 500
+          end
+        else
+          if params[:action] == BzBug::BZ_ACTIONS[:movetoassigned]
+            render :partial => 'bz_bugs/movetoassigned', :status => @response.code
 
+          end
         end
       }
     end
@@ -201,6 +217,13 @@ class BzBugsController < ApplicationController
 
   def begin_check_param
     @err_msg = ''
+    if (!current_user.blank? && params[:user].blank?)
+      params[:user] = current_user.email
+    end
+
+    if (!session[:bz_pass].blank? && params[:pwd].blank?)
+      params[:pwd] = session[:bz_pass]
+    end
   end
 
   def end_check_param

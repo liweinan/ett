@@ -1,5 +1,5 @@
 <div style="text-align: left;">
-<% if logged_in? && @package.status.code == 'inprogress' && ! @package.git_url.blank?%>
+<% if logged_in? && !@package.status.blank? && @package.status.code == 'inprogress' && ! @package.git_url.blank?%>
     <%= render :partial => 'layouts/sep_tiny' %>
     <% form_remote_tag(
                :url => {:controller => "toolbox", :action => "build_package"},

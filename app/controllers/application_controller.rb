@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
   helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_task?, :count_packages, :can_edit_package?, :current_user, :get_task, :has_status?, :has_tag?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :task_has_tags?, :get_xattrs, :background_style, :confirmed?, :default_style
-  helper_method :btag, :ebtag, :uebtag, :truncate_u, :its_me?, :extract_username
+  helper_method :btag, :ebtag, :uebtag, :truncate_u, :its_me?, :extract_username, :has_bz_auth_info?
   before_filter :process_task_id
   before_filter :save_current_link
               # Scrub sensitive parameters from your log
@@ -461,7 +461,7 @@ class ApplicationController < ActionController::Base
       session[:bz_pass] = pwd
     end
   end
-  
+
   def bz_bug_creation_uri
     if Rails.env.production?
       return URI.parse(APP_CONFIG['bz_bug_creation_url'])
@@ -469,5 +469,25 @@ class ApplicationController < ActionController::Base
       return URI.parse(APP_CONFIG['bz_bug_creation_url_mocked'])
     end
   end
-  
+
+  def bz_bug_status_update_url
+    if Rails.env.production?
+      return APP_CONFIG['bz_bug_status_update_url']
+    else
+      return APP_CONFIG['bz_bug_status_update_uri_mocked']
+    end
+  end
+
+  # bz_bug_status_update_url: "http:/mead.usersys.redhat.com/mead-bzbridge/bug/status/<id>?oneway=<oneway>&status=<status>&assignee=<assignee>&userid=<userid>&pwd=<pwd>"
+  def generate_bug_status_update_uri(id, status, assignee, userid, pwd, oneway='false')
+    URI.parse(bz_bug_status_update_url.gsub('<id>', id).gsub('<oneway>', oneway).gsub('<status>', status).gsub('<assignee>', assignee).gsub('<userid>', userid).gsub('<pwd>', pwd))
+  end
+
+  def has_bz_auth_info?(params=Hash.new)
+    # TODO not complete
+    (!current_user.blank? && !session[:bz_pass].blank?) ||
+        (!params[:bzauth_user].blank? && !params[:bzauth_pwd].blank?) ||
+        (!params[:ubbs_user].blank? && !params[:ubbs_pwd].blank?)
+  end
+
 end
