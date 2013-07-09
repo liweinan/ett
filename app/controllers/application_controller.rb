@@ -490,4 +490,27 @@ class ApplicationController < ActionController::Base
         (!params[:ubbs_user].blank? && !params[:ubbs_pwd].blank?)
   end
 
+  def get_mead_name(brew_pkg)
+    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"] +
+                                   "/mead-brewbridge/pkg/wrapped/#{brew_pkg}"))
+    res = Net::HTTP.get_response(uri)
+    if res.code == "200" && !res.body.include?("ERROR")
+      res.body
+    else
+      nil
+    end
+  end
+
+  def get_brew_name(pac)
+    # TODO: make the tag more robust
+    tag = pac.task.candidate_tag + '-build'
+    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"] +
+                                   "/mead-brewbridge/pkg/latest/#{tag}/#{pac.name}"))
+    res = Net::HTTP.get_response(uri)
+    if res.code == "200" && !res.body.include?("ERROR")
+      res.body
+    else
+      nil
+    end
+  end
 end
