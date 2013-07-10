@@ -1,0 +1,9 @@
+<% style ||= 'text-align: left' %>
+<tr>
+  <td style="<%= style %>">
+    Bugzilla account password
+  </td>
+  <td style="<%= style %>">
+    <input id="bzauth_pwd" name="bzauth_pwd" value="<%= session[:bz_pass] %>" type="password"/>
+  </td>
+</tr>

@@ -1,21 +1,6 @@
 <div class='manage-tbl'>
   <table>
-    <tr>
-      <td style="text-align: right">
-        Bugzilla account
-      </td>
-      <td style="text-align: left">
-        <input id="bzauth_user" name="bzauth_user" value="<%= current_user.email %>"/>
-      </td>
-    </tr>
-    <tr>
-      <td style="text-align: right">
-        Bugzilla account password
-      </td>
-      <td style="text-align: left">
-        <input id="bzauth_pwd" name="bzauth_pwd" value="<%= session[:bz_pass] %>" type="password"/>
-      </td>
-    </tr>
-    <tr>
+    <%=render :partial => 'bz_bugs/fields/bz_user'%>
+    <%=render :partial => 'bz_bugs/fields/bz_pass'%>
   </table>
 </div>

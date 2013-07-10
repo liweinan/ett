@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
   helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_task?, :count_packages, :can_edit_package?, :current_user, :get_task, :has_status?, :has_tag?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :task_has_tags?, :get_xattrs, :background_style, :confirmed?, :default_style
-  helper_method :btag, :ebtag, :uebtag, :truncate_u, :its_me?, :extract_username, :has_bz_auth_info?
+  helper_method :btag, :ebtag, :uebtag, :truncate_u, :its_me?, :extract_username, :has_bz_auth_info?, :force_bz_auth?
   before_filter :process_task_id
   before_filter :save_current_link
               # Scrub sensitive parameters from your log
@@ -512,5 +512,9 @@ class ApplicationController < ActionController::Base
     else
       nil
     end
+  end
+
+  def force_bz_auth?(package)
+    package.task.can_use_bz_integration? && !package.bz_bugs.blank?
   end
 end

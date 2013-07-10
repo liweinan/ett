@@ -1,0 +1,9 @@
+<% style ||= 'text-align: left' %>
+<tr>
+  <td style="<%= style %>">
+    Bugzilla account
+  </td>
+  <td style="<%= style %>">
+    <input id="bzauth_user" name="bzauth_user" value="<%= current_user.email %>"/>
+  </td>
+</tr>

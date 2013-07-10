@@ -1,6 +1,8 @@
+<%= render :partial => 'packages/common_js' %>
+
 <script type="text/javascript">
     // After page loaded, do some initial scannings and process package's bz bugs according to https://docspace.corp.redhat.com/docs/DOC-148169.
-    <% if has_bz_auth_info? %>
+    <% if has_bz_auth_info? && @package.task.can_use_bz_integration? %>
     document.observe("dom:loaded", function () {
         var bz_bug_actions = document.getObjectsByRegex(/^pbb_col_bz_action_(\d)+(.+)/);
 
@@ -115,6 +117,13 @@
 //        var nbb_rel = document.getElementById('nbb_rel').value;
 //        var nbb_tver = document.getElementById('nbb_tver').value;
         var nbb_ver = document.getElementById('nbb_ver').value;
+
+        if (!checkPackageVersionFormat(nbb_ver)) {
+            alert('Version format not correct.');
+            return false;
+        }
+
+
 //        var nbb_sum = document.getElementById('nbb_sum').value;
         var nbb_user = document.getElementById('nbb_user').value;
         var nbb_pwd = document.getElementById('nbb_pwd').value;
