@@ -14,7 +14,6 @@
         <input type="hidden" id="user" name="user" value="<%= params[:user] %>"/>
     <% end %>
 
-
     <div class='manage-tbl'>
       <table>
         <%= render :partial => 'packages/fields/name', :locals => {:f => f} %>
@@ -84,7 +83,7 @@
             var afterPackageStatus = document.getElementById('package_status_id').value;
 
             if (beforePackageStatus != afterPackageStatus) {
-                alert("Please provide your Bugzilla account and password. ETT need to update relative relative bugs' status in BZ.");
+                alert('<%=t "bz_auth_failed"%>');
                 return false;
             } else {
                 return true;

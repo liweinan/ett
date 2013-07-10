@@ -1,9 +1,14 @@
+<% id ||= nil %>
 <% style ||= 'text-align: left' %>
 <tr>
   <td style="<%= style %>">
     Bugzilla account
   </td>
   <td style="<%= style %>">
-    <input id="bzauth_user" name="bzauth_user" value="<%= current_user.email %>"/>
+    <% if id.blank? %>
+        <input id="bzauth_user" name="bzauth_user" value="<%= current_user.email %>"/>
+    <% else %>
+        <input id="bzauth_user_<%=id%>" name="bzauth_user" value="<%= current_user.email %>"/>
+    <% end %>
   </td>
 </tr>

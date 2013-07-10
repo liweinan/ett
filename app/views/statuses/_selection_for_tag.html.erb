@@ -17,11 +17,12 @@
    statuses << Status.find_all_can_select_by_task_id_in_global_scope(task_id)
    statuses = statuses.flatten
 %>
+
 <% if form.blank? %>
     <% if package.blank? || package.status.blank? %>
         <%= select_tag('package[status_id]', options_from_collection_for_select(statuses, :id, :name)) %>
     <% else %>
-        <%= select_tag('package[status_id]', options_from_collection_for_select(statuses, :id, :name, package.status.id)) %>
+        <%= select_tag('package[status_id]', options_from_collection_for_select(statuses, :id, :name, package.status.id)).gsub("id=\"package_status_id\"", "id=\"package_status_id_#{package.id}\"") %>
     <% end %>
 <% else %>
     <%= form.collection_select :status_id, statuses, :id, :name %>

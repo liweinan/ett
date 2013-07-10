@@ -1,6 +1,8 @@
+<% id ||= nil %>
+
 <div class='manage-tbl'>
   <table>
-    <%=render :partial => 'bz_bugs/fields/bz_user'%>
-    <%=render :partial => 'bz_bugs/fields/bz_pass'%>
+    <%= render :partial => 'bz_bugs/fields/bz_user', :locals => {:id => id} %>
+    <%= render :partial => 'bz_bugs/fields/bz_pass', :locals => {:id => id} %>
   </table>
 </div>

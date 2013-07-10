@@ -1,3 +1,4 @@
+<% package = Package.find(pac_id) %>
 <form action="/packages/<%= pac_id %>"
       id="pac_<%= pac_id %>_<%= field_name %>_form"
       method="post"
@@ -18,7 +19,21 @@
   <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
   <%= hidden_field_tag :is_xattr, is_xattr %>
   <%= render :partial => field_type, :locals => {:package => Package.find(pac_id), :field_name => field_name} %>
-  <%= submit_tag 'Update' %>
+  <% if field_name == 'StatusId' && force_bz_auth?(package) %>
+      <% if package.status.blank? %>
+          <input type='submit' value='Submit' onclick='return checkBzAuthInfo(<%=pac_id%>);'/>
+      <% else %>
+          <input type='submit' value='Submit' onclick='return checkBzAuthInfo(<%=pac_id%>, <%=package.status.id%>);'/>
+      <% end %>
+  <% else %>
+      <%= submit_tag 'Update' %>
+  <% end %>
   <input type="button" value="Cancel" onclick="hide_pac_editor('pac_<%= pac_id %>_<%=field_name%>','<%=field_type%>', '<%=is_xattr%>')"/>
   <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "pac_#{pac_id}_#{field_name}_spinner"} %>
+
+  <% if field_name == 'StatusId' && force_bz_auth?(package) %>
+      <%= render :partial => 'layouts/sep' %>
+      <%= render :partial => 'bz_bugs/bz_auth', :locals => {:id => package.id} %>
+  <% end %>
+
 </form>

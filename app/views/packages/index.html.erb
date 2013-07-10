@@ -91,9 +91,28 @@
 
 
 <% if logged_in? %>
+    <%= render :partial => 'packages/common_js' %>
     <!--The following codes are all for inline editors-->
     <% content_for :js do %>
         <script type="text/javascript">
+            function checkBzAuthInfo(pac_id, beforeStatus) {
+                var afterStatusElement = document.getElementById('package_status_id_' + pac_id);
+                var afterStatus;
+                if (afterStatusElement) {
+                    afterStatus = document.getElementById('package_status_id_' + pac_id).value;
+                }
+                var bzauth_user = document.getElementById('bzauth_user_' + pac_id).value;
+                var bzauth_pwd = document.getElementById('bzauth_pwd_' + pac_id).value;
+
+                if (beforeStatus != afterStatus) { // user has changed status
+                    if (!(bzauth_user && bzauth_pwd)) {
+                        alert('<%=t "bz_auth_failed"%>');
+                        return false;
+                    }
+                }
+                return true;
+            }
+
             function show_pac_editor(div, pac_id, field_name, field_type, is_xattr) {
                 Element.hide(div + '_field');
                 Element.hide(build_pac_btn_id(div, field_type, is_xattr));
@@ -224,12 +243,18 @@
 <% else %>
     <% content_for :js do %>
         <script type="text/javascript">
-            function show_pac_editor(div, pac_id, field_name, field_type, is_xattr) {}
-            function hide_pac_editor(div, field_type, is_xattr) {}
-            function show_pac_btn(div, field_type, is_xattr) {}
-            function hide_pac_btn(div, field_type, is_xattr) {}
-            function build_pac_btn_id(div, field_type, is_xattr) {}
-            function showCommentDialog(pac_id) {}
+            function show_pac_editor(div, pac_id, field_name, field_type, is_xattr) {
+            }
+            function hide_pac_editor(div, field_type, is_xattr) {
+            }
+            function show_pac_btn(div, field_type, is_xattr) {
+            }
+            function hide_pac_btn(div, field_type, is_xattr) {
+            }
+            function build_pac_btn_id(div, field_type, is_xattr) {
+            }
+            function showCommentDialog(pac_id) {
+            }
         </script>
     <% end %>
 <% end %>

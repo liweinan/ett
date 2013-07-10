@@ -161,32 +161,35 @@ class PackagesController < ApplicationController
               @tt.save
             end
 
-            if new_status.code == Status::CODES[:inprogress]
+            unless new_status.blank?
+              if new_status.code == Status::CODES[:inprogress]
 
-              # the bug statuses are waiting to be updated according to https://docspace.corp.redhat.com/docs/DOC-148169
-              @package.bz_bugs.each do |bz_bug|
-                #TODO if the assignee of this package is nil, the bug cannot be moved to assigned.
-                bz_bug.bz_action = BzBug::BZ_ACTIONS[:movetoassigned]
-                bz_bug.save
-              end
-
-              # User has provided bz integration infomation, we'll perform bug update action immediately
-              if has_bz_auth_info?(params)
-                #TODO add bz integration code here
-                # doc: https://docspace.corp.redhat.com/docs/DOC-146267
-                # Use oneway fire and forget api here
-                # http:/mead.usersys.redhat.com/mead-bzbridge/bug/status/966279?oneway=true&status=ASSIGNED&assignee=fnasser@redhat.com&userid=youruserid&pwd=yourbzpwd
-
-                #bz update submitted, move bugs to 'accepted' status
+                # the bug statuses are waiting to be updated according to https://docspace.corp.redhat.com/docs/DOC-148169
                 @package.bz_bugs.each do |bz_bug|
-                  bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+                  #TODO if the assignee of this package is nil, the bug cannot be moved to assigned.
+                  bz_bug.bz_action = BzBug::BZ_ACTIONS[:movetoassigned]
                   bz_bug.save
                 end
 
+                # User has provided bz integration infomation, we'll perform bug update action immediately
+                if has_bz_auth_info?(params)
+                  #TODO add bz integration code here
+                  # doc: https://docspace.corp.redhat.com/docs/DOC-146267
+                  # Use oneway fire and forget api here
+                  # http:/mead.usersys.redhat.com/mead-bzbridge/bug/status/966279?oneway=true&status=ASSIGNED&assignee=fnasser@redhat.com&userid=youruserid&pwd=yourbzpwd
+
+                  #bz update submitted, move bugs to 'accepted' status
+                  @package.bz_bugs.each do |bz_bug|
+                    bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+                    bz_bug.save
+                  end
+
+                end
+              elsif new_status.code == Status::CODES[:finished]
+                # Dustin, please help to add codes here
               end
-            elsif new_status.code == Status::CODES[:finished]
-              # Dustin, please help to add codes here
             end
+
 
             log_entry = AutoLogEntry.new
             last_status_changed_at ||= @package.status_changed_at
@@ -200,9 +203,10 @@ class PackagesController < ApplicationController
 
           xattrs = @package.task.setting.xattrs.split(',')
 
-          if @package.status.code == 'finished' &&
-             xattrs.include?('mead') &&
-             xattrs.include?('brew')
+          if !@package.status.blank? &&
+              @package.status.code == Status::CODES[:finished] &&
+              xattrs.include?('mead') &&
+              xattrs.include?('brew')
             brew_pkg = get_brew_name(@package)
 
             @package.brew = brew_pkg unless brew_pkg.nil?
@@ -566,7 +570,7 @@ class PackagesController < ApplicationController
   def deal_with_deprecated_brew_tag_id
     unless params[:brew_tag_id].blank?
       params[:task_id] = params[:brew_tag_id]
-    end    
+    end
   end
 
 end
