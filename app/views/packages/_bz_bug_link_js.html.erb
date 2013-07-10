@@ -27,6 +27,7 @@
             } else if (action == '<%=BzBug::BZ_ACTIONS[:movetomodified]%>') {
                 // actions similiar to the above :movetoassigned
                 // Dustin: please call moveBzBugStatusToModified here
+                moveBzBugStatusToModified(bz_bug_id);
             }
         }
 
@@ -55,7 +56,7 @@
                         // Element.hide('update_bz_bugs_indicator');
                     },
                     parameters: {
-                        'action': <%=BzBug::BZ_ACTIONS[:movetomodified]%>,
+                        'bz_action': '<%=BzBug::BZ_ACTIONS[:movetomodified]%>',
                         'authenticity_token': '<%=form_authenticity_token%>',
                         '_method': 'put'
                     }
