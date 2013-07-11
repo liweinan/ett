@@ -99,12 +99,17 @@ class BzBugsController < ApplicationController
         bz_bug = BzBug.find(params[:id])
 
         if params[:bz_action] == BzBug::BZ_ACTIONS[:movetoassigned]
-          #generate_bug_status_update_uri(id, status, assignee, userid, pwd, oneway='false')
-          uri = generate_bug_status_update_uri(bz_bug.bz_id, params[:status], params[:assignee], params[:user], params[:pwd])
-          @response = Net::HTTP.post_form(uri)
-          # weinan todo: check result
+          update_bug(bz_bug.bz_id, params[:assignee], params[:user], params[:pwd], 'ASSIGNED')
+          bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+          bz_bug.save
         elsif params[:bz_action] == BzBug::BZ_ACTIONS[:movetomodified]
-          # Dustin, here is for you
+          update_bug(bz_bug.bz_id, params[:assignee], params[:user], params[:pwd], 'MODIFIED')
+          bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+          bz_bug.save
+
+        elsif params[:bz_action] == BzBug::BZ_ACTIONS[:done]
+          bz_bug.bz_action = BzBug::BZ_ACTIONS[:done]
+          bz_bug.save
         end
 
       end
@@ -126,7 +131,7 @@ class BzBugsController < ApplicationController
           if params[:bz_action] == BzBug::BZ_ACTIONS[:movetoassigned]
             render :partial => 'bz_bugs/movetoassigned', :status => @response.code
           elsif params[:bz_action] == BzBug::BZ_ACTIONS[:movetomodified]
-            # Dustin, here is for you
+            render :partial => 'bz_bugs/movetomodified', :status => @response.code
           end
         end
       }

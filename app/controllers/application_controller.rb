@@ -474,13 +474,13 @@ class ApplicationController < ActionController::Base
     if Rails.env.production?
       return APP_CONFIG['bz_bug_status_update_url']
     else
-      return APP_CONFIG['bz_bug_status_update_uri_mocked']
+      return APP_CONFIG['bz_bug_status_update_url_mocked']
     end
   end
 
   # bz_bug_status_update_url: "http:/mead.usersys.redhat.com/mead-bzbridge/bug/status/<id>?oneway=<oneway>&status=<status>&assignee=<assignee>&userid=<userid>&pwd=<pwd>"
-  def generate_bug_status_update_uri(id, status, assignee, userid, pwd, oneway='false')
-    URI.parse(bz_bug_status_update_url.gsub('<id>', id).gsub('<oneway>', oneway).gsub('<status>', status).gsub('<assignee>', assignee).gsub('<userid>', userid).gsub('<pwd>', pwd))
+  def generate_bug_status_update_url(id, status, assignee, userid, pwd, oneway='false')
+    bz_bug_status_update_url.gsub('<id>', id).gsub('<oneway>', oneway).gsub('<status>', status).gsub('<assignee>', assignee).gsub('<userid>', userid).gsub('<pwd>', pwd)
   end
 
   def has_bz_auth_info?(params=Hash.new)
@@ -500,6 +500,15 @@ class ApplicationController < ActionController::Base
       nil
     end
   end
+
+  def update_bug(bz_id, assignee, user, pwd, status, oneway='false')
+
+      uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+      req = Net::HTTP::Post.new(generate_bug_status_update_url(
+                                bz_id, status, assignee, user, pwd, oneway))
+      res = Net::HTTP.start(uri.host, uri.port) do |http|
+        http.request(req)
+      end
 
   def get_brew_name(pac)
     # TODO: make the tag more robust

@@ -167,26 +167,22 @@ class PackagesController < ApplicationController
                 # the bug statuses are waiting to be updated according to https://docspace.corp.redhat.com/docs/DOC-148169
                 @package.bz_bugs.each do |bz_bug|
                   #TODO if the assignee of this package is nil, the bug cannot be moved to assigned.
-                  bz_bug.bz_action = BzBug::BZ_ACTIONS[:movetoassigned]
+                  # TODO: check if the summary starts with Update to
+                  update_bug(bz_bug.bz_id, params[:assignee], params[:user], params[pwd], 'ASSIGNED', oneway='true')
+                  bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
                   bz_bug.save
                 end
 
-                # User has provided bz integration infomation, we'll perform bug update action immediately
-                if has_bz_auth_info?(params)
-                  #TODO add bz integration code here
-                  # doc: https://docspace.corp.redhat.com/docs/DOC-146267
-                  # Use oneway fire and forget api here
-                  # http:/mead.usersys.redhat.com/mead-bzbridge/bug/status/966279?oneway=true&status=ASSIGNED&assignee=fnasser@redhat.com&userid=youruserid&pwd=yourbzpwd
-
-                  #bz update submitted, move bugs to 'accepted' status
-                  @package.bz_bugs.each do |bz_bug|
-                    bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
-                    bz_bug.save
-                  end
-
-                end
               elsif new_status.code == Status::CODES[:finished]
                 # Dustin, please help to add codes here
+                @package.bz_bugs.each do |bz_bug|
+                  #TODO if the assignee of this package is nil, the bug cannot be moved to assigned.
+                  # TODO: check if the summary starts with Update to
+                  update_bug(bz_bug.bz_id, params[:assignee], params[:user], params[pwd], 'MODIFIED', oneway='true')
+                  bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+                  bz_bug.save
+                end
+                # TODO: add some stuff
               end
             end
 
