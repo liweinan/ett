@@ -22,9 +22,15 @@
       </table>
 
       <%= render :partial => "layouts/sep" %>
-      * To use the auto bug creation function, you must provide the Assignee and Version for each packge.<br/>
-      * Here is the format: package_name,version,assignee<br/>
-      Example: hoge,1.0,weli
+      <pre>
+      * To use the auto bug creation function, you must provide the Assignee and Version for each package.
+        Here is the format: package_name,version,assignee
+        Example: hoge,1.0,weli
+
+      * NOTE: Please be patient after clicking 'Import', and don't resubmit the form! It will use a long
+        time to create bugs in BZ.
+
+      </pre>
       <%= render :partial => "layouts/sep" %>
   <% end %>
 
@@ -47,7 +53,13 @@
         <% if task.can_use_bz_integration? %>
         function validateForm() {
             if (document.getElementById('create_bz').checked) {
-                return checkBzAuthFieldsNotEmpty();
+                if (checkBzAuthFieldsNotEmpty()) {
+                    return true;
+                } else {
+                    alert('<%=t"bz_auth_failed"%>');
+                    return false;
+                }
+                ;
             } else {
                 return true;
             }

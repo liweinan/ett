@@ -485,9 +485,7 @@ class ApplicationController < ActionController::Base
 
   def has_bz_auth_info?(params=Hash.new)
     # TODO not complete
-    (!current_user.blank? && !session[:bz_pass].blank?) ||
-        (!params[:bzauth_user].blank? && !params[:bzauth_pwd].blank?) ||
-        (!params[:ubbs_user].blank? && !params[:ubbs_pwd].blank?)
+    (!current_user.blank? && !session[:bz_pass].blank?) || (!params[:bzauth_user].blank? && !params[:bzauth_pwd].blank?) || (!params[:ubbs_user].blank? && !params[:ubbs_pwd].blank?)
   end
 
   def get_mead_name(brew_pkg)
@@ -517,4 +515,18 @@ class ApplicationController < ActionController::Base
   def force_bz_auth?(package)
     package.task.can_use_bz_integration? && !package.bz_bugs.blank?
   end
+
+  def extract_bz_bug_info(body)
+    #  @response.body
+    # "999999: Upgrade jboss-aggregator to 7.2.0.Final-redhat-7 (MOCK)"
+    bug_info = Hash.new
+    unless body.blank?
+      bug_info[:bz_id] = body.scan(/^\d+/)[0].to_i
+      bug_info[:summary] = body.split(/^\d+:\s*/)[1]
+    end
+    bug_info
+  end
+
+
+
 end

@@ -183,16 +183,6 @@ class BzBugsController < ApplicationController
 
   protected
 
-  def extract_bz_bug_info(body)
-    #  @response.body
-    # "999999: Upgrade jboss-aggregator to 7.2.0.Final-redhat-7 (MOCK)"
-    bug_info = Hash.new
-    unless body.blank?
-      bug_info[:bz_id] = body.scan(/^\d+/)[0].to_i
-      bug_info[:summary] = body.split(/^\d+:\s*/)[1]
-    end
-    bug_info
-  end
 
   def check_param_user(params)
     if params[:user].blank?

@@ -9,4 +9,4 @@ en:
   action_updated: "Package information is updated"
   action_commented: "Someone adds comment to the package"
   action_created: "Package is created"
-  bz_auth_failed: "Please provide your Bugzilla account and password. ETT need to update relative bug status in BZ."
+  bz_auth_failed: "Please provide your Bugzilla account and password."

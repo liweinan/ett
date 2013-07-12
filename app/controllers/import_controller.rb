@@ -139,11 +139,11 @@ class ImportController < ApplicationController
 
   def create
     package_names = params[:packages].split("\r\n")
-    @final_package_names = []
+    @final_packages = []
     package_names.each do |pn|
       unless pn.blank?
-        unless @final_package_names.index(pn.strip)
-          @final_package_names << pn.strip
+        unless @final_packages.index(pn.strip)
+          @final_packages << pn.strip
         end
       end
     end
@@ -156,9 +156,16 @@ class ImportController < ApplicationController
       @tags = process_tags(params[:tags], @task.id)
       @status = Status.find(params[:package][:status_id]) unless params[:package][:status_id].blank?
 
-      @final_package_names.each do |name|
+      @bz_bugs = []
+
+      @final_packages.each do |package_str|
+        package_attr = package_str.split(",")
+        package_name = package_attr[0]
+        package_ver = package_attr[1]
+        package_assignee = package_attr[2]
+
         package = Package.new
-        package.name = name.strip
+        package.name = package_name.strip
         package.status_id = params[:package][:status_id] unless params[:package][:status_id].blank?
         package.tags = @tags unless @tags.blank?
         package.task_id = @task.id
@@ -167,13 +174,37 @@ class ImportController < ApplicationController
         result = package.save
         if result == true
           @packages << package
+          bz_bug = {:name => package_name, :ver => package_ver, :assignee => package_assignee, :package => package}
+          @bz_bugs << bz_bug
         else
           @problem_packages << package
         end
       end
     end
 
+    if params[:create_bz] == 'on'
+      BzBug.transaction do
+        @bz_bugs.each do |bz_bug_obj|
+          parameters = {'pkg' => bz_bug_obj[:name],
+                        'version' => bz_bug_obj[:ver],
+                        'release' => bz_bug_obj[:package].task.target_release,
+                        'tagversion' => bz_bug_obj[:package].task.candidate_tag,
+                        'userid' => extract_username(params[:bzauth_user]),
+                        'pwd' => params[:bzauth_pwd]}
+          response = Net::HTTP.post_form(bz_bug_creation_uri, parameters)
+          if response.class == Net::HTTPCreated
+            bug_info = extract_bz_bug_info(response.body)
+            bz_bug = BzBug.new
+            bz_bug.package_id = bz_bug_obj[:package].id
+            bz_bug.bz_id = bug_info[:bz_id]
+            bz_bug.summary = bug_info[:summary]
+            bz_bug.creator_id = current_user.id
+            bz_bug.save
+          end
+        end
+      end
+    end
+
     expire_all_fragments
   end
-
 end
