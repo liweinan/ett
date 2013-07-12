@@ -509,6 +509,7 @@ class ApplicationController < ActionController::Base
       res = Net::HTTP.start(uri.host, uri.port) do |http|
         http.request(req)
       end
+  end
 
   def get_brew_name(pac)
     # TODO: make the tag more robust

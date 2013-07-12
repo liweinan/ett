@@ -133,6 +133,9 @@ class PackagesController < ApplicationController
     unless params[:package][:name].blank?
       cleanup_package_name(params[:package][:name])
     end
+    update_bz_pass(params[:bzauth_pwd])
+
+    @assignee = User.find_by_id(params[:package][:user_id])
 
     respond_to do |format|
       Package.transaction do
@@ -168,7 +171,7 @@ class PackagesController < ApplicationController
                 @package.bz_bugs.each do |bz_bug|
                   #TODO if the assignee of this package is nil, the bug cannot be moved to assigned.
                   # TODO: check if the summary starts with Update to
-                  update_bug(bz_bug.bz_id, params[:assignee], params[:user], params[pwd], 'ASSIGNED', oneway='true')
+                  update_bug(bz_bug.bz_id, @assignee.email, params[:bzauth_user], session[:bz_pass], 'ASSIGNED', oneway='true')
                   bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
                   bz_bug.save
                 end
@@ -178,7 +181,7 @@ class PackagesController < ApplicationController
                 @package.bz_bugs.each do |bz_bug|
                   #TODO if the assignee of this package is nil, the bug cannot be moved to assigned.
                   # TODO: check if the summary starts with Update to
-                  update_bug(bz_bug.bz_id, params[:assignee], params[:user], params[pwd], 'MODIFIED', oneway='true')
+                  update_bug(bz_bug.bz_id, @assignee.email, params[:bzauth_user], session[:bz_pass], 'MODIFIED', oneway='true')
                   bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
                   bz_bug.save
                 end
@@ -203,10 +206,10 @@ class PackagesController < ApplicationController
               @package.status.code == Status::CODES[:finished] &&
               xattrs.include?('mead') &&
               xattrs.include?('brew')
-            brew_pkg = get_brew_name(@package)
+              # brew_pkg = get_brew_name(@package)
 
-            @package.brew = brew_pkg unless brew_pkg.nil?
-            @package.mead = get_mead_name(brew_pkg) unless brew_pkg.nil?
+            # @package.brew = brew_pkg unless brew_pkg.nil?
+            # @package.mead = get_mead_name(brew_pkg) unless brew_pkg.nil?
           end
 
           @package.save

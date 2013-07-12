@@ -4,19 +4,19 @@
     // After page loaded, do some initial scannings and process package's bz bugs according to https://docspace.corp.redhat.com/docs/DOC-148169.
     <% if has_bz_auth_info? && @package.task.can_use_bz_integration? %>
     document.observe("dom:loaded", function () {
-        var bz_bug_actions = document.getObjectsByRegex(/^pbb_col_bz_action_(\d)+(.+)/);
+        var bz_bug_actions = document.getObjectsByRegex(/^col_bz_action_(\d)+(.+)/);
 
         for (var i = 0; i < bz_bug_actions.length; i++) {
             var vals = bz_bug_actions[i].id.split(':');
-            var bz_bug_id = vals[0].replace("pbb_col_bz_action_", "");
+            var bz_bug_id = vals[0].replace("col_bz_action_", "");
             var action = vals[1];
 
             if (action == '<%=BzBug::BZ_ACTIONS[:accepted]%>') {
                 // user has provided bz account and password info in package edit page, and the bz update request
                 // has been submitted to BZ asynchrously.
                 // Now it's time to sync bug info automatically to see if the bz request has been done.
-                moveBzBugStatusToDone(bz_bug_id);
-                syncBugInfoWithBz([bz_bug_id]);
+      //          moveBzBugStatusToDone(bz_bug_id);
+      //          syncBugInfoWithBz([bz_bug_id]);
             }
 
     });
