@@ -1,15 +1,61 @@
+<% task = Task.find_by_name(unescape_url(params[:id])) %>
 <h2>Import packages into task: <%= params[:id] %></h2>
-<form action="/import" method="post">
-	Intital status: <%= render :partial => "statuses/selection_for_tag", :locals => { :task_id => Task.find_by_name(unescape_url(params[:id])).id }%>
-	<%= render :partial => "layouts/sep" %>
-	Initial tags: <%= render :partial => 'tags/tags_selection', :locals => { :task_id => params[:id] } %>
-	<%= render :partial => "layouts/sep" %>
-	One package name per line:
-	<div class='manage-tbl'>
-	    <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
-	    <input name="task_id" type="hidden" value="<%= escape_url(params[:id]) %>"/>
-	    <textarea cols="40" rows="50" id="packages" name="packages"></textarea>
-	    <div style="height:10px;">&nbsp;</div>
-	    <input name="commit" type="submit" value="Import"/>
-	</div>
+<form action="/import" method="post" onsubmit="return validateForm();">
+  Intital status: <%= render :partial => "statuses/selection_for_tag", :locals => {:task_id => task.id} %>
+  <%= render :partial => "layouts/sep" %>
+  Initial tags: <%= render :partial => 'tags/tags_selection', :locals => {:task_id => params[:id]} %>
+  <%= render :partial => "layouts/sep" %>
+  <% if task.can_use_bz_integration? %>
+      <div><input type="checkbox" id="create_bz" name="create_bz"/>
+        <label for="create_bz">Create BZ bug automatically</label></div>
+      <table>
+        <tr>
+          <td>
+            <%= render :partial => 'bz_bugs/fields/bz_user' %>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <%= render :partial => 'bz_bugs/fields/bz_pass' %>
+          </td>
+        </tr>
+      </table>
+
+      <%= render :partial => "layouts/sep" %>
+      * To use the auto bug creation function, you must provide the Assignee and Version for each packge.<br/>
+      * Here is the format: package_name,version,assignee<br/>
+      Example: hoge,1.0,weli
+      <%= render :partial => "layouts/sep" %>
+  <% end %>
+
+  One package per line:
+  <div class='manage-tbl'>
+    <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
+    <input name="task_id" type="hidden" value="<%= escape_url(params[:id]) %>"/>
+    <textarea cols="64" rows="20" id="packages" name="packages"></textarea>
+
+    <div style="height:10px;">&nbsp;</div>
+    <input name="commit" type="submit" value="Import"/>
+  </div>
 </form>
+
+
+
+
+<% content_for :js do %>
+    <script type="text/javascript">
+        <% if task.can_use_bz_integration? %>
+        function validateForm() {
+            if (document.getElementById('create_bz').checked) {
+                return checkBzAuthFieldsNotEmpty();
+            } else {
+                return true;
+            }
+        }
+        <% else %>
+        function validateForm() {
+            return true;
+        }
+        <% end %>
+    </script>
+<% end %>
