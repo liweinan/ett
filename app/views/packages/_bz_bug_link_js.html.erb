@@ -15,11 +15,11 @@
                 // user has provided bz account and password info in package edit page, and the bz update request
                 // has been submitted to BZ asynchrously.
                 // Now it's time to sync bug info automatically to see if the bz request has been done.
-      //          moveBzBugStatusToDone(bz_bug_id);
-      //          syncBugInfoWithBz([bz_bug_id]);
+                moveBzBugStatusToDone(bz_bug_id);
+                syncBugInfoWithBz([bz_bug_id]);
             }
-
-    });
+         }
+     });
     <% end %>
 
     function moveBzBugStatusToDone(bz_bug_id) {

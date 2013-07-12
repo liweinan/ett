@@ -32,7 +32,8 @@
           <td id="col_bz_summary_<%= bz_bug.id %>" class="small_font">
             <%= render :partial => "bz_bugs/summary", :locals => {:bz_bug => bz_bug} %>
           </td>
-          <td id="col_bz_action_<%= bz_bug.id %>:<%= bz_bug.bz_action %>" class="small_font" style="display: none"> </td>
+          <td id="col_bz_action_<%= bz_bug.id %>:<%= bz_bug.bz_action %>" class="small_font" style="display: none">
+          </td>
         </tr>
     <% end %>
   </table>
