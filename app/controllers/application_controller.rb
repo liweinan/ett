@@ -511,6 +511,17 @@ class ApplicationController < ActionController::Base
       end
   end
 
+  def add_comment_to_bug(bz_id, comment, user, pwd)
+    req_link = "/mead-bzbridge/bug/#{bz_id}?comment=#{URI::encode(comment)}&userid=#{user}&pwd=#{pwd}&oneway=true"
+    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+    req = Net::HTTP::Put.new(req_link)
+
+    res = Net::HTTP.start(uri.host, uri.port) do |http|
+      http.request(req)
+    end
+    puts res.response
+  end
+
   def get_brew_name(pac)
     # TODO: make the tag more robust
     tag = pac.task.candidate_tag + '-build'

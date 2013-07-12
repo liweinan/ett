@@ -4,6 +4,12 @@
     // After page loaded, do some initial scannings and process package's bz bugs according to https://docspace.corp.redhat.com/docs/DOC-148169.
     <% if has_bz_auth_info? && @package.task.can_use_bz_integration? %>
     document.observe("dom:loaded", function () {
+
+        setTimeout(update_bz_bugs, 5000);
+     });
+    <% end %>
+
+    function update_bz_bugs() {
         var bz_bug_actions = document.getObjectsByRegex(/^col_bz_action_(\d)+(.+)/);
 
         for (var i = 0; i < bz_bug_actions.length; i++) {
@@ -18,10 +24,8 @@
                 moveBzBugStatusToDone(bz_bug_id);
                 syncBugInfoWithBz([bz_bug_id]);
             }
-         }
-     });
-    <% end %>
-
+        }
+    }
     function moveBzBugStatusToDone(bz_bug_id) {
         new Ajax.Request('/bz_bugs/' + bz_bug_id,
                 {
