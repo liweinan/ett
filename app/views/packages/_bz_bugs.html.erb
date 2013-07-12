@@ -34,12 +34,6 @@
     <div id="sync_bz_bug_form_div" style="display:none;"></div>
     <%= render :partial => 'layouts/sep' %>
     <%= render :partial => 'layouts/line' %>
-
-    <% bz_bugs = package.pending_bz_bugs %>
-    <% unless bz_bugs.blank? %>
-        <%= render :partial => 'layouts/sep' %>
-        <%= render :partial => 'bz_bugs/update_bz_bug_status', :locals => {:package => package, :bz_bugs => bz_bugs} %>
-    <% end %>
     <%= render :partial => 'layouts/sep_tiny' %>
 <% end %>
 <% content_for :js do %>

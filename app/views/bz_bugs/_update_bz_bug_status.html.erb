@@ -21,8 +21,8 @@
                   <%# TODO: package assignee should never be empty before it moves to 'movetoassigned' status. We should check this in controller %>
                   <% package.assignee ||= User.new %>
                   Update bug from <%= bz_bug.bz_status %> to ASSIGNED (to <%= package.assignee.email %>)
-              <% elsif bz_bug.bz_action == BzBug::BZ_ACTIONS[:accepted] %>
-                  Status update request submitted to BZ, waiting to sync bug info with BZ.
+              <% elsif bz_bug.bz_action == BzBug::BZ_ACTIONS[:movetomodified] %>
+                  Update bug from <%= bz_bug.bz_status %> to MODIFIED (to <%= package.assignee.email %>)
                   <%# elsif %>
               <% end %>
             </td>

@@ -86,7 +86,7 @@ class BzBugsController < ApplicationController
 
   def update
     begin
-      if params[:action].blank?
+      if params[:bz_action].blank?
         bz_bug = BzBug.find(params[:id])
         bz_bug.bz_id = params[:bz_id]
         bz_bug.save
@@ -98,13 +98,18 @@ class BzBugsController < ApplicationController
 
         bz_bug = BzBug.find(params[:id])
 
-        if params[:action] == BzBug::BZ_ACTIONS[:movetoassigned]
-          #generate_bug_status_update_uri(id, status, assignee, userid, pwd, oneway='false')
-          uri = generate_bug_status_update_uri(bz_bug.bz_id, params[:status], params[:assignee], params[:user], params[:pwd])
-          @response = Net::HTTP.post_form(uri)
-          # weinan todo: check result
-        elsif params[:action] == BzBug::BZ_ACTIONS[:movetomodified]
-          # Dustin, here is for you
+        if params[:bz_action] == BzBug::BZ_ACTIONS[:movetoassigned]
+          update_bug(bz_bug.bz_id, params[:assignee], params[:user], params[:pwd], 'ASSIGNED')
+          bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+          bz_bug.save
+        elsif params[:bz_action] == BzBug::BZ_ACTIONS[:movetomodified]
+          update_bug(bz_bug.bz_id, params[:assignee], params[:user], params[:pwd], 'MODIFIED')
+          bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+          bz_bug.save
+
+        elsif params[:bz_action] == BzBug::BZ_ACTIONS[:done]
+          bz_bug.bz_action = BzBug::BZ_ACTIONS[:done]
+          bz_bug.save
         end
 
       end
@@ -123,10 +128,10 @@ class BzBugsController < ApplicationController
             render :status => 500
           end
         else
-          if params[:action] == BzBug::BZ_ACTIONS[:movetoassigned]
+          if params[:bz_action] == BzBug::BZ_ACTIONS[:movetoassigned]
             render :partial => 'bz_bugs/movetoassigned', :status => @response.code
-          elsif params[:action] == BzBug::BZ_ACTIONS[:movetomodified]
-            # Dustin, here is for you
+          elsif params[:bz_action] == BzBug::BZ_ACTIONS[:movetomodified]
+            render :partial => 'bz_bugs/movetomodified', :status => @response.code
           end
         end
       }
