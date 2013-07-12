@@ -538,4 +538,12 @@ class ApplicationController < ActionController::Base
   def force_bz_auth?(package)
     package.task.can_use_bz_integration? && !package.bz_bugs.blank?
   end
+
+  def get_bz_info(bz_id, userid, pwd)
+        @response = Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_query_url"]}#{bz_id}.json?userid=#{userid}&pwd=#{pwd}"))
+
+        if @response.class == Net::HTTPOK
+          JSON.parse(@response.body)
+        end
+  end
 end

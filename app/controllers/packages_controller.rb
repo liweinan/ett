@@ -170,11 +170,13 @@ class PackagesController < ApplicationController
                 # the bug statuses are waiting to be updated according to https://docspace.corp.redhat.com/docs/DOC-148169
                 @package.bz_bugs.each do |bz_bug|
                     if bz_bug.summary.match(/^Upgrade/)
-                      update_bug(bz_bug.bz_id, @assignee.email,
-                                 extract_username(params[:bzauth_user]),
-                                 session[:bz_pass], 'ASSIGNED', oneway='true')
-                      bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
-                      bz_bug.save
+                      if get_bz_info(bz_bug.bz_id, extract_username(params[:bzauth_user]), session[:bz_pass])["assignee"] == @assignee.email
+                          update_bug(bz_bug.bz_id, @assignee.email,
+                                     extract_username(params[:bzauth_user]),
+                                     session[:bz_pass], 'ASSIGNED', oneway='true')
+                          bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+                          bz_bug.save
+                      end
                     end
                 end
 
@@ -190,17 +192,19 @@ class PackagesController < ApplicationController
 
                 @package.bz_bugs.each do |bz_bug|
                   if bz_bug.summary.match(/^Upgrade/)
-                      update_bug(bz_bug.bz_id, @assignee.email,
-                                 extract_username(params[:bzauth_user]),
-                                 session[:bz_pass], 'MODIFIED', oneway='true')
-                      comment = "Source URL: #{@package.git_url}\n" +
-                                "Mead-Build: #{@package.mead}\n" +
-                                "Brew-Build: #{@package.brew}\n"
-                      add_comment_to_bug(bz_bug.bz_id, comment,
-                                 extract_username(params[:bzauth_user]), session[:bz_pass])
+                      if get_bz_info(bz_bug.bz_id, extract_username(params[:bzauth_user]), session[:bz_pass])["assignee"] == @assignee.email
+                          update_bug(bz_bug.bz_id, @assignee.email,
+                                     extract_username(params[:bzauth_user]),
+                                     session[:bz_pass], 'MODIFIED', oneway='true')
+                          comment = "Source URL: #{@package.git_url}\n" +
+                                    "Mead-Build: #{@package.mead}\n" +
+                                    "Brew-Build: #{@package.brew}\n"
+                          add_comment_to_bug(bz_bug.bz_id, comment,
+                                     extract_username(params[:bzauth_user]), session[:bz_pass])
 
-                      bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
-                      bz_bug.save
+                          bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+                          bz_bug.save
+                      end
                     end
                 end
               end
