@@ -25,6 +25,12 @@ class BzBugsController < ApplicationController
 
         parameters['see_also'] = params[:see_also] unless params[:see_also].blank?
 
+        email = nil
+        unless package.assignee.blank?
+          email = package.assignee.email
+          parameters['assignee'] = email
+        end
+
         @response = Net::HTTP.post_form(bz_bug_creation_uri, parameters)
 
         if @response.class == Net::HTTPCreated
@@ -36,6 +42,7 @@ class BzBugsController < ApplicationController
           @bz_bug.package_id = package_id
           @bz_bug.bz_id = bug_info[:bz_id]
           @bz_bug.summary = bug_info[:summary]
+          @bz_bug.bz_assignee = email
           @bz_bug.creator_id = current_user.id
           @bz_bug.save
         end
@@ -99,12 +106,14 @@ class BzBugsController < ApplicationController
         bz_bug = BzBug.find(params[:id])
 
         if params[:bz_action] == BzBug::BZ_ACTIONS[:movetoassigned]
-          update_bug(bz_bug.bz_id, params[:assignee], params[:user], params[:pwd], 'ASSIGNED')
+          update_bug(bz_bug.bz_id, params[:assignee], params[:user], params[:pwd], BzBug::BZ_STATUS[:assigned])
           bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+          bz_bug.bz_assignee = params[:assignee]
           bz_bug.save
         elsif params[:bz_action] == BzBug::BZ_ACTIONS[:movetomodified]
-          update_bug(bz_bug.bz_id, params[:assignee], params[:user], params[:pwd], 'MODIFIED')
+          update_bug(bz_bug.bz_id, params[:assignee], params[:user], params[:pwd], BzBug::BZ_STATUS[:modified])
           bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+          bz_bug.bz_assignee = params[:assignee]
           bz_bug.save
 
         elsif params[:bz_action] == BzBug::BZ_ACTIONS[:done]

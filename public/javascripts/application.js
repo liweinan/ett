@@ -18,3 +18,7 @@ function checkBzAuthFieldsNotEmpty(id) {
         return false;
     }
 }
+
+function checkPackageVersionFormat(ver) {
+    return ver.match(/[\d\.a-zA-Z]+/) == ver;
+}

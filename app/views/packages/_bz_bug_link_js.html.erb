@@ -1,10 +1,7 @@
-<%= render :partial => 'packages/common_js' %>
-
 <script type="text/javascript">
     // After page loaded, do some initial scannings and process package's bz bugs according to https://docspace.corp.redhat.com/docs/DOC-148169.
     <% if has_bz_auth_info? && @package.task.can_use_bz_integration? %>
     document.observe("dom:loaded", function () {
-
         setTimeout(update_bz_bugs, 5000);
      });
     <% end %>
@@ -16,7 +13,6 @@
             var vals = bz_bug_actions[i].id.split(':');
             var bz_bug_id = vals[0].replace("col_bz_action_", "");
             var action = vals[1];
-
             if (action == '<%=BzBug::BZ_ACTIONS[:accepted]%>') {
                 // user has provided bz account and password info in package edit page, and the bz update request
                 // has been submitted to BZ asynchrously.
@@ -33,44 +29,18 @@
                     asynchronous: true,
                     evalScripts: true,
                     onLoading: function () {
-                        // Element.show('update_bz_bugs_indicator');
+                        Element.show('update_bz_bugs_indicator');
                     },
                     onFailure: function () {
-                        // Element.hide('update_bz_bugs_indicator');
+                        Element.hide('update_bz_bugs_indicator');
                     },
                     onSuccess: function () {
-                        // Element.hide('update_bz_bugs_indicator');
+                        Element.hide('update_bz_bugs_indicator');
                     },
                     onComplete: function() {
                     },
                     parameters: {
                         'bz_action': '<%=BzBug::BZ_ACTIONS[:done]%>',
-                        'authenticity_token': '<%=form_authenticity_token%>',
-                        '_method': 'put'
-                    }
-                }
-        );
-    }
-
-    // Dustin, please use the bz_bugs/update properly to call necessary BZ and MEAD apis according to the requirement in https://docspace.corp.redhat.com/docs/DOC-148169
-    // Check '==> Finished' section in the doc
-    function moveBzBugStatusToModified(bz_bug_id) {
-        new Ajax.Request('/bz_bugs/' + bz_bug_id,
-                {
-                    method: 'POST',
-                    asynchronous: true,
-                    evalScripts: true,
-                    onLoading: function () {
-                        // Element.show('update_bz_bugs_indicator');
-                    },
-                    onFailure: function () {
-                        // Element.hide('update_bz_bugs_indicator');
-                    },
-                    onSuccess: function () {
-                        // Element.hide('update_bz_bugs_indicator');
-                    },
-                    parameters: {
-                        'bz_action': '<%=BzBug::BZ_ACTIONS[:movetomodified]%>',
                         'authenticity_token': '<%=form_authenticity_token%>',
                         '_method': 'put'
                     }
@@ -102,7 +72,7 @@
             sbb_pwd = document.getElementById('sbb_pwd').value;
         }
 
-        var bz_id = bz_bug.match(/\d+/)[0]
+        var bz_id = bz_bug.match(/\d+/)[0];
         new Ajax.Request('/bz_bugs/sync/' + bz_id,
                 {
                     method: 'GET',
@@ -286,6 +256,9 @@
         // alert("colBzBugCreator: " + colBzBugCreator);
         renderBzBugCreator(id, colBzBugCreator);
 
+        var colBzBugAssignee = document.getElementById('col_bz_assignee_' + id);
+        renderPartial(id, colBzBugAssignee.id, 'bz_bugs/bz_assignee');
+
         var colBzLastSyncedAt = document.getElementById('col_bz_last_synced_at_' + id);
         // alert("colBzLastSyncedAt: " + colBzLastSyncedAt);
         renderBzBugLastSyncedAt(id, colBzLastSyncedAt);
@@ -321,15 +294,20 @@
         colBzBugCreator.id = 'col_bz_creator_' + id;
         renderBzBugCreator(id, colBzBugCreator);
 
-        var colBzLastSyncedAt = row.insertCell(3);
+
+        var colBzBugAssignee = row.insertCell(3);
+        colBzBugAssignee.id = 'col_bz_assignee_' + id;
+        renderPartial(id, colBzBugAssignee.id, 'bz_bugs/bz_assignee');
+
+        var colBzLastSyncedAt = row.insertCell(4);
         colBzLastSyncedAt.id = 'col_bz_last_synced_at_' + id;
         renderBzBugLastSyncedAt(id, colBzLastSyncedAt);
 
-        var colBzBugStatus = row.insertCell(4);
+        var colBzBugStatus = row.insertCell(5);
         colBzBugStatus.id = 'col_bz_status_' + id;
         renderBzBugStatus(id, colBzBugStatus);
 
-        var colBzBugSummary = row.insertCell(5);
+        var colBzBugSummary = row.insertCell(6);
         colBzBugSummary.id = 'col_bz_summary_' + id;
         renderBzBugSummary(id, colBzBugSummary);
 

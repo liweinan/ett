@@ -500,13 +500,12 @@ class ApplicationController < ActionController::Base
   end
 
   def update_bug(bz_id, assignee, user, pwd, status, oneway='false')
-
-      uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
-      req = Net::HTTP::Post.new(generate_bug_status_update_url(
-                                bz_id, status, assignee, user, pwd, oneway))
-      res = Net::HTTP.start(uri.host, uri.port) do |http|
-        http.request(req)
-      end
+    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+    req = Net::HTTP::Post.new(generate_bug_status_update_url(
+                                  bz_id, status, assignee, user, pwd, oneway))
+    res = Net::HTTP.start(uri.host, uri.port) do |http|
+      http.request(req)
+    end
   end
 
   def add_comment_to_bug(bz_id, comment, user, pwd)
@@ -548,11 +547,26 @@ class ApplicationController < ActionController::Base
     bug_info
   end
 
-  def get_bz_info(bz_id, userid, pwd)
-        @response = Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_query_url"]}#{bz_id}.json?userid=#{userid}&pwd=#{pwd}"))
-
-        if @response.class == Net::HTTPOK
-          JSON.parse(@response.body)
-        end
+  def current_bzuser(params)
+    extract_username(params[:bzauth_user])
   end
+
+  def current_bzpass(params)
+    if session[:bz_pass].blank?
+      return params[:bzauth_pwd]
+    else
+      return session[:bz_pass]
+    end
+  end
+
+  def get_bz_info(bz_id, userid, pwd)
+    @response = Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_query_url"]}#{bz_id}.json?userid=#{userid}&pwd=#{pwd}"))
+    bz_info = nil
+    if @response.class == Net::HTTPOK
+      bz_info = JSON.parse(@response.body)
+    end
+
+    bz_info
+  end
+
 end

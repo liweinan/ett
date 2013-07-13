@@ -19,6 +19,7 @@ class BzBug < ActiveRecord::Base
     bz_bug.summary = summary
     bz_bug.bz_status = bz_status
     bz_bug.creator_id = current_user.id
+    bz_bug.bz_assignee = bz_info["assignee"]
     bz_bug.save
     bz_bug
   end
@@ -27,6 +28,7 @@ class BzBug < ActiveRecord::Base
     bz_bug.bz_id = bz_info["id"]
     bz_bug.summary = bz_info["summary"]
     bz_bug.bz_status = bz_info["status"]
+    bz_bug.bz_assignee = bz_info["assignee"]
     bz_bug.last_synced_at = Time.now
     bz_bug.save
     bz_bug

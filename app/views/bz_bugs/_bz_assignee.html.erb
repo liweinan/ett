@@ -1,0 +1,3 @@
+<% unless bz_bug.bz_assignee.blank? %>
+    <a href="mailto:<%= bz_bug.bz_assignee %>"><%= bz_bug.bz_assignee %></a>
+<% end %>
