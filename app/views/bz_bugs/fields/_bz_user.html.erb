@@ -5,10 +5,12 @@
     Bugzilla account
   </td>
   <td style="<%= style %>">
-    <% if id.blank? %>
+    <%# if id.blank? %>
         <input id="bzauth_user" name="bzauth_user" value="<%= current_user.email %>"/>
-    <% else %>
-        <input id="bzauth_user_<%=id%>" name="bzauth_user" value="<%= current_user.email %>"/>
-    <% end %>
+    <%# else %>
+        <!--
+           - <input id="bzauth_user_<%=id%>" name="bzauth_user" value="<%= current_user.email %>"/>
+           -->
+    <%# end %>
   </td>
 </tr>

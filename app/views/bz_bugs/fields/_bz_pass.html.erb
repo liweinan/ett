@@ -5,10 +5,12 @@
     Bugzilla account password
   </td>
   <td style="<%= style %>">
-    <% if id.blank? %>
+    <%# if id.blank? %>
         <input id="bzauth_pwd" name="bzauth_pwd" value="<%= session[:bz_pass] %>" type="password"/>
-    <% else %>
-        <input id="bzauth_pwd_<%=id%>" name="bzauth_pwd" value="<%= session[:bz_pass] %>" type="password"/>
-    <% end %>
+    <%# else %>
+        <!--
+           - <input id="bzauth_pwd_<%=id%>" name="bzauth_pwd" value="<%= session[:bz_pass] %>" type="password"/>
+           -->
+    <%# end %>
   </td>
 </tr>

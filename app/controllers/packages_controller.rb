@@ -133,6 +133,9 @@ class PackagesController < ApplicationController
     unless params[:package][:name].blank?
       cleanup_package_name(params[:package][:name])
     end
+    update_bz_pass(params[:bzauth_pwd])
+
+    @assignee = User.find_by_id(params[:package][:user_id]) if params[:package].key? :user_id
 
     respond_to do |format|
       Package.transaction do
@@ -162,31 +165,48 @@ class PackagesController < ApplicationController
             end
 
             unless new_status.blank?
-              if new_status.code == Status::CODES[:inprogress]
+              if new_status.code == Status::CODES[:inprogress] && !@assignee.nil?
 
                 # the bug statuses are waiting to be updated according to https://docspace.corp.redhat.com/docs/DOC-148169
                 @package.bz_bugs.each do |bz_bug|
-                  #TODO if the assignee of this package is nil, the bug cannot be moved to assigned.
-                  bz_bug.bz_action = BzBug::BZ_ACTIONS[:movetoassigned]
-                  bz_bug.save
+                    if bz_bug.summary.match(/^Upgrade/)
+                      if get_bz_info(bz_bug.bz_id, extract_username(params[:bzauth_user]), session[:bz_pass])["assignee"] == @assignee.email
+                          update_bug(bz_bug.bz_id, @assignee.email,
+                                     extract_username(params[:bzauth_user]),
+                                     session[:bz_pass], 'ASSIGNED', oneway='true')
+                          bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+                          bz_bug.save
+                      end
+                    end
                 end
 
-                # User has provided bz integration infomation, we'll perform bug update action immediately
-                if has_bz_auth_info?(params)
-                  #TODO add bz integration code here
-                  # doc: https://docspace.corp.redhat.com/docs/DOC-146267
-                  # Use oneway fire and forget api here
-                  # http:/mead.usersys.redhat.com/mead-bzbridge/bug/status/966279?oneway=true&status=ASSIGNED&assignee=fnasser@redhat.com&userid=youruserid&pwd=yourbzpwd
+              elsif new_status.code == Status::CODES[:finished] && !@assignee.nil?
+                xattrs = @package.task.setting.xattrs.split(',')
 
-                  #bz update submitted, move bugs to 'accepted' status
-                  @package.bz_bugs.each do |bz_bug|
-                    bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
-                    bz_bug.save
-                  end
-
+                if xattrs.include?('mead') && xattrs.include?('brew')
+                  brew_pkg = get_brew_name(@package)
+                  @package.brew = brew_pkg unless brew_pkg.nil?
+                  @package.mead = get_mead_name(brew_pkg) unless brew_pkg.nil?
+                  @package.save
                 end
-              elsif new_status.code == Status::CODES[:finished]
-                # Dustin, please help to add codes here
+
+                @package.bz_bugs.each do |bz_bug|
+                  if bz_bug.summary.match(/^Upgrade/)
+                      if get_bz_info(bz_bug.bz_id, extract_username(params[:bzauth_user]), session[:bz_pass])["assignee"] == @assignee.email
+                          update_bug(bz_bug.bz_id, @assignee.email,
+                                     extract_username(params[:bzauth_user]),
+                                     session[:bz_pass], 'MODIFIED', oneway='true')
+                          comment = "Source URL: #{@package.git_url}\n" +
+                                    "Mead-Build: #{@package.mead}\n" +
+                                    "Brew-Build: #{@package.brew}\n"
+                          add_comment_to_bug(bz_bug.bz_id, comment,
+                                     extract_username(params[:bzauth_user]), session[:bz_pass])
+
+                          bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+                          bz_bug.save
+                      end
+                    end
+                end
               end
             end
 
@@ -199,18 +219,6 @@ class PackagesController < ApplicationController
             log_entry.package = @package
             log_entry.status = last_status
             log_entry.save
-          end
-
-          xattrs = @package.task.setting.xattrs.split(',')
-
-          if !@package.status.blank? &&
-              @package.status.code == Status::CODES[:finished] &&
-              xattrs.include?('mead') &&
-              xattrs.include?('brew')
-            brew_pkg = get_brew_name(@package)
-
-            @package.brew = brew_pkg unless brew_pkg.nil?
-            @package.mead = get_mead_name(brew_pkg) unless brew_pkg.nil?
           end
 
           @package.save
