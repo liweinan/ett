@@ -26,15 +26,7 @@
           <input type='submit' value='Submit' onclick='return checkBzAuthInfo(<%=pac_id%>, <%=package.status.id%>);'/>
       <% end %>
   <% elsif field_name == 'Ver' %>
-        <%# Dustin, please implement version format checking. you need to write a function in package index page and do the format checking.
-            You can check checkBzAuthInfo() in packages/index.html.erb as example.
-         %>
-        <%# (rdb:2) field_type
-"packages/index/field_input"
-(rdb:2) field_name
-"Ver" %>
-
-
+      <input type='submit' value='Submit' onclick='if (checkPackageVersionFormat(document.getElementById("pac_<%=pac_id%>_Ver_input").value)) { return true; } else { alert("Version format not correct."); return false; }'/>
   <% else %>
       <%= submit_tag 'Update' %>
   <% end %>

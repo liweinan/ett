@@ -198,6 +198,7 @@ class ImportController < ApplicationController
             bz_bug.package_id = bz_bug_obj[:package].id
             bz_bug.bz_id = bug_info[:bz_id]
             bz_bug.summary = bug_info[:summary]
+            bz_bug.bz_assignee = bug_info[:assignee]
             bz_bug.creator_id = current_user.id
             bz_bug.save
           end
