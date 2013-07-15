@@ -7,6 +7,7 @@
       <th>Can Show</th>
       <th>Candidate Tag</th>
       <th>Target Release</th>
+      <th>Version</th>
       <% if can_manage? %>
           <th>Operation</th>
       <% end %>
@@ -28,6 +29,13 @@
                 -
             <% else %>
                 <%= task.target_release %>
+            <% end %>
+          </td>
+          <td>
+            <% if task.tag_version.blank? %>
+                -
+            <% else %>
+                <%= task.tag_version %>
             <% end %>
           </td>
           <% if can_manage? %>
