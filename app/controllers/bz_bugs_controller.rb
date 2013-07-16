@@ -19,7 +19,7 @@ class BzBugsController < ApplicationController
         parameters = {'pkg' => package.name,
                       'version' => params[:ver],
                       'release' => package.task.target_release,
-                      'tagversion' => package.task.candidate_tag,
+                      'tagversion' => package.task.tag_version,
                       'userid' => extract_username(params[:user]),
                       'pwd' => params[:pwd]}
 
