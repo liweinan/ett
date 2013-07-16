@@ -196,7 +196,7 @@ class PackagesController < ApplicationController
 
                   if bz_bug.summary.match(/^Upgrade/)
                     #if get_assignee(bz_bug, params) == @assignee.email
-                    if bz_bug.assignee == @assignee.email
+                    if bz_bug.bz_assignee == @assignee.email
                           update_bug(bz_bug.bz_id, @assignee.email,
                                      extract_username(params[:bzauth_user]),
                                      session[:bz_pass], BzBug::BZ_STATUS[:modified], oneway='true')
