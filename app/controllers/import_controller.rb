@@ -162,19 +162,19 @@ class ImportController < ApplicationController
         package_attr = package_str.split(",")
         package_name = package_attr[0]
         package_ver = package_attr[1]
-        package_assignee = package_attr[2]
 
         package = Package.new
         package.name = package_name.strip
         package.status_id = params[:package][:status_id] unless params[:package][:status_id].blank?
         package.tags = @tags unless @tags.blank?
         package.task_id = @task.id
+        package.ver = package_ver
         package.created_by = current_user.id
         package.updated_by = current_user.id
         result = package.save
         if result == true
           @packages << package
-          bz_bug = {:name => package_name, :ver => package_ver, :assignee => "#{package_assignee}@redhat.com", :package => package}
+          bz_bug = {:name => package_name, :ver => package_ver, :package => package}
           @bz_bugs << bz_bug
         else
           @problem_packages << package
@@ -188,9 +188,8 @@ class ImportController < ApplicationController
           parameters = {'pkg' => bz_bug_obj[:name],
                         'version' => bz_bug_obj[:ver],
                         'release' => bz_bug_obj[:package].task.target_release,
-                        'tagversion' => bz_bug_obj[:package].task.candidate_tag,
+                        'tagversion' => bz_bug_obj[:package].task.tag_version,
                         'userid' => extract_username(params[:bzauth_user]),
-                        'assignee' => bz_bug_obj[:assignee],
                         'pwd' => params[:bzauth_pwd]}
           response = Net::HTTP.post_form(bz_bug_creation_uri, parameters)
           if response.class == Net::HTTPCreated
@@ -199,7 +198,6 @@ class ImportController < ApplicationController
             bz_bug.package_id = bz_bug_obj[:package].id
             bz_bug.bz_id = bug_info[:bz_id]
             bz_bug.summary = bug_info[:summary]
-            bz_bug.bz_assignee = bz_bug_obj[:assignee]
             bz_bug.creator_id = current_user.id
             bz_bug.save
           end
