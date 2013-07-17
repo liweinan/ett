@@ -1,5 +1,5 @@
 <div style="text-align: left;">
-<% if logged_in? && !@package.status.blank? && @package.status.code == 'inprogress' && ! @package.git_url.blank?%>
+<% if logged_in?%>
     <%= render :partial => 'layouts/sep_tiny' %>
     <% form_remote_tag(
                :url => {:controller => "toolbox", :action => "build_package"},
@@ -7,12 +7,8 @@
                :success => "Element.hide('spinner_build_#{@package.id}');
            ") do %>
           <%= hidden_field_tag :package_id, @package.id %>
-          <%= render :partial => 'packages/fields/git_url_display' %>
-          <%= submit_tag 'Build' %>
+          <%= submit_tag 'Build This Package Using Mead-Scheduler' %>
           <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "spinner_build_#{@package.id}"} %>
         </div>
     <% end %>
-<% else %>
- <%= render :partial => 'packages/fields/git_url_display' %>
 <% end %>
-<%= render :partial => 'layouts/sep_tiny' %>
