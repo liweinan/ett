@@ -44,7 +44,7 @@
             %>
 
             <%= f.submit 'Update' %>
-            <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "validate_bz_auth_indicator"} %>
+            <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "validate_bz_auth_indicator", :msg => t('validating_bzauth_info')} %>
             <%= render :partial => 'layouts/notification_link',
                        :locals => {:div_id => 'package_edit'} %>
           </td>
@@ -57,9 +57,9 @@
 
 <% content_for :js do %>
     <script type="text/javascript">
-        var beforePackageStatus;
+        var beforeStatus;
         document.observe("dom:loaded", function () {
-            beforePackageStatus = document.getElementById('package_status_id').value;
+            beforeStatus = document.getElementById('package_status_id').value;
         });
 
         function validateForm() {
@@ -69,32 +69,7 @@
                 return false;
             }
 
-            return checkBzAuthInfo();
+            return checkBzAuthInfo(null, beforeStatus, document.getElementById('edit_package_<%=@package.id%>'));
         }
-
-        <% if force_bz_auth?(@package) %>
-        function checkBzAuthInfo() {
-            var bzauth_user = document.getElementById('bzauth_user').value;
-            var bzauth_pass = document.getElementById('bzauth_pwd').value;
-
-            if (bzauth_user) {
-                if (bzauth_pass) {
-                    var afterPackageStatus = document.getElementById('package_status_id').value;
-                    if (beforePackageStatus != afterPackageStatus) {
-                        return validateBzAuthInfo(bzauth_user, bzauth_pass);
-                    } else {
-                        return true;
-                    }
-
-                }
-            }
-            alert('<%=t "need_bzauth_info"%>');
-            return false;
-        }
-        <% else %>
-        function checkBzAuthInfo() {
-            return true;
-        }
-        <% end %>
     </script>
 <% end %>

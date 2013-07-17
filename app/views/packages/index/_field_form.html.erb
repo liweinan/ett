@@ -2,15 +2,7 @@
 <form action="/packages/<%= pac_id %>"
       id="pac_<%= pac_id %>_<%= field_name %>_form"
       method="post"
-      onsubmit="new Ajax.Request('/packages/<%=pac_id%>',
-              {
-                      asynchronous:true, evalScripts:true,
-                      onLoading:function(request) {Element.show('pac_<%=pac_id%>_<%=field_name%>_spinner');},
-                      onSuccess:function(request) {
-
-                              },
-                      parameters:Form.serialize(this)
-                      });return false;">
+      onsubmit="postInlineEditorForm('<%=pac_id%>', '<%=field_name%>', this);return false;">
 
   <%= hidden_field_tag '_method', 'put' %>
   <%= hidden_field_tag :id, pac_id %>
@@ -21,11 +13,12 @@
   <%= render :partial => field_type, :locals => {:package => Package.find(pac_id), :field_name => field_name} %>
   <% if field_name == 'StatusId' && force_bz_auth?(package) %>
       <% if package.status.blank? %>
-          <input type='submit' value='Submit' onclick='return checkBzAuthInfo(<%=pac_id%>);'/>
+          <input type='submit' value='Submit' onclick='return checkBzAuthInfo(<%=pac_id%>, null, document.getElementById("pac_<%=pac_id%>_StatusId_form"), "<%=field_name%>");'/>
       <% else %>
-          <input type='submit' value='Submit' onclick='return checkBzAuthInfo(<%=pac_id%>, <%=package.status.id%>);'/>
+          <input type='submit' value='Submit' onclick='return checkBzAuthInfo(<%=pac_id%>, <%=package.status.id%>, document.getElementById("pac_<%=pac_id%>_StatusId_form"), "<%=field_name%>");'/>
       <% end %>
-  <% elsif field_name == 'Ver' %>
+      <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "validate_bz_auth_indicator_#{pac_id}", :msg => t('validating_bzauth_info')} %>
+<% elsif field_name == 'Ver' %>
       <input type='submit' value='Submit' onclick='if (checkPackageVersionFormat(document.getElementById("pac_<%=pac_id%>_Ver_input").value)) { return true; } else { alert("Version format not correct."); return false; }'/>
   <% else %>
       <%= submit_tag 'Update' %>

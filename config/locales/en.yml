@@ -14,3 +14,4 @@ en:
   wrong_bz_pwd: "'Wrong Bugzilla email or password!'"
   version_fmt_incorrect: "Version format not correct."
   bz_auth_failed: "Your Bugzilla account/password is not correct."
+  validating_bzauth_info: "Validating BZ account/password..."

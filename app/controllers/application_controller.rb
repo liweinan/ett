@@ -578,8 +578,8 @@ class ApplicationController < ActionController::Base
       return 401 # authentication failure
     end
 
-    res = Net::HTTP.get_response(URI(APP_CONFIG["mead_scheduler"] + "/mead-bzbridge/bug/status/966279?userid=#{bzauth_user}&pwd=#{bzauth_pwd}"))
-    res.code.to_i
+    res = Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_query_url"]}#{APP_CONFIG["magic_bug_id"]}?userid=#{bzauth_user}&pwd=#{bzauth_pwd}"))
+    res.code
   end
 
 end

@@ -1,7 +1,14 @@
 <%# we put js here because Rails won't process ruby codes in js file %>
 <script type="text/javascript">
 
-    function validateBzAuthInfo(bzauth_user, bzauth_pwd) {
+    function validateBzAuthInfo(id, bzauth_user, bzauth_pwd, form, inline) {
+        var indicator;
+        if (id) {
+            indicator = "validate_bz_auth_indicator_" + id;
+        } else {
+            indicator = "validate_bz_auth_indicator";
+        }
+
         if (bzauth_user)
             if (bzauth_pwd) {
                 new Ajax.Request('/toolbox/verify_bz_pwd',
@@ -10,10 +17,10 @@
                             asynchronous: true,
                             evalScripts: true,
                             onLoading: function () {
-                                Element.show('validate_bz_auth_indicator');
+                                Element.show(indicator);
                             },
                             onFailure: function (response) {
-                                Element.hide('validate_bz_auth_indicator');
+                                Element.hide(indicator);
                                 if (response.status == 401) {
                                     alert("<%=t 'bz_auth_failed'%>");
                                 }
@@ -22,8 +29,14 @@
                                 }
                                 return false;
                             },
-                            onSuccess: function (response) {
-                                Element.hide('validate_bz_auth_indicator');
+                            onSuccess: function () {
+                                Element.hide(indicator);
+                                if (inline) {
+                                    postInlineEditorForm(id, inline, form);
+                                } else {
+                                    form.submit();
+                                }
+
                                 return true;
                             },
                             parameters: {
@@ -36,43 +49,27 @@
         return false;
     }
 
-    function checkBzAuthFieldsNotEmpty(id) {
-        if (id) {
-            var bzauth_user = document.getElementById('bzauth_user_' + id);
-            var bzauth_pwd = document.getElementById('bzauth_pwd_' + id);
-            if (bzauth_user) {
-                if (bzauth_pwd) {
-                    if (bzauth_user.value) {
-                        if (bzauth_pwd.value) {
-                            return true;
-                        }
+    function checkBzAuthFieldsNotEmpty(bzauth_user, bzauth_pwd) {
+        if (bzauth_user) {
+            if (bzauth_pwd) {
+                if (bzauth_user.value) {
+                    if (bzauth_pwd.value) {
+                        return true;
                     }
                 }
             }
-            return false;
-        } else {
-            var bzauth_user = document.getElementById('bzauth_user');
-            var bzauth_pwd = document.getElementById('bzauth_pwd');
-
-            if (bzauth_user) {
-                if (bzauth_pwd) {
-                    if (bzauth_user.value) {
-                        if (bzauth_pwd.value) {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
         }
+        return false;
     }
 
     function checkPackageVersionFormat(ver) {
         return ver.match(/[\d\.a-zA-Z\-_]+/) == ver;
     }
 
-    function checkBzAuthInfo(id, beforeStatus) {
+    function checkBzAuthInfo(id, beforeStatus, form, inline) {
         var afterStatusElement;
+        var bzauth_user;
+        var bzauth_pwd;
 
         if (id) {
             afterStatusElement = document.getElementById('package_status_id_' + id);
@@ -85,12 +82,38 @@
             afterStatus = afterStatusElement.value;
         }
 
-        if (beforeStatus != afterStatus) { // user has changed status
-            if (!checkBzAuthFieldsNotEmpty(id)) {
-                alert("<%=t'need_bzauth_info'%>");
-                return false;
+        if (beforeStatus == afterStatus) { // user has changed status
+            return true;
+        } else {
+            if (id) {
+                bzauth_user = document.getElementById('bzauth_user_' + id);
+                bzauth_pwd = document.getElementById('bzauth_pwd_' + id);
+            } else {
+                bzauth_user = document.getElementById('bzauth_user');
+                bzauth_pwd = document.getElementById('bzauth_pwd');
+            }
+
+            if (checkBzAuthFieldsNotEmpty(bzauth_user, bzauth_pwd)) {
+                return validateBzAuthInfo(id, bzauth_user.value, bzauth_pwd.value, form, inline);
             }
         }
-        return true;
+
+        alert("<%=t'need_bzauth_info'%>");
+        return false;
+    }
+
+    function postInlineEditorForm(id, name, form) {
+        new Ajax.Request('/packages/' + id,
+                {
+                    asynchronous: true, evalScripts: true,
+                    onLoading: function (request) {
+                        Element.show('pac_' + id + '_' + name + '_spinner');
+                    },
+                    onSuccess: function (request) {
+
+                    },
+                    parameters: Form.serialize(form)
+                });
+        return false;
     }
 </script>
