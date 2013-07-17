@@ -4,6 +4,6 @@ bz_bug_creation_url_mocked: "http://mead.usersys.redhat.com/mead-bzbridge/bug/mo
 bz_bug_creation_url: "http://mead.usersys.redhat.com/mead-bzbridge/bug/"
 bz_bug_query_url: "http://mead.usersys.redhat.com/mead-bzbridge/bug/"
 mead_scheduler: "http://mead.usersys.redhat.com"
-bz_bug_status_update_url: "/mead-bzbridge/bug/status/<id>?oneway=<oneway>&status=<status>&assignee=<assignee>&userid=<userid>&pwd=<pwd>"
-bz_bug_status_update_url_mocked: "/mead-bzbridge/bug/status/<id>?oneway=<oneway>&status=<status>&assignee=<assignee>&userid=<userid>&pwd=<pwd>"
+bz_bug_status_update_url: "/mead-bzbridge/bug/status/<id>?oneway=<oneway>"
+bz_bug_status_update_url_mocked: "/mead-bzbridge/bug/status/<id>?oneway=<oneway>"
 magic_bug_id: "966279"
