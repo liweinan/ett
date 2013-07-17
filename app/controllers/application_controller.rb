@@ -479,8 +479,13 @@ class ApplicationController < ActionController::Base
   end
 
   # bz_bug_status_update_url: "http:/mead.usersys.redhat.com/mead-bzbridge/bug/status/<id>?oneway=<oneway>&status=<status>&assignee=<assignee>&userid=<userid>&pwd=<pwd>"
-  def generate_bug_status_update_url(id, status, assignee, userid, pwd, oneway='false')
-    bz_bug_status_update_url.gsub('<id>', id).gsub('<oneway>', oneway).gsub('<status>', status).gsub('<assignee>', assignee).gsub('<userid>', userid).gsub('<pwd>', pwd)
+  def generate_bug_status_update_url(id, oneway, params)
+      link = APP_CONFIG["mead_scheduler"] +
+          bz_bug_status_update_url.gsub('<id>', id).gsub('<oneway>', oneway)
+      params.each do |key,value|
+          link += "&#{key}=#{value}"
+      end
+      link
   end
 
   def has_bz_auth_info?(params=Hash.new)
@@ -499,13 +504,17 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def update_bug(bz_id, assignee, user, pwd, status, oneway='false')
+  def update_bug(bz_id, oneway, params)
     uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
     req = Net::HTTP::Post.new(generate_bug_status_update_url(
-                                  bz_id, status, assignee, user, pwd, oneway))
+                                  bz_id, oneway, params))
+
+    puts generate_bug_status_update_url(bz_id, oneway, params)
+
     res = Net::HTTP.start(uri.host, uri.port) do |http|
       http.request(req)
     end
+    res
   end
 
   def add_comment_to_bug(bz_id, comment, user, pwd)

@@ -105,18 +105,7 @@ class BzBugsController < ApplicationController
 
         bz_bug = BzBug.find(params[:id])
 
-        if params[:bz_action] == BzBug::BZ_ACTIONS[:movetoassigned]
-          update_bug(bz_bug.bz_id, params[:assignee], params[:user], params[:pwd], BzBug::BZ_STATUS[:assigned])
-          bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
-          bz_bug.bz_assignee = params[:assignee]
-          bz_bug.save
-        elsif params[:bz_action] == BzBug::BZ_ACTIONS[:movetomodified]
-          update_bug(bz_bug.bz_id, params[:assignee], params[:user], params[:pwd], BzBug::BZ_STATUS[:modified])
-          bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
-          bz_bug.bz_assignee = params[:assignee]
-          bz_bug.save
-
-        elsif params[:bz_action] == BzBug::BZ_ACTIONS[:done]
+        if params[:bz_action] == BzBug::BZ_ACTIONS[:done]
           bz_bug.bz_action = BzBug::BZ_ACTIONS[:done]
           bz_bug.save
         end
