@@ -44,6 +44,7 @@
             %>
 
             <%= f.submit 'Update' %>
+            <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "validate_bz_auth_indicator"} %>
             <%= render :partial => 'layouts/notification_link',
                        :locals => {:div_id => 'package_edit'} %>
           </td>
@@ -64,7 +65,7 @@
         function validateForm() {
             var ver = document.getElementById('package_ver').value;
             if (!checkPackageVersionFormat(ver)) {
-                alert('Version format not correct.');
+                alert('<%=t"version_fmt_incorrect"%>');
                 return false;
             }
 
@@ -75,18 +76,20 @@
         function checkBzAuthInfo() {
             var bzauth_user = document.getElementById('bzauth_user').value;
             var bzauth_pass = document.getElementById('bzauth_pwd').value;
-            if (bzauth_user && bzauth_pass) {
-                return true;
-            }
 
-            var afterPackageStatus = document.getElementById('package_status_id').value;
+            if (bzauth_user) {
+                if (bzauth_pass) {
+                    var afterPackageStatus = document.getElementById('package_status_id').value;
+                    if (beforePackageStatus != afterPackageStatus) {
+                        return validateBzAuthInfo(bzauth_user, bzauth_pass);
+                    } else {
+                        return true;
+                    }
 
-            if (beforePackageStatus != afterPackageStatus) {
-                alert('<%=t "bz_auth_failed"%>');
-                return false;
-            } else {
-                return true;
+                }
             }
+            alert('<%=t "need_bzauth_info"%>');
+            return false;
         }
         <% else %>
         function checkBzAuthInfo() {

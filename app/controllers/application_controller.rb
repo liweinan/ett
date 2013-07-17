@@ -569,4 +569,17 @@ class ApplicationController < ActionController::Base
     bz_info
   end
 
+
+  def verify_bz_credentials(params)
+    bzauth_user = extract_username(params[:bzauth_user])
+    bzauth_pwd = params[:bzauth_pwd]
+
+    if bzauth_user.blank? || bzauth_pwd.blank?
+      return 401 # authentication failure
+    end
+
+    res = Net::HTTP.get_response(URI(APP_CONFIG["mead_scheduler"] + "/mead-bzbridge/bug/status/966279?userid=#{bzauth_user}&pwd=#{bzauth_pwd}"))
+    res.code.to_i
+  end
+
 end

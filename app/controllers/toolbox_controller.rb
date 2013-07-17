@@ -60,5 +60,13 @@ class ToolboxController < ApplicationController
     end
   end
 
+  def verify_bz_pwd
+    respond_to do |format|
+      format.js {
+        render :status => verify_bz_credentials(params), :text => nil
+      }
+    end
+  end
+
 
 end

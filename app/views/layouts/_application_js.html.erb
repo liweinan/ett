@@ -1,0 +1,96 @@
+<%# we put js here because Rails won't process ruby codes in js file %>
+<script type="text/javascript">
+
+    function validateBzAuthInfo(bzauth_user, bzauth_pwd) {
+        if (bzauth_user)
+            if (bzauth_pwd) {
+                new Ajax.Request('/toolbox/verify_bz_pwd',
+                        {
+                            method: 'GET',
+                            asynchronous: true,
+                            evalScripts: true,
+                            onLoading: function () {
+                                Element.show('validate_bz_auth_indicator');
+                            },
+                            onFailure: function (response) {
+                                Element.hide('validate_bz_auth_indicator');
+                                if (response.status == 401) {
+                                    alert("<%=t 'bz_auth_failed'%>");
+                                }
+                                else {
+                                    alert("Internal Error: " + response.status);
+                                }
+                                return false;
+                            },
+                            onSuccess: function (response) {
+                                Element.hide('validate_bz_auth_indicator');
+                                return true;
+                            },
+                            parameters: {
+                                'bzauth_user': bzauth_user,
+                                'bzauth_pwd': bzauth_pwd
+                            }
+                        }
+                );
+            }
+        return false;
+    }
+
+    function checkBzAuthFieldsNotEmpty(id) {
+        if (id) {
+            var bzauth_user = document.getElementById('bzauth_user_' + id);
+            var bzauth_pwd = document.getElementById('bzauth_pwd_' + id);
+            if (bzauth_user) {
+                if (bzauth_pwd) {
+                    if (bzauth_user.value) {
+                        if (bzauth_pwd.value) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        } else {
+            var bzauth_user = document.getElementById('bzauth_user');
+            var bzauth_pwd = document.getElementById('bzauth_pwd');
+
+            if (bzauth_user) {
+                if (bzauth_pwd) {
+                    if (bzauth_user.value) {
+                        if (bzauth_pwd.value) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+    }
+
+    function checkPackageVersionFormat(ver) {
+        return ver.match(/[\d\.a-zA-Z\-_]+/) == ver;
+    }
+
+    function checkBzAuthInfo(id, beforeStatus) {
+        var afterStatusElement;
+
+        if (id) {
+            afterStatusElement = document.getElementById('package_status_id_' + id);
+        } else {
+            afterStatusElement = document.getElementById('package_status_id');
+        }
+
+        var afterStatus;
+        if (afterStatusElement) {
+            afterStatus = afterStatusElement.value;
+        }
+
+        if (beforeStatus != afterStatus) { // user has changed status
+            if (!checkBzAuthFieldsNotEmpty(id)) {
+                alert("<%=t'need_bzauth_info'%>");
+                return false;
+            }
+        }
+        return true;
+    }
+</script>

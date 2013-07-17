@@ -120,15 +120,15 @@ class PackagesController < ApplicationController
     params[:package] ||= Hash.new
     params[:package][:id] = @package.id
 
-    if !params[:bzauth_user].nil?
-        if params[:bzauth_pwd].blank?
-            redirect_to params[:request_path], :notice => 'You need to enter your Bugzilla Password!'
-            return
-        elsif !verify_bz_credentials(params)
-            redirect_to params[:request_path], :notice => 'Wrong Bugzilla email or password!'
-            return
-        end
-    end
+    #unless params[:bzauth_user].nil? #TODO: we should check the real logic when the bz auth info should be provided
+    #    if params[:bzauth_pwd].blank?
+    #        redirect_to params[:request_path], :notice => t('bz_pwd_required')
+    #        return
+    #    elsif !verify_bz_credentials(params)
+    #        redirect_to params[:request_path], :notice => t('wrong_bz_pwd')
+    #        return
+    #    end
+    #end
 
     if @package.created_by.blank?
       params[:package][:created_by] = current_user.id
@@ -603,18 +603,5 @@ class PackagesController < ApplicationController
     end
     assignee
   end
-  def verify_bz_credentials(params)
-    url = URI.parse(APP_CONFIG["mead_scheduler"] +
-                    "/mead-bzbridge/bug/status/966279?userid="\
-                    "#{extract_username(params[:bzauth_user])}&pwd=#{params[:bzauth_pwd]}")
-    req = Net::HTTP::Get.new(url.to_s)
-    res = Net::HTTP.start(url.host, url.port) {|http|
-      http.request(req)
-    }
-    if res.code == "200"
-      return true
-    else
-      return false
-    end
-  end
+
 end
