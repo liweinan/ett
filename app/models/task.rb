@@ -2,7 +2,7 @@ class Task < ActiveRecord::Base
 #  acts_as_tree
   validates_presence_of :name
   validates_uniqueness_of :name
-  
+
   default_value_for :can_show, 'Yes'
   default_value_for :total_manual_track_time, 0
 
@@ -31,8 +31,12 @@ class Task < ActiveRecord::Base
     Task.all(:conditions => ["id in (select task_id from packages where name = ?)", name])
   end
 
-  def can_use_bz_integration?
-    !target_release.blank?    
+  def use_bz_integration?
+    if setting.blank?
+      false
+    else
+      setting.use_bz_integration?
+    end
   end
 
 end

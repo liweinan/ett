@@ -1,0 +1,9 @@
+<form onsubmit="return false;">
+  <input type="hidden" id="mead_sync" name="mead_sync" value="<%=@package.mead_action%>" />
+</form>
+<div>
+<%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "update_mead_info_indicator", :msg => t('updating_mead_info')} %>
+</div>
+<div id="mead_info_div">
+
+</div>

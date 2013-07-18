@@ -1,0 +1,2 @@
+page.replace_html 'mead_info_div', "Mead: #{@package.mead}/ Brew: #{@package.brew}"
+page.visual_effect :highlight, 'mead_info_div'

@@ -4,7 +4,7 @@
   @<%= link_to @package.task.name, :controller => 'packages', :action => 'index', :task_id => escape_url(@package.task.name) %>
 </span>
 </h2>
-
+<%= render :partial => 'packages/fields/mead_sync' %>
 Created By:
 <% unless @package.created_by.blank? %>
     <%= h @package.creator.name %>
@@ -42,7 +42,7 @@ Tags:
 <%= render :partial => 'layouts/sep_tiny' %>
 
 Wrapper build:
-    <%= h @package.wrapper_build %>
+<%= h @package.wrapper_build %>
 <%= render :partial => 'packages/fields/build' %>
 <% get_xattrs(@package.task, true, false) do |attr| %>
     <%= render :partial => 'layouts/sep_tiny' %>
@@ -61,8 +61,8 @@ Wrapper build:
     <% unless @package.deleted? %>
         | <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(@package.name), :task_id => escape_url(@package.task.name) %>
         | <%= link_to 'Delete', @package,
-            :confirm => "Are you sure to delete #{escape_url(@package.name)}?",
-            :method => :delete %>
+                      :confirm => "Are you sure to delete #{escape_url(@package.name)}?",
+                      :method => :delete %>
     <% end %>
 <% end %>
 
@@ -74,7 +74,7 @@ Wrapper build:
 
 <%= render :partial => 'packages/attachment' %>
 <%= render :partial => 'layouts/sep' %>
-<% if @package.task.can_use_bz_integration? %>
+<% if @package.task.use_bz_integration? %>
     <%= render :partial => 'packages/bz_bugs', :locals => {:package => @package} %>
     <%= render :partial => 'layouts/sep' %>
 <% end %>

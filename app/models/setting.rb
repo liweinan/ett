@@ -5,6 +5,8 @@ class Setting < ActiveRecord::Base
   default_value_for :enabled, 'No'
   default_value_for :show_xattrs, 'No'
   default_value_for :enable_xattrs, 'No'
+  default_value_for :use_bz_integration, 'No'
+
 
   PROPS = {:creator => 0b1, :commenter => 0b10, :assignee => 0b100}
   ACTIONS = {:created => 0b1, :updated => 0b10, :commented => 0b100}
@@ -142,5 +144,9 @@ class Setting < ActiveRecord::Base
     else
       Setting.find_by_task_id(task.to_i)
     end
+  end
+
+  def use_bz_integration?
+    use_bz_integration == 'Yes'
   end
 end

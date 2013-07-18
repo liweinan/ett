@@ -120,16 +120,6 @@ class PackagesController < ApplicationController
     params[:package] ||= Hash.new
     params[:package][:id] = @package.id
 
-    #unless params[:bzauth_user].nil? #TODO: we should check the real logic when the bz auth info should be provided
-    #    if params[:bzauth_pwd].blank?
-    #        redirect_to params[:request_path], :notice => t('bz_pwd_required')
-    #        return
-    #    elsif !verify_bz_credentials(params)
-    #        redirect_to params[:request_path], :notice => t('wrong_bz_pwd')
-    #        return
-    #    end
-    #end
-
     if @package.created_by.blank?
       params[:package][:created_by] = current_user.id
     end
@@ -146,7 +136,12 @@ class PackagesController < ApplicationController
     end
     update_bz_pass(params[:bzauth_pwd])
 
-    @assignee = User.find_by_id(params[:package][:user_id]) if (params[:package].key?(:user_id) && !params[:package][:user_id].blank?)
+    if params[:package].key?(:user_id)
+      @assignee = User.find_by_id(params[:package][:user_id])
+    else
+      @assignee = old_assignee
+    end
+
 
     respond_to do |format|
       Package.transaction do
@@ -190,9 +185,8 @@ class PackagesController < ApplicationController
               @tt.save
             end
 
-
             unless new_status.blank?
-              if new_status.code == Status::CODES[:inprogress] && !@assignee.nil?
+              if new_status.code == Status::CODES[:inprogress] && !@assignee.blank?
 
                 # the bug statuses are waiting to be updated according to https://docspace.corp.redhat.com/docs/DOC-148169
                 @package.bz_bugs.each do |bz_bug|
@@ -205,16 +199,11 @@ class PackagesController < ApplicationController
                     bz_bug.save
                   end
                 end
-
-              elsif new_status.code == Status::CODES[:finished] && !@assignee.nil?
-                xattrs = @package.task.setting.xattrs.split(',')
-
-                if xattrs.include?('mead') && xattrs.include?('brew')
-                  brew_pkg = get_brew_name(@package)
-                  @package.brew = brew_pkg unless brew_pkg.nil?
-                  @package.mead = get_mead_name(brew_pkg) unless brew_pkg.nil?
-                  @package.save
+              elsif new_status.code == Status::CODES[:finished] && !@assignee.blank?
+                if has_mead_integration?(@package.task)
+                  @package.mead_action = Package::MEAD_ACTIONS[:needsync]
                 end
+
 
                 @package.bz_bugs.each do |bz_bug|
 
@@ -226,18 +215,22 @@ class PackagesController < ApplicationController
                     update_bug(bz_bug.bz_id, oneway='true', params_bz)
 
                     comment = "Source URL: #{@package.git_url}\n" +
-                              "Mead-Build: #{@package.mead}\n" +
-                              "Brew-Build: #{@package.brew}\n"
+                        "Mead-Build: #{@package.mead}\n" +
+                        "Brew-Build: #{@package.brew}\n"
                     add_comment_to_bug(bz_bug.bz_id, comment,
-                               extract_username(params[:bzauth_user]), session[:bz_pass])
+                                       extract_username(params[:bzauth_user]), session[:bz_pass])
 
                     bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
                     bz_bug.save
                   end
                 end
+
+                if has_mead_integration?(@package.task) && params[:_type] == "inline"
+                  # for inline editor, we get build info immediately
+                  get_mead_info(@package)
+                end
               end
             end
-
 
             log_entry = AutoLogEntry.new
             last_status_changed_at ||= @package.status_changed_at
@@ -472,7 +465,27 @@ class PackagesController < ApplicationController
     end
   end
 
+  def process_mead_info
+    @package = Package.find(params[:id])
+
+    get_mead_info(@package)
+
+    respond_to do |format|
+      format.js {
+
+      }
+    end
+  end
+
   protected
+
+  def get_mead_info(package)
+    brew_pkg = get_brew_name(package)
+    package.brew = brew_pkg
+    package.mead = get_mead_name(brew_pkg) unless brew_pkg.blank?
+    package.mead_action = Package::MEAD_ACTIONS[:done]
+    package.save
+  end
 
   def do_sync(fields)
     fields.each do |field|
@@ -608,4 +621,6 @@ class PackagesController < ApplicationController
       params[:task_id] = params[:brew_tag_id]
     end
   end
+
+
 end

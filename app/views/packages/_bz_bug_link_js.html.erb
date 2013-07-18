@@ -1,10 +1,32 @@
 <script type="text/javascript">
     // After page loaded, do some initial scannings and process package's bz bugs according to https://docspace.corp.redhat.com/docs/DOC-148169.
-    <% if has_bz_auth_info? && @package.task.can_use_bz_integration? %>
+    <% if has_bz_auth_info? && @package.task.use_bz_integration? %>
     document.observe("dom:loaded", function () {
+        processMeadInfo();
         setTimeout(update_bz_bugs, 5000);
-     });
+    });
     <% end %>
+
+    function processMeadInfo() {
+        if (document.getElementById('mead_sync').value == '<%=Package::MEAD_ACTIONS[:needsync]%>') {
+            new Ajax.Request('/packages/process_mead_info/<%=@package.id%>',
+                    {
+                        method: 'GET',
+                        asynchronous: true,
+                        evalScripts: true,
+                        onLoading: function () {
+                            Element.show('update_mead_info_indicator');
+                        },
+                        onFailure: function () {
+                            Element.hide('update_mead_info_indicator');
+                        },
+                        onSuccess: function () {
+                            Element.hide('update_mead_info_indicator');
+                        }
+                    }
+            );
+        }
+    }
 
     function update_bz_bugs() {
         var bz_bug_actions = document.getObjectsByRegex(/^col_bz_action_(\d)+(.+)/);
@@ -15,7 +37,7 @@
             var action = vals[1];
             if (action == '<%=BzBug::BZ_ACTIONS[:accepted]%>') {
                 // user has provided bz account and password info in package edit page, and the bz update request
-                // has been submitted to BZ asynchrously.
+                // has been submitted to BZ asynchronously.
                 // Now it's time to sync bug info automatically to see if the bz request has been done.
                 moveBzBugStatusToDone(bz_bug_id);
                 syncBugInfoWithBz([bz_bug_id]);
@@ -37,7 +59,7 @@
                     onSuccess: function () {
                         Element.hide('update_bz_bugs_indicator');
                     },
-                    onComplete: function() {
+                    onComplete: function () {
                     },
                     parameters: {
                         'bz_action': '<%=BzBug::BZ_ACTIONS[:done]%>',

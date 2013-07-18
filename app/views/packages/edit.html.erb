@@ -19,7 +19,7 @@
         <%= render :partial => 'packages/fields/name', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/task', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/status', :locals => {:f => f} %>
-        <% if force_bz_auth?(@package) %>
+        <% if @package.task.use_bz_integration? %>
             <%= render :partial => 'bz_bugs/fields/bz_user' %>
             <%= render :partial => 'bz_bugs/fields/bz_pass' %>
         <% end %>

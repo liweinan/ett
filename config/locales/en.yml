@@ -15,3 +15,4 @@ en:
   version_fmt_incorrect: "Version format not correct."
   bz_auth_failed: "Your Bugzilla account/password is not correct."
   validating_bzauth_info: "Validating BZ account/password..."
+  updating_mead_info: "Getting MEAD build info..."

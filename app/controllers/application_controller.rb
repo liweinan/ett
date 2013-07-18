@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
   helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_task?, :count_packages, :can_edit_package?, :current_user, :get_task, :has_status?, :has_tag?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :task_has_tags?, :get_xattrs, :background_style, :confirmed?, :default_style
-  helper_method :btag, :ebtag, :uebtag, :truncate_u, :its_me?, :extract_username, :has_bz_auth_info?, :force_bz_auth?
+  helper_method :btag, :ebtag, :uebtag, :truncate_u, :its_me?, :extract_username, :has_bz_auth_info?, :has_mead_integration?
   before_filter :process_task_id
   before_filter :save_current_link
               # Scrub sensitive parameters from your log
@@ -355,21 +355,7 @@ class ApplicationController < ActionController::Base
   end
 
   def home_page
-    #unless has_task?
-    #  unless Setting.system_settings.default_task.blank?
-    #    default_task = Task.find_by_name(Setting.system_settings.default_tag)
-    #    unless default_task.blank?
-    #      params[:task_id] = escape_url(default_task.name)
-    #    else
-    #      params[:task_id] = escape_url(Task.find(:first, :order => 'updated_at DESC').name)
-    #    end
-    #  else
-    #    params[:task_id] = escape_url(Task.find(:first, :order => 'updated_at DESC').name)
-    #  end
-    #end
-
     redirect_to(:controller => :packages, :action => :index)
-
   end
 
   def process_task_id
@@ -383,13 +369,6 @@ class ApplicationController < ActionController::Base
       session[:prev_url] = generate_request_path(request)
     end
   end
-
-
-  #def notify_package_update_system_wide(link, package)
-  #  if Setting.system_settings.actions & Setting::ACTIONS[:updated] > 0
-  #    notify_package_update(link, package, Setting.all_recipients_of_package(@package))
-  #  end
-  #end
 
   def expire_all_fragments
     expire_fragment(%r{tasks/.*})
@@ -432,9 +411,9 @@ class ApplicationController < ActionController::Base
 
   def default_style(css)
     if css.blank?
-      return "background:#808080;"
+      "background:#808080;"
     else
-      return css
+      css
     end
   end
 
@@ -480,12 +459,12 @@ class ApplicationController < ActionController::Base
 
   # bz_bug_status_update_url: "http:/mead.usersys.redhat.com/mead-bzbridge/bug/status/<id>?oneway=<oneway>&status=<status>&assignee=<assignee>&userid=<userid>&pwd=<pwd>"
   def generate_bug_status_update_url(id, oneway, params)
-      link = APP_CONFIG["mead_scheduler"] +
-          bz_bug_status_update_url.gsub('<id>', id).gsub('<oneway>', oneway)
-      params.each do |key,value|
-          link += "&#{key}=#{value}"
-      end
-      link
+    link = APP_CONFIG["mead_scheduler"] +
+        bz_bug_status_update_url.gsub('<id>', id).gsub('<oneway>', oneway)
+    params.each do |key, value|
+      link += "&#{key}=#{value}"
+    end
+    link
   end
 
   def has_bz_auth_info?(params=Hash.new)
@@ -541,10 +520,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def force_bz_auth?(package)
-    package.task.can_use_bz_integration? && !package.bz_bugs.blank?
-  end
-
   def extract_bz_bug_info(body)
     #  @response.body
     # "999999: Upgrade jboss-aggregator to 7.2.0.Final-redhat-7 (MOCK)"
@@ -578,7 +553,6 @@ class ApplicationController < ActionController::Base
     bz_info
   end
 
-
   def verify_bz_credentials(params)
     bzauth_user = extract_username(params[:bzauth_user])
     bzauth_pwd = params[:bzauth_pwd]
@@ -589,6 +563,15 @@ class ApplicationController < ActionController::Base
 
     res = Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_query_url"]}#{APP_CONFIG["magic_bug_id"]}?userid=#{bzauth_user}&pwd=#{bzauth_pwd}"))
     res.code
+  end
+
+  def has_mead_integration?(task)
+    if task.setting.blank?
+      false
+    else
+      xattrs = task.setting.xattrs.split(',')
+      xattrs.include?('mead') && xattrs.include?('brew')
+    end
   end
 
 end

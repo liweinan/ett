@@ -8,6 +8,7 @@ class Package < ActiveRecord::Base
   DISTS = ['jb-eap-5-rhel-6', 'jb-eap-5-jdk5-rhel-6', 'jb-eap-4.3-rhel-6']
 
   SKIP_FIELDS = ['id', 'updated_at', 'updated_by', 'created_by', 'created_at']
+  MEAD_ACTIONS = {:open => 'open', :needsync => 'needsync', :done => 'done'}
 
   acts_as_textiled :notes
   acts_as_commentable
@@ -40,6 +41,7 @@ class Package < ActiveRecord::Base
   default_value_for :time_point, 0
   default_value_for :status_changed_at, Time.now
   default_value_for :wrapper_build, 'No'
+  default_value_for :mead_action, MEAD_ACTIONS[:open]
 
   def self.per_page
     10

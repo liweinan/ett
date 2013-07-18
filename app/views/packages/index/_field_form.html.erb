@@ -5,13 +5,14 @@
       onsubmit="postInlineEditorForm('<%=pac_id%>', '<%=field_name%>', this);return false;">
 
   <%= hidden_field_tag '_method', 'put' %>
+  <%= hidden_field_tag '_type', 'inline' %>
   <%= hidden_field_tag :id, pac_id %>
   <%= hidden_field_tag :div, "pac_#{pac_id}_#{field_name}" %>
   <%= hidden_field_tag :user, params[:user] %>
   <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
   <%= hidden_field_tag :is_xattr, is_xattr %>
   <%= render :partial => field_type, :locals => {:package => Package.find(pac_id), :field_name => field_name} %>
-  <% if field_name == 'StatusId' && force_bz_auth?(package) %>
+  <% if field_name == 'StatusId' && package.task.use_bz_integration? %>
       <% if package.status.blank? %>
           <input type='submit' value='Submit' onclick='return checkBzAuthInfo(<%=pac_id%>, null, document.getElementById("pac_<%=pac_id%>_StatusId_form"), "<%=field_name%>");'/>
       <% else %>
@@ -26,7 +27,7 @@
   <input type="button" value="Cancel" onclick="hide_pac_editor('pac_<%= pac_id %>_<%=field_name%>','<%=field_type%>', '<%=is_xattr%>')"/>
   <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "pac_#{pac_id}_#{field_name}_spinner"} %>
 
-  <% if field_name == 'StatusId' && force_bz_auth?(package) %>
+  <% if field_name == 'StatusId' && package.task.use_bz_integration? %>
       <%= render :partial => 'layouts/sep' %>
       <%= render :partial => 'bz_bugs/bz_auth', :locals => {:id => package.id} %>
   <% end %>

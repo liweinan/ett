@@ -5,7 +5,7 @@
   <%= render :partial => "layouts/sep" %>
   Initial tags: <%= render :partial => 'tags/tags_selection', :locals => {:task_id => params[:id]} %>
   <%= render :partial => "layouts/sep" %>
-  <% if task.can_use_bz_integration? %>
+  <% if task.use_bz_integration? %>
       <div><input type="checkbox" id="create_bz" name="create_bz"/>
         <label for="create_bz">Create BZ bug automatically</label></div>
       <table>
@@ -50,7 +50,7 @@
 
 <% content_for :js do %>
     <script type="text/javascript">
-        <% if task.can_use_bz_integration? %>
+        <% if task.use_bz_integration? %>
         function validateForm() {
             if (document.getElementById('create_bz').checked) {
                 if (checkBzAuthFieldsNotEmpty()) {
