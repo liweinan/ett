@@ -138,22 +138,39 @@ class PackagesController < ApplicationController
 
     last_status_changed_at = @package.status_changed_at
     last_status = Status.find_by_id(@package.status_id)
+    old_assignee = @package.assignee
+
 
     unless params[:package][:name].blank?
       cleanup_package_name(params[:package][:name])
     end
     update_bz_pass(params[:bzauth_pwd])
 
-    @assignee = User.find_by_id(params[:package][:user_id]) if params[:package].key? :user_id
+    @assignee = User.find_by_id(params[:package][:user_id]) if (params[:package].key?(:user_id) && !params[:package][:user_id].blank?)
 
     respond_to do |format|
       Package.transaction do
         if @package.update_attributes(params[:package])
-
           @package.reload
 
           if params[:process_tags] == 'Yes'
             @package.tags = process_tags(params[:tags], @package.task_id)
+          end
+
+          # update the assignee of the bugs if assignee changed
+          # TODO: we don't check if the bz_bug assignee is the same as the old
+          # one. Will have to fix this someday
+          if old_assignee != @assignee
+            @package.bz_bugs.each do |bz_bug|
+              if bz_bug.summary.match(/^Upgrade/) && !@assignee.nil?
+
+                params_bz = {:assignee => @assignee.email, :userid => extract_username(params[:bzauth_user]), :pwd => session[:bz_pass]}
+                update_bug(bz_bug.bz_id, oneway='true', params_bz)
+                bz_bug.bz_assignee = @assignee.email
+                bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+                bz_bug.save
+              end
+            end
           end
 
           # status changed
@@ -173,22 +190,20 @@ class PackagesController < ApplicationController
               @tt.save
             end
 
+
             unless new_status.blank?
               if new_status.code == Status::CODES[:inprogress] && !@assignee.nil?
 
                 # the bug statuses are waiting to be updated according to https://docspace.corp.redhat.com/docs/DOC-148169
                 @package.bz_bugs.each do |bz_bug|
-                    if bz_bug.summary.match(/^Upgrade/)
-                      bz_info = get_bz_info(bz_bug.bz_id, extract_username(params[:bzauth_user]), current_bzpass(params))
-                      #if get_assignee(bz_bug, params) == @assignee.email
-                      if bz_bug.bz_assignee == @assignee.email
-                          update_bug(bz_bug.bz_id, @assignee.email,
-                                     extract_username(params[:bzauth_user]),
-                                     session[:bz_pass], BzBug::BZ_STATUS[:assigned], oneway='true')
-                          bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
-                          bz_bug.save
-                      end
-                    end
+                  if bz_bug.summary.match(/^Upgrade/) && bz_bug.bz_assignee == @assignee.email
+                    params_bz = {:assignee => @assignee.email, :userid => extract_username(params[:bzauth_user]),
+                                 :pwd => session[:bz_pass], :status => BzBug::BZ_STATUS[:assigned]}
+
+                    update_bug(bz_bug.bz_id, oneway='true', params_bz)
+                    bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+                    bz_bug.save
+                  end
                 end
 
               elsif new_status.code == Status::CODES[:finished] && !@assignee.nil?
@@ -203,22 +218,22 @@ class PackagesController < ApplicationController
 
                 @package.bz_bugs.each do |bz_bug|
 
-                  if bz_bug.summary.match(/^Upgrade/)
-                    #if get_assignee(bz_bug, params) == @assignee.email
-                    if bz_bug.bz_assignee == @assignee.email
-                          update_bug(bz_bug.bz_id, @assignee.email,
-                                     extract_username(params[:bzauth_user]),
-                                     session[:bz_pass], BzBug::BZ_STATUS[:modified], oneway='true')
-                          comment = "Source URL: #{@package.git_url}\n" +
-                                    "Mead-Build: #{@package.mead}\n" +
-                                    "Brew-Build: #{@package.brew}\n"
-                          add_comment_to_bug(bz_bug.bz_id, comment,
-                                     extract_username(params[:bzauth_user]), session[:bz_pass])
+                  if bz_bug.summary.match(/^Upgrade/) && bz_bug.bz_assignee == @assignee.email
 
-                          bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
-                          bz_bug.save
-                      end
-                    end
+                    params_bz = {:assignee => @assignee.email, :userid => extract_username(params[:bzauth_user]),
+                                 :pwd => session[:bz_pass], :status => BzBug::BZ_STATUS[:finished]}
+
+                    update_bug(bz_bug.bz_id, oneway='true', params_bz)
+
+                    comment = "Source URL: #{@package.git_url}\n" +
+                              "Mead-Build: #{@package.mead}\n" +
+                              "Brew-Build: #{@package.brew}\n"
+                    add_comment_to_bug(bz_bug.bz_id, comment,
+                               extract_username(params[:bzauth_user]), session[:bz_pass])
+
+                    bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+                    bz_bug.save
+                  end
                 end
               end
             end
@@ -593,15 +608,4 @@ class PackagesController < ApplicationController
       params[:task_id] = params[:brew_tag_id]
     end
   end
-
-
-  def get_assignee(bz_bug, params)
-    bz_info = get_bz_info(bz_bug.bz_id, current_bzuser(params), current_bzpass(params))
-    assignee = nil
-    unless bz_info.blank?
-      assignee = bz_info["assignee"]
-    end
-    assignee
-  end
-
 end
