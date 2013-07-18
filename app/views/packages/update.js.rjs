@@ -13,6 +13,12 @@ if @package.errors.blank?
   page.replace_html(params[:div]+'_field', :partial => "packages/index/#{col_name.underscore}_col", :locals => {:package => @package, :field_name => field_name})
   page.show(params[:div]+'_field')
   page.visual_effect :highlight, params[:div]+'_field'
+
+  if field_name == 'StatusId'
+    page << "var brewField=document.getElementById('pac_#{@package.id}_Brew_field');if (brewField) { brewField.innerHTML = '#{@package.brew}';}"
+    page << "var meadField=document.getElementById('pac_#{@package.id}_Mead_field');if (meadField) { meadField.innerHTML = '#{@package.mead}';}"
+  end
+
 else
   errors = @package.errors.full_messages
   @package = Package.find(@package.id)
