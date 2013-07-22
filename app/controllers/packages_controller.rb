@@ -259,7 +259,7 @@ class PackagesController < ApplicationController
             if params[:request_path].blank?
               task_name = escape_url(@package.task.name)
               package_name = escape_url(@package.name)
-              frag = "#{task_name}/packages/#{package_name}"
+              frag = "tasks/#{task_name}/packages/#{package_name}"
               url = generate_request_path(request, frag)
             else
               url = params[:request_path].gsub('/edit', '')
