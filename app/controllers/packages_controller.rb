@@ -83,9 +83,8 @@ class PackagesController < ApplicationController
         expire_all_fragments
         flash[:notice] = 'Package was successfully created.'
 
-        url = APP_CONFIG["site_prefix"] + "tasks/" + escape_url(@package.task.name) + "/packages/" + escape_url(@package.name)
-
         if Rails.env.production?
+          url = get_package_link(params, @package, :create)
 
           if Setting.activated?(@package.task, Setting::ACTIONS[:created])
             Notify::Package.create(current_user, url, @package, Setting.all_recipients_of_package(@package, nil, :create))
@@ -142,11 +141,15 @@ class PackagesController < ApplicationController
       @assignee = old_assignee
     end
 
-
     respond_to do |format|
       Package.transaction do
         if @package.update_attributes(params[:package])
           @package.reload
+          # this is needed since we write to @package later in this section of
+          # the code. (@package.status_changed_at = Time.now). This messes up
+          # with the latest_changes command since the latest_change will be that
+          # instead of what the user changed in the website.
+          latest_changes_package = @package.latest_changes
 
           if params[:process_tags] == 'Yes'
             @package.tags = process_tags(params[:tags], @package.task_id)
@@ -254,23 +257,14 @@ class PackagesController < ApplicationController
           flash[:notice] = 'Package was successfully updated.'
 
           if Rails.env.production?
-            url = ''
-
-            if params[:request_path].blank?
-              task_name = escape_url(@package.task.name)
-              package_name = escape_url(@package.name)
-              frag = "tasks/#{task_name}/packages/#{package_name}"
-              url = generate_request_path(request, frag)
-            else
-              url = params[:request_path].gsub('/edit', '')
-            end
+            url = get_package_link(params, @package).gsub('/edit', '')
 
             if Setting.activated?(@package.task, Setting::ACTIONS[:updated])
-              Notify::Package.update(current_user, url, @package, Setting.all_recipients_of_package(@package, current_user, :edit))
+              Notify::Package.update(current_user, url, @package, Setting.all_recipients_of_package(@package, current_user, :edit), latest_changes_package)
             end
 
             unless params[:div_package_edit_notification_area].blank?
-              Notify::Package.update(current_user, url, @package, params[:div_package_edit_notification_area])
+              Notify::Package.update(current_user, url, @package, params[:div_package_edit_notification_area], latest_changes_package)
             end
           end
 

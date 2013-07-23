@@ -30,7 +30,7 @@ class Notify
       str.gsub(/<\/?[^>]*>/, "")
     end
 
-    def self.update(editor, link, package, recipients)
+    def self.update(editor, link, package, recipients, latest_changes_package=nil)
       body = Hash.new
       subject = "#{editor.name} edited package: #{package.name}"
       body[:link] = link
@@ -38,7 +38,11 @@ class Notify
       body[:action] = "edited package #{package.name}"
 
       detail = ''
-      hashes = package.latest_changes
+      unless latest_changes_package.nil?
+        hashes = latest_changes_package
+      else
+        hashes = package.latest_changes
+      end
       hashes.keys.each do |key|
         if key == 'notes'
           detail += "\n#{key.capitalize}\n--------------------\n***Was***\n #{strip_html(hashes[key][0])}\n\n***Now***\n #{strip_html(hashes[key][1])}\n\n"
@@ -54,12 +58,15 @@ class Notify
           prev = Status.find(hashes[key][0]).name unless hashes[key][0].blank?
           now = Status.find(hashes[key][1]).name unless hashes[key][1].blank?
           detail += "\nStatus\n--------------------\n***Was***\n #{prev}\n\n***Now***\n #{now}\n\n"
+        elsif key != "status_changed_at"
+          prev = hashes[key][0]
+          now = hashes[key][1]
+          detail += "\n#{key} changed\n--------------------\n***Was***\n #{prev}\n\n***Now***\n #{now}\n\n"
         end
       end
 
       body[:detail] = detail
       body[:updated_at] = package.created_at
-
       Notify.notify(recipients, subject, body)
     end
   end
