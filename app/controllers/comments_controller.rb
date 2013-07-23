@@ -20,11 +20,12 @@ class CommentsController < ApplicationController
       if Rails.env.production?
         if Setting.activated?(@package.task, Setting::ACTIONS[:commented])
           debugger
-          Notify::Comment.create(current_user, params[:request_path], @package, @comment, Setting.all_recipients_of_package(@package, @comment.user, :comment))
+
+          Notify::Comment.create(current_user, get_package_link(params, @package), @package, @comment, Setting.all_recipients_of_package(@package, @comment.user, :comment))
         end
 
         unless params[:div_comment_notification_area].blank?
-          Notify::Comment.create(current_user, params[:request_path], @package, @comment, params[:div_comment_notification_area])
+          Notify::Comment.create(current_user, get_package_link(params, @package), @package, @comment, params[:div_comment_notification_area])
         end
       end
     end
