@@ -44,12 +44,17 @@ Tags:
 Wrapper build:
 <%= h @package.wrapper_build %>
 <%= render :partial => 'packages/fields/build' %>
+
+Errata:
+<%= render :partial => 'packages/fields/errata' %>
+
 <% get_xattrs(@package.task, true, false) do |attr| %>
     <%= render :partial => 'layouts/sep_tiny' %>
     <% unless @package.read_attribute(attr).blank? %>
         <%= attr.camelcase %>: <%= Extractor.extract_url(@package.read_attribute(attr)) %>
     <% end %>
 <% end %>
+
 
 <%= render :partial => 'packages/fields/track_time' %>
 

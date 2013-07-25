@@ -1,0 +1,7 @@
+pac = Package.find(params[:package_id])
+begin
+  res = add_errata(pac, 'eap6')
+  page.alert(res);
+rescue TypeError => e
+  page.alert(e.message)
+end

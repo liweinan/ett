@@ -103,6 +103,41 @@ module ApplicationHelper
       end
   end
 
+  def add_errata(pac, prod)
+
+    unless !pac.status.blank? && pac.status.name == 'Finished'
+      "You can only add to Errata when the build is Finished."
+    else
+        # uri = URI.parse(URI.encode(APP_CONFIG["errata_url"]))
+        # No working errata server currently, so test with fake request
+        # to mead_scheduler.
+        uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+        req = Net::HTTP::Put.new("/mead-scheduler-web/rest/build/sched/#{prod}/#{pac.name}")
+        mode = pac.wrapper_build == 'No' ? 'chain': 'wrapper'
+        params = {:bz_bugs => pac.bz_bug_ids, :mead => pac.mead}
+        req.set_form_data(params)
+
+        res = Net::HTTP.start(uri.host, uri.port) do |http|
+          http.request(req)
+        end
+
+        case res.code
+        when "202"
+            "202: Successfully added package #{pac.name} to Errata"
+        when "400"
+            "400: Bad Request: One of the mandatory paramenters is missing or has an invalid value.\n
+            Parameters used:  #{params.to_json} \n
+            #{res.body}"
+        when "409"
+            "409: Rejected, build already scheduled for this package \n #{res.body}"
+        else
+            "#{res.code} error! \n
+            Parameters used: #{params.to_json} \n
+            #{res.body}"
+        end
+      end
+  end
+
   def convert_worktime(worktime)
     worktime ||= ""
     worktime = worktime.to_s

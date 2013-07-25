@@ -118,6 +118,11 @@ class Package < ActiveRecord::Base
     BzBug.all(:conditions => ['package_id = ? and bz_action is not null', self.id])
   end
 
+  def bz_bug_ids
+    # want to return a list of all the ids in the :bz_bugs field
+    return bz_bugs.map {|bug| bug["bz_id"]}
+  end
+
   protected
 
   def all_from_packages_of(from_relationships, relationship_name)
