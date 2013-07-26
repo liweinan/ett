@@ -108,16 +108,12 @@ module ApplicationHelper
     unless !pac.status.blank? && pac.status.name == 'Finished'
       "You can only add to Errata when the build is Finished."
     else
-        # uri = URI.parse(URI.encode(APP_CONFIG["errata_url"]))
-        # No working errata server currently, so test with fake request
-        # to mead_scheduler.
         uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+        # the errata request is sent to mead-scheduler's rest api:
+        req = Net::HTTP::Put.new("/mead-scheduler-web/rest/errata/#{prod}")
 
-        # Need to change this req path to the appropriate one for submitting errata
-        # once it is known.
-        req = Net::HTTP::Put.new("/errata/#{prod}")
-        # mode = pac.wrapper_build == 'No' ? 'chain': 'wrapper'
-        params = {:bz_bugs => pac.bz_bug_ids, :mead => pac.mead}
+        # may need to update the names of these two parameters:
+        params = {:bz_bugs => pac.bz_bug_ids, :brew => pac.brew}
         req.set_form_data(params)
 
         res = Net::HTTP.start(uri.host, uri.port) do |http|

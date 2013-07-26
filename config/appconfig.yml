@@ -7,4 +7,3 @@ mead_scheduler: "http://mead.usersys.redhat.com"
 bz_bug_status_update_url: "/mead-bzbridge/bug/status/<id>?oneway=<oneway>"
 bz_bug_status_update_url_mocked: "/mead-bzbridge/bug/status/<id>?oneway=<oneway>"
 magic_bug_id: "966279"
-errata_url: "http://rhn.redhat.com" # Replace this with correct Internal Errata URL.
