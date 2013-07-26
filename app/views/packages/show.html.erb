@@ -44,8 +44,6 @@ Tags:
 Wrapper build:
 <%= h @package.wrapper_build %>
 <%= render :partial => 'packages/fields/build' %>
-
-Errata:
 <%= render :partial => 'packages/fields/errata' %>
 
 <% get_xattrs(@package.task, true, false) do |attr| %>

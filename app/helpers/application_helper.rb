@@ -112,8 +112,11 @@ module ApplicationHelper
         # No working errata server currently, so test with fake request
         # to mead_scheduler.
         uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
-        req = Net::HTTP::Put.new("/mead-scheduler-web/rest/build/sched/#{prod}/#{pac.name}")
-        mode = pac.wrapper_build == 'No' ? 'chain': 'wrapper'
+
+        # Need to change this req path to the appropriate one for submitting errata
+        # once it is known.
+        req = Net::HTTP::Put.new("/errata/#{prod}")
+        # mode = pac.wrapper_build == 'No' ? 'chain': 'wrapper'
         params = {:bz_bugs => pac.bz_bug_ids, :mead => pac.mead}
         req.set_form_data(params)
 
@@ -121,6 +124,7 @@ module ApplicationHelper
           http.request(req)
         end
 
+        # Need to update the error codes when we get word on their values:
         case res.code
         when "202"
             "202: Successfully added package #{pac.name} to Errata"
@@ -129,7 +133,7 @@ module ApplicationHelper
             Parameters used:  #{params.to_json} \n
             #{res.body}"
         when "409"
-            "409: Rejected, build already scheduled for this package \n #{res.body}"
+            "409: Rejected, Errata already submitted for this package \n #{res.body}"
         else
             "#{res.code} error! \n
             Parameters used: #{params.to_json} \n
