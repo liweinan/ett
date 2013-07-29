@@ -1,0 +1,14 @@
+<div style="text-align: left;">
+<% if logged_in?%>
+    <%= render :partial => 'layouts/sep_tiny' %>
+    <% form_remote_tag(
+               :url => {:controller => "toolbox", :action => "add_errata"}, 
+               :loading => "Element.show('spinner_errata_#{@package.id}');",
+               :success => "Element.hide('spinner_errata_#{@package.id}');
+           ") do %>
+          <%= hidden_field_tag :package_id, @package.id %>
+          <%= submit_tag 'Add to Errata' %>
+          <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "spinner_errata_#{@package.id}"} %>
+        </div>
+    <% end %>
+<% end %>
