@@ -9,9 +9,7 @@ class ApplicationController < ActionController::Base
   before_filter :save_current_link
               # Scrub sensitive parameters from your log
               # filter_parameter_logging :password
-  filter_parameter_logging :bzauth_pwd
-  filter_parameter_logging :pwd
-  filter_parameter_logging :ubbs_pwd
+  filter_parameter_logging :bzauth_pwd, :pwd, :ubbs_pwd
 
   def get_task(name)
     Task.find_by_name(unescape_url(name))
