@@ -162,7 +162,7 @@ class PackagesController < ApplicationController
             @package.bz_bugs.each do |bz_bug|
               if bz_bug.summary.match(/^Upgrade/) && !@assignee.nil?
 
-                params_bz = {:assignee => @assignee.email, :userid => extract_username(params[:bzauth_user]), :pwd => session[:bz_pass]}
+                params_bz = {:assignee => @assignee.email, :userid => extract_username(params[:bzauth_user]), :pwd => session[:bz_pass], :status => BzBug::BZ_STATUS[:assigned]}
                 update_bug(bz_bug.bz_id, oneway='true', params_bz)
                 bz_bug.bz_assignee = @assignee.email
                 bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
