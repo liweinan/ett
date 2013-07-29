@@ -23,7 +23,7 @@ class BzBugsController < ApplicationController
                       'userid' => extract_username(params[:user]),
                       'pwd' => params[:pwd]}
 
-        parameters['see_also'] = params[:see_also] unless params[:see_also].blank?
+        parameters['seealso'] = params[:see_also] unless params[:see_also].blank?
 
         email = nil
         unless package.assignee.blank?
