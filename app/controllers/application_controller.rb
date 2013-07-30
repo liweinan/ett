@@ -563,7 +563,7 @@ class ApplicationController < ActionController::Base
       return 401 # authentication failure
     end
 
-    res = Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_query_url"]}#{APP_CONFIG["magic_bug_id"]}?userid=#{bzauth_user}&pwd=#{bzauth_pwd}"))
+    res = Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_check"]}#{bzauth_user}?pwd=#{bzauth_pwd}"))
     res.code
   end
 
