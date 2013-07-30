@@ -249,7 +249,7 @@ class PackagesController < ApplicationController
 
           Changelog.package_updated(@orig_package, @package, @orig_tags)
 
-          do_sync(["name", "notes", "ver", "assignee", "brew_link", "group_id", "artifact_id", "project_name", "project_url", "license", "scm"])
+          do_sync(["name", "notes", "clentry", "ver", "assignee", "brew_link", "group_id", "artifact_id", "project_name", "project_url", "license", "scm"])
 
           sync_status if params[:sync_status] == 'yes'
           sync_tags if params[:sync_tags] == 'yes'

@@ -22,6 +22,7 @@
             <%= render :partial => 'packages/fields/xattrs', :locals => {:f => f, :xattr => attr} %>
         <% end %>
         <%= render :partial => 'packages/fields/notes', :locals => {:f => f} %>
+        <%= render :partial => 'packages/fields/clentry', :locals => {:f => f} %>
         <tr>
           <td colspan=2 style="text-align:left;">
             <%= render :partial => 'layouts/notification', :locals => {:title => 'Notify the package creation to:', :div_id => 'package_create'} %>            
