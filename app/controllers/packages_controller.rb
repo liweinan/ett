@@ -213,15 +213,16 @@ class PackagesController < ApplicationController
                   if bz_bug.summary.match(/^Upgrade/) && bz_bug.bz_assignee == @assignee.email
 
                     params_bz = {:assignee => @assignee.email, :userid => extract_username(params[:bzauth_user]),
-                                 :pwd => session[:bz_pass], :status => BzBug::BZ_STATUS[:finished]}
+                                 :pwd => session[:bz_pass], :status => BzBug::BZ_STATUS[:modified], :milestone => @package.task.milestone}
 
-                    update_bug(bz_bug.bz_id, oneway='true', params_bz)
+                    # removed for now because we need to add milestone and status
+                    # update_bug(bz_bug.bz_id, oneway='true', params_bz)
 
                     comment = "Source URL: #{@package.git_url}\n" +
                         "Mead-Build: #{@package.mead}\n" +
                         "Brew-Build: #{@package.brew}\n"
-                    add_comment_to_bug(bz_bug.bz_id, comment,
-                                       extract_username(params[:bzauth_user]), session[:bz_pass])
+                    add_comment_milestone_status_to_bug(bz_bug.bz_id, comment, @package.task.milestone,
+                                       BzBug::BZ_STATUS[:modified], @assignee.email, extract_username(params[:bzauth_user]), session[:bz_pass])
 
                     bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
                     bz_bug.save
