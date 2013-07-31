@@ -498,8 +498,8 @@ class ApplicationController < ActionController::Base
     res
   end
 
-  def add_comment_to_bug(bz_id, comment, user, pwd)
-    req_link = "/mead-bzbridge/bug/#{bz_id}?comment=#{URI::encode(comment)}&userid=#{user}&pwd=#{pwd}&oneway=true"
+  def add_comment_milestone_status_to_bug(bz_id, comment, milestone, status, assignee, user, pwd)
+    req_link = "/mead-bzbridge/bug/#{bz_id}?comment=#{URI::encode(comment)}&milestone=#{URI::encode(milestone)}&assignee=#{URI::encode(assignee)}&status=#{URI::encode(status)}&userid=#{user}&pwd=#{pwd}&oneway=true"
     uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
     req = Net::HTTP::Put.new(req_link)
 
@@ -508,6 +508,7 @@ class ApplicationController < ActionController::Base
     end
     puts res.response
   end
+
 
   def get_brew_name(pac)
     # TODO: make the tag more robust
