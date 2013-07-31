@@ -70,7 +70,11 @@
                     return false;
                 }
             }
+            <% if @package.task.use_bz_integration? %>
             return checkBzAuthInfo(null, beforeStatus, document.getElementById('edit_package_<%=@package.id%>'));
+            <% else %>
+            document.getElementById('edit_package_<%=@package.id%>').submit();
+            <% end %>
         }
     </script>
 <% end %>
