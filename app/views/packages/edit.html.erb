@@ -5,9 +5,8 @@
 %>
 
 <h2><%= h @package.name %></h2>
-
+<div id="package_ver" style="display:none"><%=@package.ver%></div>
 <%= render :partial => "layouts/error_messages" %>
-
 <% form_for(@package, :html => {:onsubmit => 'return validateForm();'}) do |f| %>
     <%= f.error_messages %>
     <% if params[:user] %>
@@ -63,12 +62,13 @@
         });
 
         function validateForm() {
-            var ver = document.getElementById('package_ver').value;
-            if (!checkPackageVersionFormat(ver)) {
-                alert('<%=t"version_fmt_incorrect"%>');
-                return false;
+            var ver = document.getElementById('package_ver').innerHTML;
+            if (ver != "") {
+                if (!checkPackageVersionFormat(ver)) {
+                    alert('<%=t"version_fmt_incorrect"%>');
+                    return false;
+                }
             }
-
             return checkBzAuthInfo(null, beforeStatus, document.getElementById('edit_package_<%=@package.id%>'));
         }
     </script>
