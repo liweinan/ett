@@ -1,4 +1,4 @@
-<% if has_ver_integration?(@package.task) && @package.status.code != Status::CODES[:finished] %>
+<% if @package.status.code != Status::CODES[:finished] %>
 <tr>
   <td>
   Version
