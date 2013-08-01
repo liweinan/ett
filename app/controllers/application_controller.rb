@@ -567,16 +567,21 @@ class ApplicationController < ActionController::Base
       return 401 # authentication failure
     end
 
-    res = Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_query_url"]}#{APP_CONFIG["magic_bug_id"]}?userid=#{bzauth_user}&pwd=#{bzauth_pwd}"))
+    res = Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_check"]}#{bzauth_user}?pwd=#{bzauth_pwd}"))
     res.code
   end
 
   def has_mead_integration?(task)
+    return has_x_integration?(task, ['mead', 'brew'])
+  end
+
+  def has_x_integration?(task, items)
     if task.setting.blank?
       false
     else
       xattrs = task.setting.xattrs.split(',')
-      xattrs.include?('mead') && xattrs.include?('brew')
+      # find the 'subset' of the & and see if all the items are in xattrs
+      xattrs & items == items
     end
   end
 
