@@ -3,7 +3,7 @@
   Version
   </td>
   <td style="text-align:left;">
-    <%= f.text_field :ver, :disabled => @package.can_edit_version? %>
+    <%= f.text_field :ver, :disabled => (@package.can_edit_version? == true ? nil : 'disabled') %>
     <%# render :partial => 'sync', :locals => {:key => 'name'} %>
   </td>
 </tr>

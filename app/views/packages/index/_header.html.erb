@@ -2,14 +2,12 @@
   <% if logged_in? %>
       <<%= col %> class='content-list-head'>Operations</<%= col %>>
   <% end %>
-
   <<%= col %> class='content-list-head'>Name</<%= col %>>
   <<%= col %> class='content-list-head'>Status</<%= col %>>
   <<%= col %> class='content-list-head'>Tags</<%= col %>>
   <<%= col %> class='content-list-head'>Assignee</<%= col %>>
-
-  <% get_xattrs(@task, true, false) do |attr| %>
-      <<%= col %> class='content-list-head'><%= attr.camelcase %></<%= col %>>
-  <% end %>
-
+  <<%= col %> class='content-list-head'>Version</<%= col %>>
+  <<%= col %> class='content-list-head'>GitUrl</<%= col %>>
+  <<%= col %> class='content-list-head'>Mead</<%= col %>>
+  <<%= col %> class='content-list-head'>Brew</<%= col %>>
 </tr>

@@ -572,7 +572,11 @@ class ApplicationController < ActionController::Base
   end
 
   def has_mead_integration?(task)
-  	true # todo: add an 'can_use_mead_integration' into project
+  	if task.blank?
+      false
+    else
+      task.setting.use_mead_integration?
+    end
 #     return has_x_integration?(task, ['mead', 'brew'])
   end
 

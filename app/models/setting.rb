@@ -6,6 +6,7 @@ class Setting < ActiveRecord::Base
   default_value_for :show_xattrs, 'No'
   default_value_for :enable_xattrs, 'No'
   default_value_for :use_bz_integration, 'No'
+  default_value_for :use_mead_integration, 'No'
 
 
   PROPS = {:creator => 0b1, :commenter => 0b10, :assignee => 0b100}
@@ -149,4 +150,9 @@ class Setting < ActiveRecord::Base
   def use_bz_integration?
     use_bz_integration == 'Yes'
   end
+
+  def use_mead_integration?
+    use_mead_integration == 'Yes'
+  end
+
 end

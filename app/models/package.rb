@@ -47,6 +47,10 @@ class Package < ActiveRecord::Base
     10
   end
 
+  def can_edit_version?
+    status.code != Status::CODES[:finished]
+  end
+
   def commenters
     user_ids = Comment.find_by_sql("select distinct user_id from comments where commentable_type='Package' and commentable_id=#{id}")
     commenters = []
@@ -180,7 +184,4 @@ class Package < ActiveRecord::Base
     end
   end
 
-  def can_edit_version?
-    status.code != Status::CODES[:finished]
-  end
 end
