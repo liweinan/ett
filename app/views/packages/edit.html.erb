@@ -32,9 +32,8 @@
         <%# render :partial => 'packages/fields/track_time' %>
 
         <%# get_xattrs(@package.task, false, true) do |attr| %>
-            <%# render :partial => 'packages/fields/xattrs', :locals => {:f => f, :xattr => attr} %>
+        <%# render :partial => 'packages/fields/xattrs', :locals => {:f => f, :xattr => attr} %>
         <%# end %>
-        <%= render :partial => 'packages/fields/assignee', :locals => {:f => f} %>
         <%# render :partial => 'packages/fields/track_time' %>
         <%= render :partial => 'packages/fields/notes', :locals => {:f => f} %>
         <tr>
@@ -65,8 +64,11 @@
             beforeStatus = document.getElementById('package_status_id').value;
         });
 
+
         function validateForm() {
-            var ver = document.getElementById('package_ver').innerHTML;
+            var ver = document.getElementById('package_ver').value;
+
+
             if (ver != "") {
                 if (!checkPackageVersionFormat(ver)) {
                     alert('<%=t"version_fmt_incorrect"%>');
@@ -74,9 +76,9 @@
                 }
             }
             <% if @package.task.use_bz_integration? %>
-            return checkBzAuthInfo(null, beforeStatus, document.getElementById('edit_package_<%=@package.id%>'));
+                return checkBzAuthInfo(null, beforeStatus, document.getElementById('edit_package_<%=@package.id%>'));
             <% else %>
-            document.getElementById('edit_package_<%=@package.id%>').submit();
+                document.getElementById('edit_package_<%=@package.id%>').submit();
             <% end %>
         }
     </script>

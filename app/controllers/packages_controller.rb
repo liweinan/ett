@@ -380,15 +380,15 @@ class PackagesController < ApplicationController
 
     csv_string = FasterCSV.generate do |csv|
       # header row
-      header_row = ["name", "status", "tags"]
-
-      get_xattrs(@task, true, false) do |attr|
-        if attr.blank?
-          header_row << ""
-        else
-          header_row << attr.downcase
-        end
-      end
+      header_row = ["name", "status", "tags", "assignee", "version", "git_url", "mead", "brew"]
+      #
+      #get_xattrs(@task, true, false) do |attr|
+      #  if attr.blank?
+      #    header_row << ""
+      #  else
+      #    header_row << attr.downcase
+      #  end
+      #end
 
       csv << header_row
 
@@ -412,13 +412,18 @@ class PackagesController < ApplicationController
           val << tag_val
         end
 
-        get_xattrs(@task, true, false) do |attr|
-          if package.read_attribute(attr).blank?
-            val << ""
-          else
-            val << package.read_attribute(attr)
-          end
-        end
+        val << package.assignee.email
+        val << package.version
+        val << package.git_url
+        val << package.mead
+        val << package.brew
+        #get_xattrs(@task, true, false) do |attr|
+        #  if package.read_attribute(attr).blank?
+        #    val << ""
+        #  else
+        #    val << package.read_attribute(attr)
+        #  end
+        #end
 
         csv << val
       end

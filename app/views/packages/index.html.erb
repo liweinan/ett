@@ -100,10 +100,9 @@
     <% content_for :js do %>
         <script type="text/javascript">
 
-
-            function show_pac_editor(div, pac_id, field_name, field_type, is_xattr) {
+            function show_pac_editor(div, pac_id, field_name, field_type) {
                 Element.hide(div + '_field');
-                Element.hide(build_pac_btn_id(div, field_type, is_xattr));
+                Element.hide(build_pac_btn_id(div, field_type));
                 new Ajax.Request('/toolbox/get_pac_form',
                         {
                             asynchronous: true,
@@ -119,7 +118,6 @@
                                 'pac_id': pac_id,
                                 'field_name': field_name,
                                 'field_type': field_type,
-                                'is_xattr': is_xattr,
                                 'authenticity_token': '<%=form_authenticity_token%>'}
                         });
                 Element.show(div + '_editor');
@@ -127,25 +125,25 @@
                 document.getElementById(div + "_switch").innerHTML = 'off';
             }
 
-            function hide_pac_editor(div, field_type, is_xattr) {
+            function hide_pac_editor(div, field_type) {
                 Element.show(div + '_field');
-                Element.show(build_pac_btn_id(div, field_type, is_xattr));
+                Element.show(build_pac_btn_id(div, field_type));
                 Element.hide(div + '_editor');
                 document.getElementById(div + "_switch").innerHTML = 'on';
             }
 
-            function show_pac_btn(div, field_type, is_xattr) {
+            function show_pac_btn(div, field_type) {
                 if (document.getElementById(div + "_switch").innerHTML == 'on')
-                    Element.show(build_pac_btn_id(div, field_type, is_xattr));
+                    Element.show(build_pac_btn_id(div, field_type));
             }
 
-            function hide_pac_btn(div, field_type, is_xattr) {
+            function hide_pac_btn(div, field_type) {
                 if (document.getElementById(div + "_switch").innerHTML == 'on')
-                    Element.hide(build_pac_btn_id(div, field_type, is_xattr));
+                    Element.hide(build_pac_btn_id(div, field_type));
             }
 
-            function build_pac_btn_id(div, field_type, is_xattr) {
-                return div + '_-' + field_type + '-' + is_xattr + '-_btn';
+            function build_pac_btn_id(div, field_type) {
+                return div + '_-' + field_type + '-_btn';
             }
 
             function getPacBtns() {
@@ -231,15 +229,15 @@
 <% else %>
     <% content_for :js do %>
         <script type="text/javascript">
-            function show_pac_editor(div, pac_id, field_name, field_type, is_xattr) {
+            function show_pac_editor(div, pac_id, field_name, field_type) {
             }
-            function hide_pac_editor(div, field_type, is_xattr) {
+            function hide_pac_editor(div, field_type) {
             }
-            function show_pac_btn(div, field_type, is_xattr) {
+            function show_pac_btn(div, field_type) {
             }
-            function hide_pac_btn(div, field_type, is_xattr) {
+            function hide_pac_btn(div, field_type) {
             }
-            function build_pac_btn_id(div, field_type, is_xattr) {
+            function build_pac_btn_id(div, field_type) {
             }
             function showCommentDialog(pac_id) {
             }

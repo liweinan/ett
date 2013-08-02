@@ -1,11 +1,7 @@
 page.hide(params[:div]+'_editor')
 page.hide(params[:div]+'_spinner')
 
-if params[:is_xattr] == 'yes'
-  col_name = 'xattr'
-else
-  col_name = params[:div].split('_')[2]
-end
+col_name = params[:div].split('_')[2]
 
 field_name = params[:div].split('_')[2]
 
