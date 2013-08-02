@@ -5,9 +5,8 @@
 %>
 
 <h2><%= h @package.name %></h2>
-
+<div id="package_ver" style="display:none"><%=@package.ver%></div>
 <%= render :partial => "layouts/error_messages" %>
-
 <% form_for(@package, :html => {:onsubmit => 'return validateForm();'}) do |f| %>
     <%= f.error_messages %>
     <% if params[:user] %>
@@ -28,6 +27,7 @@
         <%= render :partial => 'packages/fields/git_url', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/brew', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/mead', :locals => {:f => f} %>
+        <%= render :partial => 'packages/fields/wrapper_build', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/assignee', :locals => {:f => f} %>
         <%# render :partial => 'packages/fields/track_time' %>
 
@@ -35,6 +35,10 @@
             <%# render :partial => 'packages/fields/xattrs', :locals => {:f => f, :xattr => attr} %>
         <%# end %>
 
+        <%= render :partial => 'packages/fields/ver', :locals => {:f => f} %>
+
+        <%= render :partial => 'packages/fields/assignee', :locals => {:f => f} %>
+        <%# render :partial => 'packages/fields/track_time' %>
         <%= render :partial => 'packages/fields/notes', :locals => {:f => f} %>
         <tr>
           <td colspan=2 style="text-align:left;">
@@ -65,13 +69,18 @@
         });
 
         function validateForm() {
-            var ver = document.getElementById('package_ver').value;
-            if (!checkPackageVersionFormat(ver)) {
-                alert('<%=t"version_fmt_incorrect"%>');
-                return false;
+            var ver = document.getElementById('package_ver').innerHTML;
+            if (ver != "") {
+                if (!checkPackageVersionFormat(ver)) {
+                    alert('<%=t"version_fmt_incorrect"%>');
+                    return false;
+                }
             }
-
+            <% if @package.task.use_bz_integration? %>
             return checkBzAuthInfo(null, beforeStatus, document.getElementById('edit_package_<%=@package.id%>'));
+            <% else %>
+            document.getElementById('edit_package_<%=@package.id%>').submit();
+            <% end %>
         }
     </script>
 <% end %>

@@ -120,7 +120,7 @@ class Package < ActiveRecord::Base
 
   def bz_bug_ids
     # want to return a list of all the ids in the :bz_bugs field
-    return bz_bugs.map {|bug| bug["bz_id"]}
+    return bz_bugs.map { |bug| bug["bz_id"] }
   end
 
   protected
@@ -180,5 +180,7 @@ class Package < ActiveRecord::Base
     end
   end
 
-
+  def can_edit_version?
+    status.code != Status::CODES[:finished]
+  end
 end
