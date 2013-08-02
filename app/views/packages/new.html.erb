@@ -16,6 +16,7 @@
         <%= render :partial => 'packages/fields/status', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/tags', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/git_url', :locals => {:f => f} %>
+        <%= render :partial => 'packages/fields/ver', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/wrapper_build', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/assignee', :locals => {:f => f} %>
         <% get_xattrs(Task.find_by_name(unescape_url(params[:task_id])), false, true) do |attr| %>
