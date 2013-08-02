@@ -24,14 +24,16 @@
             <%= render :partial => 'bz_bugs/fields/bz_pass' %>
         <% end %>
         <%= render :partial => 'packages/fields/tags', :locals => {:f => f} %>
+        <%= render :partial => 'packages/fields/ver', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/git_url', :locals => {:f => f} %>
-        <%= render :partial => 'packages/fields/wrapper_build', :locals => {:f => f} %>
+        <%= render :partial => 'packages/fields/brew', :locals => {:f => f} %>
+        <%= render :partial => 'packages/fields/mead', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/assignee', :locals => {:f => f} %>
         <%# render :partial => 'packages/fields/track_time' %>
 
-        <% get_xattrs(@package.task, false, true) do |attr| %>
-            <%= render :partial => 'packages/fields/xattrs', :locals => {:f => f, :xattr => attr} %>
-        <% end %>
+        <%# get_xattrs(@package.task, false, true) do |attr| %>
+            <%# render :partial => 'packages/fields/xattrs', :locals => {:f => f, :xattr => attr} %>
+        <%# end %>
 
         <%= render :partial => 'packages/fields/notes', :locals => {:f => f} %>
         <tr>

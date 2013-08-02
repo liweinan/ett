@@ -572,12 +572,13 @@ class ApplicationController < ActionController::Base
   end
 
   def has_mead_integration?(task)
-    if task.setting.blank?
-      false
-    else
-      xattrs = task.setting.xattrs.split(',')
-      xattrs.include?('mead') && xattrs.include?('brew')
-    end
+    true
+    #if task.setting.blank?
+    #  false
+    #else
+    #  xattrs = task.setting.xattrs.split(',')
+    #  xattrs.include?('mead') && xattrs.include?('brew')
+    #end
   end
 
   # mode flag needed since for mode=:create,
