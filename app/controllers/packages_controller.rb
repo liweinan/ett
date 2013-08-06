@@ -204,7 +204,14 @@ class PackagesController < ApplicationController
                 end
               elsif new_status.code == Status::CODES[:finished] && !@assignee.blank?
                 if has_mead_integration?(@package.task)
-                  @package.mead_action = Package::MEAD_ACTIONS[:needsync]
+                  # Disable asynchronous update <- we need that data for
+                  # bugzilla immediately
+                  # @package.mead_action = Package::MEAD_ACTIONS[:needsync]
+
+                  brew_pkg = get_brew_name(@package)
+                  @package.brew = brew_pkg unless brew_pkg.nil?
+                  @package.mead = get_mead_name(brew_pkg) unless brew_pkg.nil?
+                  @package.save
                 end
 
 
