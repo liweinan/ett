@@ -127,7 +127,7 @@ class PackagesController < ApplicationController
 
     last_status_changed_at = @package.status_changed_at
     last_status = Status.find_by_id(@package.status_id)
-    old_assignee = @package.assignee
+    old_assignee_email = @package.assignee.email if @package.assignee
 
 
     unless params[:package][:name].blank?
@@ -135,10 +135,10 @@ class PackagesController < ApplicationController
     end
     update_bz_pass(params[:bzauth_pwd])
 
-    if params[:package].key?(:user_id)
-      @assignee = User.find_by_id(params[:package][:user_id])
+    if params[:package].key?(:user_id) && !params[:package][:user_id].blank?
+      assignee_email = User.find_by_id(params[:package][:user_id]).email
     else
-      @assignee = old_assignee
+      assignee_email = ''
     end
 
     respond_to do |format|
@@ -158,13 +158,13 @@ class PackagesController < ApplicationController
           # update the assignee of the bugs if assignee changed
           # TODO: we don't check if the bz_bug assignee is the same as the old
           # one. Will have to fix this someday
-          if old_assignee != @assignee
+          if old_assignee_email != assignee_email
             @package.bz_bugs.each do |bz_bug|
-              if bz_bug.summary.match(/^Upgrade/) && !@assignee.nil?
+              if bz_bug.summary.match(/^Upgrade/) && !assignee_email.nil?
 
-                params_bz = {:assignee => @assignee.email, :userid => extract_username(params[:bzauth_user]), :pwd => session[:bz_pass], :status => BzBug::BZ_STATUS[:assigned]}
+                params_bz = {:assignee => assignee_email, :userid => extract_username(params[:bzauth_user]), :pwd => session[:bz_pass], :status => BzBug::BZ_STATUS[:assigned]}
                 update_bug(bz_bug.bz_id, oneway='true', params_bz)
-                bz_bug.bz_assignee = @assignee.email
+                bz_bug.bz_assignee = assignee_email
                 bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
                 bz_bug.save
               end
@@ -189,12 +189,12 @@ class PackagesController < ApplicationController
             end
 
             unless new_status.blank?
-              if new_status.code == Status::CODES[:inprogress] && !@assignee.blank?
+              if new_status.code == Status::CODES[:inprogress] && !assignee_email.blank?
 
                 # the bug statuses are waiting to be updated according to https://docspace.corp.redhat.com/docs/DOC-148169
                 @package.bz_bugs.each do |bz_bug|
-                  if bz_bug.summary.match(/^Upgrade/) && bz_bug.bz_assignee == @assignee.email
-                    params_bz = {:assignee => @assignee.email, :userid => extract_username(params[:bzauth_user]),
+                  if bz_bug.summary.match(/^Upgrade/) && bz_bug.bz_assignee == assignee_email
+                    params_bz = {:assignee => assignee_email, :userid => extract_username(params[:bzauth_user]),
                                  :pwd => session[:bz_pass], :status => BzBug::BZ_STATUS[:assigned]}
 
                     update_bug(bz_bug.bz_id, oneway='true', params_bz)
@@ -202,7 +202,7 @@ class PackagesController < ApplicationController
                     bz_bug.save
                   end
                 end
-              elsif new_status.code == Status::CODES[:finished] && !@assignee.blank?
+              elsif new_status.code == Status::CODES[:finished] && !assignee_email.blank?
                 if has_mead_integration?(@package.task)
                   # Disable asynchronous update <- we need that data for
                   # bugzilla immediately
@@ -213,7 +213,7 @@ class PackagesController < ApplicationController
 
                 @package.bz_bugs.each do |bz_bug|
 
-                  if bz_bug.summary.match(/^Upgrade/) && bz_bug.bz_assignee == @assignee.email
+                  if bz_bug.summary.match(/^Upgrade/) && bz_bug.bz_assignee == assignee_email
 
                     comment = "Source URL: #{@package.git_url}\n" +
                         "Mead-Build: #{@package.mead}\n" +
@@ -222,7 +222,7 @@ class PackagesController < ApplicationController
                     userid = extract_username(params[:bzauth_user])
                     params_bz = { :comment => comment,
                                :milestone => @package.task.milestone,
-                               :assignee => @assignee.email,
+                               :assignee => assignee_email,
                                :userid => extract_username(params[:bzauth_user]),
                                :status => BzBug::BZ_STATUS[:modified],
                                :pwd => session[:bz_pass] }
