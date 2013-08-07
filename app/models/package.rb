@@ -48,7 +48,11 @@ class Package < ActiveRecord::Base
   end
 
   def can_edit_version?
-    status.code != Status::CODES[:finished]
+    if status.respond_to?(:code)
+        status.code != Status::CODES[:finished]
+    else
+      true
+    end
   end
 
   def commenters
