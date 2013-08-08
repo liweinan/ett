@@ -233,10 +233,10 @@ class PackagesController < ApplicationController
                   end
                 end
 
-                if has_mead_integration?(@package.task) && params[:_type] == "inline"
-                  # for inline editor, we get build info immediately
-                  get_mead_info(@package)
-                end
+                #if has_mead_integration?(@package.task) && params[:_type] == "inline"
+                #  # for inline editor, we get build info immediately
+                #  get_mead_info(@package)
+                #end
               end
             end
 
