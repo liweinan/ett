@@ -40,7 +40,7 @@ class ActionsController < ApplicationController
         # 2. check the target task name is same within session
         target_task_name = session[:clone_review][:target_task_name].downcase.strip
         @target_task = Task.find_by_name(target_task_name)
-        if !@target_task
+        unless @target_task
           @target_task = Task.new
           @target_task.name = target_task_name
           @target_task.save
@@ -72,6 +72,23 @@ class ActionsController < ApplicationController
             else
               clone_tag.save
             end
+          end
+        end
+
+        # clone settings
+        if session[:clone_review][:scopes].include? 'setting'
+          unless @source_task.setting.blank?
+            setting = Setting.new
+            setting.recipients = @source_task.setting.recipients
+            setting.props = @source_task.setting.props
+            setting.actions = @source_task.setting.actions
+            setting.enabled = @source_task.setting.enabled
+            setting.default_tag = @source_task.setting.default_tag
+            setting.close_status_id = @source_task.setting.close_status_id
+            setting.use_bz_integration = @source_task.setting.use_bz_integration
+            setting.use_mead_integration = @source_task.setting.use_mead_integration
+            setting.task_id = @target_task.id
+            setting.save
           end
         end
 
@@ -162,10 +179,10 @@ class ActionsController < ApplicationController
 
       end
 
-      tag_clone_done
+      task_clone_done
     rescue Exception => e
 
-      tag_clone_failed(e)
+      task_clone_failed(e)
     ensure
       session[:clone_review] = nil
       render :text => 'ok'

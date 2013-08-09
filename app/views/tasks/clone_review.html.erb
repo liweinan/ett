@@ -3,9 +3,8 @@
 Please review the clone action you are going to performed in below:
 <%= render :partial => 'layouts/sep_tiny' %>
 
-<strong>Source Task:</strong> <%= unescape_url(session[:clone_review][:source_task_name]) %>
-<%= render :partial => 'layouts/sep_tiny' %>
-<strong>Target Task:</strong> <%= unescape_url(session[:clone_review][:target_task_name]) %>
+<strong>Clone task from </strong> <%= unescape_url(session[:clone_review][:source_task_name]) %>
+<strong>to</strong> <%= unescape_url(session[:clone_review][:target_task_name]) %>
 <%= render :partial => 'layouts/sep_tiny' %>
 <strong>Options:</strong>
 
@@ -21,7 +20,9 @@ Please review the clone action you are going to performed in below:
 <% if session[:clone_review][:scopes].include? 'tag' %>
     Clone tags /
 <% end %>
-
+<% if session[:clone_review][:scopes].include? 'setting' %>
+    Clone setting /
+<% end %>
 <%= render :partial => 'layouts/sep_tiny' %>
 
 <% session[:clone_review][:status_option] %>

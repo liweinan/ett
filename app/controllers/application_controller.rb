@@ -139,12 +139,12 @@ class ApplicationController < ActionController::Base
     File.open('/tmp/ett_clone_in_progress_marker').first.match(/^#{status}/)
   end
 
-  def tag_clone_in_progress
-    tag_clone_in_status('in_progress')
+  def task_clone_in_progress
+    task_clone_in_status('in_progress')
   end
 
-  def tag_clone_failed(e)
-    tag_clone_in_status('failed')
+  def task_clone_failed(e)
+    task_clone_in_status('failed')
     open('/tmp/ett_clone_in_progress_marker', 'a') { |f|
       f.puts e.message
       f.puts e.backtrace.inspect
@@ -231,11 +231,11 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def tag_clone_done
-    tag_clone_in_status('done')
+  def task_clone_done
+    task_clone_in_status('done')
   end
 
-  def tag_clone_in_status(status)
+  def task_clone_in_status(status)
     File.open('/tmp/ett_clone_in_progress_marker', 'w') { |f| f.write(status) }
   end
 

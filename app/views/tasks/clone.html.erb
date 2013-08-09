@@ -16,16 +16,17 @@
   <input id='scope_tag' name="scopes[]" type="checkbox" value="tag" onclick="refresh_form();"/>
   <label for="scope_tag">Clone Tags</label>
   <%= render :partial => 'layouts/sep_tiny' %>
+  <div id='scope_setting_div'>
+    <input id='scope_setting' name="scopes[]" type="checkbox" value="setting" onclick="refresh_form();"/>
+    <label for="scope_setting">Clone Setting</label>
+  </div>
+  <%= render :partial => 'layouts/sep_tiny' %>
   <input id='scope_package' name="scopes[]" type="checkbox" value="package" onclick="refresh_form();"/>
   <label for="scope_package">Clone Packages</label>
   <%= render :partial => 'layouts/sep_tiny' %>
   <div id='scope_assignee_div' style="display:none;">
     <input id='scope_assignee' name="scopes[]" type="checkbox" value="assignee"/>
     <label for="scope_assignee">Clone Assignee</label>
-  </div>
-  <div id='scope_setting_div' style="display:none;">
-    <input id='scope_setting' name="scopes[]" type="checkbox" value="setting"/>
-    <label for="scope_setting">Clone Setting</label>
   </div>
   <%= render :partial => 'layouts/sep' %>
 
