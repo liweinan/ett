@@ -2,7 +2,7 @@
     // After page loaded, do some initial scannings and process package's bz bugs according to https://docspace.corp.redhat.com/docs/DOC-148169.
     <% if has_bz_auth_info? && @package.task.use_bz_integration? %>
     document.observe("dom:loaded", function () {
-        processMeadInfo();
+//        processMeadInfo(); this is a sync operation now
         setTimeout(update_bz_bugs, 5000);
     });
     <% end %>
