@@ -8,7 +8,7 @@
   <label for="target_task_name_field">Clone <%= @task.name %> to:</label>
   <input id='target_task_name_field' name="target_task_name"/> - (new tag name) <br/>
 
-  <%= render :partial => 'layouts/sep' %>  
+  <%= render :partial => 'layouts/sep' %>
 
   <input id='scope_status' name="scopes[]" type="checkbox" value="status" onclick="refresh_form();"/>
   <label for="scope_status">Clone Statuses</label>
@@ -19,12 +19,15 @@
   <input id='scope_package' name="scopes[]" type="checkbox" value="package" onclick="refresh_form();"/>
   <label for="scope_package">Clone Packages</label>
   <%= render :partial => 'layouts/sep_tiny' %>
-<div id='scope_assignee_div' style="display:none;">
-<input id='scope_assignee' name="scopes[]" type="checkbox" value="assignee"/>
-  <label for="scope_assignee">Clone Assignee</label>
-</div>
+  <div id='scope_assignee_div' style="display:none;">
+    <input id='scope_assignee' name="scopes[]" type="checkbox" value="assignee"/>
+    <label for="scope_assignee">Clone Assignee</label>
+  </div>
+  <div id='scope_setting_div' style="display:none;">
+    <input id='scope_setting' name="scopes[]" type="checkbox" value="setting"/>
+    <label for="scope_setting">Clone Setting</label>
+  </div>
   <%= render :partial => 'layouts/sep' %>
-
 
   <div id='div_status' style="display:none;">
     <span style="font-weight: bold;">Set status of cloned packages:</span><br/>
@@ -50,7 +53,7 @@
       </span>
 
     <input id="status_select_global" type="radio" name="status_option" value="selection_global"/>
-    <label for="status_select_global"> Set to system internal status: </label>
+    <label for="status_select_global">Set to system internal status: </label>
     <select name="status_selection_value_global" onclick="select_status_option(false,false,false,true);">
       <option value=""> -</option>
       <% Status.find_all_can_select_only_in_global_scope.each do |status| %>
@@ -104,7 +107,7 @@
             var scope_package = document.getElementById('scope_package');
 
             if (scope_package.checked) {
-						document.getElementById('scope_assignee_div').style.display = 'block';
+                document.getElementById('scope_assignee_div').style.display = 'block';
                 if (!scope_status.checked) {
                     document.getElementById('div_status_default').style.display = 'none';
                     document.getElementById('div_status_selection').style.display = 'none';
@@ -113,7 +116,7 @@
                     document.getElementById('div_status_selection').style.display = 'block';
                 }
 
-            <% if task_has_tags?(unescape_url(params[:id])) %>
+                <% if task_has_tags?(unescape_url(params[:id])) %>
                 if (!scope_tag.checked) {
                     document.getElementById('div_tag_default').style.display = 'none';
                     document.getElementById('div_tag_selection').style.display = 'none';
@@ -121,14 +124,14 @@
                     document.getElementById('div_tag_default').style.display = 'block';
                     document.getElementById('div_tag_selection').style.display = 'block';
                 }
-            <% end %>
+                <% end %>
                 new Effect.SlideDown('div_status', {duration: 0.5});
                 new Effect.SlideDown('div_tags', {duration: 0.5});
 
             } else {
                 document.getElementById('div_status').style.display = 'none';
                 document.getElementById('div_tags').style.display = 'none';
-				document.getElementById('scope_assignee_div').style.display = 'none';
+                document.getElementById('scope_assignee_div').style.display = 'none';
             }
         }
 
@@ -137,7 +140,6 @@
         }
 
         Event.observe(window, "load", refresh_form());
-
     </script>
 <% end %>
 

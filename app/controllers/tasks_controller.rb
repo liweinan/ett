@@ -126,6 +126,7 @@ class TasksController < ApplicationController
       session[:clone_review][:status_option] = params[:status_option]
       session[:clone_review][:initial_tag_values] = params[:initial_tag_values]
       session[:clone_review][:tags] = params[:tags]
+      session[:clone_review][:setting] = params[:tags]
       session[:clone_review][:initial_status_value] = params[:initial_status_value]
       session[:clone_review][:status_selection_value] = params[:status_selection_value]
       session[:clone_review][:status_selection_value_global] = params[:status_selection_value_global]
