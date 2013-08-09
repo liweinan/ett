@@ -1,4 +1,4 @@
-<h2>Clone Settings</h2>
+<h2>Clone Task</h2>
 <%= render :partial => 'layouts/error_messages' %>
 
 
@@ -6,7 +6,7 @@
   <input type='hidden' value='<%= escape_url(params[:id]) %>' name='source_task_name'/>
   <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
   <label for="target_task_name_field">Clone <%= @task.name %> to:</label>
-  <input id='target_task_name_field' name="target_task_name"/> - (target tag name) <br/>
+  <input id='target_task_name_field' name="target_task_name"/> - (new tag name) <br/>
 
   <%= render :partial => 'layouts/sep' %>  
 
@@ -14,7 +14,7 @@
   <label for="scope_status">Clone Statuses</label>
   <%= render :partial => 'layouts/sep_tiny' %>
   <input id='scope_tag' name="scopes[]" type="checkbox" value="tag" onclick="refresh_form();"/>
-  <label for="scope_tag">Clone Tasks</label>
+  <label for="scope_tag">Clone Tags</label>
   <%= render :partial => 'layouts/sep_tiny' %>
   <input id='scope_package' name="scopes[]" type="checkbox" value="package" onclick="refresh_form();"/>
   <label for="scope_package">Clone Packages</label>

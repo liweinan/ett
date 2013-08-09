@@ -19,7 +19,8 @@
 <%= link_to "Printable Page", :controller => :packages, :action => :index, 
   :task_id => escape_url(params[:task_id]), :user => params[:user], 
   :style => 'printable' %> / 
-<%= link_to 'Export to CSV', "/packages/export_to_csv/-1?task_id=#{escape_url(params[:task_id])}&tag=#{escape_url(params[:tag])}&status=#{escape_url(params[:status])}&user=#{escape_url(params[:user])}" %>
+<%= link_to 'Export to CSV', "/packages/export_to_csv/-1?task_id=#{escape_url(params[:task_id])}&tag=#{escape_url(params[:tag])}&status=#{escape_url(params[:status])}&user=#{escape_url(params[:user])}" %> /
+<%= link_to 'Copy Task', :controller => :tasks, :action => :copy, :id => params[:task_id] %>
 
 <% if logged_in? && has_task? && can_manage? %>
   <%
