@@ -202,7 +202,7 @@ class PackagesController < ApplicationController
                     bz_bug.save
                   end
                 end
-              elsif new_status.code == Status::CODES[:finished] && !assignee_email.blank?
+              elsif new_status.code == Status::CODES[:finished]
                 if has_mead_integration?(@package.task)
                   # Disable asynchronous update <- we need that data for
                   # bugzilla immediately
