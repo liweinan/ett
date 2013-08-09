@@ -1,6 +1,6 @@
 pac = Package.find(params[:package_id])
 begin
-  res = submit_build(pac, 'eap6')
+  res = submit_build(pac, params[:clentry][:text], 'eap6')
   page.alert(res);
 rescue TypeError => e
   page.alert(e.message)

@@ -71,36 +71,31 @@ module ApplicationHelper
     end
   end
 
-  def submit_build(pac, prod)
+  def submit_build(pac, clentry, prod)
+    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+    req = Net::HTTP::Put.new("/mead-scheduler-web/rest/build/sched/#{prod}/#{pac.name}")
+    mode = pac.wrapper_build == 'No' ? 'chain': 'wrapper'
+    params = {:mode => mode, :userid => pac.user.email, :sources => pac.git_url, :clentry => clentry}
+    req.set_form_data(params)
 
-      unless !pac.status.blank? && pac.status.code == 'inprogress' && ! pac.git_url.blank?
-          "You can only use the Build Button when the Git-Url is provided and the status is 'InProgress'"
-      else
-          uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
-          req = Net::HTTP::Put.new("/mead-scheduler-web/rest/build/sched/#{prod}/#{pac.name}")
-          mode = pac.wrapper_build == 'No' ? 'chain': 'wrapper'
-          params = {:mode => mode, :userid => pac.user.email, :sources => pac.git_url, :clentry => ''}
-          req.set_form_data(params)
+    res = Net::HTTP.start(uri.host, uri.port) do |http|
+      http.request(req)
+    end
 
-          res = Net::HTTP.start(uri.host, uri.port) do |http|
-            http.request(req)
-          end
-
-          case res.code
-          when "202"
-              "202: Successfully queued package #{pac.name} for building in prod: #{prod}"
-          when "400"
-              "400: Bad Request: One of the mandatory paramenters is missing or has an invalid value.\n
-              Parameters used:  #{params.to_json} \n
-              #{res.body}"
-          when "409"
-              "409: Rejected, build already scheduled for this package \n #{res.body}"
-          else
-              "#{res.code} error! \n
-              Parameters used: #{params.to_json} \n
-              #{res.body}"
-          end
-      end
+    case res.code
+    when "202"
+        "202: Successfully queued package #{pac.name} for building in prod: #{prod}"
+    when "400"
+        "400: Bad Request: One of the mandatory paramenters is missing or has an invalid value.\n
+        Parameters used:  #{params.to_json} \n
+        #{res.body}"
+    when "409"
+        "409: Rejected, build already scheduled for this package \n #{res.body}"
+    else
+        "#{res.code} error! \n
+        Parameters used: #{params.to_json} \n
+        #{res.body}"
+    end
   end
 
   def add_errata(pac, prod)
