@@ -1,14 +1,4 @@
 <div style="text-align: left;">
 <% if logged_in?%>
-    <%= render :partial => 'layouts/sep_tiny' %>
-    <% form_remote_tag(
-               :url => {:controller => "toolbox", :action => "build_package"},
-               :loading => "Element.show('spinner_build_#{@package.id}');",
-               :success => "Element.hide('spinner_build_#{@package.id}');
-           ") do %>
-          <%= hidden_field_tag :package_id, @package.id %>
-          <%= submit_tag 'Build This Package Using Mead-Scheduler' %>
-          <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "spinner_build_#{@package.id}"} %>
-        </div>
-    <% end %>
+    <button onclick="TINY.box.show({url:'/toolbox/submit_build?id=<%=@package.id%>'})">Submit Build</button>
 <% end %>
