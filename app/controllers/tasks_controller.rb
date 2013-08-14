@@ -129,6 +129,7 @@ class TasksController < ApplicationController
       session[:clone_review][:initial_status_value] = params[:initial_status_value]
       session[:clone_review][:status_selection_value] = params[:status_selection_value]
       session[:clone_review][:status_selection_value_global] = params[:status_selection_value_global]
+      session[:clone_review][:task] = params[:task]
 
       redirect_to :action => :clone_review, :id => escape_url(params[:source_task_name])
     else

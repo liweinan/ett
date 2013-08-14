@@ -6,12 +6,61 @@ Please review the clone action you are going to performed in below:
 <strong>Clone task from </strong> <%= unescape_url(session[:clone_review][:source_task_name]) %>
 <strong>to</strong> <%= unescape_url(session[:clone_review][:target_task_name]) %>
 <%= render :partial => 'layouts/sep_tiny' %>
+Target task information:
+
+<div class='manage-tbl'>
+  <table>
+    <tr>
+      <td>
+        Candidate Tag:
+      </td>
+      <td>
+        <%= h session[:clone_review][:task][:candidate_tag] %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Target Release:
+      </td>
+      <td>
+        <%= h session[:clone_review][:task][:target_release] %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Milestone:
+      </td>
+      <td>
+        <%= h session[:clone_review][:task][:milestone] %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Version:
+      </td>
+      <td>
+        <%= h session[:clone_review][:task][:tag_version] %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Description:
+      </td>
+      <td style="text-align: left;text-wrap:normal;white-space:normal;">
+        <%= session[:clone_review][:task][:description] %>
+      </td>
+    </tr>
+
+  </table>
+</div>
+
+<%= render :partial => 'layouts/sep_tiny' %>
 <strong>Options:</strong>
 
 <% if session[:clone_review][:scopes].include? 'package' %>
     Clone packages /
 	<% if session[:clone_review][:scopes].include? 'assignee' %>
-		Clone Assignee / 
+		Clone Assignee /
 	<% end %>
 <% end %>
 <% if session[:clone_review][:scopes].include? 'status' %>
@@ -69,6 +118,6 @@ Please review the clone action you are going to performed in below:
 <% end %>
 <%= render :partial => 'layouts/line' %>
 <%= render :partial => 'layouts/sep_tiny' %>
-<%= link_to "Confirm the setting and start the clone process", :controller =>:tasks, :action => :process_clone, :id => escape_url(session[:clone_review][:target_task_name]) %>
+<%= link_to "Confirm the setting and start the clone process", :controller => :tasks, :action => :process_clone, :id => escape_url(session[:clone_review][:target_task_name]) %>
 <%= render :partial => 'layouts/sep_tiny' %>
-<%= link_to "Go back and review the setting" %>
+<a href = "javascript:history.back()">Go back and review the setting</a>

@@ -8,6 +8,17 @@
   <label for="target_task_name_field">Clone <%= @task.name %> to:</label>
   <input id='target_task_name_field' name="target_task_name"/> - (new tag name) <br/>
 
+  <h3>New tag information</h3>
+
+  <% f = ActionView::Helpers::FormBuilder.new('task', @task, self, nil, nil) %>
+  <table>
+    <%= render :partial => 'tasks/fields/candidate_tag', :locals => {:f => f} %>
+    <%= render :partial => 'tasks/fields/target_release', :locals => {:f => f} %>
+    <%= render :partial => 'tasks/fields/milestone', :locals => {:f => f} %>
+    <%= render :partial => 'tasks/fields/tag_version', :locals => {:f => f} %>
+    <%= render :partial => 'tasks/fields/description', :locals => {:f => f} %>
+  </table>
+
   <%= render :partial => 'layouts/sep' %>
 
   <input id='scope_status' name="scopes[]" type="checkbox" value="status" onclick="refresh_form();"/>
