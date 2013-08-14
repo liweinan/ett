@@ -41,20 +41,21 @@ Tags:
 <% end %>
 <%= render :partial => 'layouts/sep_tiny' %>
 
+GitUrl: <%= h @package.git_url %>
+<%= render :partial => 'layouts/sep_tiny' %>
+
+RPM: <%= h @package.RPM %>
+<%= render :partial => 'layouts/sep_tiny' %>
+
+Mead: <%= h @package.MEAD %>
+<%= render :partial => 'layouts/sep_tiny' %>
+
 Wrapper build:
 <%= h @package.wrapper_build %>
 <%= render :partial => 'packages/fields/build' %>
 <% if @package.task.use_bz_integration?%>
     <%= render :partial => 'packages/fields/errata' %>
 <% end %>
-
-<% get_xattrs(@package.task, true, false) do |attr| %>
-    <%= render :partial => 'layouts/sep_tiny' %>
-    <% unless @package.read_attribute(attr).blank? %>
-        <%= attr.camelcase %>: <%= Extractor.extract_url(@package.read_attribute(attr)) %>
-    <% end %>
-<% end %>
-
 
 <%= render :partial => 'packages/fields/track_time' %>
 

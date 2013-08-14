@@ -1,4 +1,7 @@
-<div style="text-align: left;">
-<% if logged_in?%>
-    <button onclick="TINY.box.show({url:'/toolbox/submit_build?id=<%=@package.id%>'})">Submit Build</button>
-<% end %>
+<%= render :partial => 'layouts/sep_tiny' %>
+
+<span style="text-align: left;">
+  <% if logged_in? %>
+      <button onclick="TINY.box.show({url:'/toolbox/submit_build?id=<%=@package.id%>'})">Submit Build</button>
+  <% end %>
+</span>
