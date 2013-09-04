@@ -1,4 +1,4 @@
-<% if logged_in? %>
+<% if logged_in? && @package.status.name == "Finished" && @package.can_be_shipped? %>
     <span style="text-align: left;">
       <% form_remote_tag(
                  :url => {:controller => "toolbox", :action => "add_errata"},

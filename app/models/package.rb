@@ -101,6 +101,15 @@ class Package < ActiveRecord::Base
     end
   end
 
+  def can_be_shipped?
+    self.tags.each do |tag|
+      if tag.key == "Not Shipped"
+        return false
+      end
+    end
+
+    return true
+  end
   def all_relationships_of(relationship_name = nil)
     relationship = Relationship.find_by_name(relationship_name)
     unless relationship.blank?
@@ -187,5 +196,6 @@ class Package < ActiveRecord::Base
       Changelog.package_deleted(self)
     end
   end
+
 
 end
