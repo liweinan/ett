@@ -383,7 +383,7 @@ class PackagesController < ApplicationController
 
     csv_string = FasterCSV.generate do |csv|
       # header row
-      header_row = ["name", "status", "tags", "assignee", "version", "git_url", "mead", "brew"]
+      header_row = ["name", "status", "tags", "assignee", "version", "bz", "git_url", "mead", "brew"]
       #
       #get_xattrs(@task, true, false) do |attr|
       #  if attr.blank?
@@ -414,9 +414,14 @@ class PackagesController < ApplicationController
           end
           val << tag_val
         end
+        if package.assignee.blank?
+          val << ""
+        else
+          val << package.assignee.email
+        end
 
-        val << package.assignee.email
         val << package.version
+        val << package.bz_bugs.map {|bz| bz = bz.bz_id }.join(" ")
         val << package.git_url
         val << package.mead
         val << package.brew
