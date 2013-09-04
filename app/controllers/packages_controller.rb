@@ -420,7 +420,7 @@ class PackagesController < ApplicationController
           val << package.assignee.email
         end
 
-        val << package.version
+        val << package.ver
         val << package.bz_bugs.map {|bz| bz = bz.bz_id }.join(" ")
         val << package.git_url
         val << package.mead
