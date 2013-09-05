@@ -111,6 +111,10 @@ class Package < ActiveRecord::Base
     end
   end
 
+  def bzs_flatten
+    bz_bugs.map {|bz| bz = bz.bz_id }.join(" ")
+  end
+
   def to_s
     str = "Name: " + name + "\n"
     str += "Created By: " + creator.name + "(#{creator.email})" + "\n"

@@ -141,6 +141,14 @@ class PackagesController < ApplicationController
       assignee_email = ''
     end
 
+    # app/controllers/packages_controller.rb:146:in `update'
+    # TODO
+    # function to support inline editor to update BZ
+    # First we check the input format is like: <Bz1Id> <Bz2Id> <Bz3Id>
+    unless params[:flatten_bzs].blank?
+      puts '*' * 100
+    end
+
     respond_to do |format|
       Package.transaction do
         if @package.update_attributes(params[:package])
@@ -203,33 +211,36 @@ class PackagesController < ApplicationController
                   end
                 end
               elsif new_status.code == Status::CODES[:finished]
-                if has_mead_integration?(@package.task)
-                  # Disable asynchronous update <- we need that data for
-                  # bugzilla immediately
-                  # @package.mead_action = Package::MEAD_ACTIONS[:needsync]
-                  get_mead_info(@package)
+                if Rails.env.production?
+                  if has_mead_integration?(@package.task)
+                    # Disable asynchronous update <- we need that data for
+                    # bugzilla immediately
+                    # @package.mead_action = Package::MEAD_ACTIONS[:needsync]
+                    get_mead_info(@package)
+                  end
                 end
 
+                if Rails.env.production?
+                  @package.bz_bugs.each do |bz_bug|
 
-                @package.bz_bugs.each do |bz_bug|
+                    if bz_bug.summary.match(/^Upgrade/) && bz_bug.bz_assignee == assignee_email
 
-                  if bz_bug.summary.match(/^Upgrade/) && bz_bug.bz_assignee == assignee_email
+                      comment = "Source URL: #{@package.git_url}\n" +
+                          "Mead-Build: #{@package.mead}\n" +
+                          "Brew-Build: #{@package.brew}\n"
 
-                    comment = "Source URL: #{@package.git_url}\n" +
-                        "Mead-Build: #{@package.mead}\n" +
-                        "Brew-Build: #{@package.brew}\n"
+                      userid = extract_username(params[:bzauth_user])
+                      params_bz = {:comment => comment,
+                                   :milestone => @package.task.milestone,
+                                   :assignee => assignee_email,
+                                   :userid => extract_username(params[:bzauth_user]),
+                                   :status => BzBug::BZ_STATUS[:modified],
+                                   :pwd => session[:bz_pass]}
+                      add_comment_milestone_status_to_bug(bz_bug.bz_id, params_bz)
 
-                    userid = extract_username(params[:bzauth_user])
-                    params_bz = { :comment => comment,
-                               :milestone => @package.task.milestone,
-                               :assignee => assignee_email,
-                               :userid => extract_username(params[:bzauth_user]),
-                               :status => BzBug::BZ_STATUS[:modified],
-                               :pwd => session[:bz_pass] }
-                    add_comment_milestone_status_to_bug(bz_bug.bz_id, params_bz)
-
-                    bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
-                    bz_bug.save
+                      bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+                      bz_bug.save
+                    end
                   end
                 end
 
@@ -421,7 +432,7 @@ class PackagesController < ApplicationController
         end
 
         val << package.version
-        val << package.bz_bugs.map {|bz| bz = bz.bz_id }.join(" ")
+        val << package.bzs_flatten
         val << package.git_url
         val << package.mead
         val << package.brew

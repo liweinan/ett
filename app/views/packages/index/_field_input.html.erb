@@ -3,4 +3,12 @@
      disabled = true
    end %>
 
-<%= text_field_tag "package[#{field_name.underscore}]", package[field_name.underscore], :id => "pac_#{package.id}_#{field_name}_input", :disabled => disabled %>
+<% final_field_name = "package[#{field_name.underscore}]" %>
+<% field_val = package[field_name.underscore] %>
+
+<% if field_name == "Bz" %>
+    <% final_field_name = "flatten_bzs" %>
+    <% field_val = package.bzs_flatten %>
+<% end %>
+
+<%= text_field_tag final_field_name, field_val, :id => "pac_#{package.id}_#{field_name}_input", :disabled => disabled %>
