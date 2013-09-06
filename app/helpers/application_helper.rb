@@ -71,10 +71,9 @@ module ApplicationHelper
     end
   end
 
-  def submit_build(pac, clentry, prod)
+  def submit_build(pac, clentry, prod, mode)
     uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
     req = Net::HTTP::Put.new("/mead-scheduler-web/rest/build/sched/#{prod}/#{pac.name}")
-    mode = pac.wrapper_build == 'No' ? 'chain': 'wrapper'
     params = {:mode => mode, :userid => pac.user.email, :sources => pac.git_url, :clentry => clentry}
     req.set_form_data(params)
 
