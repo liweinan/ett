@@ -431,7 +431,7 @@ class PackagesController < ApplicationController
           val << package.assignee.email
         end
 
-        val << package.version
+        val << package.ver
         val << package.bzs_flatten
         val << package.git_url
         val << package.mead
