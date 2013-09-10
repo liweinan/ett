@@ -40,7 +40,6 @@ class Package < ActiveRecord::Base
   default_value_for :time_consumed, 0
   default_value_for :time_point, 0
   default_value_for :status_changed_at, Time.now
-  default_value_for :wrapper_build, 'No'
   default_value_for :mead_action, MEAD_ACTIONS[:open]
 
   def self.per_page
@@ -133,6 +132,19 @@ class Package < ActiveRecord::Base
 
   def pending_bz_bugs
     BzBug.all(:conditions => ['package_id = ? and bz_action is not null', self.id])
+  end
+
+  def errata_related_bz
+    errata_bz = []
+    bz_bugs.each do |bug|
+      if (bug.bz_status == "MODIFIED") &&
+         (bug.summary.start_with? "Upgrade") &&
+         (bug.component.include? "RPMs") &&
+         (bug.keywords.include? "Rebase")
+        errata_bz.push bug.bz_id
+      end
+    end
+    errata_bz
   end
 
   def bz_bug_ids
