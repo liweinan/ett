@@ -38,13 +38,14 @@ class BzBugsController < ApplicationController
           #  @response.body
           # "BZ#999999: Upgrade jboss-aggregator to 7.2.0.Final-redhat-7 (MOCK)"
           bug_info = extract_bz_bug_info(@response.body)
-          @bz_bug = BzBug.new
-          @bz_bug.package_id = package_id
-          @bz_bug.bz_id = bug_info[:bz_id]
-          @bz_bug.summary = bug_info[:summary]
-          @bz_bug.bz_assignee = email
-          @bz_bug.creator_id = current_user.id
-          @bz_bug.save
+          bz_id = bug_info[:bz_id]
+          @response = Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_query_url"]}#{bz_id}.json?userid=#{extract_username(params[:user])}&pwd=#{params[:pwd]}"))
+
+          if @response.class == Net::HTTPOK
+            bz_info = JSON.parse(@response.body)
+            @bz_bug =
+                BzBug.create_from_bz_info(bz_info, package_id, current_user)
+          end
         end
       rescue => e
         @error = e
@@ -65,6 +66,7 @@ class BzBugsController < ApplicationController
         #{}"{\"id\":\"333\",\"summary\":\"edquota calls /usr/bin/vi, which does not exist\",\"status\":\"CLOSED\",\"release\":\"---\",\"milestone\":\"---\"}
 
         if @response.class == Net::HTTPOK
+
           bz_info = JSON.parse(@response.body)
           @bz_bug =
               BzBug.create_from_bz_info(bz_info, package_id, current_user)

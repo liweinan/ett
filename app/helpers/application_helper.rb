@@ -104,10 +104,12 @@ module ApplicationHelper
     else
         uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
         # the errata request is sent to mead-scheduler's rest api:
-        req = Net::HTTP::Put.new("/mead-scheduler-web/rest/errata/#{prod}")
+        req = Net::HTTP::Post.new("/mead-scheduler-web/rest/errata/#{prod}/files")
+
+        # TODO: choose which bugs to send to send to mead scheduler
 
         # may need to update the names of these two parameters:
-        params = {:bz_bugs => pac.bz_bug_ids, :brew => pac.brew}
+        params = {:bugs => pac.errata_related_bz, :nvr => pac.brew}
         req.set_form_data(params)
 
         res = Net::HTTP.start(uri.host, uri.port) do |http|

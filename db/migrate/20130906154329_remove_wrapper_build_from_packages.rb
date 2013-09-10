@@ -4,6 +4,6 @@ class RemoveWrapperBuildFromPackages < ActiveRecord::Migration
   end
 
   def self.down
-    add_column :packages, :wrapper_build
+    add_column :packages, :wrapper_build, :string
   end
 end
