@@ -137,6 +137,7 @@ class Package < ActiveRecord::Base
   def errata_related_bz
     errata_bz = []
     bz_bugs.each do |bug|
+
       if (bug.bz_status == "MODIFIED") &&
          (bug.summary.start_with? "Upgrade") &&
          (bug.component.include? "RPMs") &&
@@ -144,7 +145,7 @@ class Package < ActiveRecord::Base
         errata_bz.push bug.bz_id
       end
     end
-    errata_bz
+    errata_bz.join(",")
   end
 
   def bz_bug_ids

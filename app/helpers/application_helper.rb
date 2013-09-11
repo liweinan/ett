@@ -73,7 +73,7 @@ module ApplicationHelper
 
   def submit_build(pac, clentry, prod, mode)
     uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
-    req = Net::HTTP::Put.new("/mead-scheduler-web/rest/build/sched/#{prod}/#{pac.name}")
+    req = Net::HTTP::Put.new("/mead-scheduler/rest/build/sched/#{prod}/#{pac.name}")
     params = {:mode => mode, :userid => pac.user.email, :sources => pac.git_url, :clentry => clentry}
     req.set_form_data(params)
 
@@ -104,17 +104,21 @@ module ApplicationHelper
     else
         uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
         # the errata request is sent to mead-scheduler's rest api:
-        req = Net::HTTP::Post.new("/mead-scheduler-web/rest/errata/#{prod}/files")
+        bugs = pac.errata_related_bz
+
+        link = "/mead-scheduler/rest/errata/#{prod}/files?dist=el6&bugs=#{pac.errata_related_bz}&nvr=#{pac.brew}"
+        req = Net::HTTP::Post.new(link)
 
         # TODO: choose which bugs to send to send to mead scheduler
 
         # may need to update the names of these two parameters:
-        params = {:bugs => pac.errata_related_bz, :nvr => pac.brew}
-        req.set_form_data(params)
+        # params = {:bugs => pac.errata_related_bz, :nvr => pac.brew}
+        # req.set_form_data(params)
 
         res = Net::HTTP.start(uri.host, uri.port) do |http|
           http.request(req)
         end
+
 
         # Need to update the error codes when we get word on their values:
         case res.code
@@ -122,13 +126,13 @@ module ApplicationHelper
             "202: Successfully added package #{pac.name} to Errata"
         when "400"
             "400: Bad Request: One of the mandatory paramenters is missing or has an invalid value.\n
-            Parameters used:  #{params.to_json} \n
+            Link used:  #{link} \n
             #{res.body}"
         when "409"
             "409: Rejected, Errata already submitted for this package \n #{res.body}"
         else
             "#{res.code} error! \n
-            Parameters used: #{params.to_json} \n
+            Link used: #{link} \n
             #{res.body}"
         end
       end
