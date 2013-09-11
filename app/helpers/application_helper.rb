@@ -106,7 +106,7 @@ module ApplicationHelper
         # the errata request is sent to mead-scheduler's rest api:
         bugs = pac.errata_related_bz
 
-        link = "/mead-scheduler/rest/errata/#{prod}/files?dist=el6&bugs=#{pac.errata_related_bz}&nvr=#{pac.brew}"
+        link = "/mead-scheduler/rest/errata/#{prod}/files?dist=el6&bugs=#{pac.errata_related_bz}&nvr=#{pac.brew}&pkg=#{pac.name}"
         req = Net::HTTP::Post.new(link)
 
         # TODO: choose which bugs to send to send to mead scheduler
