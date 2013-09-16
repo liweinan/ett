@@ -499,7 +499,7 @@ class ApplicationController < ActionController::Base
   end
 
   def add_comment_milestone_status_to_bug(bz_id, params)
-    req_link = "/mead-bzbridge/bug/#{bz_id}?oneway=true"
+    req_link = "/mead-bzbridge/bug/#{bz_id}?oneway=false"
     params.each do |key, value|
       req_link += "&#{key}=#{URI::encode(value)}" if value != nil
     end
