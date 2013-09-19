@@ -10,6 +10,7 @@ class PackagesController < ApplicationController
   # GET /packages
   # GET /packages.xml
   def index
+    expire_all_fragments
     unless params[:task_id].blank?
       @packages = get_packages(unescape_url(params[:task_id]), unescape_url(params[:tag]), unescape_url(params[:status]), unescape_url(params[:user]))
     end
