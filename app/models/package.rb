@@ -41,6 +41,7 @@ class Package < ActiveRecord::Base
   default_value_for :time_point, 0
   default_value_for :status_changed_at, Time.now
   default_value_for :mead_action, MEAD_ACTIONS[:open]
+  default_value_for :in_errata, ''
 
   def self.per_page
     10
@@ -153,6 +154,21 @@ class Package < ActiveRecord::Base
     return bz_bugs.map { |bug| bug["bz_id"] }
   end
 
+  def nvr_and_nvr_in_errata?
+    if in_errata and brew and (in_errata == brew):
+      brew + " ✔  In Errata!"
+    else
+      brew
+    end
+  end
+
+  def brew_and_is_in_errata?
+    if in_errata and brew and (in_errata == brew)
+        "✔  " + brew
+    else
+      brew
+    end
+  end
   protected
 
   def all_from_packages_of(from_relationships, relationship_name)
