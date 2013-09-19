@@ -8,6 +8,7 @@ class BzBug < ActiveRecord::Base
   default_value_for :bz_status, 'NEW'
   default_value_for :bz_action, BZ_ACTIONS[:done]
   default_value_for :last_synced_at, Time.now
+  default_value_for :is_in_errata, "NO"
 
   def self.create_from_bz_info(bz_info, package_id, current_user)
     bz_id = bz_info["id"]
@@ -36,6 +37,14 @@ class BzBug < ActiveRecord::Base
     bz_bug.last_synced_at = Time.now
     bz_bug.save
     bz_bug
+  end
+
+  def bz_id_and_is_in_errata
+    if is_in_errata and is_in_errata == "YES"
+      bz_id + " ✔"
+    else
+      bz_id
+    end
   end
 end
 

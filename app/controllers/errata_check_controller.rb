@@ -13,13 +13,16 @@ class ErrataCheckController < ApplicationController
     end
   end
 
-  def test
+  def sync_bz
     bz_bugs = JSON.parse(params["bz_bugs"])
     render :text => "OK", :status => 202
 
     bz_bugs.each do |bug|
-      bz_bug = BzBug.first(:conditions => ["bz_id = ?", bug])
-      bz_bug.is_in_errata = "YES"
+      bz_bug = BzBug.first(:conditions => ["bz_id = ?", bug.to_s])
+      if bz_bug:
+        bz_bug.is_in_errata = "YES"
+        bz_bug.save
+      end
     end
   end
 end
