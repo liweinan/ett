@@ -169,7 +169,7 @@ class PackagesController < ApplicationController
           # one. Will have to fix this someday
           if old_assignee_email != assignee_email
             @package.bz_bugs.each do |bz_bug|
-              if bz_bug.summary.match(/^Upgrade/) && !assignee_email.nil?
+              if bz_bug.summary.match(/^Upgrade/) && !assignee_email.nil? && (bz_bug.component.include? "RPMs") && (bz_bug.keywords.include? "Rebase")
 
                 params_bz = {:assignee => assignee_email, :userid => extract_username(params[:bzauth_user]), :pwd => session[:bz_pass], :status => BzBug::BZ_STATUS[:assigned]}
                 update_bug(bz_bug.bz_id, oneway='true', params_bz)
