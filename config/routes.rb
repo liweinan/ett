@@ -63,6 +63,7 @@ ActionController::Routing::Routes.draw do |map|
   # consider removing or commenting them out if you're using named routes and resources.
   map.connect 'errata_check/sync', :controller => 'errata_check', :action => 'sync'
   map.connect 'errata_check/sync_bz', :controller => 'errata_check', :action => 'sync_bz'
+  map.connect 'errata_check/sync_rpmdiffs', :controller => 'errata_check', :action => 'sync_rpmdiffs'
   map.connect ':controller/:action/:id'
   map.connect ':controller/:action/:id.:format'
 end

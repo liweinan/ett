@@ -1,5 +1,6 @@
 require 'json'
 class ErrataCheckController < ApplicationController
+
   def sync
     nvrs = JSON.parse(params["nvrs"])
     render :text => "OK", :status => 202
@@ -24,5 +25,19 @@ class ErrataCheckController < ApplicationController
         bz_bug.save
       end
     end
+  end
+
+  def sync_rpmdiffs
+    rpmdiffs = JSON.parse(params['rpmdiffs'])
+    rpmdiffs.each do |rpmdiff|
+        package = Package.first(:conditions => ["brew = ?", rpmdiff['nvr']])
+        if package
+          package.rpmdiff_status = rpmdiff['status']
+          package.rpmdiff_id = rpmdiff['id']
+          package.save
+        end
+
+    end
+    render :text => "OK", :status => 202
   end
 end
