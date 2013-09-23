@@ -10,6 +10,17 @@ class Package < ActiveRecord::Base
   SKIP_FIELDS = ['id', 'updated_at', 'updated_by', 'created_by', 'created_at']
   MEAD_ACTIONS = {:open => 'open', :needsync => 'needsync', :done => 'done'}
 
+  RPMDIFF_INFO = {
+    0 => {:status => "PASSED", :style => "background-color: #b5f36d;"},
+    1 => {:status => "INFO", :style => "background-color: #b5f36d;"},
+    2 => {:status => "WAIVED", :style => "background-color: #b5f36d;"},
+    3 => {:status => "NEEDS INSPECTION", :style => "background-color: #ff5757;"},
+    4 => {:status => "FAILED", :style => "background-color: #ff5757;"},
+    498 => {:status => "TEST IN PROGRESS", :style => "background-color: #b2f4ff;"},
+    499 => {:status => "UNPACKING FILES", :style => "background-color: #b2f4ff;"},
+    500 => {:status => "QUEUED FOR TEST", :style => "background-color: #b2f4ff;"},
+    -1 => {:status => "DUPLICATE", :style => "background-color: #b2ffa1;"}
+  }
   acts_as_textiled :notes
   acts_as_commentable
 
@@ -42,6 +53,7 @@ class Package < ActiveRecord::Base
   default_value_for :status_changed_at, Time.now
   default_value_for :mead_action, MEAD_ACTIONS[:open]
   default_value_for :in_errata, ''
+  default_value_for :rpmdiff_status, ''
 
   def self.per_page
     10
@@ -171,6 +183,30 @@ class Package < ActiveRecord::Base
         "✔  " + brew
     else
       brew
+    end
+  end
+
+
+  def rpmdiff_info
+    if rpmdiff_status
+      RPMDIFF_INFO[rpmdiff_status.to_i][:status]
+    else
+      ''
+    end
+  end
+
+  def rpmdiff_link
+    if rpmdiff_id
+      'https://errata.devel.redhat.com/rpmdiff/show/' + rpmdiff_id
+    else
+      ''
+    end
+  end
+  def rpmdiff_style
+    if rpmdiff_status
+      RPMDIFF_INFO[rpmdiff_status.to_i][:style]
+    else
+      ''
     end
   end
   protected
