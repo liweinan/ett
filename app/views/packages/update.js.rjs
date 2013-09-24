@@ -5,7 +5,7 @@ col_name = params[:div].split('_')[2]
 
 field_name = params[:div].split('_')[2]
 
-if @package.errors.blank?
+if @package.errors.blank? && @error_message.blank?
   page.replace_html(params[:div]+'_field', :partial => "packages/index/#{col_name.underscore}_col", :locals => {:package => @package, :field_name => field_name})
   page.show(params[:div]+'_field')
   page.visual_effect :highlight, params[:div]+'_field'
@@ -14,18 +14,20 @@ if @package.errors.blank?
     page << "var brewField=document.getElementById('pac_#{@package.id}_Brew_field');if (brewField) { brewField.innerHTML = '#{@package.brew}';}"
     page << "var meadField=document.getElementById('pac_#{@package.id}_Mead_field');if (meadField) { meadField.innerHTML = '#{@package.mead}';}"
   end
-
 else
-  errors = @package.errors.full_messages
+  errors = ""
+  if @error_message.blank?
+    errors = @package.errors.full_messages
+  else
+    errors=@error_message
+  end
+
   @package = Package.find(@package.id)
   page.replace_html(params[:div]+'_field', :partial => "packages/index/#{col_name.underscore}_col", :locals => {:package => @package, :field_name => field_name})
   page.show(params[:div]+'_field')
   page.alert("#{errors}")
 end
 
-unless @error_message.blank?
-  page.alert(@error_message)
-end
 
 page.replace_html params[:div]+'_switch', 'on'
 

@@ -97,7 +97,6 @@
 <%= render :partial => 'layouts/sep' %>
 
 
-<% if logged_in? %>
     <!--The following codes are all for inline editors-->
     <% content_for :js do %>
         <script type="text/javascript">
@@ -226,23 +225,31 @@
             }
         </script>
 
-
-    <% end %>
-<% else %>
-    <% content_for :js do %>
         <script type="text/javascript">
-            function show_pac_editor(div, pac_id, field_name, field_type) {
+            function validateBzAccountAndPostInlineEditorForm(params) {
+                var bzauth_user = document.getElementById('bzauth_user_' + params.myId);
+                var bzauth_pwd = document.getElementById('bzauth_pwd_' + params.myId);
+                checkBzAuthInfoWithCallback(bzauth_user, bzauth_pwd, "validate_bz_auth_indicator_" + params.myId, postInlineEditorFormCallback, params);
             }
-            function hide_pac_editor(div, field_type) {
+
+            function postInlineEditorFormCallback(params) {
+                alert(params);
+                postInlineEditorForm(params.myId, params.myName, params.myForm);
             }
-            function show_pac_btn(div, field_type) {
-            }
-            function hide_pac_btn(div, field_type) {
-            }
-            function build_pac_btn_id(div, field_type) {
-            }
-            function showCommentDialog(pac_id) {
+
+            function postInlineEditorForm(id, name, form) {
+                new Ajax.Request('/packages/' + id,
+                        {
+                            asynchronous: true, evalScripts: true,
+                            onLoading: function (request) {
+                                Element.show('pac_' + id + '_' + name + '_spinner');
+                            },
+                            onSuccess: function (request) {
+
+                            },
+                            parameters: Form.serialize(form)
+                        });
+                return false;
             }
         </script>
-    <% end %>
 <% end %>
