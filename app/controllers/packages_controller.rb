@@ -152,19 +152,16 @@ class PackagesController < ApplicationController
         new_bugs_hash = Hash.new
 
         flatten_bzs.each do |bz_id|
-          debugger
           query_resp = query_bz_bug_info(bz_id, params[:user], params[:pwd]).class
-          unless query_resp == Net::HTTPOK
+          if query_resp == Net::HTTPOK
+            bz_info = JSON.parse(query_resp.body)
+            new_bugs_hash[bz_info["id"]] = bz_info
+          else
             valid = false # if only one bz input has error, we cancel the whole transaction
             query_errors << query_resp
           end
-          bz_info = JSON.parse(query_resp.body)
-          new_bugs_hash[bz_info["id"]] = bz_info
         end
 
-        unless valid
-          @error_message = "Error: #{query_resp.flatten}"
-        end
 
         if valid
           bz_bugs_to_be_deleted = @package.bz_bugs.clone
@@ -182,13 +179,15 @@ class PackagesController < ApplicationController
           bz_bugs_to_be_deleted.each do |bz_bug|
             bz_bug.destroy
           end
+        else
+          @error_message = "Error: #{query_errors.flatten}"
         end
       end
     end
 
     respond_to do |format|
       Package.transaction do
-        if @package.update_attributes(params[:package])
+        if params[:flatten_bzs].blank? && @package.update_attributes(params[:package])
           @package.reload
           # this is needed since we write to @package later in this section of
           # the code. (@package.status_changed_at = Time.now). This messes up

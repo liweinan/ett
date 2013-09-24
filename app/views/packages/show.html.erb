@@ -24,14 +24,12 @@ Last Modified At:
 <%= at_zone(@package.updated_at) %>
 <%= render :partial => 'layouts/sep_tiny' %>
 
-
 Status:
 <% unless @package.status.blank? %>
     <span style="<%= default_style(@package.status.style) %>">&nbsp;</span>
     <%= h @package.status.name %>
 <% end %>
 <%= render :partial => 'layouts/sep_tiny' %>
-
 
 Tags:
 <% unless @package.tags.blank? %>

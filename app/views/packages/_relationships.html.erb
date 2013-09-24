@@ -8,7 +8,7 @@
 <% end %>
 <%
    if tos.size > 0
-       tos.each do |to|
+     tos.each do |to|
 %>  <span style="<%= deleted_style(to.to_package) %>">
 
         <%= to.relationship.to_name %> <%= link_to to.to_package.name, :controller => :packages, :action => :show, :id => escape_url(to.to_package.name), :task_id => escape_url(to.to_package.task.name) %>
@@ -21,7 +21,7 @@
     %>
 <%
    if froms.size > 0
-       froms.each do |from|
+     froms.each do |from|
 %>
         <span style="<%= deleted_style(from.from_package) %>">
         <%= from.relationship.from_name %> <%= link_to from.from_package.name, :controller => :packages, :action => :show, :id => escape_url(from.from_package.name), :task_id => escape_url(from.from_package.task.name) %>
