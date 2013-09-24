@@ -42,7 +42,9 @@
                                 }
                             },
                             onSuccess: function () {
-                                callback(params);
+                                if (callback) {
+                                    callback(params);
+                                }
                                 Element.hide(indicator);
                             },
                             parameters: {
