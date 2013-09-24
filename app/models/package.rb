@@ -202,6 +202,7 @@ class Package < ActiveRecord::Base
       ''
     end
   end
+
   def rpmdiff_style
     if rpmdiff_status
       RPMDIFF_INFO[rpmdiff_status.to_i][:style]
@@ -209,6 +210,28 @@ class Package < ActiveRecord::Base
       ''
     end
   end
+
+  def version_style
+
+    if ver.nil? || ver.empty?
+      return ''
+    end
+
+    first_part_ver = ver.gsub(/\.([^.]*)$/, '').gsub('-', '_')
+    second_part_ver = ver.gsub(first_part_ver + '.', '').gsub('-', '_')
+
+    [mead, brew].each do |item|
+      if !item.nil? && !item.empty?
+        if !item.include?(first_part_ver) || !item.include?(second_part_ver)
+          return "background-color: #ff5757;"
+        end
+      end
+    end
+
+    # if they are valid, return empty
+    return ''
+  end
+
   protected
 
   def all_from_packages_of(from_relationships, relationship_name)
