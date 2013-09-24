@@ -73,9 +73,9 @@ module ApplicationHelper
 
   def submit_build(pac, clentry, prod, mode)
     uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
-    req = Net::HTTP::Put.new("/mead-scheduler/rest/build/sched/#{prod}/#{pac.name}")
-    params = {:mode => mode, :userid => pac.user.email, :sources => pac.git_url, :clentry => clentry}
-    req.set_form_data(params)
+
+    params_build = URI.encode("mode=#{mode}&userid=#{pac.user.email.gsub('@redhat.com', '')}&sources=#{pac.git_url}&clentry=#{clentry}")
+    req = Net::HTTP::Post.new("/mead-scheduler/rest/build/sched/#{prod}/#{pac.name}?" + params_build)
 
     res = Net::HTTP.start(uri.host, uri.port) do |http|
       http.request(req)
@@ -102,6 +102,12 @@ module ApplicationHelper
     unless !pac.status.blank? && pac.status.name == 'Finished'
       "You can only add to Errata when the build is Finished."
     else
+        in_shipped_list = open('/var/www/html/shipped-list') { |f| f.grep("#{pac.name}\n")  }
+
+        if in_shipped_list == []
+          return "Package not in shipped list. Aborting"
+        end
+
         uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
         # the errata request is sent to mead-scheduler's rest api:
         bugs = pac.errata_related_bz

@@ -10,6 +10,7 @@ class PackagesController < ApplicationController
   # GET /packages
   # GET /packages.xml
   def index
+    expire_all_fragments
     unless params[:task_id].blank?
       @packages = get_packages(unescape_url(params[:task_id]), unescape_url(params[:tag]), unescape_url(params[:status]), unescape_url(params[:user]))
     end
@@ -204,7 +205,7 @@ class PackagesController < ApplicationController
           # one. Will have to fix this someday
           if old_assignee_email != assignee_email
             @package.bz_bugs.each do |bz_bug|
-              if bz_bug.summary.match(/^Upgrade/) && !assignee_email.nil?
+              if bz_bug.summary.match(/^Upgrade/) && !assignee_email.nil? && (bz_bug.component.include? "RPMs") && (bz_bug.keywords.include? "Rebase")
 
                 params_bz = {:assignee => assignee_email, :userid => extract_username(params[:bzauth_user]), :pwd => session[:bz_pass], :status => BzBug::BZ_STATUS[:assigned]}
                 update_bug(bz_bug.bz_id, oneway='true', params_bz)

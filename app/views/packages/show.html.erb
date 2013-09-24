@@ -44,7 +44,8 @@ Tags:
 GitUrl: <%= h @package.git_url %>
 <%= render :partial => 'layouts/sep_tiny' %>
 
-Brew: <%= h @package.brew %>
+Brew: <%= h @package.nvr_and_nvr_in_errata? %>
+
 <%= render :partial => 'layouts/sep_tiny' %>
 
 Mead: <%= h @package.mead %>

@@ -61,6 +61,9 @@ ActionController::Routing::Routes.draw do |map|
   # Install the default routes as the lowest priority.
   # Note: These default routes make all actions in every controller accessible via GET requests. You should
   # consider removing or commenting them out if you're using named routes and resources.
+  map.connect 'errata_check/sync', :controller => 'errata_check', :action => 'sync'
+  map.connect 'errata_check/sync_bz', :controller => 'errata_check', :action => 'sync_bz'
+  map.connect 'errata_check/sync_rpmdiffs', :controller => 'errata_check', :action => 'sync_rpmdiffs'
   map.connect ':controller/:action/:id'
   map.connect ':controller/:action/:id.:format'
 end
