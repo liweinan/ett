@@ -537,6 +537,10 @@ class ApplicationController < ActionController::Base
     bug_info
   end
 
+  def query_bz_bug_info(bz_id, user, pwd)
+    Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_query_url"]}#{bz_id}.json?userid=#{extract_username(user)}&pwd=#{pwd}"))
+  end
+
   def current_bzuser(params)
     extract_username(params[:bzauth_user])
   end

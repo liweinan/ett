@@ -22,5 +22,10 @@ else
   page.show(params[:div]+'_field')
   page.alert("#{errors}")
 end
+
+unless @error_message.blank?
+  page.alert(@error_message)
+end
+
 page.replace_html params[:div]+'_switch', 'on'
 

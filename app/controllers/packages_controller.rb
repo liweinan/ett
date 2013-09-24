@@ -129,7 +129,6 @@ class PackagesController < ApplicationController
     last_status = Status.find_by_id(@package.status_id)
     old_assignee_email = @package.assignee.email if @package.assignee
 
-
     unless params[:package][:name].blank?
       cleanup_package_name(params[:package][:name])
     end
@@ -141,12 +140,49 @@ class PackagesController < ApplicationController
       assignee_email = ''
     end
 
-    # app/controllers/packages_controller.rb:146:in `update'
-    # TODO
-    # function to support inline editor to update BZ
-    # First we check the input format is like: <Bz1Id> <Bz2Id> <Bz3Id>
+    # Function to support inline editor to update BZ
+    # Input syntax: <Bz1Id> <Bz2Id> <Bz3Id>
     unless params[:flatten_bzs].blank?
-      puts '*' * 100
+      flatten_bzs = params[:flatten_bzs].split(/\s+/).map { |bz| bz.to_i if bz.to_i > 0 }.compact
+
+      Package.transaction do
+        valid = true
+        query_errors = []
+        new_bugs_hash = Hash.new
+
+        flatten_bzs.each do |bz_id|
+          debugger
+          query_resp = query_bz_bug_info(bz_id, params[:user], params[:pwd]).class
+          unless query_resp == Net::HTTPOK
+            valid = false # if only one bz input has error, we cancel the whole transaction
+            query_errors << query_resp
+          end
+          bz_info = JSON.parse(query_resp.body)
+          new_bugs_hash[bz_info["id"]] = bz_info
+        end
+
+        unless valid
+          @error_message = "Error: #{query_resp.flatten}"
+        end
+
+        if valid
+          bz_bugs_to_be_deleted = @package.bz_bugs.clone
+
+          flatten_bzs.each do |bz_id|
+            bz_bug = @package.bz_bug_with_bz_id(bz_id)
+            if bz_bug.blank? # a new bug link, add it to package
+              BzBug.create_from_bz_info(new_bugs_hash[bz_id], @package.id, current_user)
+            else # this bug already linked to this package, don't delete it later.
+              bz_bugs_to_be_deleted.delete(bz_bug)
+            end
+          end
+
+          # left bugs are removed from inline editor, we delete it then.
+          bz_bugs_to_be_deleted.each do |bz_bug|
+            bz_bug.destroy
+          end
+        end
+      end
     end
 
     respond_to do |format|
@@ -164,7 +200,7 @@ class PackagesController < ApplicationController
           end
 
           # update the assignee of the bugs if assignee changed
-          # TODO: we don't check if the bz_bug assignee is the same as the old
+          # TODO: we don't check whether the bz_bug assignee is the same as the old
           # one. Will have to fix this someday
           if old_assignee_email != assignee_email
             @package.bz_bugs.each do |bz_bug|
@@ -200,14 +236,16 @@ class PackagesController < ApplicationController
               if new_status.code == Status::CODES[:inprogress] && !assignee_email.blank?
 
                 # the bug statuses are waiting to be updated according to https://docspace.corp.redhat.com/docs/DOC-148169
-                @package.bz_bugs.each do |bz_bug|
-                  if bz_bug.summary.match(/^Upgrade/) && bz_bug.bz_assignee == assignee_email
-                    params_bz = {:assignee => assignee_email, :userid => extract_username(params[:bzauth_user]),
-                                 :pwd => session[:bz_pass], :status => BzBug::BZ_STATUS[:assigned]}
+                if Rails.env.production? # TODO we need to write some unit tests to test all the integrations with SOA
+                  @package.bz_bugs.each do |bz_bug|
+                    if bz_bug.summary.match(/^Upgrade/) && bz_bug.bz_assignee == assignee_email
+                      params_bz = {:assignee => assignee_email, :userid => extract_username(params[:bzauth_user]),
+                                   :pwd => session[:bz_pass], :status => BzBug::BZ_STATUS[:assigned]}
 
-                    update_bug(bz_bug.bz_id, oneway='true', params_bz)
-                    bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
-                    bz_bug.save
+                      update_bug(bz_bug.bz_id, oneway='true', params_bz)
+                      bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+                      bz_bug.save
+                    end
                   end
                 end
               elsif new_status.code == Status::CODES[:finished]
