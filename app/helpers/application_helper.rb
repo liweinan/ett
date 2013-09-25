@@ -99,15 +99,11 @@ module ApplicationHelper
 
   def add_errata(pac, prod)
 
-    unless !pac.status.blank? && pac.status.name == 'Finished'
+    if pac.status.blank? || pac.status.name != 'Finished'
       "You can only add to Errata when the build is Finished."
+    elsif !pac.in_shipped_list?
+        "Package not in shipped list. Aborting"
     else
-        in_shipped_list = open('/var/www/html/shipped-list') { |f| f.grep("#{pac.name}\n")  }
-
-        if in_shipped_list == []
-          return "Package not in shipped list. Aborting"
-        end
-
         uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
         # the errata request is sent to mead-scheduler's rest api:
         bugs = pac.errata_related_bz

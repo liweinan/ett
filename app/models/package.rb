@@ -178,14 +178,19 @@ class Package < ActiveRecord::Base
     end
   end
 
+  def in_shipped_list?
+    open('/var/www/html/shipped-list') { |f| f.grep("#{name}\n")  }
+  end
+
   def brew_and_is_in_errata?
     if in_errata and brew and (in_errata == brew)
         "✔  " + brew
+    elsif brew and (!can_be_shipped? or !in_shipped_list?)
+        "✘  " + brew
     else
       brew
     end
   end
-
 
   def rpmdiff_info
     if rpmdiff_status
