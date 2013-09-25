@@ -104,8 +104,6 @@ module ApplicationHelper
     elsif !pac.in_shipped_list?
         "Package not in shipped list. Aborting"
     else
-
-        return "booya!"
         uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
         # the errata request is sent to mead-scheduler's rest api:
         bugs = pac.errata_related_bz
