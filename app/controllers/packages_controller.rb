@@ -109,6 +109,17 @@ class PackagesController < ApplicationController
   # PUT /packages/1
   # PUT /packages/1.xml
   def update
+    # TODO: we'll refactor this method to make it more modular
+
+    # set local shared vals
+    shared_bzauth_user = extract_username(params[:bzauth_user])
+    shared_bzauth_pass = session[:bz_pass]
+    shared_inline_bz_val = params[:flatten_bzs]
+    shared_inline_bzs = nil
+    unless shared_inline_bz_val.blank?
+      shared_inline_bzs =
+          shared_inline_bz_val.split(/\s+/).map { |bz| bz.to_i if bz.to_i > 0 }.compact
+    end
 
     # for Changelog.package_updated
     @orig_package = Package.find(params[:id])
@@ -142,51 +153,59 @@ class PackagesController < ApplicationController
 
     # Function to support inline editor to update BZ
     # Input syntax: <Bz1Id> <Bz2Id> <Bz3Id>
-    unless params[:flatten_bzs].blank?
-      flatten_bzs = params[:flatten_bzs].split(/\s+/).map { |bz| bz.to_i if bz.to_i > 0 }.compact
-
+    if shared_inline_bz_val != nil && shared_inline_bz_val.blank?
       Package.transaction do
-        valid = true
-        query_errors = []
-        new_bugs_hash = Hash.new
+        @package.bz_bugs.each do |bz_bug|
+          bz_bug.destroy
+        end
+      end
+    end
 
-        flatten_bzs.each do |bz_id|
-          query_resp = query_bz_bug_info(bz_id, params[:user], params[:pwd]).class
-          if query_resp == Net::HTTPOK
-            bz_info = JSON.parse(query_resp.body)
-            new_bugs_hash[bz_info["id"]] = bz_info
+    unless shared_inline_bzs.blank?
+      Package.transaction do
+        tx_ok = true
+        bad_queries = []
+        new_bug_info_store = []
+        deprecated_bug_store = @package.bz_bugs.clone
+
+        shared_inline_bzs.each do |bz_id|
+          bz_query_resp = query_bz_bug_info(bz_id, shared_bzauth_user, shared_bzauth_pass)
+          if bz_query_resp.class == Net::HTTPOK
+            bz_body = JSON.parse(bz_query_resp.body)
+            existing_bz_bug = @package.bz_bug_with_bz_id(bz_id)
+
+            if existing_bz_bug.blank?
+              new_bug_info_store << bz_body
+            else
+              deprecated_bug_store.delete(existing_bz_bug)
+            end
           else
-            valid = false # if only one bz input has error, we cancel the whole transaction
-            query_errors << query_resp
+            tx_ok = false # atomic commit. If one bug input has error, cancel the whole tx.
+            if bz_query_resp.class == Net::HTTPNotFound
+              bad_queries << "Not Found: bz" + bz_id.to_s
+            else
+              bad_queries << bz_query_resp.response.code + bz_query_resp.response.message
+            end
           end
         end
 
-
-        if valid
-          bz_bugs_to_be_deleted = @package.bz_bugs.clone
-
-          flatten_bzs.each do |bz_id|
-            bz_bug = @package.bz_bug_with_bz_id(bz_id)
-            if bz_bug.blank? # a new bug link, add it to package
-              BzBug.create_from_bz_info(new_bugs_hash[bz_id], @package.id, current_user)
-            else # this bug already linked to this package, don't delete it later.
-              bz_bugs_to_be_deleted.delete(bz_bug)
-            end
+        if tx_ok
+          new_bug_info_store.each do |bz_bug_info|
+            BzBug.create_from_bz_info(bz_bug_info, @package.id, current_user)
           end
 
-          # left bugs are removed from inline editor, we delete it then.
-          bz_bugs_to_be_deleted.each do |bz_bug|
+          deprecated_bug_store.each do |bz_bug|
             bz_bug.destroy
           end
         else
-          @error_message = "Error: #{query_errors.flatten}"
+          @error_message = "Error: #{bad_queries.flatten}"
         end
       end
     end
 
     respond_to do |format|
       Package.transaction do
-        if params[:flatten_bzs].blank? && @package.update_attributes(params[:package])
+        if shared_inline_bz_val.blank? && @package.update_attributes(params[:package])
           @package.reload
           # this is needed since we write to @package later in this section of
           # the code. (@package.status_changed_at = Time.now). This messes up
@@ -206,7 +225,7 @@ class PackagesController < ApplicationController
               @package.bz_bugs.each do |bz_bug|
                 if bz_bug.summary.match(/^Upgrade/) && !assignee_email.nil? && (!bz_bug.component.blank? && bz_bug.component.include?("RPMs")) && (bz_bug.keywords.include? "Rebase")
 
-                  params_bz = {:assignee => assignee_email, :userid => extract_username(params[:bzauth_user]), :pwd => session[:bz_pass], :status => BzBug::BZ_STATUS[:assigned]}
+                  params_bz = {:assignee => assignee_email, :userid => shared_bzauth_user, :pwd => shared_bzauth_pass, :status => BzBug::BZ_STATUS[:assigned]}
                   update_bug(bz_bug.bz_id, oneway='true', params_bz)
                   bz_bug.bz_assignee = assignee_email
                   bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
@@ -240,8 +259,8 @@ class PackagesController < ApplicationController
                 if Rails.env.production? # TODO we need to write some unit tests to test all the integrations with SOA
                   @package.bz_bugs.each do |bz_bug|
                     if bz_bug.summary.match(/^Upgrade/) && bz_bug.bz_assignee == assignee_email
-                      params_bz = {:assignee => assignee_email, :userid => extract_username(params[:bzauth_user]),
-                                   :pwd => session[:bz_pass], :status => BzBug::BZ_STATUS[:assigned]}
+                      params_bz = {:assignee => assignee_email, :userid => shared_bzauth_user,
+                                   :pwd => shared_bzauth_pass, :status => BzBug::BZ_STATUS[:assigned]}
 
                       update_bug(bz_bug.bz_id, oneway='true', params_bz)
                       bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
@@ -271,9 +290,9 @@ class PackagesController < ApplicationController
                       params_bz = {:comment => comment,
                                    :milestone => @package.task.milestone,
                                    :assignee => assignee_email,
-                                   :userid => extract_username(params[:bzauth_user]),
+                                   :userid => shared_bzauth_user,
                                    :status => BzBug::BZ_STATUS[:modified],
-                                   :pwd => session[:bz_pass]}
+                                   :pwd => shared_bzauth_pass}
                       add_comment_milestone_status_to_bug(bz_bug.bz_id, params_bz)
 
                       bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
@@ -282,10 +301,6 @@ class PackagesController < ApplicationController
                   end
                 end
 
-                #if has_mead_integration?(@package.task) && params[:_type] == "inline"
-                #  # for inline editor, we get build info immediately
-                #  get_mead_info(@package)
-                #end
               end
             end
 
@@ -352,12 +367,6 @@ class PackagesController < ApplicationController
 
     respond_to do |format|
       format.html {
-        #if params[:user].blank?
-        #  redirect_to(:controller => :packages, :action => :index, :task_id => escape_url(@package.task.name))
-        #else
-        #  redirect_to(:controller => :packages, :action => :index, :task_id => escape_url(@package.task.name), :user => params[:user])
-        #end
-
         redirect_to(:controller => :packages, :action => :show, :task_id => escape_url(@package.task.name), :id => escape_url(@package.name))
       }
     end
@@ -433,14 +442,6 @@ class PackagesController < ApplicationController
     csv_string = FasterCSV.generate do |csv|
       # header row
       header_row = ["name", "status", "tags", "assignee", "version", "bz", "git_url", "mead", "brew"]
-      #
-      #get_xattrs(@task, true, false) do |attr|
-      #  if attr.blank?
-      #    header_row << ""
-      #  else
-      #    header_row << attr.downcase
-      #  end
-      #end
 
       csv << header_row
 
@@ -474,13 +475,7 @@ class PackagesController < ApplicationController
         val << package.git_url
         val << package.mead
         val << package.brew
-        #get_xattrs(@task, true, false) do |attr|
-        #  if package.read_attribute(attr).blank?
-        #    val << ""
-        #  else
-        #    val << package.read_attribute(attr)
-        #  end
-        #end
+
 
         csv << val
       end

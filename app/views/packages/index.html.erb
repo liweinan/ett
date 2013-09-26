@@ -14,46 +14,47 @@
     <% session[:not_cloned_packages] = nil %>
 <% end %>
 
-    <% if has_task? %>
-        <% @task = Task.find_by_name(unescape_url(params[:task_id])) %>
-        <h2>
-          Listing packages of <%= unescape_url(params[:task_id]) %>
-          <% if has_status? %>
-              / <%= unescape_url(params[:status]) %>
-          <% end %>
-          <% if has_tag? %>
-              / <%= unescape_url(params[:tag]) %>
-          <% end %>
-        </h2>
-        <% unless @task.description.blank? %>
-            <%= @task.description %>
-        <% end %>
-    <% else %>
-        <h2>Listing packages</h2>
+<% if has_task? %>
+    <% @task = Task.find_by_name(unescape_url(params[:task_id])) %>
+    <h2>
+      Listing packages of <%= unescape_url(params[:task_id]) %>
+      <% if has_status? %>
+          / <%= unescape_url(params[:status]) %>
+      <% end %>
+      <% if has_tag? %>
+          / <%= unescape_url(params[:tag]) %>
+      <% end %>
+    </h2>
+    <% unless @task.description.blank? %>
+        <%= @task.description %>
     <% end %>
+<% else %>
+    <h2>Listing packages</h2>
+<% end %>
 
-    <%= render :partial => 'ops' %>
+<%= render :partial => 'ops' %>
 
-    <%= render :partial => 'layouts/sep' %>
+<%= render :partial => 'layouts/sep' %>
 
-    Statuses:
-    <%= link_to "All (#{@all_packages_count})", :controller => :packages, :action => :index, :task_id => params[:task_id] %> /
+Statuses:
+<%= link_to "All (#{@all_packages_count})", :controller => :packages, :action => :index, :task_id => params[:task_id] %> /
 
-    <% if logged_in? %>
-        <%= link_to "My (#{@my_packages_count})", :controller => :packages, :action => :index, :task_id => params[:task_id], :user => session[:current_user].email %> /
+<% if logged_in? %>
+    <%= link_to "My (#{@my_packages_count})", :controller => :packages, :action => :index, :task_id => params[:task_id], :user => session[:current_user].email %> /
+<% end %>
+
+<% Status.find_all_can_show_by_task_id_in_global_scope(Task.find_by_name(unescape_url(params[:task_id])).id).each do |status| %>
+    <%= link_to "#{status.name} (#{count_packages(unescape_url(params[:task_id]), status.name)})", :controller => :packages, :action => :index, :task_id => params[:task_id], :status => escape_url(status.name) %> /
+<% end %>
+<%= render :partial => 'layouts/sep' %>
+<% tags = Task.find_by_name(unescape_url(params[:task_id])).tags %>
+<% unless tags.blank? %>
+    Tags:
+    <% tags.each do |tag| %>
+        <%= link_to "#{tag.key} (#{tag.packages_can_show.size})", :controller => :packages, :action => :index, :task_id => params[:task_id], :tag => tag.key %> /
     <% end %>
-
-    <% Status.find_all_can_show_by_task_id_in_global_scope(Task.find_by_name(unescape_url(params[:task_id])).id).each do |status| %>
-        <%= link_to "#{status.name} (#{count_packages(unescape_url(params[:task_id]), status.name)})", :controller => :packages, :action => :index, :task_id => params[:task_id], :status => escape_url(status.name) %> /
-    <% end %>
-    <%= render :partial => 'layouts/sep' %>
-    <% tags = Task.find_by_name(unescape_url(params[:task_id])).tags %>
-    <% unless tags.blank? %>
-        Tags:
-        <% tags.each do |tag| %>
-            <%= link_to "#{tag.key} (#{tag.packages_can_show.size})", :controller => :packages, :action => :index, :task_id => params[:task_id], :tag => tag.key %> /
-        <% end %>
-    <% end %>
+<% end %>
+<% if logged_in? %>
     <%= render :partial => 'layouts/sep' %>
     <span id="inline_editor_switch" style="display:none;">
       <a href="javascript:void(0);" onclick="getPacBtns();">
@@ -61,194 +62,193 @@
       </a>
     </span>
     <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "inline_editor_indicator"} %>
-    <p> ✔ : nvr added to errata. ✘ : nvr not in shipped-list </p>
+<% end %>
+<p> ✔ : nvr added to errata. ✘ : nvr not in shipped-list </p>
 
-    <div class='manage-tbl'>
-      <%= render :partial => 'layouts/sep' %>
-      <table>
-        <%= render :partial => 'packages/index/header', :locals => {:col => 'th'} %>
-        <% @packages.each_with_index do |package, i| %>
-            <% cache(package) do %>
-            <% if i % 25 == 0 && i > 0 %>
-                <%= render :partial => 'packages/index/header', :locals => {:col => 'td'} %>
-            <% end %>
-            <tr>
-              <% @show_progress = true %>
-              <% if logged_in? %>
-                  <%= render :partial => 'packages/index/ops', :locals => {:package => package} %>
-              <% end %>
-              <%= render :partial => 'packages/index/name', :locals => {:package => package} %>
-              <%= render :partial => 'packages/index/status', :locals => {:package => package} %>
-              <%= render :partial => 'packages/index/tag', :locals => {:package => package} %>
-              <%= render :partial => 'packages/index/user', :locals => {:package => package} %>
-              <%= render :partial => 'packages/index/ver', :locals => {:package => package} %>
-              <%= render :partial => 'packages/index/bz', :locals => {:package => package} %>
-              <%= render :partial => 'packages/index/git_url', :locals => {:package => package} %>
-              <%= render :partial => 'packages/index/mead', :locals => {:package => package} %>
-              <%= render :partial => 'packages/index/brew', :locals => {:package => package} %>
-              <%= render :partial => 'packages/index/rpmdiff', :locals => {:package => package} %>
-
-              <%# render :partial => 'packages/index/xattr', :locals => {:package => package} %>
-            </tr>
-            <% end %>
+<div class='manage-tbl'>
+  <%= render :partial => 'layouts/sep' %>
+  <table>
+    <%= render :partial => 'packages/index/header', :locals => {:col => 'th'} %>
+    <% @packages.each_with_index do |package, i| %>
+        <% if i % 25 == 0 && i > 0 %>
+            <%= render :partial => 'packages/index/header', :locals => {:col => 'td'} %>
         <% end %>
-      </table>
-    </div>
+        <tr>
+          <% @show_progress = true %>
+          <% if logged_in? %>
+              <%= render :partial => 'packages/index/ops', :locals => {:package => package} %>
+          <% end %>
+          <%= render :partial => 'packages/index/name', :locals => {:package => package} %>
+          <%= render :partial => 'packages/index/status', :locals => {:package => package} %>
+          <%= render :partial => 'packages/index/tag', :locals => {:package => package} %>
+          <%= render :partial => 'packages/index/user', :locals => {:package => package} %>
+          <%= render :partial => 'packages/index/ver', :locals => {:package => package} %>
+          <%= render :partial => 'packages/index/bz', :locals => {:package => package} %>
+          <%= render :partial => 'packages/index/git_url', :locals => {:package => package} %>
+          <%= render :partial => 'packages/index/mead', :locals => {:package => package} %>
+          <%= render :partial => 'packages/index/brew', :locals => {:package => package} %>
+          <%= render :partial => 'packages/index/rpmdiff', :locals => {:package => package} %>
+
+          <%# render :partial => 'packages/index/xattr', :locals => {:package => package} %>
+        </tr>
+    <% end %>
+  </table>
+</div>
 <%= render :partial => 'layouts/sep' %>
 
 
-    <!--The following codes are all for inline editors-->
-    <% content_for :js do %>
-        <script type="text/javascript">
+<!--The following codes are all for inline editors-->
+<% content_for :js do %>
+    <script type="text/javascript">
 
-            function show_pac_editor(div, pac_id, field_name, field_type) {
-                Element.hide(div + '_field');
-                Element.hide(build_pac_btn_id(div, field_type));
-                new Ajax.Request('/toolbox/get_pac_form',
-                        {
-                            asynchronous: true,
-                            evalScripts: true,
-                            onLoading: function (request) {
-                                Element.show(div + '_indicator');
-                            },
-                            onSuccess: function (response) {
-                                Element.hide(div + '_indicator');
-                            },
-                            parameters: {
-                                'form_id': div + '_editor',
-                                'pac_id': pac_id,
-                                'field_name': field_name,
-                                'field_type': field_type,
-                                'authenticity_token': '<%=form_authenticity_token%>'}
-                        });
-                Element.show(div + '_editor');
-                Element.setStyle(div + '_td', {'text-decoration': 'none', 'background': 'none'});
-                document.getElementById(div + "_switch").innerHTML = 'off';
-            }
+        function show_pac_editor(div, pac_id, field_name, field_type) {
+            Element.hide(div + '_field');
+            Element.hide(build_pac_btn_id(div, field_type));
+            new Ajax.Request('/toolbox/get_pac_form',
+                    {
+                        asynchronous: true,
+                        evalScripts: true,
+                        onLoading: function (request) {
+                            Element.show(div + '_indicator');
+                        },
+                        onSuccess: function (response) {
+                            Element.hide(div + '_indicator');
+                        },
+                        parameters: {
+                            'form_id': div + '_editor',
+                            'pac_id': pac_id,
+                            'field_name': field_name,
+                            'field_type': field_type,
+                            'authenticity_token': '<%=form_authenticity_token%>'}
+                    });
+            Element.show(div + '_editor');
+            Element.setStyle(div + '_td', {'text-decoration': 'none', 'background': 'none'});
+            document.getElementById(div + "_switch").innerHTML = 'off';
+        }
 
-            function hide_pac_editor(div, field_type) {
-                Element.show(div + '_field');
+        function hide_pac_editor(div, field_type) {
+            Element.show(div + '_field');
+            Element.show(build_pac_btn_id(div, field_type));
+            Element.hide(div + '_editor');
+            document.getElementById(div + "_switch").innerHTML = 'on';
+        }
+
+        function show_pac_btn(div, field_type) {
+            if (document.getElementById(div + "_switch").innerHTML == 'on')
                 Element.show(build_pac_btn_id(div, field_type));
-                Element.hide(div + '_editor');
-                document.getElementById(div + "_switch").innerHTML = 'on';
-            }
+        }
 
-            function show_pac_btn(div, field_type) {
-                if (document.getElementById(div + "_switch").innerHTML == 'on')
-                    Element.show(build_pac_btn_id(div, field_type));
-            }
+        function hide_pac_btn(div, field_type) {
+            if (document.getElementById(div + "_switch").innerHTML == 'on')
+                Element.hide(build_pac_btn_id(div, field_type));
+        }
 
-            function hide_pac_btn(div, field_type) {
-                if (document.getElementById(div + "_switch").innerHTML == 'on')
-                    Element.hide(build_pac_btn_id(div, field_type));
-            }
+        function build_pac_btn_id(div, field_type) {
+            return div + '_-' + field_type + '-_btn';
+        }
 
-            function build_pac_btn_id(div, field_type) {
-                return div + '_-' + field_type + '-_btn';
-            }
+        function getPacBtns() {
+            // get the [EDIT] link, and inject each editable columns
+            var pacBtns = document.getElementsByRegex('^pac.*btn');
 
-            function getPacBtns() {
-                // get the [EDIT] link, and inject each editable columns
-                var pacBtns = document.getElementsByRegex('^pac.*btn');
+            // inject [EDIT] link switch
+            var pacBtnSwitches = document.getElementsByRegex('^pac.*switch');
+            new Ajax.Request('/toolbox/get_initial_pac_btn_switch',
+                    {
+                        asynchronous: true,
+                        evalScripts: true,
+                        onLoading: function (request) {
+                            document.getElementById('inline_editor_switch').innerHTML = "LOADING INLINE EDITOR...";
+                            Element.show('inline_editor_indicator');
+                        },
+                        parameters: {
+                            'ids': pacBtnSwitches.toString(),
+                            'authenticity_token': '<%=form_authenticity_token%>'}
+                    });
 
-                // inject [EDIT] link switch
-                var pacBtnSwitches = document.getElementsByRegex('^pac.*switch');
-                new Ajax.Request('/toolbox/get_initial_pac_btn_switch',
-                        {
-                            asynchronous: true,
-                            evalScripts: true,
-                            onLoading: function (request) {
-                                document.getElementById('inline_editor_switch').innerHTML = "LOADING INLINE EDITOR...";
-                                Element.show('inline_editor_indicator');
-                            },
-                            parameters: {
-                                'ids': pacBtnSwitches.toString(),
-                                'authenticity_token': '<%=form_authenticity_token%>'}
-                        });
+            new Ajax.Request('/toolbox/get_pac_btns',
+                    {
+                        asynchronous: true,
+                        evalScripts: true,
+                        onSuccess: function (response) {
+                            Element.hide('inline_editor_indicator');
+                            document.getElementById('inline_editor_switch').innerHTML = '<span style="color:#228b22;">[INLINE EDITOR ENABLED]</span>';
+                            new Effect.Highlight('inline_editor_switch', { duration: 1 });
 
-                new Ajax.Request('/toolbox/get_pac_btns',
-                        {
-                            asynchronous: true,
-                            evalScripts: true,
-                            onSuccess: function (response) {
-                                Element.hide('inline_editor_indicator');
-                                document.getElementById('inline_editor_switch').innerHTML = '<span style="color:#228b22;">[INLINE EDITOR ENABLED]</span>';
-                                new Effect.Highlight('inline_editor_switch', { duration: 1 });
+                        },
+                        parameters: {
+                            'ids': pacBtns.toString(),
+                            'authenticity_token': '<%=form_authenticity_token%>'}
+                    });
+        }
 
-                            },
-                            parameters: {
-                                'ids': pacBtns.toString(),
-                                'authenticity_token': '<%=form_authenticity_token%>'}
-                        });
-            }
+        Event.observe(window, 'load', function () {
+            Element.show('inline_editor_switch');
+        });
 
-            Event.observe(window, 'load', function () {
-                Element.show('inline_editor_switch');
-            });
+        function showLog(pac_id) {
+            new Ajax.Request('/toolbox/show_log_dialog',
+                    {
+                        asynchronous: true,
+                        evalScripts: true,
+                        onLoading: function (request) {
+                            Element.show('log_area_indicator_' + pac_id);
+                        },
+                        onSuccess: function (response) {
+                            Element.hide('log_area_indicator_' + pac_id);
+                            Element.show('log_area_' + pac_id);
+                        },
+                        parameters: {
+                            'id': pac_id,
+                            'authenticity_token': '<%=form_authenticity_token%>'
+                        }
+                    });
+        }
 
-            function showLog(pac_id) {
-                new Ajax.Request('/toolbox/show_log_dialog',
-                        {
-                            asynchronous: true,
-                            evalScripts: true,
-                            onLoading: function (request) {
-                                Element.show('log_area_indicator_' + pac_id);
-                            },
-                            onSuccess: function (response) {
-                                Element.hide('log_area_indicator_' + pac_id);
-                                Element.show('log_area_' + pac_id);
-                            },
-                            parameters: {
-                                'id': pac_id,
-                                'authenticity_token': '<%=form_authenticity_token%>'
-                            }
-                        });
-            }
+        function showCommentDialog(pac_id) {
+            new Ajax.Request('/toolbox/show_comment_dialog',
+                    {
+                        asynchronous: true,
+                        evalScripts: true,
+                        onLoading: function (request) {
+                            Element.show('comment_area_indicator_' + pac_id);
+                        },
+                        onSuccess: function (response) {
+                            Element.hide('comment_area_indicator_' + pac_id);
+                            Element.show('comment_area_' + pac_id);
+                        },
+                        parameters: {
+                            'id': pac_id,
+                            'authenticity_token': '<%=form_authenticity_token%>'
+                        }
+                    });
+        }
+    </script>
 
-            function showCommentDialog(pac_id) {
-                new Ajax.Request('/toolbox/show_comment_dialog',
-                        {
-                            asynchronous: true,
-                            evalScripts: true,
-                            onLoading: function (request) {
-                                Element.show('comment_area_indicator_' + pac_id);
-                            },
-                            onSuccess: function (response) {
-                                Element.hide('comment_area_indicator_' + pac_id);
-                                Element.show('comment_area_' + pac_id);
-                            },
-                            parameters: {
-                                'id': pac_id,
-                                'authenticity_token': '<%=form_authenticity_token%>'
-                            }
-                        });
-            }
-        </script>
+    <script type="text/javascript">
+        function validateBzAccountAndPostInlineEditorForm(params) {
+            var bzauth_user = document.getElementById('bzauth_user_' + params.myId);
+            var bzauth_pwd = document.getElementById('bzauth_pwd_' + params.myId);
+            checkBzAuthInfoWithCallback(bzauth_user, bzauth_pwd, "validate_bz_auth_indicator_" + params.myId, postInlineEditorFormCallback, params);
+        }
 
-        <script type="text/javascript">
-            function validateBzAccountAndPostInlineEditorForm(params) {
-                var bzauth_user = document.getElementById('bzauth_user_' + params.myId);
-                var bzauth_pwd = document.getElementById('bzauth_pwd_' + params.myId);
-                checkBzAuthInfoWithCallback(bzauth_user, bzauth_pwd, "validate_bz_auth_indicator_" + params.myId, postInlineEditorFormCallback, params);
-            }
+        function postInlineEditorFormCallback(params) {
+            postInlineEditorForm(params.myId, params.myName, params.myForm);
+        }
 
-            function postInlineEditorFormCallback(params) {
-                postInlineEditorForm(params.myId, params.myName, params.myForm);
-            }
+        function postInlineEditorForm(id, name, form) {
+            new Ajax.Request('/packages/' + id,
+                    {
+                        asynchronous: true, evalScripts: true,
+                        onLoading: function (request) {
+                            Element.show('pac_' + id + '_' + name + '_spinner');
+                        },
+                        onSuccess: function (request) {
 
-            function postInlineEditorForm(id, name, form) {
-                new Ajax.Request('/packages/' + id,
-                        {
-                            asynchronous: true, evalScripts: true,
-                            onLoading: function (request) {
-                                Element.show('pac_' + id + '_' + name + '_spinner');
-                            },
-                            onSuccess: function (request) {
-
-                            },
-                            parameters: Form.serialize(form)
-                        });
-                return false;
-            }
-        </script>
+                        },
+                        parameters: Form.serialize(form)
+                    });
+            return false;
+        }
+    </script>
 <% end %>

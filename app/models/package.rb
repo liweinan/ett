@@ -237,6 +237,19 @@ class Package < ActiveRecord::Base
     return ''
   end
 
+  def bz_bug_with_bz_id(bz_id)
+    if bz_bugs.blank?
+      nil
+    else
+      bz_bugs.each do |bz_bug|
+        if bz_bug.bz_id == bz_id.to_s
+          return bz_bug
+        end
+      end
+      nil
+    end
+  end
+
   protected
 
   def all_from_packages_of(from_relationships, relationship_name)

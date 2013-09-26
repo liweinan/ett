@@ -38,7 +38,7 @@
                                     alert("<%=t 'bz_auth_failed'%>");
                                 }
                                 else {
-                                    alert("Internal Error: " + response.status);
+                                    alert("Internal Error: " + response.status + "\n" + response.responseText);
                                 }
                             },
                             onSuccess: function () {
