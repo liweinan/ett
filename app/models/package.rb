@@ -179,7 +179,7 @@ class Package < ActiveRecord::Base
   end
 
   def in_shipped_list?
-    open('/var/www/html/shipped-list') { |f| f.grep("#{name}\n")  }
+    !open('/var/www/html/shipped-list') { |f| f.grep("#{name}\n")  }.empty?
   end
 
   def brew_and_is_in_errata?
