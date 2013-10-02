@@ -3,6 +3,7 @@
 # for creating, updating, syncing JIRA issues in the DB and also for sending RESTful requests to the JIRA server.
 #
 class JiraBug < ActiveRecord::Base
+  require 'rubygems'
   require 'net/http'
   require 'json'
 
@@ -15,7 +16,19 @@ class JiraBug < ActiveRecord::Base
   JIRA_RESOURCES = {:issue => "issue"} # TODO: verify which JIRA resources are needed with huwang
 
   #JIRA_ACTIONS = {:movetoassigned => 'movetoassigned', :movetomodified => 'movetomodified', :accepted => 'accepted', :outofdate => 'outofdate', :done => 'done'}
-  
+  JIRA_FIELDS = { 
+    :project => "id", 
+    :summary => "", 
+    :issuetype => "name", 
+    :reporter => "name", 
+    :assignee => "id", 
+    :priority => "id", 
+    :security => "id", 
+    :versions => "id", 
+    :fixVersions => "id", 
+    :environment => "", 
+    :description => ""}
+
   # Verify that these are all correct JIRA statuses:
   JIRA_STATUS = {:open => "Open", :resolved => "Resolved", :closed => "Closed", :in_progress => "In Progress", :reopened => "Reopened"}
 
@@ -56,7 +69,13 @@ class JiraBug < ActiveRecord::Base
   # See https://docs.atlassian.com/jira/REST/latest/ for request documentation.
 
   # Session authentication. 
-  # Currently not needed, but keep in mind for later.
+  # Currently we can just put username:password 
+  # int the request HEADer info.
+  # But this is bad since they're sent unencrypted
+  # so later we'll need to figure out how to do a proper
+  # authentication using HTTP Cookies.
+  # See here for tutorial:
+  # https://developer.atlassian.com/display/JIRADEV/JIRA+REST+API+%28Alpha%29+Tutorial#JIRARESTAPI%28Alpha%29Tutorial-UserAuthentication
   def authenticate(username, password)
 
   end
@@ -164,11 +183,32 @@ class JiraBug < ActiveRecord::Base
 
   end
 
-  # Create a correctly formatted json object from a 
+ # Create a correctly formatted json object from a 
   # dictionary of parameters. This JSON must
   # adhere to the issue POST requirements:
   # https://docs.atlassian.com/jira/REST/latest/#idp1846544
   def create_json_from_dict(parameters)
+    # 
+    jira_map = {}
+    jira_map[:fields]={}
+
+
+    # All the fields get put into "fields"
+    parameters.each do |p, v|
+      # If it's in "fields"
+      if JIRA_FIELDS.key?(p)
+        puts p
+        jira_map[:fields][p]={}
+        jira_map[:fields][p][JIRA_FIELDS[p]]=v
+        #jira_map[:fields][ p => { JIRA_FIELDS[p] => v }]
+      end
+
+    end 
+
+    jira_map
+  end
+
+  def insert_param_info_field(parameters, param)
 
   end
 
