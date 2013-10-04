@@ -185,6 +185,7 @@ class JiraBug < ActiveRecord::Base
 
   end
 
+
 # Create a correctly formatted json object from a 
   # dictionary of parameters. This JSON must
   # adhere to the issue POST requirements:
@@ -196,7 +197,6 @@ class JiraBug < ActiveRecord::Base
 
     # All the fields get put into "fields"
     parameters.each do |p, v|
-      #puts print_key_value(p,v)
       # If it's in "fields"
       if JIRA_FIELDS.key?(p)
         if JIRA_FIELDS[p].empty?
@@ -205,7 +205,6 @@ class JiraBug < ActiveRecord::Base
           jira_map[:fields][p]={}
           jira_map[:fields][p][JIRA_FIELDS[p]]=v
         end
-        #jira_map[:fields][ p => { JIRA_FIELDS[p] => v }]
       end
 
       # For other non-field JIRA params:
@@ -217,7 +216,7 @@ class JiraBug < ActiveRecord::Base
     jira_map
   end
 
-   # Takes a jira style JSON and flattens it into
+ # Takes a jira style JSON and flattens it into
   # a regular dictionary.
   def create_dict_from_json(jira_json)
     d = {}
@@ -226,6 +225,10 @@ class JiraBug < ActiveRecord::Base
       # Handle field
       if k == :fields
         v.each do |f,i|
+          # Skip it if not in our fields list.
+          if not JIRA_FIELDS.include? f
+            next
+          end
           if JIRA_FIELDS[f].empty?
             d[f]=v[f]
           else
@@ -234,7 +237,10 @@ class JiraBug < ActiveRecord::Base
         end
       # Handle others
       else 
-        d[k]=v
+        # Keep it if it's in the info list.
+        if JIRA_INFO.include? k
+          d[k]=v
+        end
       end
     end
     d

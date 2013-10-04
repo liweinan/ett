@@ -1,7 +1,3 @@
-  require jira_bug
-  require bz_bugs_controller
- 
-
   class JiraBugsController < ApplicationController
  
 
