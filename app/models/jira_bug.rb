@@ -24,12 +24,13 @@ class JiraBug < ActiveRecord::Base
     :assignee => "id", 
     :priority => "id", 
     :security => "id", 
-    :versions => "id", 
-    :fixVersions => "id", 
+    :versions => ["name"], 
+    :fixVersions => ["name"], 
     :environment => "", 
-    :description => ""}
-
-  JIRA_INFO = [ "id", "key", "self" ]
+    :description => "",
+    :components => ["name"]}
+    
+  JIRA_INFO = [ :id, :key, :self ]
 
   # Verify that these are all correct JIRA statuses:
   JIRA_STATUS = {:open => "Open", :resolved => "Resolved", :closed => "Closed", :in_progress => "In Progress", :reopened => "Reopened"}

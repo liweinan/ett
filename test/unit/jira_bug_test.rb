@@ -15,7 +15,8 @@ require 'json'
     :versions => ["name"], 
     :fixVersions => ["name"], 
     :environment => "", 
-    :description => ""}
+    :description => "",
+	:components => ["name"]}
 
   JIRA_INFO = [ :id, :key, :self ]
 
