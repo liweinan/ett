@@ -1,9 +1,11 @@
 #require 'test_helper'
+#$LOAD_PATH << File.join('../../app/models/') 
+#require 'jira_bug'
 require 'rubygems'
 require 'net/http'
 require 'json'
 
-#JIRA_ACTIONS = {:movetoassigned => 'movetoassigned', :movetomodified => 'movetomodified', :accepted => 'accepted', :outofdate => 'outofdate', :done => 'done'}
+JIRA_ACTIONS = {:movetoassigned => 'movetoassigned', :movetomodified => 'movetomodified', :accepted => 'accepted', :outofdate => 'outofdate', :done => 'done'}
   JIRA_FIELDS = { 
     :project => "key", 
     :summary => "", 

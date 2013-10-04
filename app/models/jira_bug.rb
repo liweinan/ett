@@ -19,8 +19,8 @@ class JiraBug < ActiveRecord::Base
   belongs_to :package, :class_name => "Package", :foreign_key => "package_id"
 
   # http://hostname/rest/api/2/<resource-name>
-  JIRA_BASE_URI = https://issues.jboss.org/rest/api/2/issue
-  JIRIA_AUTH_URI = https://issues.jboss.org/rest/auth
+  JIRA_BASE_URI = "https://issues.jboss.org/rest/api/2"
+  JIRIA_AUTH_URI = "https://issues.jboss.org/rest/auth"
   JIRA_RESOURCES = {:issue => "issue"} # TODO: verify which JIRA resources are needed with huwang
 
   #JIRA_ACTIONS = {:movetoassigned => 'movetoassigned', :movetomodified => 'movetomodified', :accepted => 'accepted', :outofdate => 'outofdate', :done => 'done'}
@@ -37,7 +37,7 @@ class JiraBug < ActiveRecord::Base
     :environment => "", 
     :description => "",
     :components => ["name"]}
-    
+
   JIRA_INFO = [ :id, :key, :self ]
 
   # Verify that these are all correct JIRA statuses:
