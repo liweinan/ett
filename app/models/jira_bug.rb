@@ -185,7 +185,6 @@ class JiraBug < ActiveRecord::Base
 
   end
 
-
 # Create a correctly formatted json object from a 
   # dictionary of parameters. This JSON must
   # adhere to the issue POST requirements:
@@ -193,26 +192,37 @@ class JiraBug < ActiveRecord::Base
   def create_json_from_dict(parameters)
     # 
     jira_map = {}
-    jira_map[:fields]={}
+    fields_dict = {}
+    
 
-    # All the fields get put into "fields"
-    parameters.each do |p, v|
-      # If it's in "fields"
-      if JIRA_FIELDS.key?(p)
-        if JIRA_FIELDS[p].empty?
-          jira_map[:fields][p]=v
-        else
-          jira_map[:fields][p]={}
-          jira_map[:fields][p][JIRA_FIELDS[p]]=v
-        end
+    # Do the fields
+    JIRA_FIELDS.each do |k,v|
+      # If field isn't in parameters, skip
+      unless parameters.keys.include? k.to_s
+        next
+      end
+      param = parameters[k.to_s]
+      # Handle array types
+      if v.is_a?(Array)
+        fields_dict[k.to_s]=inject_list(param,v[0])
+      elsif v.empty?
+        fields_dict[k.to_s] = param
+      else
+        # Handle 'normal' fields
+        fields_dict[k.to_s]={}
+        fields_dict[k.to_s][v]=param
       end
 
-      # For other non-field JIRA params:
-      if JIRA_INFO.include? p
-        jira_map[p]=v
+    JIRA_INFO.each do |k|
+      unless parameters.keys.include? k.to_s
+        next
       end
-    end 
+      jira_map[k.to_s]=parameters[k.to_s]
+    end
 
+        
+    end
+    jira_map[:fields.to_s]=fields_dict
     jira_map
   end
 
@@ -221,29 +231,53 @@ class JiraBug < ActiveRecord::Base
   def create_dict_from_json(jira_json)
     d = {}
 
-    jira_json.each do |k,v|
-      # Handle field
-      if k == :fields
-        v.each do |f,i|
-          # Skip it if not in our fields list.
-          if not JIRA_FIELDS.include? f
-            next
-          end
-          if JIRA_FIELDS[f].empty?
-            d[f]=v[f]
+    # Grab the fields
+    JIRA_FIELDS.each do |k,v|
+      field = jira_json[:fields.to_s][k.to_s]
+
+      
+      # Only if it's not empty in json
+      unless field.nil?
+      if v.is_a?(Array)
+          d[k.to_s] = extract_list(field, v[0])
+          next
+        end
+
+        field_val = field[v]
+        unless field_val.nil?
+          # Handle lists of stuffs
+          
+          if v.empty?
+            d[k.to_s] = field
           else
-            d[f]=i[JIRA_FIELDS[f]]
-        end
-        end
-      # Handle others
-      else 
-        # Keep it if it's in the info list.
-        if JIRA_INFO.include? k
-          d[k]=v
+            d[k.to_s] = field_val
+          end
         end
       end
     end
-    d
+
+    # Grab the info
+    JIRA_INFO.each do |k|
+      info = jira_json[k.to_s].empty?
+      unless info.nil?
+        d[k.to_s]=jira_json[k.to_s]
+      end
+    end
+    d # give the d
+  end
+
+  # Takes a list of hashes with lot's of
+  # key value pairs, and returns a list of
+  # just values from the wanted key
+  def extract_list(items, key)
+    items.map {|item| item[key]}
+  end
+
+  # Takes a list full of a bunch of values
+  # and returns a list full of hashes with
+  # the value assigned to a key
+  def inject_list(list, key)
+    list.map {|item| Hash[key,item]}
   end
 
 end
