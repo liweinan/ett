@@ -17,7 +17,7 @@ class JiraBug < ActiveRecord::Base
 
   #JIRA_ACTIONS = {:movetoassigned => 'movetoassigned', :movetomodified => 'movetomodified', :accepted => 'accepted', :outofdate => 'outofdate', :done => 'done'}
   JIRA_FIELDS = { 
-    :project => "id", 
+    :project => "key", 
     :summary => "", 
     :issuetype => "name", 
     :reporter => "name", 
@@ -28,6 +28,8 @@ class JiraBug < ActiveRecord::Base
     :fixVersions => "id", 
     :environment => "", 
     :description => ""}
+
+  JIRA_INFO = [ "id", "key", "self" ]
 
   # Verify that these are all correct JIRA statuses:
   JIRA_STATUS = {:open => "Open", :resolved => "Resolved", :closed => "Closed", :in_progress => "In Progress", :reopened => "Reopened"}
@@ -183,7 +185,7 @@ class JiraBug < ActiveRecord::Base
 
   end
 
- # Create a correctly formatted json object from a 
+# Create a correctly formatted json object from a 
   # dictionary of parameters. This JSON must
   # adhere to the issue POST requirements:
   # https://docs.atlassian.com/jira/REST/latest/#idp1846544
@@ -192,24 +194,50 @@ class JiraBug < ActiveRecord::Base
     jira_map = {}
     jira_map[:fields]={}
 
-
     # All the fields get put into "fields"
     parameters.each do |p, v|
+      #puts print_key_value(p,v)
       # If it's in "fields"
       if JIRA_FIELDS.key?(p)
-        puts p
-        jira_map[:fields][p]={}
-        jira_map[:fields][p][JIRA_FIELDS[p]]=v
+        if JIRA_FIELDS[p].empty?
+          jira_map[:fields][p]=v
+        else
+          jira_map[:fields][p]={}
+          jira_map[:fields][p][JIRA_FIELDS[p]]=v
+        end
         #jira_map[:fields][ p => { JIRA_FIELDS[p] => v }]
       end
 
+      # For other non-field JIRA params:
+      if JIRA_INFO.include? p
+        jira_map[p]=v
+      end
     end 
 
     jira_map
   end
 
-  def insert_param_info_field(parameters, param)
+   # Takes a jira style JSON and flattens it into
+  # a regular dictionary.
+  def create_dict_from_json(jira_json)
+    d = {}
 
+    jira_json.each do |k,v|
+      # Handle field
+      if k == :fields
+        v.each do |f,i|
+          if JIRA_FIELDS[f].empty?
+            d[f]=v[f]
+          else
+            d[f]=i[JIRA_FIELDS[f]]
+        end
+        end
+      # Handle others
+      else 
+        d[k]=v
+      end
+    end
+    d
   end
 
 end
