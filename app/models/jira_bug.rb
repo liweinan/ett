@@ -5,13 +5,21 @@
 class JiraBug < ActiveRecord::Base
   require 'rubygems'
   require 'net/http'
+  require 'net/https'
   require 'json'
+  require 'uri'
+
+  attr_accessor :username, :password
+  def initialize(username = "", password = "")
+    @username = username
+    @password = password
+  end
 
   belongs_to :creator, :class_name => "User", :foreign_key => "creator_id"
   belongs_to :package, :class_name => "Package", :foreign_key => "package_id"
 
   # http://hostname/rest/api/2/<resource-name>
-  JIRA_BASE_URI = https://issues.jboss.org/rest/api/2
+  JIRA_BASE_URI = https://issues.jboss.org/rest/api/2/issue
   JIRIA_AUTH_URI = https://issues.jboss.org/rest/auth
   JIRA_RESOURCES = {:issue => "issue"} # TODO: verify which JIRA resources are needed with huwang
 
@@ -80,7 +88,8 @@ class JiraBug < ActiveRecord::Base
   # See here for tutorial:
   # https://developer.atlassian.com/display/JIRADEV/JIRA+REST+API+%28Alpha%29+Tutorial#JIRARESTAPI%28Alpha%29Tutorial-UserAuthentication
   def authenticate(username, password)
-
+    @username = username
+    @password = password
   end
 
   # Returns the URI for a given resource:
@@ -167,14 +176,22 @@ class JiraBug < ActiveRecord::Base
   # GET an issue from JIRA.
   # See https://docs.atlassian.com/jira/REST/latest/#idp1908272
   def get
-
     # Put together URI of the form: 
     # http://hostname/rest/api/2/issue/{issueIdOrKey}
-    uri = make_jira_uri("issue") + params[:jira_issue_id]
     
+    #uri = make_jira_uri("issue") + params[:jira_issue_id]
+    uri = URI.parse("http://issues.jboss.org/rest/api/2/issue/12410378")
+    request =  Net::HTTP::Get.new(uri.to_s, initheader = {'Content-Type' => 'application/json'})
+    req.basic_auth @username, @password
     # Create HTTP request and get response
-    @response = Net::HTTP.get_response(uri, json)
+    response = Net::HTTP.new($url_read.host, $url_read.port).start { |http| http.request(req) }
 
+
+    #@response = Net::HTTP.get_response(uri, json)
+    
+    # If you want to get the response code
+    # response.code will give you that
+    
     # Response Handler
     if @response.class == Net::HTTPOK
       # 200 returns json the "id", a "key", and a "self" (link to issue).
@@ -184,6 +201,7 @@ class JiraBug < ActiveRecord::Base
       
     end
 
+    dictionary = create_dict_from_json(JSON.parse(response.body))
   end
 
 # Create a correctly formatted json object from a 
