@@ -1,4 +1,8 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :allowed_statuses
+
+  map.resources :workflows
+
   map.resources :manual_log_entries
 
   map.resources :sandboxes

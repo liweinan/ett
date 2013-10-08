@@ -1,0 +1,18 @@
+<p>
+  <b>Workflow:</b>
+  <%=h @allowed_status.workflow_id %>
+</p>
+
+<p>
+  <b>Status:</b>
+  <%=h @allowed_status.status_id %>
+</p>
+
+<p>
+  <b>Next statuses:</b>
+  <%=h @allowed_status.next_statuses %>
+</p>
+
+
+<%= link_to 'Edit', edit_allowed_status_path(@allowed_status) %> |
+<%= link_to 'Back', allowed_statuses_path %>
