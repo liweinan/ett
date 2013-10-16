@@ -156,7 +156,7 @@ class Package < ActiveRecord::Base
     bz_bugs.each do |bug|
 
       if (bug.bz_status == "MODIFIED") &&
-         (bug.summary.start_with? "Upgrade") &&
+         (bug.summary.include? "Upgrade") &&
          (bug.component.include? "RPMs") &&
          (bug.keywords.include? "Rebase")
         errata_bz.push bug.bz_id

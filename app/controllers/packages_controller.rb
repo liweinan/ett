@@ -223,7 +223,7 @@ class PackagesController < ApplicationController
           if Rails.env.production?
             if old_assignee_email != assignee_email
               @package.bz_bugs.each do |bz_bug|
-                if bz_bug.summary.match(/^Upgrade/) && !assignee_email.nil? && (!bz_bug.component.blank? && bz_bug.component.include?("RPMs")) && (bz_bug.keywords.include? "Rebase")
+                if bz_bug.summary.match(/Upgrade/) && !assignee_email.nil? && (!bz_bug.component.blank? && bz_bug.component.include?("RPMs")) && (bz_bug.keywords.include? "Rebase")
 
                   params_bz = {:assignee => assignee_email, :userid => shared_bzauth_user, :pwd => shared_bzauth_pass, :status => BzBug::BZ_STATUS[:assigned]}
                   update_bug(bz_bug.bz_id, oneway='true', params_bz)
@@ -258,7 +258,7 @@ class PackagesController < ApplicationController
                 # the bug statuses are waiting to be updated according to https://docspace.corp.redhat.com/docs/DOC-148169
                 if Rails.env.production? # TODO we need to write some unit tests to test all the integrations with SOA
                   @package.bz_bugs.each do |bz_bug|
-                    if bz_bug.summary.match(/^Upgrade/) && bz_bug.bz_assignee == assignee_email
+                    if bz_bug.summary.match(/Upgrade/) && bz_bug.bz_assignee == assignee_email
                       params_bz = {:assignee => assignee_email, :userid => shared_bzauth_user,
                                    :pwd => shared_bzauth_pass, :status => BzBug::BZ_STATUS[:assigned]}
 
@@ -280,7 +280,7 @@ class PackagesController < ApplicationController
 
                 if Rails.env.production?
                   @package.bz_bugs.each do |bz_bug|
-                    if bz_bug.summary.match(/^Upgrade/) && bz_bug.bz_assignee == assignee_email
+                    if bz_bug.summary.match(/Upgrade/) && bz_bug.bz_assignee == assignee_email
 
                       comment = "Source URL: #{@package.git_url}\n" +
                           "Mead-Build: #{@package.mead}\n" +
