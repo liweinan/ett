@@ -21,6 +21,7 @@ class BzBugsController < ApplicationController
                       'release' => package.task.target_release,
                       'tagversion' => package.task.tag_version,
                       'userid' => extract_username(params[:user]),
+                      'summary' => "RHEL6 RPMs: Upgrade #{package.name} to #{params[:ver]}",
                       'pwd' => params[:pwd]}
 
         parameters['seealso'] = params[:see_also] unless params[:see_also].blank?
