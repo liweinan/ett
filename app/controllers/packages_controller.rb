@@ -275,6 +275,7 @@ class PackagesController < ApplicationController
                     # bugzilla immediately
                     # @package.mead_action = Package::MEAD_ACTIONS[:needsync]
                     get_mead_info(@package)
+                    update_source_url_info(@package)
                   end
                 end
 
@@ -547,6 +548,15 @@ class PackagesController < ApplicationController
   end
 
   protected
+
+  def update_source_url_info(package)
+    package.brew_scm_url = get_scm_url_brew(package)
+
+    if package.git_url.nil? || package.git_url.empty?
+      package.git_url = package.brew_scm_url
+    end
+    package.save
+  end
 
   def get_mead_info(package)
     brew_pkg = get_brew_name(package)

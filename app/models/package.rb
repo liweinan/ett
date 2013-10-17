@@ -218,11 +218,21 @@ class Package < ActiveRecord::Base
 
   def brew_style
     if brew.nil? || brew.empty? || latest_brew_nvr.nil? || latest_brew_nvr.empty?
-      return ''
+      ''
     elsif brew == latest_brew_nvr
-      return ''
+      ''
     else
-        return "background-color: yellow;"
+      "background-color: yellow;"
+    end
+  end
+
+  def get_scm_url_style
+    if git_url.nil? || git_url.empty? || brew_scm_url.nil? || brew_scm_url.empty?
+      ''
+    elsif git_url != brew_scm_url && !can_edit_version?
+      "background-color: yellow;"
+    else
+      ''
     end
   end
 

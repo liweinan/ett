@@ -3,7 +3,7 @@
   Git-URL
   </td>
   <td style="text-align:left;">
-    <%= f.text_field :git_url %>
+    <%= f.text_field :git_url, :disabled => (@package.can_edit_version? == true ? nil : 'disabled')%>
     <%# render :partial => 'sync', :locals => {:key => 'name'} %>
   </td>
 </tr>
