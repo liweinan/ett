@@ -437,8 +437,11 @@ class PackagesController < ApplicationController
     end
     @packages = get_packages(unescape_url(params[:task_id]), nil, nil, nil)
     @packages.each do |package|
-      package.latest_brew_nvr = get_brew_name(package)
-      package.save
+      brew_nvr = package.brew
+      if !brew_nvr.nil? && !brew_nvr.empty?
+        package.latest_brew_nvr = get_brew_name(package)
+        package.save
+      end
     end
     render :text => params[:task_id]
 
