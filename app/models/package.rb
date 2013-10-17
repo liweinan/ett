@@ -216,6 +216,16 @@ class Package < ActiveRecord::Base
     end
   end
 
+  def brew_style
+    if brew.nil? || brew.empty? || latest_brew_nvr.nil? || latest_brew_nvr.empty?
+      return ''
+    elsif brew == latest_brew_nvr
+      return ''
+    else
+        return "background-color: yellow;"
+    end
+  end
+
   def version_style
 
     if ver.nil? || ver.empty?
