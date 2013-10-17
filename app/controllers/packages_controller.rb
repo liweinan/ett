@@ -431,6 +431,19 @@ class PackagesController < ApplicationController
     end
   end
 
+  def get_latest_pkgs_from_brew
+    unless params[:secret_key] == 'birdistheword'
+      render :status => :unauthorized, :text => 'Wrong secret key' and return
+    end
+    @packages = get_packages(unescape_url(params[:task_id]), nil, nil, nil)
+    @packages.each do |package|
+      package.latest_brew_nvr = get_brew_name(package)
+      package.save
+    end
+    render :text => params[:task_id]
+
+  end
+
   def export_to_csv
 
     require 'faster_csv'
