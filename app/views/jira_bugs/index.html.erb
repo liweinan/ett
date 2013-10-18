@@ -8,16 +8,8 @@
 <th>Type</th>
 <th>Priority</th>
 </tr>
-<% @jira_bugs.each do |jira_bug| %>
-	<% @url = "/jira_bugs/" + jira_bug.key %>
-	<tr>
-	<td><%= jira_bug.jid %></td>
-	<td><%= jira_bug.key %></td>
-	<td><a href=<%= @url %>><%= jira_bug.summary %></a></td>
-	<td><%= jira_bug.components %></td>
-	<td><%= jira_bug.type %></td>
-	<td><%= jira_bug.priority %></td>
-	</tr>
+<% @jira_bugs.each do |@jira_bug| %>
+	<%= render 'jira_bugs/jira_bug_row' %>
 <% end %>
 
 </tr>

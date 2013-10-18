@@ -1,0 +1,15 @@
+<h2><%= @jira_bug.key %></h2>
+<table>
+<%= @ele = :id; render 'jira_bugs/jira_bug_element' %>
+<%= @ele = :summary; render 'jira_bugs/jira_bug_element' %>
+<%= @ele = :reporter; render 'jira_bugs/jira_bug_element' %>
+<%= @ele = :issuetype; render 'jira_bugs/jira_bug_element' %>
+<%= @ele = :priority; render 'jira_bugs/jira_bug_element' %>
+<%= @ele = :security; render 'jira_bugs/jira_bug_element' %>
+</table>
+<!-- Raw Info: -->
+<table>
+<tr><td>
+Raw Info: <%= JSON.pretty_generate(@info) %>
+</tr></td>
+</table>
