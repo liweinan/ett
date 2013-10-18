@@ -9,6 +9,7 @@
       <th>Target Release</th>
       <th>Milestone</th>
       <th>Version</th>
+      <th>Advisory</th>
       <% if can_manage? %>
           <th>Operation</th>
       <% end %>
@@ -44,6 +45,13 @@
                 -
             <% else %>
                 <%= task.tag_version %>
+            <% end %>
+          </td>
+          <td>
+            <% if task.advisory.blank? %>
+                -
+            <% else %>
+                <%= task.advisory %>
             <% end %>
           </td>
           <% if can_manage? %>
