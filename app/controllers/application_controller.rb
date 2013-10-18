@@ -1,6 +1,9 @@
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
+require "xmlrpc/client"
+XMLRPC::Config::ENABLE_NIL_PARSER = true
 class ApplicationController < ActionController::Base
+
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
   helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_task?, :count_packages, :can_edit_package?, :current_user, :get_task, :has_status?, :has_tag?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :task_has_tags?, :get_xattrs, :background_style, :confirmed?, :default_style
@@ -512,6 +515,20 @@ class ApplicationController < ActionController::Base
     puts res.response
   end
 
+
+  def get_scm_url_brew(pac)
+    server = XMLRPC::Client.new('brewhub.devel.redhat.com', '/brewhub', 80)
+    begin
+      param = server.call('getBuild', pac.mead)
+      if not param.nil?:
+        server.call('getTaskRequest', param['task_id'])[0]
+      else
+        nil
+      end
+    rescue XMLRPC::FaultException => e
+      nil
+    end
+  end
 
   def get_brew_name(pac)
     # TODO: make the tag more robust
