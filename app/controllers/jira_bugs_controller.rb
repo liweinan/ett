@@ -1,5 +1,7 @@
 require 'jira_bug.rb'
 
+
+
 class JiraBugsController < ApplicationController
   # GET /jira_bugs
   def index
@@ -27,7 +29,7 @@ class JiraBugsController < ApplicationController
 
   def sync
     # Authenticate from userinfo
-    JiraBug.authenticate(@user,@password)
+    JiraBug.authenticate(@user, @password)
 
     # Grab the issue info from JIRA
     jira_info = JiraBug.get(params[:id])

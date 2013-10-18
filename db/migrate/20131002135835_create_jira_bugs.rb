@@ -10,7 +10,10 @@ class CreateJiraBugs < ActiveRecord::Migration
       t.project :project
       t.string  :issuetype
       t.integer :priority
-
+      t.string :components
+      t.string :affected_versions
+      t.string :fix_versions
+      t.string :security
     	t.timestamps
     end
   end

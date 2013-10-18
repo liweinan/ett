@@ -4,14 +4,19 @@
 <th>ID</th>
 <th>Key</th>
 <th>Summary</th>
-<th>Reporter</th>
+<th>Components</th>
+<th>Type</th>
+<th>Priority</th>
 </tr>
 <% @jira_bugs.each do |jira_bug| %>
+	<% @url = "/jira_bugs/" + jira_bug.key %>
 	<tr>
 	<td><%= jira_bug.jid %></td>
 	<td><%= jira_bug.key %></td>
-	<td><%= jira_bug.summary %></td>
-	<td><%= jira_bug.reporter %></td>
+	<td><a href=<%= @url %>><%= jira_bug.summary %></a></td>
+	<td><%= jira_bug.components %></td>
+	<td><%= jira_bug.type %></td>
+	<td><%= jira_bug.priority %></td>
 	</tr>
 <% end %>
 

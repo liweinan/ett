@@ -65,7 +65,9 @@ class JiraBug < ActiveRecord::Base
     jira_bug.reporter = jira_info["reporter"]
     jira_bug.issuetype = jira_info["issuetype"]
     jira_bug.priority = jira_info["priority"]
-    #jira_bug.components = jira_info["components"]
+    jira_bug.components = jira_info["components"].join(',')
+    jira_bug.affected_versions = jira_info["versions"].join(',')
+    jira_bug.affected_versions = jira_info["fixVersions"].join(',')
     
     jira_bug.save
     jira_bug
