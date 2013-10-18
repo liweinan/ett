@@ -27,7 +27,7 @@ class JiraBugsController < ApplicationController
 
   def sync
     # Authenticate from userinfo
-    JiraBug.authenticate("fcanas","trisveryfuzzy")
+    JiraBug.authenticate(@user,@password)
 
     # Grab the issue info from JIRA
     jira_info = JiraBug.get(params[:id])
