@@ -2,7 +2,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :manual_log_entries
 
   map.resources :sandboxes
-
+  map.resources :jira_bugs
   map.resources :changelogs
   map.resources :components
   map.resources :package_relationships

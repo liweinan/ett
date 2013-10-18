@@ -1,0 +1,14 @@
+<h1>Jira Bugs</h1>
+<table>
+<tr>
+<th>ID</th>
+<th>Summary</th>
+<th>Reporter</th>
+<% @jira_bugs.each do |jira_bug| %>
+	<td><%= jira_bug.id %></td>
+	<td><%= jira_bug.summary %></td>
+	<td><%= jira_bug.reporter %></td>
+<% end %>
+
+</tr>
+</table>

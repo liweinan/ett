@@ -9,12 +9,6 @@ class JiraBug < ActiveRecord::Base
   require 'json'
   require 'uri'
 
-  attr_accessor :username, :password
-  def initialize(username = "", password = "")
-    @username = username
-    @password = password
-  end
-
   belongs_to :creator, :class_name => "User", :foreign_key => "creator_id"
   belongs_to :package, :class_name => "Package", :foreign_key => "package_id"
 
@@ -44,7 +38,7 @@ class JiraBug < ActiveRecord::Base
   JIRA_STATUS = {:open => "Open", :resolved => "Resolved", :closed => "Closed", :in_progress => "In Progress", :reopened => "Reopened"}
 
   default_value_for :jira_status, 'NEW'
-  default_value_for :jira_action, JIRA_ACTIONS[:done]
+  #default_value_for :jira_action, JIRA_ACTIONS[:done]
   default_value_for :last_synced_at, Time.now
   default_value_for :is_in_errata, "NO"
 
@@ -55,23 +49,23 @@ class JiraBug < ActiveRecord::Base
   # request to JIRA.
   # Save this new instance into the database.
   def self.create_from_jira_info(jira_info, package_id, current_user)
-    jiraBug = JiraBug.new
-    jiraBug.package_id = package_id
-    jiraBug.reporter = current_user.id
-    jiraBug.type = jira_info["type"]
-    jiraBug.priority = jira_info["priority"]
-    jiraBug.components = jira_info["components"]
-
-    jiraBug.save
-    jiraBug
+    jira_bug = JiraBug.new
+    jira_bug.package_id = package_id
+    jira_bug.reporter = current_user.id
+    jira_bug.type = jira_info["type"]
+    jira_bug.priority = jira_info["priority"]
+    jira_bug.components = jira_info["components"]
+    jira_bug.save
+    jira_bug
   end
 
   # Update a JIRA issue from the DB with info from a JIRA request 
   # and then save it to the DB.
-  def self.update_from_jira_info(jira_info, jira_issue_id)
+  def update_from_jira_info(jira_info, jira_issue_id)
     # Grab whatever fields we need for this bug from the jira_info hash.
-    jiraBug.save
-    jiraBug
+    jira_bug.id = jira_issue_id
+    jira_bug.save
+    jira_bug
   end
 
 
@@ -87,21 +81,21 @@ class JiraBug < ActiveRecord::Base
   # authentication using HTTP Cookies.
   # See here for tutorial:
   # https://developer.atlassian.com/display/JIRADEV/JIRA+REST+API+%28Alpha%29+Tutorial#JIRARESTAPI%28Alpha%29Tutorial-UserAuthentication
-  def authenticate(username, password)
+  def self.authenticate(username, password)
     @username = username
     @password = password
   end
 
   # Returns the URI for a given resource:
   # A resource can be 'issue', (just that for now)
-  def make_jira_uri(resource)
+  def self.make_jira_uri(resource)
     JiraBug.JIRA_BASE_URI + JIRA_RESOURCES[resource]
   end
 
   # Send a RESTful request to create a new issue in JIRA.
   # See the following docs for details:
   # https://docs.atlassian.com/jira/REST/latest/#idp1846544
-  def create
+  def self.create
     # params is a dictionary that comes straight from the 
     # current package info page where the 'create jira issue'
     # button is pressed.
@@ -147,7 +141,7 @@ class JiraBug < ActiveRecord::Base
 
   # PUT (update) fields on an existing JIRA issue.
   # See: https://docs.atlassian.com/jira/REST/latest/#idp1908272
-  def update
+  def self.update
     # Put parameters together.
     parameters = {
       # Stuff we're updating.
@@ -175,12 +169,12 @@ class JiraBug < ActiveRecord::Base
 
   # GET an issue from JIRA.
   # See https://docs.atlassian.com/jira/REST/latest/#idp1908272
-  def get
+  def self.get(id)
     # Put together URI of the form: 
     # http://hostname/rest/api/2/issue/{issueIdOrKey}
     
     #uri = make_jira_uri("issue") + params[:jira_issue_id]
-    uri = URI.parse("http://issues.jboss.org/rest/api/2/issue/12410378")
+    uri = URI.parse("http://issues.jboss.org/rest/api/2/issue/" + id)
     request =  Net::HTTP::Get.new(uri.to_s, initheader = {'Content-Type' => 'application/json'})
     req.basic_auth @username, @password
     # Create HTTP request and get response
@@ -208,7 +202,7 @@ class JiraBug < ActiveRecord::Base
   # dictionary of parameters. This JSON must
   # adhere to the issue POST requirements:
   # https://docs.atlassian.com/jira/REST/latest/#idp1846544
-  def create_json_from_dict(parameters)
+  def self.create_json_from_dict(parameters)
     # 
     jira_map = {}
     fields_dict = {}
@@ -247,7 +241,7 @@ class JiraBug < ActiveRecord::Base
 
  # Takes a jira style JSON and flattens it into
   # a regular dictionary.
-  def create_dict_from_json(jira_json)
+  def self.create_dict_from_json(jira_json)
     d = {}
 
     # Grab the fields
@@ -288,14 +282,14 @@ class JiraBug < ActiveRecord::Base
   # Takes a list of hashes with lot's of
   # key value pairs, and returns a list of
   # just values from the wanted key
-  def extract_list(items, key)
+  def self.extract_list(items, key)
     items.map {|item| item[key]}
   end
 
   # Takes a list full of a bunch of values
   # and returns a list full of hashes with
   # the value assigned to a key
-  def inject_list(list, key)
+  def self.inject_list(list, key)
     list.map {|item| Hash[key,item]}
   end
 
