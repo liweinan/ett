@@ -8,9 +8,7 @@ class ErrataCheckController < ApplicationController
 
     render :text => "OK", :status => 202
 
-    # TODO: work-around for now
-    # TODO: should depend on the advisory number in the future
-    task = Task.first(:conditions => ["name = ?", 'jb-eap-6.2.0'])
+    task = Task.first(:conditions => ["advisory = ?", params[:advisory]])
 
     nvrs.each do |nvr|
       pac_name = nvr.gsub(/-[0-9].*/, '')
@@ -39,9 +37,7 @@ class ErrataCheckController < ApplicationController
 
     rpmdiffs = JSON.parse(params['rpmdiffs'])
 
-    # TODO: work-around for now
-    # TODO: should depend on the advisory number in the future
-    task = Task.first(:conditions => ["name = ?", 'jb-eap-6.2.0'])
+    task = Task.first(:conditions => ["advisory = ?", params[:advisory]])
 
     rpmdiffs.each do |rpmdiff|
         nvr = rpmdiff['nvr']
