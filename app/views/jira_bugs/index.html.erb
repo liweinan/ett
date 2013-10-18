@@ -2,12 +2,17 @@
 <table>
 <tr>
 <th>ID</th>
+<th>Key</th>
 <th>Summary</th>
 <th>Reporter</th>
+</tr>
 <% @jira_bugs.each do |jira_bug| %>
-	<td><%= jira_bug.id %></td>
+	<tr>
+	<td><%= jira_bug.jid %></td>
+	<td><%= jira_bug.key %></td>
 	<td><%= jira_bug.summary %></td>
 	<td><%= jira_bug.reporter %></td>
+	</tr>
 <% end %>
 
 </tr>

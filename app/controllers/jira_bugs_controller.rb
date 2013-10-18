@@ -8,6 +8,9 @@ class JiraBugsController < ApplicationController
 
   def show
     @jira_bug = JiraBug.find(params[:id])
+      # Grab the issue info from JIRA
+    jira_info = JiraBug.get(params[:id])
+    @info = jira_info
   end
 
   def create
@@ -23,16 +26,32 @@ class JiraBugsController < ApplicationController
   end
 
   def sync
+    # Authenticate from userinfo
     JiraBug.authenticate("fcanas","trisveryfuzzy")
+
+    # Grab the issue info from JIRA
     jira_info = JiraBug.get(params[:id])
+    @info = jira_info
+
     
-    unless jira_info.blank?
-      if JiraBug.exists?(:id => params[:id]) then
+    # If we get a jira_info back:
+    unless jira_info.nil?
+      # Is it already in database?
+      if JiraBug.exists?(:key => params[:id]) then
+        # Update the local copy
         @jira_bug = JiraBug.find(params[:id])
-        @jira_bug.update_from_jira_info(jira_info, params[:id])
+        JiraBug.update_from_jira_info(jira_info, @jira_bug)
       else
-        @jira_bug = JiraBug.create_from_jira_info(jira_info,params[:package_id].strip, current_user)
+        # Create a new local copy
+        @jira_bug = JiraBug.create_from_jira_info(jira_info)
       end
+    else
+      # If we got nil back, print some error or something
+      respond_to do |format|
+      format.js {
+          render :status => $response.code
+      }
+    end
     end
 
   end

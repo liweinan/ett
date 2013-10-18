@@ -9,13 +9,14 @@ class JiraBug < ActiveRecord::Base
   require 'json'
   require 'uri'
 
+  set_primary_key :key
   belongs_to :creator, :class_name => "User", :foreign_key => "creator_id"
   belongs_to :package, :class_name => "Package", :foreign_key => "package_id"
 
   # http://hostname/rest/api/2/<resource-name>
-  JIRA_BASE_URI = "https://issues.jboss.org/rest/api/2"
-  JIRIA_AUTH_URI = "https://issues.jboss.org/rest/auth"
-  JIRA_RESOURCES = {:issue => "issue"} # TODO: verify which JIRA resources are needed with huwang
+  JIRA_BASE_URI = "https://issues.jboss.org/rest/api/2/"
+  JIRIA_AUTH_URI = "https://issues.jboss.org/rest/auth/"
+  JIRA_RESOURCES = {:issue => "issue/"} # TODO: verify which JIRA resources are needed with huwang
 
   #JIRA_ACTIONS = {:movetoassigned => 'movetoassigned', :movetomodified => 'movetomodified', :accepted => 'accepted', :outofdate => 'outofdate', :done => 'done'}
   JIRA_FIELDS = { 
@@ -37,10 +38,10 @@ class JiraBug < ActiveRecord::Base
   # Verify that these are all correct JIRA statuses:
   JIRA_STATUS = {:open => "Open", :resolved => "Resolved", :closed => "Closed", :in_progress => "In Progress", :reopened => "Reopened"}
 
-  default_value_for :jira_status, 'NEW'
+  #default_value_for :jira_status, 'NEW'
   #default_value_for :jira_action, JIRA_ACTIONS[:done]
-  default_value_for :last_synced_at, Time.now
-  default_value_for :is_in_errata, "NO"
+  #default_value_for :last_synced_at, Time.now
+  #default_value_for :is_in_errata, "NO"
 
 
   # DB JIRA Issue methods: create, update.
@@ -48,22 +49,24 @@ class JiraBug < ActiveRecord::Base
   # Create a new instance of a jira bug from the info passed to us from a RESTful
   # request to JIRA.
   # Save this new instance into the database.
-  def self.create_from_jira_info(jira_info, package_id, current_user)
+  def self.create_from_jira_info(jira_info)
     jira_bug = JiraBug.new
-    jira_bug.package_id = package_id
-    jira_bug.reporter = current_user.id
-    jira_bug.type = jira_info["type"]
-    jira_bug.priority = jira_info["priority"]
-    jira_bug.components = jira_info["components"]
-    jira_bug.save
-    jira_bug
+    JiraBug.update_from_jira_info(jira_info, jira_bug)
   end
 
   # Update a JIRA issue from the DB with info from a JIRA request 
   # and then save it to the DB.
-  def update_from_jira_info(jira_info, jira_issue_id)
+  def self.update_from_jira_info(jira_info, jira_bug)
     # Grab whatever fields we need for this bug from the jira_info hash.
-    jira_bug.id = jira_issue_id
+    jira_bug.jid = jira_info["id"].to_i
+    jira_bug.summary = jira_info["summary"]
+    jira_bug.key = jira_info["key"]
+    #jira_bug.package_id = package_id
+    jira_bug.reporter = jira_info["reporter"]
+    jira_bug.issuetype = jira_info["issuetype"]
+    jira_bug.priority = jira_info["priority"]
+    #jira_bug.components = jira_info["components"]
+    
     jira_bug.save
     jira_bug
   end
@@ -89,7 +92,7 @@ class JiraBug < ActiveRecord::Base
   # Returns the URI for a given resource:
   # A resource can be 'issue', (just that for now)
   def self.make_jira_uri(resource)
-    JiraBug.JIRA_BASE_URI + JIRA_RESOURCES[resource]
+    JIRA_BASE_URI + JIRA_RESOURCES[resource]
   end
 
   # Send a RESTful request to create a new issue in JIRA.
@@ -151,7 +154,7 @@ class JiraBug < ActiveRecord::Base
 
     # Put together URI of the form: 
     # http://hostname/rest/api/2/issue/{issueIdOrKey}
-    uri = make_jira_uri("issue") + params[:jira_issue_id]
+    uri = make_jira_uri(:issue) + params[:jira_issue_id]
     
     # Create HTTP request and get response
     @response = Net::HTTP.put_form(uri, json)
@@ -169,33 +172,31 @@ class JiraBug < ActiveRecord::Base
 
   # GET an issue from JIRA.
   # See https://docs.atlassian.com/jira/REST/latest/#idp1908272
-  def self.get(id)
+  def self.get(issue_key)
     # Put together URI of the form: 
     # http://hostname/rest/api/2/issue/{issueIdOrKey}
     
-    #uri = make_jira_uri("issue") + params[:jira_issue_id]
-    uri = URI.parse("http://issues.jboss.org/rest/api/2/issue/" + id)
-    request =  Net::HTTP::Get.new(uri.to_s, initheader = {'Content-Type' => 'application/json'})
-    req.basic_auth @username, @password
-    # Create HTTP request and get response
-    response = Net::HTTP.new($url_read.host, $url_read.port).start { |http| http.request(req) }
-
-
-    #@response = Net::HTTP.get_response(uri, json)
+    uri = URI.parse(JiraBug.make_jira_uri(:issue) + issue_key)
     
+    request =  Net::HTTP::Get.new(uri.to_s, initheader = {'Content-Type' => 'application/json'})
+    request.basic_auth @username, @password
+
+    # Create HTTP request and get response
+    $response = Net::HTTP.new(uri.host,uri.port)
+    $response.use_ssl = true
+    $response.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    $response = $response.start { |http| http.request(request) }
     # If you want to get the response code
     # response.code will give you that
     
     # Response Handler
-    if @response.class == Net::HTTPOK
+    if $response.class == Net::HTTPOK
       # 200 returns json the "id", a "key", and a "self" (link to issue).
-
-    elsif @response.class == Net::HTTPNotFound
+      dictionary = create_dict_from_json(JSON.parse($response.body))
+    elsif $response.class == Net::HTTPNotFound
       # 404 for 'not found' or user doesn't 'have permission'
-      
+      nil
     end
-
-    dictionary = create_dict_from_json(JSON.parse(response.body))
   end
 
 # Create a correctly formatted json object from a 
