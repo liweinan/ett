@@ -1,0 +1,1 @@
+<tr><td colspan="2">Depends On</td><td colspan="2"><%= @jira_bug["depends_on"].split(',').map { |issue| JiraBug.generate_ref(issue) } %></td></tr>

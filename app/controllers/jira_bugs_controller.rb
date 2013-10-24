@@ -10,10 +10,16 @@ class JiraBugsController < ApplicationController
     JiraBug.authenticate(@username, @password)
 
     begin
-      # The bug:
-      @jira_bug = JiraBug.find(params[:id])
-      # Grab the issue info from JIRA
-      @info = JiraBug.get(params[:id])
+
+        # Is it already in database?
+      if JiraBug.exists?(:key => params[:id]) then
+        # Update the local copy
+        @jira_bug = JiraBug.find(params[:id])
+      else
+        # Grab the issue info from JIRA
+        @info = JiraBug.get(params[:id])
+        @jira_bug = JiraBug.create_from_jira_info(@info)
+      end
     rescue => e
       # Handle errors here
       raise
@@ -48,7 +54,12 @@ class JiraBugsController < ApplicationController
       if JiraBug.exists?(:key => params[:id]) then
         # Update the local copy
         @jira_bug = JiraBug.find(params[:id])
-        JiraBug.update_from_jira_info(@info, @jira_bug)
+
+        unless @jira_bug.nil?
+          JiraBug.update_from_jira_info(@info, @jira_bug)
+        else
+          raise
+        end
       else
         # Create a new local copy
         @jira_bug = JiraBug.create_from_jira_info(@info)

@@ -70,7 +70,7 @@ class JiraBug < ActiveRecord::Base
     jira_bug.components = jira_info["components"].join(',')
     jira_bug.affected_versions = jira_info["versions"].join(',')
     jira_bug.affected_versions = jira_info["fixVersions"].join(',')
-    
+    jira_bug.depends_on = jira_info["depends_on"].join(',')
     jira_bug.save
     jira_bug
   end
@@ -276,7 +276,27 @@ class JiraBug < ActiveRecord::Base
         d[k.to_s]=jira_json[k.to_s]
       end
     end
+
+    # Grab the depends_on
+    d["depends_on"] = JiraBug.extract_depends_on(jira_json)
+
     d # give the d
+  end
+
+  # Gets all "depends on" issue keys from
+  # this bug json
+  def self.extract_depends_on(json)
+    if !json.has_key?("fields") or !json["fields"].has_key?("issuelinks")
+      return []
+    end
+    linksj = json["fields"]["issuelinks"]
+
+    unless linksj.empty?
+      linksl = linksj.map { |issue| issue["outwardIssue"]["key"] if issue.has_key?("outwardIssue") and issue["type"]["outward"].eql? "depends on" }.reject(&:nil?)
+    else
+      return []
+    end
+    return linksl
   end
 
   # Takes a list of hashes with lot's of
@@ -291,6 +311,10 @@ class JiraBug < ActiveRecord::Base
   # the value assigned to a key
   def self.inject_list(list, key)
     list.map {|item| Hash[key,item]}
+  end
+
+  def self.generate_ref(key)
+    return "<a href=\"/jira_bugs/" + key.to_s + "\">" + key.to_s + "</a> "
   end
 
 end
