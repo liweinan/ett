@@ -71,6 +71,7 @@ class JiraBug < ActiveRecord::Base
     jira_bug.affected_versions = jira_info["versions"].join(',')
     jira_bug.affected_versions = jira_info["fixVersions"].join(',')
     jira_bug.depends_on = jira_info["depends_on"].join(',')
+    jira_bug.depended_on_by = jira_info["depended_on_by"].join(',')
     jira_bug.save
     jira_bug
   end
@@ -279,24 +280,33 @@ class JiraBug < ActiveRecord::Base
 
     # Grab the depends_on
     d["depends_on"] = JiraBug.extract_depends_on(jira_json)
+    d["depended_on_by"] = JiraBug.extract_depended_on_by(jira_json)
 
     d # give the d
   end
 
   # Gets all "depends on" issue keys from
   # this bug json
-  def self.extract_depends_on(json)
+  def self.extract_dependency(json, inout)
     if !json.has_key?("fields") or !json["fields"].has_key?("issuelinks")
       return []
     end
     linksj = json["fields"]["issuelinks"]
 
     unless linksj.empty?
-      linksl = linksj.map { |issue| issue["outwardIssue"]["key"] if issue.has_key?("outwardIssue") and issue["type"]["outward"].eql? "depends on" }.reject(&:nil?)
+      linksl = linksj.map { |issue| issue[inout]["key"] if issue.has_key?(inout) and issue["type"]["name"].eql? "Dependency" }.reject(&:nil?)
     else
       return []
     end
     return linksl
+  end
+
+  def self.extract_depends_on(json)
+    return JiraBug.extract_dependency(json, "outwardIssue")
+  end
+
+  def self.extract_depended_on_by(json)
+    return JiraBug.extract_dependency(json, "inwardIssue")
   end
 
   # Takes a list of hashes with lot's of

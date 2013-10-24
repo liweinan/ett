@@ -15,6 +15,7 @@ class CreateJiraBugs < ActiveRecord::Migration
       t.string :fix_versions
       t.string :security
       t.text :depends_on
+      t.text :depended_on_by
     	t.timestamps
     end
   end

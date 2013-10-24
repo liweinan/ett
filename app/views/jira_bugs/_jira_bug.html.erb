@@ -6,7 +6,8 @@
 <%= @ele = :issuetype; render 'jira_bugs/jira_bug_element' %>
 <%= @ele = :priority; render 'jira_bugs/jira_bug_element' %>
 <%= @ele = :security; render 'jira_bugs/jira_bug_element' %>
-<%= render 'jira_bugs/jira_bug_depends_on' %>
+<%= @ele = "depends_on"; render 'jira_bugs/jira_bug_depends_on' %>
+<%= @ele = "depended_on_by"; render 'jira_bugs/jira_bug_depends_on' %>
 </table>
 <!-- Raw Info: -->
 <table>
