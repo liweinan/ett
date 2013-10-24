@@ -10,6 +10,12 @@
 <!-- Raw Info: -->
 <table>
 <tr><td>
-Raw Info: <%= JSON.pretty_generate(@info) %>
+
+<h3> Raw Info: </h3>
+<% unless @info.nil? %>
+		<%= simple_format JSON.pretty_generate(@info) %>
+	<% else %> 
+	None Available.
+	<% end %>
 </tr></td>
 </table>

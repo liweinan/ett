@@ -9,6 +9,8 @@ class JiraBug < ActiveRecord::Base
   require 'json'
   require 'uri'
 
+
+
   set_primary_key :key
   belongs_to :creator, :class_name => "User", :foreign_key => "creator_id"
   belongs_to :package, :class_name => "Package", :foreign_key => "package_id"
@@ -146,29 +148,18 @@ class JiraBug < ActiveRecord::Base
 
   # PUT (update) fields on an existing JIRA issue.
   # See: https://docs.atlassian.com/jira/REST/latest/#idp1908272
-  def self.update
-    # Put parameters together.
-    parameters = {
-      # Stuff we're updating.
-    }
+  def self.update(param_dict)
     # Make JSON out of parameters.
-    json = create_json_from_dict(parameters)
+    json = create_json_from_dict(param_dict)
 
     # Put together URI of the form: 
     # http://hostname/rest/api/2/issue/{issueIdOrKey}
-    uri = make_jira_uri(:issue) + params[:jira_issue_id]
+    uri = URI.parse(JiraBug.make_jira_uri(:issue) + issue_key)
     
     # Create HTTP request and get response
     @response = Net::HTTP.put_form(uri, json)
 
-    # Response Handler
-    if @response.class == Net::HTTPOK
-      # 200 returns json the "id", a "key", and a "self" (link to issue).
-
-    elsif @response.class == Net::HTTPBadRequest
-      # 404 
-      
-    end
+    
 
   end
 
@@ -179,26 +170,32 @@ class JiraBug < ActiveRecord::Base
     # http://hostname/rest/api/2/issue/{issueIdOrKey}
     
     uri = URI.parse(JiraBug.make_jira_uri(:issue) + issue_key)
-    
-    request =  Net::HTTP::Get.new(uri.to_s, initheader = {'Content-Type' => 'application/json'})
-    request.basic_auth @username, @password
+    begin
+      request =  Net::HTTP::Get.new(uri.to_s, initheader = {'Content-Type' => 'application/json'})
+      request.basic_auth @username, @password
 
-    # Create HTTP request and get response
-    $response = Net::HTTP.new(uri.host,uri.port)
-    $response.use_ssl = true
-    $response.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    $response = $response.start { |http| http.request(request) }
-    # If you want to get the response code
-    # response.code will give you that
-    
-    # Response Handler
-    if $response.class == Net::HTTPOK
-      # 200 returns json the "id", a "key", and a "self" (link to issue).
-      dictionary = create_dict_from_json(JSON.parse($response.body))
-    elsif $response.class == Net::HTTPNotFound
-      # 404 for 'not found' or user doesn't 'have permission'
-      nil
+      # Create HTTP request and get response
+      @response = Net::HTTP.new(uri.host,uri.port)
+      @response.use_ssl = true
+      @response.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      @response = @response.start { |http| http.request(request) }
+
+      # Response Handler
+      if @response.class == Net::HTTPOK
+        # 200 returns json the "id", a "key", and a "self" (link to issue).
+        dictionary = create_dict_from_json(JSON.parse(@response.body))  
+        return dictionary
+      elsif @response.class == Net::HTTPUnauthorized
+        raise
+      end
+      
+    # If any of the following errors or Net codes are thrown/returned:
+    rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError, Net::HTTPNotFound,
+      Net::HTTPUnauthorized,Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
+      # Throw exception for the controller to handle
+      raise
     end
+    # Should not reach this point?
   end
 
 # Create a correctly formatted json object from a 
