@@ -518,7 +518,11 @@ class ApplicationController < ActionController::Base
 
   def get_scm_url_brew(pac)
     server = XMLRPC::Client.new('brewhub.devel.redhat.com', '/brewhub', 80)
+      if pac.mead.nil?
+        return nil
+      end
     begin
+
       param = server.call('getBuild', pac.mead)
       if not param.nil?:
         server.call('getTaskRequest', param['task_id'])[0]
