@@ -18,7 +18,7 @@ class JiraBug < ActiveRecord::Base
   # http://hostname/rest/api/2/<resource-name>
   JIRA_BASE_URI = "https://issues.jboss.org/rest/api/2/"
   JIRIA_AUTH_URI = "https://issues.jboss.org/rest/auth/"
-  JIRA_RESOURCES = {:issue => "issue/"} # TODO: verify which JIRA resources are needed with huwang
+  JIRA_RESOURCES = {:issue => "issue/", :issueLink => "issueLink"} # TODO: verify which JIRA resources are needed with huwang
 
   #JIRA_ACTIONS = {:movetoassigned => 'movetoassigned', :movetomodified => 'movetomodified', :accepted => 'accepted', :outofdate => 'outofdate', :done => 'done'}
   JIRA_FIELDS = { 
@@ -181,6 +181,8 @@ class JiraBug < ActiveRecord::Base
       @response.verify_mode = OpenSSL::SSL::VERIFY_NONE
       @response = @response.start { |http| http.request(request) }
 
+      puts "Response: " + @response.code + ":" + @response.message
+
       # Response Handler
       if @response.class == Net::HTTPOK
         # 200 returns json the "id", a "key", and a "self" (link to issue).
@@ -197,6 +199,33 @@ class JiraBug < ActiveRecord::Base
       raise
     end
     # Should not reach this point?
+  end
+
+  def self.post_issuelink(issueLinkJson)
+    uri = URI.parse(JiraBug.make_jira_uri(:issueLink))
+
+    begin
+      request =  Net::HTTP::Post.new(uri.to_s, initheader = {'Content-Type' => 'application/json'})
+      request.basic_auth @username, @password
+      request.body = issueLinkJson
+      @response = Net::HTTP.new(uri.host,uri.port)
+      @response.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      @response = @response.start { |http| http.request(request) }
+      
+      # Response Handler
+      if @response.class == Net::HTTPOK
+        # 200 returns json the "id", a "key", and a "self" (link to issue).
+        return @response
+      else
+        raise
+      end
+
+       # If any of the following errors or Net codes are thrown/returned:
+    rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError, Net::HTTPNotFound,
+      Net::HTTPUnauthorized,Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
+      # Throw exception for the controller to handle
+      raise
+    end
   end
 
 # Create a correctly formatted json object from a 
@@ -321,6 +350,26 @@ class JiraBug < ActiveRecord::Base
   # the value assigned to a key
   def self.inject_list(list, key)
     list.map {|item| Hash[key,item]}
+  end
+
+  # Generates an issueLink json for use with
+  # POST issuelink request to JIRA
+  def self.generate_issuelink_json(inwardIssue, outwardIssue, info)
+    j = { 
+      "type" => { 
+        "name" => "Dependency"},
+      "inwardIssue" => { 
+        "key" => inwardIssue },
+      "outwardIssue" => { 
+        "key" => outwardIssue},
+      "comment" => {
+          "body" => info["body"],
+          "visibility" => {
+            "type" => info["type"],
+            "value" => info["value"]
+          }
+        } 
+      }.to_json
   end
 
   def self.generate_ref(key)
