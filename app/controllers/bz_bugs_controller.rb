@@ -32,7 +32,7 @@ class BzBugsController < ApplicationController
           parameters['assignee'] = email
         end
 
-        @response = Net::HTTP.post_form(bz_bug_creation_uri, parameters)
+        # @response = Net::HTTP.post_form(bz_bug_creation_uri, parameters)
 
         if @response.class == Net::HTTPCreated
           update_bz_pass(params[:pwd])

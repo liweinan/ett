@@ -1,0 +1,4 @@
+<% package.reload %>
+<% if !package.upgrade_bz.nil? %>
+    <%=link_to package.upgrade_bz.bz_id_and_is_in_errata, "#{APP_CONFIG['bugzilla_prefix']}#{package.upgrade_bz.bz_id}", :target => '_blank' %>
+<% end %>

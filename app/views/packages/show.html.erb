@@ -55,7 +55,16 @@ Mead: <%= h @package.mead %>
     <%= render :partial => 'packages/fields/errata' %>
 <% end %>
 
+<% if @package.task.use_bz_integration? %>
+    <div id="upgrade_bz_unique">
+        <%= render :partial => 'bz_bugs/upgrade_bz_bug', :locals => {:bz_bug => @package.upgrade_bz} %>
+    </div>
+<% end %>
+
+
+
 <%= render :partial => 'packages/fields/track_time' %>
+
 
 <% if can_edit_package? @package %>
     <%= link_to 'Edit', :controller => 'packages', :action => 'edit', :id => escape_url(@package.name) %>

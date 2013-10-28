@@ -12,6 +12,7 @@
       <th class='content-list-head'>Summary</th>
     </tr>
     <% package.bz_bugs.each do |bz_bug| %>
+        <% if package.upgrade_bz.nil? || package.upgrade_bz.id != bz_bug.id %>
         <tr id='bz_list_row_<%= bz_bug.id %>'>
           <% if logged_in? %>
               <td id="col_bz_ops_<%= bz_bug.id %>" class="small_font">
@@ -39,6 +40,7 @@
           <td id="col_bz_action_<%= bz_bug.id %>:<%= bz_bug.bz_action %>" class="small_font" style="display: none">
           </td>
         </tr>
+        <% end %>
     <% end %>
   </table>
 </div>

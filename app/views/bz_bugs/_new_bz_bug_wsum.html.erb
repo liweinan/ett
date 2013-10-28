@@ -19,52 +19,29 @@
           <input id="nbb_pwd" value="<%= session[:bz_pass] %>" type="password"/>
         </td>
       </tr>
-      <!--<tr>-->
-        <!--<td style="text-align: right">-->
-          <!--Release (target_release)-->
-        <!--</td>-->
-        <!--<td style="text-align: left">-->
-          <!--<input id="nbb_rel" value="<%# @package.task.target_release %>"/>-->
-        <!--</td>-->
-      <!--</tr>-->
-      <!--<tr>-->
-        <!--<td style="text-align: right">Tag Version (candidate_tag)</td>-->
-        <!--<td style="text-align: left">-->
-          <!--<input id="nbb_tver" value="<%# @package.task.candidate_tag %>"/>-->
-        <!--</td>-->
-      <!--</tr>-->
       <tr>
         <td style="text-align: right">
-            Summary
+          Package Version (ver)
         </td>
         <td style="text-align: left">
-          <input id="nbb_summary" value=""/>
+          <input id="nbb_ver" value="<%= @package.ver %>"/>
         </td>
       </tr>
-
       <tr>
         <td style="text-align: right">
             See Also (Bugzilla ID)
         </td>
         <td style="text-align: left">
-          <input id="nbb_see_also" value=""/>
+          <input id="nbb_wsum_see_also" value=""/>
         </td>
       </tr>
-      <!--<tr>-->
-      <!--<td style="text-align: right">-->
-      <!--Summary-->
-      <!--</td>-->
-      <!--<td style="text-align: left">-->
-      <!--<input id="nbb_sum"/>-->
-      <!--</td>-->
-      <!--</tr>-->
       <tr>
         <td colspan="2" style="text-align: right">
           <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'create_bz_bug_indicator', :msg => "Be patient"} %>
-          <button onclick="createBzBug()">
+          <button onclick="createBzBugWithoutSummary()">
             Create
           </button>
-          <button onclick="hideBzBugForm('new_bz_bug')">
+          <button onclick="hideBzBugForm('new_bz_bug_wsum')">
             Cancel
           </button>
         </td>

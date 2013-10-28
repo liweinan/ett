@@ -136,6 +136,10 @@ class Package < ActiveRecord::Base
     bz_bugs.map {|bz| bz = bz.bz_id }.join(" ")
   end
 
+  def upgrade_bz
+    BzBug.first(:conditions => ['package_id = ? and summary like ?', self.id, "%Upgrade%#{self.name}%"])
+  end
+
   def to_s
     str = "Name: " + name + "\n"
     str += "Created By: " + creator.name + "(#{creator.email})" + "\n"
