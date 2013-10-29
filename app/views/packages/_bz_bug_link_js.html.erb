@@ -119,20 +119,55 @@
         );
     }
 
-    function createBzBug() {
-//        var nbb_rel = document.getElementById('nbb_rel').value;
-//        var nbb_tver = document.getElementById('nbb_tver').value;
+    function createBzBugWithoutSummary() {
         var nbb_ver = document.getElementById('nbb_ver').value;
 
         if (!checkPackageVersionFormat(nbb_ver)) {
             return false;
         }
 
+        var nbb_user = document.getElementById('nbb_user').value;
+        var nbb_pwd = document.getElementById('nbb_pwd').value;
+        var nbb_see_also = document.getElementById('nbb_wsum_see_also').value;
+        alert('yohoo');
+        new Ajax.Request('/bz_bugs',
+                {
+                    method: 'POST',
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function () {
+                        Element.show('create_bz_bug_indicator');
+                    },
+                    onSuccess: function () {
+                        var div = document.getElementById('new_bz_bug_sum_form_div');
+                        Element.hide(div);
+                        div.innerHTML = "";
+                    },
+                    onFailure: function () {
+                        Element.hide('create_bz_bug_indicator');
+                    },
+                    parameters: {
+                        'package_id': '<%=package.id%>',
+                        'type': 'create_bz',
+                        'ver': nbb_ver,
+                        'user': nbb_user,
+                        'pwd': nbb_pwd,
+                        'see_also': nbb_see_also,
+                        'authenticity_token': '<%=form_authenticity_token%>'
+                    }
+                });
+    }
 
-//        var nbb_sum = document.getElementById('nbb_sum').value;
+    function createBzBug() {
+        var nbb_summary = document.getElementById('nbb_summary').value;
         var nbb_user = document.getElementById('nbb_user').value;
         var nbb_pwd = document.getElementById('nbb_pwd').value;
         var nbb_see_also = document.getElementById('nbb_see_also').value;
+
+        if(nbb_summary.trim() == '') {
+            alert('Summary field is empty!');
+            return false;
+        }
 
         new Ajax.Request('/bz_bugs',
                 {
@@ -153,12 +188,10 @@
                     parameters: {
                         'package_id': '<%=package.id%>',
                         'type': 'create_bz',
-//                        'rel': nbb_rel,
-//                        'tver': nbb_tver,
-                        'ver': nbb_ver,
-//                        'sum' : nbb_sum,
+                        'ver': 0,
                         'user': nbb_user,
                         'pwd': nbb_pwd,
+                        'summary': nbb_summary,
                         'see_also': nbb_see_also,
                         'authenticity_token': '<%=form_authenticity_token%>'
                     }
@@ -267,7 +300,7 @@
     function updateBzBugRow(id) {
 
         var colOps = document.getElementById('col_bz_ops_' + id);
-        // alert("colOps: " + colOps);    
+        // alert("colOps: " + colOps);
         renderOps(id, colOps);
 
         var colBzBugId = document.getElementById('col_bz_id_' + id);
@@ -336,34 +369,38 @@
         Element.highlight(row);
     }
 
+    function renderByUpgradeBz(id) {
+        renderPartial(id, 'upgrade_bz_unique', 'bz_bugs/upgrade_bz_bug', '<%=package.id%>');
+    }
+
     function renderBzBugId(id, col) {
         col.className = 'small_font';
-        renderPartial(id, col.id, 'bz_bugs/bz_id');
+        renderPartial(id, col.id, 'bz_bugs/bz_id', '<%=package.id%>');
     }
 
     function renderOps(id, col) {
         col.className = 'small_font';
-        renderPartial(id, col.id, 'bz_bugs/ops');
+        renderPartial(id, col.id, 'bz_bugs/ops', '<%=package.id%>');
     }
 
     function renderBzBugCreator(id, col) {
         col.className = 'small_font';
-        renderPartial(id, col.id, 'bz_bugs/creator');
+        renderPartial(id, col.id, 'bz_bugs/creator', '<%=package.id%>');
     }
 
     function renderBzBugLastSyncedAt(id, col) {
         col.className = 'small_font';
-        renderPartial(id, col.id, 'bz_bugs/last_synced_at');
+        renderPartial(id, col.id, 'bz_bugs/last_synced_at', '<%=package.id%>');
     }
 
     function renderBzBugStatus(id, col) {
         col.className = 'small_font';
-        renderPartial(id, col.id, 'bz_bugs/bz_status');
+        renderPartial(id, col.id, 'bz_bugs/bz_status', '<%=package.id%>');
     }
 
     function renderBzBugSummary(id, col) {
         col.className = 'small_font';
-        renderPartial(id, col.id, 'bz_bugs/summary');
+        renderPartial(id, col.id, 'bz_bugs/summary', '<%=package.id%>');
     }
 
     function deleteRow(rowid) {

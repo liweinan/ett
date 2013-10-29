@@ -139,6 +139,7 @@ class PackagesController < ApplicationController
     last_status_changed_at = @package.status_changed_at
     last_status = Status.find_by_id(@package.status_id)
     old_assignee_email = @package.assignee.email if @package.assignee
+    old_version = @package.ver
 
     unless params[:package][:name].blank?
       cleanup_package_name(params[:package][:name])
@@ -150,6 +151,8 @@ class PackagesController < ApplicationController
     else
       assignee_email = ''
     end
+
+    current_ver = params[:package][:ver] if params[:package].key?(:ver)
 
     # Function to support inline editor to update BZ
     # Input syntax: <Bz1Id> <Bz2Id> <Bz3Id>
@@ -233,7 +236,19 @@ class PackagesController < ApplicationController
                 end
               end
             end
+
           end
+            if !current_ver.nil? and !old_version.nil? and current_ver != old_version
+              errata_bz = @package.upgrade_bz
+              unless errata_bz.nil?
+                new_errata_bz_summary = errata_bz.summary.gsub(old_version, current_ver)
+                params_bz = {:userid => shared_bzauth_user, :pwd => shared_bzauth_pass, :summary => new_errata_bz_summary}
+                update_bug_summary(errata_bz.bz_id, oneway='true', params_bz)
+                errata_bz.bz_action = BzBug::BZ_ACTIONS[:accepted]
+                errata_bz.save
+              end
+            end
+
 
           # status changed
           new_status = Status.find_by_id(params[:package][:status_id].to_i)

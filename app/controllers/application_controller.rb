@@ -1,6 +1,7 @@
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
 require "xmlrpc/client"
+require 'open-uri'
 XMLRPC::Config::ENABLE_NIL_PARSER = true
 class ApplicationController < ActionController::Base
 
@@ -414,6 +415,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
+
   def default_style(css)
     if css.blank?
       "background:#808080;"
@@ -467,7 +469,16 @@ class ApplicationController < ActionController::Base
     link = APP_CONFIG["mead_scheduler"] +
         bz_bug_status_update_url.gsub('<id>', id).gsub('<oneway>', oneway)
     params.each do |key, value|
-      link += "&#{key}=#{value}"
+      link += "&#{key}=#{URI::encode(value)}"
+    end
+    link
+  end
+
+  def generate_bug_summary_update_url(id, oneway, params)
+    link = APP_CONFIG["mead_scheduler"] +
+        APP_CONFIG["bz_bug_summary_update_url"].gsub('<id>', id).gsub('<oneway>', oneway)
+    params.each do |key, value|
+      link += "&#{key}=#{URI::encode(value)}"
     end
     link
   end
@@ -495,6 +506,16 @@ class ApplicationController < ActionController::Base
 
     puts generate_bug_status_update_url(bz_id, oneway, params)
 
+    res = Net::HTTP.start(uri.host, uri.port) do |http|
+      http.request(req)
+    end
+    res
+  end
+
+  def update_bug_summary(bz_id, oneway, params)
+    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+    req = Net::HTTP::Put.new(generate_bug_summary_update_url(
+                                  bz_id, oneway, params))
     res = Net::HTTP.start(uri.host, uri.port) do |http|
       http.request(req)
     end

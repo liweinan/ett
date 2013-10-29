@@ -1,3 +1,5 @@
+require 'net/http'
+
 class Package < ActiveRecord::Base
   versioned # versioned plugin sucks, try to withdrawal the usage of it.
             #  STATUS = [ 'Open', 'Assigned', 'Finished', 'Uploaded', 'Deleted' ]
@@ -136,6 +138,10 @@ class Package < ActiveRecord::Base
     bz_bugs.map {|bz| bz = bz.bz_id }.join(" ")
   end
 
+  def upgrade_bz
+    BzBug.first(:conditions => ['package_id = ? and summary like ?', self.id, "%Upgrade%#{self.name}%"])
+  end
+
   def to_s
     str = "Name: " + name + "\n"
     str += "Created By: " + creator.name + "(#{creator.email})" + "\n"
@@ -179,7 +185,14 @@ class Package < ActiveRecord::Base
   end
 
   def in_shipped_list?
-    !open('/var/www/html/shipped-list') { |f| f.grep("#{name}\n")  }.empty?
+
+    ans = ''
+    Net::HTTP.start('mead.usersys.redhat.com') do |http|
+      resp = http.get("/mead-scheduler/rest/package/eap6/#{name}/shipped")
+      ans = resp.body
+    end
+
+    return ans == "YES"
   end
 
   def brew_and_is_in_errata?

@@ -1,6 +1,11 @@
 if @error.blank?
   if @response.class == Net::HTTPOK
-    page << "updateBzBugRow('#{@bz_bug.id}')"
+    bug = @bz_bug.package.upgrade_bz
+    if !bug.nil? && bug.id == @bz_bug.id
+      page << "renderByUpgradeBz('#{@bz_bug.id}')"
+    else
+      page << "updateBzBugRow('#{@bz_bug.id}')"
+    end
   elsif @response.class == Net::HTTPUnauthorized
     page.alert("Bugzilla account/password not correct.")
   elsif @response.class == Net::HTTPNotFound
