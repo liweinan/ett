@@ -580,7 +580,12 @@ class ApplicationController < ActionController::Base
   end
 
   def query_bz_bug_info(bz_id, user, pwd)
-    Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_query_url"]}#{bz_id}.json?userid=#{extract_username(user)}&pwd=#{pwd}"))
+    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+    req = Net::HTTP::Get.new("/mead-bzbridge/bug/#{bz_id}?userid=#{user}&pwd=#{pwd}")
+    req['Accept'] = 'application/json'
+    response = Net::HTTP.start(uri.host, uri.port) do |http|
+      http.request(req)
+    end
   end
 
   def current_bzuser(params)
@@ -596,7 +601,7 @@ class ApplicationController < ActionController::Base
   end
 
   def get_bz_info(bz_id, userid, pwd)
-    @response = Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_query_url"]}#{bz_id}.json?userid=#{userid}&pwd=#{pwd}"))
+    @response = query_bz_bug_info(bz_id, user_id, pwd)
     bz_info = nil
     if @response.class == Net::HTTPOK
       bz_info = JSON.parse(@response.body)
