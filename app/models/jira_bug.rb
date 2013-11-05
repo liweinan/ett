@@ -9,8 +9,6 @@ class JiraBug < ActiveRecord::Base
   require 'json'
   require 'uri'
 
-
-
   set_primary_key :key
   belongs_to :creator, :class_name => "User", :foreign_key => "creator_id"
   belongs_to :package, :class_name => "Package", :foreign_key => "package_id"
@@ -20,8 +18,8 @@ class JiraBug < ActiveRecord::Base
   JIRIA_AUTH_URI = "https://issues.jboss.org/rest/auth/"
   JIRA_RESOURCES = {:issue => "issue/", :issueLink => "issueLink"} # TODO: verify which JIRA resources are needed with huwang
 
-  #JIRA_ACTIONS = {:movetoassigned => 'movetoassigned', :movetomodified => 'movetomodified', :accepted => 'accepted', :outofdate => 'outofdate', :done => 'done'}
-  JIRA_FIELDS = { 
+  # This dict maps the JIRA fields to their types as seen in the jsons JIRA represents issues with.
+  JIRA_FIELD_TYPES = { 
     :project => "key", 
     :summary => "", 
     :issuetype => "name", 
@@ -39,11 +37,6 @@ class JiraBug < ActiveRecord::Base
 
   # Verify that these are all correct JIRA statuses:
   JIRA_STATUS = {:open => "Open", :resolved => "Resolved", :closed => "Closed", :in_progress => "In Progress", :reopened => "Reopened"}
-
-  #default_value_for :jira_status, 'NEW'
-  #default_value_for :jira_action, JIRA_ACTIONS[:done]
-  #default_value_for :last_synced_at, Time.now
-  #default_value_for :is_in_errata, "NO"
 
 
   # DB JIRA Issue methods: create, update.
@@ -107,33 +100,9 @@ class JiraBug < ActiveRecord::Base
     # params is a dictionary that comes straight from the 
     # current package info page where the 'create jira issue'
     # button is pressed.
-    begin_check_param
-    check_param_user(params)
-    check_param_pwd(params)
-    check_param_ver(params)
-    end_check_param
-    # create parameters hash
-    parameters = {
-      'userid' => params[:user],
-      'pwd' => params[:pwd]
-    # TODO: Find out the params keys for the JIRA fields listed below
-    # Must fill (From Hui Wang):
-    # Project: default is JBoss Enterprise Application Platform
-    # Issue Type: default is task
-    # Summary: user need to fill some info [ see bz for options ]
-    # Assignee: from package info 'assignee'
-    # Reporter: probably same as assignee
-    # Priority: default is Critical
-    # Affect version/s: e.g EAP_EWP 5.2.0.ER1
-    # Fix Version/s: e.g EAP_EWP 5.2.0.ER2
-    # Security Level: default is Public
-    }
-
     # Put together URI:
-    uri = make_jira_uri("issue")
     
     # Create HTTP request and get response
-    @response = Net::HTTP.post_form(uri, parameters)
 
     # Response Handler
     if @response.class == Net::HTTPOK
@@ -143,25 +112,40 @@ class JiraBug < ActiveRecord::Base
       # 400 returns json with list of "errorMessages" and dictionary "errors"
       
     end
-
-
   end
 
   # PUT (update) fields on an existing JIRA issue.
   # See: https://docs.atlassian.com/jira/REST/latest/#idp1908272
   def self.update(param_dict)
     # Make JSON out of parameters.
-    json = create_json_from_dict(param_dict)
+    json = JiraBug.generate_update_json(param_dict)
 
     # Put together URI of the form: 
     # http://hostname/rest/api/2/issue/{issueIdOrKey}
     uri = URI.parse(JiraBug.make_jira_uri(:issue) + issue_key)
     
-    # Create HTTP request and get response
-    @response = Net::HTTP.put_form(uri, json)
+    begin
+      # Create HTTP request and get response
+      request =  Net::HTTP::Put.new(uri.to_s, initheader = {'Content-Type' => 'application/json'})
+      request.basic_auth @username, @password
+      # Create HTTP request and get response
+      @response = Net::HTTP.new(uri.host,uri.port)
+      @response.use_ssl = true
+      @response.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      @response = @response.start { |http| http.request(request) }      
+      
+      # Response Handler
+      if @response.class == Net::HTTPOK
+        # return the response
+        return @response
+      else
+        raise
+      end
 
-    
-
+    rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError, Net::HTTPNotFound,
+      Net::HTTPUnauthorized,Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
+      raise
+    end
   end
 
   # GET an issue from JIRA.
@@ -239,7 +223,7 @@ class JiraBug < ActiveRecord::Base
     
 
     # Do the fields
-    JIRA_FIELDS.each do |k,v|
+    JIRA_FIELD_TYPES.each do |k,v|
       # If field isn't in parameters, skip
       unless parameters.keys.include? k.to_s
         next
@@ -275,7 +259,7 @@ class JiraBug < ActiveRecord::Base
     d = {}
 
     # Grab the fields
-    JIRA_FIELDS.each do |k,v|
+    JIRA_FIELD_TYPES.each do |k,v|
       field = jira_json[:fields.to_s][k.to_s]
 
       
@@ -371,6 +355,16 @@ class JiraBug < ActiveRecord::Base
         } 
       }.to_json
   end
+
+  def self.generate_update_json(edits)
+    j = { "fields" => {} }
+
+    edits.each do |k,v|
+      j["fields"][k.to_s] = v.to_s
+    end
+
+  end
+
 
   def self.generate_ref(key)
     return "<a href=\"/jira_bugs/" + key.to_s + "\">" + key.to_s + "</a> "
