@@ -26,17 +26,29 @@ class JiraBugsController < ApplicationController
     end
   end
 
+  def new
+  end
+
   def create
   end
 
+  # This edit action should be called when the user 
+  # hits the 'submit' button on an edit issue form.
+  # The params are all of the fields being edited
+  # and the other fields for the bug.
   def edit
+    # submit form must have user_id and user_pwd fields
+    JiraBug.authenticate(params[:user_id], params[:user_pwd])
+    
+    @response = JiraBug.update(params)
+
+    @jira_bug = JiraBug.find(params[:id])
+    @info = JiraBug.get(params[:id])
+    # Update the local copy of the JIRA as well
+    JiraBug.update_from_jira_info(@info, @jira_bug)
   end
 
   def update
-    JiraBug.authenticate(@username,@password)
-
-    # Do stuff in here
-
   end
 
   def destroy

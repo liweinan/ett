@@ -119,6 +119,7 @@ class JiraBug < ActiveRecord::Base
   def self.update(param_dict)
     # Make JSON out of parameters.
     json = JiraBug.generate_update_json(param_dict)
+    issue_key = param_dict[:id]
 
     # Put together URI of the form: 
     # http://hostname/rest/api/2/issue/{issueIdOrKey}
@@ -136,8 +137,8 @@ class JiraBug < ActiveRecord::Base
       
       # Response Handler
       if @response.class == Net::HTTPOK
-        # return the response
-        return @response
+        # return the edited JiraBug info:
+        return JiraBug.get(issue_key)
       else
         raise
       end
