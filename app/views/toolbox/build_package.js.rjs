@@ -4,6 +4,9 @@ begin
   mode = 'wrapper' if params.include? :wrapper_build
   res = submit_build(pac, params[:clentry][:text], 'eap6', mode)
   page.alert(res);
+  if res.start_with?('202')
+    page << "TINY.box.hide()"
+  end
 rescue TypeError => e
   page.alert(e.message)
 end
