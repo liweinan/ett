@@ -1,1 +1,2 @@
+<% package ||= Package.new %>
 <%= render :partial => 'packages/index/field_template', :locals => {:package => package, :field_name => 'brew', :field_type => 'packages/index/field_input', :partial => 'packages/index/brew_col', :style => package.brew_style} %>
