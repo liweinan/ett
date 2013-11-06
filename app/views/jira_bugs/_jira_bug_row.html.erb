@@ -4,6 +4,7 @@
 <td><%= @jira_bug.key %></td>
 <td><a href=<%= @url %>><%= @jira_bug.summary %></a></td>
 <td><%= @jira_bug.components %></td>
-<td><%= @jira_bug.type %></td>
+<td><%= @jira_bug.issuetype %></td>
 <td><%= @jira_bug.priority %></td>
+<td><%= JiraBug.browse_url(@jira_bug) %></td>
 </tr>

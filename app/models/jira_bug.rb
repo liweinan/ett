@@ -56,7 +56,9 @@ class JiraBug < ActiveRecord::Base
     jira_bug.jid = jira_info["id"].to_i
     jira_bug.summary = jira_info["summary"]
     jira_bug.key = jira_info["key"]
+    jira_bug.security = jira_info["security"]
     #jira_bug.package_id = package_id
+    jira_bug.self = jira_info["self"]
     jira_bug.reporter = jira_info["reporter"]
     jira_bug.issuetype = jira_info["issuetype"]
     jira_bug.priority = jira_info["priority"]
@@ -370,6 +372,15 @@ class JiraBug < ActiveRecord::Base
 
   def self.generate_ref(key)
     return "<a href=\"/jira_bugs/" + key.to_s + "\">" + key.to_s + "</a> "
+  end
+
+  def self.url(jira_bug)
+    return "<a href=" + jira_bug.self + ">" + jira_bug.self + "</a>"
+  end
+
+  def self.browse_url(jira_bug)
+    url = "http://issues.jboss.org/browse/" + jira_bug.key
+    return "<a href=" + url + ">" + url + "</a>"
   end
 
 end

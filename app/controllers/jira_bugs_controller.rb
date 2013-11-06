@@ -28,11 +28,11 @@ class JiraBugsController < ApplicationController
   def create
   end
 
-  # This edit action should be called when the user 
+  # This update action should be called when the user 
   # hits the 'submit' button on an edit issue form.
   # The params are all of the fields being edited
   # and the other fields for the bug.
-  def edit
+  def update
     begin_check_param
     check_param_user(params)
     check_param_pwd(params)
@@ -49,7 +49,13 @@ class JiraBugsController < ApplicationController
     JiraBug.update_from_jira_info(@info, @jira_bug)
   end
 
-  def update
+  def edit
+      if JiraBug.exists?(:key => params[:id]) then
+        # Update the local copy
+        @jira_bug = JiraBug.find(params[:id])
+      else
+        @jira_bug = nil
+      end
   end
 
   def destroy

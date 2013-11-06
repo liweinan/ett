@@ -1,7 +1,7 @@
 <% unless @jira_bug.nil? %>
 	<h2><%= @jira_bug.key %></h2>
 	<table>
-	<%= @ele = :id; render 'jira_bugs/jira_bug_element' %>
+	<%= @ele = :jid; render 'jira_bugs/jira_bug_element' %>
 	<%= @ele = :summary; render 'jira_bugs/jira_bug_element' %>
 	<%= @ele = :reporter; render 'jira_bugs/jira_bug_element' %>
 	<%= @ele = :issuetype; render 'jira_bugs/jira_bug_element' %>
@@ -9,6 +9,7 @@
 	<%= @ele = :security; render 'jira_bugs/jira_bug_element' %>
 	<%= @ele = "depends_on"; render 'jira_bugs/jira_bug_depends_on' %>
 	<%= @ele = "depended_on_by"; render 'jira_bugs/jira_bug_depends_on' %>
+	<tr><td colspan="2">URL: </td><td colspan="2"><%= JiraBug.browse_url(@jira_bug) %></td></tr>
 	</table>
 	<table>
 	<tr><td>
@@ -24,7 +25,7 @@
 	<br>
 <% else %>
 <h2><%= params[:id] %>
-No local version of this Issue can be found. Please Sync with JIRA.
+No local copy of this Issue can be found. Please Sync with JIRA.
 <% end %>
 <br>
 <br>
