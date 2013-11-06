@@ -6,19 +6,15 @@ class JiraBugsController < ApplicationController
     @jira_bugs = JiraBug.all
   end
 
-  def show
-    JiraBug.authenticate(@username, @password)
-
+  def show 
     begin
-
         # Is it already in database?
       if JiraBug.exists?(:key => params[:id]) then
         # Update the local copy
+        puts params[:id] + " found."
         @jira_bug = JiraBug.find(params[:id])
       else
-        # Grab the issue info from JIRA
-        @info = JiraBug.get(params[:id])
-        @jira_bug = JiraBug.create_from_jira_info(@info)
+        puts params[:id] + " not found."
       end
     rescue => e
       # Handle errors here
@@ -37,8 +33,13 @@ class JiraBugsController < ApplicationController
   # The params are all of the fields being edited
   # and the other fields for the bug.
   def edit
-    # submit form must have user_id and user_pwd fields
-    JiraBug.authenticate(params[:user_id], params[:user_pwd])
+    begin_check_param
+    check_param_user(params)
+    check_param_pwd(params)
+    end_check_param
+    
+    # Authenticate from userinfo
+    JiraBug.authenticate(params[:jira_user], params[:jira_pass])
     
     @response = JiraBug.update(params)
 
@@ -55,9 +56,13 @@ class JiraBugsController < ApplicationController
   end
 
   def sync
+      begin_check_param
+      check_param_user(params)
+      check_param_pwd(params)
+      end_check_param
     # Authenticate from userinfo
-    JiraBug.authenticate(@username,@password)
-
+    JiraBug.authenticate(params[:jira_user], params[:jira_pass])
+    
     begin
     # Grab the issue info from JIRA
     @info = JiraBug.get(params[:id])
@@ -82,6 +87,28 @@ class JiraBugsController < ApplicationController
       raise
     end
 
+  end
+
+  def check_param_user(params)
+    if params[:jira_user].blank?
+      @err_msg << "Jira account user can't be empty.\n"
+    end
+  end
+
+  def check_param_pwd(params)
+    if params[:jira_pass].blank?
+      @err_msg << "Jira account password can't be empty.\n"
+    end
+  end
+
+  def begin_check_param
+    @err_msg = ''
+  end
+
+  def end_check_param
+    unless @err_msg.blank?
+      raise ArgumentError, @err_msg
+    end
   end
  
 end

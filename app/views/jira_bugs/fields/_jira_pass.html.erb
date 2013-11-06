@@ -1,0 +1,10 @@
+<% id ||= nil %>
+<% style ||= 'text-align: left' %>
+<tr>
+  <td style="<%= style %>">
+    JIRA account password
+  </td>
+  <td style="<%= style %>">
+    <input id="jira_pass" name="jira_pass" value="<%= session[:jira_pass] %>" type="password"/>
+  </td>
+</tr>

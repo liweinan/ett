@@ -83,7 +83,8 @@ class JiraBug < ActiveRecord::Base
   # See here for tutorial:
   # https://developer.atlassian.com/display/JIRADEV/JIRA+REST+API+%28Alpha%29+Tutorial#JIRARESTAPI%28Alpha%29Tutorial-UserAuthentication
   def self.authenticate(username, password)
-    @username = username
+    # JIRA doesn't use the full email, only the userid before the '@'
+    @username = username.partition('@').first
     @password = password
   end
 
@@ -138,7 +139,7 @@ class JiraBug < ActiveRecord::Base
       # Response Handler
       if @response.class == Net::HTTPOK
         # return the edited JiraBug info:
-        return JiraBug.get(issue_key)
+        
       else
         raise
       end
