@@ -175,14 +175,14 @@ class JiraBug < ActiveRecord::Base
         dictionary = create_dict_from_json(JSON.parse(@response.body))  
         return dictionary
       elsif @response.class == Net::HTTPUnauthorized
-        raise
+        raise ArgumentError, "Jira did not recognize that username and/or password."
       end
       
     # If any of the following errors or Net codes are thrown/returned:
     rescue Timeout::Error, Errno::EINVAL, Errno::ECONNRESET, EOFError, Net::HTTPNotFound,
       Net::HTTPUnauthorized,Net::HTTPBadResponse, Net::HTTPHeaderSyntaxError, Net::ProtocolError => e
       # Throw exception for the controller to handle
-      raise
+      raise e
     end
     # Should not reach this point?
   end

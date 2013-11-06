@@ -67,6 +67,11 @@ class JiraBugsController < ApplicationController
     # Grab the issue info from JIRA
     @info = JiraBug.get(params[:id])
 
+    if @info.nil?
+      # handle 
+      raise ArgumentError, "Jira did not find an issue by that key."
+    end
+
       # Is it already in database?
       if JiraBug.exists?(:key => params[:id]) then
         # Update the local copy
@@ -84,7 +89,7 @@ class JiraBugsController < ApplicationController
   
     rescue => e
       # Handle errors here
-      raise
+      raise e
     end
 
   end
