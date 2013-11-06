@@ -1,4 +1,5 @@
 <% package ||= Package.new %>
+<% field_name ||= '' %>
 <span id='pac_<%= package.id %>_<%= field_name %>_field'>
   <%= render :partial => partial, :locals => {:package => package, :field_name => field_name} %>
 </span>

@@ -196,6 +196,7 @@ class Package < ActiveRecord::Base
   end
 
   def brew_and_is_in_errata?
+    brew ||= ''
     if !in_errata.blank? and !brew.blank? and (in_errata == brew)
         "✔  " + brew
     elsif brew and (!can_be_shipped? or !in_shipped_list?)
