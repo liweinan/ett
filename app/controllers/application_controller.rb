@@ -656,4 +656,14 @@ class ApplicationController < ActionController::Base
       params[:request_path]
     end
   end
+
+  def build_type(package)
+    Net::HTTP.get('mead.usersys.redhat.com', "/mead-scheduler/rest/package/eap6/#{package}/type")
+  end
+
+  def repolib_wrapper_or_rpm?(package)
+    build = build_type(package)
+    return (build == 'REPOLIB_WRAPPER') || (build == "NON_WRAPPER")
+  end
+
 end

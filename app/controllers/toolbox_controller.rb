@@ -73,10 +73,8 @@ class ToolboxController < ApplicationController
 
     pac = Package.find(@package_id)
     @error = nil
-    unless !pac.status.blank? && pac.status.code == 'inprogress' &&
-           !pac.user.nil?
-          # temp hack
-           # !pac.git_url.blank? &&
+    if pac.status.blank? || pac.status.code != 'inprogress' ||
+       pac.user.nil? || (pac.git_url.blank? && !repolib_wrapper_or_rpm?(pac.name))
       @error = "You can only use the Build Button when the Git-Url is provided," \
                " the status is 'InProgress' and there is an assignee to this package"
     end
