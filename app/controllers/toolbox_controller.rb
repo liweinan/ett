@@ -71,10 +71,14 @@ class ToolboxController < ApplicationController
   def submit_build
     @package_id = params[:id]
 
-    pac = Package.find(@package_id)
+    @pac = Package.find(@package_id)
+    # metaprogramming
+    @clentry = Object.new
+    @clentry.class.module_eval { attr_accessor :text }
+    @clentry.text = "- "
     @error = nil
-    if pac.status.blank? || pac.status.code != 'inprogress' ||
-       pac.user.nil? || (pac.git_url.blank? && !repolib_wrapper_or_rpm?(pac.name))
+    if @pac.status.blank? || @pac.status.code != 'inprogress' ||
+       @pac.user.nil? || (@pac.git_url.blank? && !repolib_wrapper_or_rpm?(@pac.name))
       @error = "You can only use the Build Button when the Git-Url is provided," \
                " the status is 'InProgress' and there is an assignee to this package"
     end
@@ -82,5 +86,4 @@ class ToolboxController < ApplicationController
     render :layout => false
 
   end
-
 end
