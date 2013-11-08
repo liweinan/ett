@@ -177,7 +177,7 @@ class Package < ActiveRecord::Base
   end
 
   def nvr_and_nvr_in_errata?
-    if in_errata and brew and (in_errata == brew):
+    if in_errata and brew and (in_errata == brew)
       brew + " ✔  In Errata!"
     else
       brew
