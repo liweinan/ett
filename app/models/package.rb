@@ -13,15 +13,15 @@ class Package < ActiveRecord::Base
   MEAD_ACTIONS = {:open => 'open', :needsync => 'needsync', :done => 'done'}
 
   RPMDIFF_INFO = {
-    0 => {:status => "PASSED", :style => "background-color: #b5f36d;"},
-    1 => {:status => "INFO", :style => "background-color: #b5f36d;"},
-    2 => {:status => "WAIVED", :style => "background-color: #b5f36d;"},
-    3 => {:status => "NEEDS INSPECTION", :style => "background-color: #ff5757;"},
-    4 => {:status => "FAILED", :style => "background-color: #ff5757;"},
-    498 => {:status => "TEST IN PROGRESS", :style => "background-color: #b2f4ff;"},
-    499 => {:status => "UNPACKING FILES", :style => "background-color: #b2f4ff;"},
-    500 => {:status => "QUEUED FOR TEST", :style => "background-color: #b2f4ff;"},
-    -1 => {:status => "DUPLICATE", :style => "background-color: #b2ffa1;"}
+      0 => {:status => "PASSED", :style => "background-color: #b5f36d;"},
+      1 => {:status => "INFO", :style => "background-color: #b5f36d;"},
+      2 => {:status => "WAIVED", :style => "background-color: #b5f36d;"},
+      3 => {:status => "NEEDS INSPECTION", :style => "background-color: #ff5757;"},
+      4 => {:status => "FAILED", :style => "background-color: #ff5757;"},
+      498 => {:status => "TEST IN PROGRESS", :style => "background-color: #b2f4ff;"},
+      499 => {:status => "UNPACKING FILES", :style => "background-color: #b2f4ff;"},
+      500 => {:status => "QUEUED FOR TEST", :style => "background-color: #b2f4ff;"},
+      -1 => {:status => "DUPLICATE", :style => "background-color: #b2ffa1;"}
   }
   acts_as_textiled :notes
   acts_as_commentable
@@ -63,7 +63,7 @@ class Package < ActiveRecord::Base
 
   def can_edit_version?
     if status.respond_to?(:code)
-        status.code != Status::CODES[:finished]
+      status.code != Status::CODES[:finished]
     else
       true
     end
@@ -124,6 +124,7 @@ class Package < ActiveRecord::Base
 
     return true
   end
+
   def all_relationships_of(relationship_name = nil)
     relationship = Relationship.find_by_name(relationship_name)
     unless relationship.blank?
@@ -135,7 +136,7 @@ class Package < ActiveRecord::Base
   end
 
   def bzs_flatten
-    bz_bugs.map {|bz| bz = bz.bz_id }.join(" ")
+    bz_bugs.map { |bz| bz = bz.bz_id }.join(" ")
   end
 
   def upgrade_bz
@@ -162,9 +163,9 @@ class Package < ActiveRecord::Base
     bz_bugs.each do |bug|
 
       if (bug.bz_status == "MODIFIED") &&
-         (bug.summary.include? "Upgrade") &&
-         (bug.component.include? "RPMs") &&
-         (bug.keywords.include? "Rebase")
+          (bug.summary.include? "Upgrade") &&
+          (bug.component.include? "RPMs") &&
+          (bug.keywords.include? "Rebase")
         errata_bz.push bug.bz_id
       end
     end
@@ -176,8 +177,8 @@ class Package < ActiveRecord::Base
     return bz_bugs.map { |bug| bug["bz_id"] }
   end
 
-  def nvr_and_nvr_in_errata?
-    if in_errata and brew and (in_errata == brew)
+  def nvr_in_errata
+    if in_errata?
       brew + " ✔  In Errata!"
     else
       brew
@@ -185,7 +186,6 @@ class Package < ActiveRecord::Base
   end
 
   def in_shipped_list?
-
     ans = ''
     Net::HTTP.start('mead.usersys.redhat.com') do |http|
       resp = http.get("/mead-scheduler/rest/package/eap6/#{name}/shipped")
@@ -195,14 +195,18 @@ class Package < ActiveRecord::Base
     return ans == "YES"
   end
 
-  def brew_and_is_in_errata?
-    if !in_errata.blank? and !brew.blank? and (in_errata == brew)
-        "✔  " + brew
+  def brew_in_errata
+    if in_errata?
+      "✔  " + brew
     elsif brew and (!can_be_shipped? or !in_shipped_list?)
-        "✘  " + brew
+      "✘  " + brew
     else
       brew
     end
+  end
+
+  def in_errata?
+    !in_errata.blank? and !brew.blank? and (in_errata.strip == brew.strip)
   end
 
   def rpmdiff_info
