@@ -1,12 +1,15 @@
-<% package ||= Package.new %>
-<% style||='' %>
-<% field_name = field_name.camelcase %>
-<td id="pac_<%= package.id %>_<%= field_name %>_td" style='font-size:10px;text-align:left;<%= style %>;' onmouseover="show_pac_btn('pac_<%= package.id %>_<%= field_name %>', '<%=field_type%>');" onmouseout="hide_pac_btn('pac_<%= package.id %>_<%= field_name %>', '<%=field_type%>');">
-  <span id='pac_<%= package.id %>_<%= field_name %>_switch' style="display:none;">&nbsp;</span>
-  <%= render :partial => 'packages/index/field_col', :locals => {:partial => partial, :package => package, :field_name => field_name} %>
-  <span id='pac_<%= package.id %>_<%= field_name %>_editor' style="display:none">
+<% unless package.blank? %>
+    <% style||='' %>
+    <% field_name = field_name.camelcase %>
+    <td id="pac_<%= package.id %>_<%= field_name %>_td" style='font-size:10px;text-align:left;<%= style %>;' onmouseover="show_pac_btn('pac_<%= package.id %>_<%= field_name %>', '<%=field_type%>');" onmouseout="hide_pac_btn('pac_<%= package.id %>_<%= field_name %>', '<%=field_type%>');">
+      <span id='pac_<%= package.id %>_<%= field_name %>_switch' style="display:none;">&nbsp;</span>
+      <%= render :partial => 'packages/index/field_col', :locals => {:partial => partial, :package => package, :field_name => field_name} %>
+      <span id='pac_<%= package.id %>_<%= field_name %>_editor' style="display:none">
   &nbsp;
   </span>
-  <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "pac_#{package.id}_#{field_name}_indicator"} %>
-  <span id='pac_<%= package.id %>_<%= field_name %>_-<%=field_type%>-_btn' style="display:none;">&nbsp;</span>
-</td>
+      <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "pac_#{package.id}_#{field_name}_indicator"} %>
+      <span id='pac_<%= package.id %>_<%= field_name %>_-<%= field_type %>-_btn' style="display:none;">&nbsp;</span>
+    </td>
+<% else %>
+    <td></td>
+<% end %>

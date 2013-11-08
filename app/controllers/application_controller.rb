@@ -93,9 +93,10 @@ class ApplicationController < ActionController::Base
   end
 
   def deleted_style(package)
-    if package.deleted?
+    if !package.blank? && package.deleted?
       'text-decoration:line-through;'
     end
+    ''
   end
 
   def can_delete_comment?(comment)

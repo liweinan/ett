@@ -1,3 +1,4 @@
+<% unless package.blank? %>
 <%
    begin
      package.reload
@@ -8,4 +9,5 @@
 <% ub = package.upgrade_bz %>
 <% unless ub.blank? %>
     <%=link_to ub.bz_id_and_is_in_errata, "#{APP_CONFIG['bugzilla_prefix']}#{ub.bz_id}", :target => '_blank' %>
+<% end %>
 <% end %>

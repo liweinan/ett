@@ -1,15 +1,17 @@
-<% @show_progress ||= false %>
+<% unless package.blank? %>
+    <% @show_progress ||= false %>
 
-<% if @show_progress %>
-    <span onmouseover="Element.show('amt_<%=package.id%>')" onmouseout="Element.hide('amt_<%=package.id%>')">
+    <% if @show_progress %>
+        <span onmouseover="Element.show('amt_<%=package.id%>')" onmouseout="Element.hide('amt_<%=package.id%>')">
     <span id="manual_time_track_component_<%= package.id %>_btn"></span>
     <span id="manual_time_track_component_<%= package.id %>_amt"></span>
     </span>
-    <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "manual_time_track_component_#{package.id}_indicator"} %>
-<% end %>
+        <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "manual_time_track_component_#{package.id}_indicator"} %>
+    <% end %>
 
-<% if params[:user] %>
-    <%= link_to "#{package.name}", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :task_id => escape_url(package.task.name), :user => params[:user] %>
-<% else %>
-    <%= link_to "#{package.name}", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :task_id => escape_url(package.task.name) %>
+    <% if params[:user] %>
+        <%= link_to "#{package.name}", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :task_id => escape_url(package.task.name), :user => params[:user] %>
+    <% else %>
+        <%= link_to "#{package.name}", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :task_id => escape_url(package.task.name) %>
+    <% end %>
 <% end %>

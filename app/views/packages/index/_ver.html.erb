@@ -1,1 +1,3 @@
+<% unless package.blank? %>
 <%= render :partial => 'packages/index/field_template', :locals => {:package => package, :field_name => 'ver', :field_type => 'packages/index/field_input', :partial => 'packages/index/ver_col', :style => package.version_style} %>
+<% end %>
