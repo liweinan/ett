@@ -74,7 +74,9 @@ module ApplicationHelper
   def submit_build(pac, clentry, prod, mode)
     uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
 
-    params_build = URI.encode("mode=#{mode}&userid=#{pac.user.email.gsub('@redhat.com', '')}&sources=#{pac.git_url}&clentry=#{clentry}")
+    # stupid URI.encode cannot encode the '+' sign
+    params_build = "mode=#{mode}&userid=#{pac.user.email.gsub('@redhat.com', '')}" + "&sources=#{url_encode(pac.git_url)}&clentry=#{url_encode(clentry)}"
+    puts params_build
     req = Net::HTTP::Post.new("/mead-scheduler/rest/build/sched/#{prod}/#{pac.name}?" + params_build)
 
     res = Net::HTTP.start(uri.host, uri.port) do |http|
