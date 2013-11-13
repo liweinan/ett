@@ -41,4 +41,12 @@ class Task < ActiveRecord::Base
     end
   end
 
+  def use_bz_integration?
+    if setting.blank?
+      false
+    else
+      setting.use_jira_integration?
+    end
+  end
+
 end
