@@ -85,11 +85,9 @@ module ApplicationHelper
 
     case res.code
     when "202"
-        "202: Successfully queued package #{pac.name} for building in prod: #{prod}"
+        "Success: #{res.body}"
     when "400"
-        "400: Bad Request: One of the mandatory paramenters is missing or has an invalid value.\n
-        Parameters used:  #{params.to_json} \n
-        #{res.body}"
+        "#{res.body}"
     when "409"
         "409: Rejected, build already scheduled for this package \n #{res.body}"
     else
