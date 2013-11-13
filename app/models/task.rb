@@ -37,15 +37,23 @@ class Task < ActiveRecord::Base
     if setting.blank?
       false
     else
-      setting.use_bz_integration?
+      setting.use_bz_integration? == 'Yes'
     end
   end
 
-  def use_bz_integration?
+  def use_jira_integration?
     if setting.blank?
       false
     else
-      setting.use_jira_integration?
+      setting.use_jira_integration? == 'Yes'
+    end
+  end
+
+  def use_mead_integration?
+    if setting.blank?
+      false
+    else
+      setting.use_mead_integration? == 'Yes'
     end
   end
 

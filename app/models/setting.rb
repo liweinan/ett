@@ -155,4 +155,8 @@ class Setting < ActiveRecord::Base
     use_mead_integration == 'Yes'
   end
 
+  def use_jira_integration?
+    use_jira_integration == 'Yes'
+  end
+
 end
