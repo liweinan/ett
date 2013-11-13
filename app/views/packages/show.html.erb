@@ -24,14 +24,12 @@ Last Modified At:
 <%= at_zone(@package.updated_at) %>
 <%= render :partial => 'layouts/sep_tiny' %>
 
-
 Status:
 <% unless @package.status.blank? %>
     <span style="<%= default_style(@package.status.style) %>">&nbsp;</span>
     <%= h @package.status.name %>
 <% end %>
 <%= render :partial => 'layouts/sep_tiny' %>
-
 
 Tags:
 <% unless @package.tags.blank? %>
@@ -44,7 +42,8 @@ Tags:
 GitUrl: <%= h @package.git_url %>
 <%= render :partial => 'layouts/sep_tiny' %>
 
-RPM: <%= h @package.nvr_and_nvr_in_errata? %>
+Brew: <%= h @package.nvr_in_errata %>
+
 <%= render :partial => 'layouts/sep_tiny' %>
 
 Mead: <%= h @package.mead %>
@@ -56,7 +55,16 @@ Mead: <%= h @package.mead %>
     <%= render :partial => 'packages/fields/errata' %>
 <% end %>
 
+<% if @package.task.use_bz_integration? %>
+    <div id="upgrade_bz_unique">
+        <%= render :partial => 'bz_bugs/upgrade_bz_bug', :locals => {:bz_bug => @package.upgrade_bz} %>
+    </div>
+<% end %>
+
+
+
 <%= render :partial => 'packages/fields/track_time' %>
+
 
 <% if can_edit_package? @package %>
     <%= link_to 'Edit', :controller => 'packages', :action => 'edit', :id => escape_url(@package.name) %>

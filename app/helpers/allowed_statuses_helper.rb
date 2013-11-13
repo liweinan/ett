@@ -1,0 +1,2 @@
+module AllowedStatusesHelper
+end

@@ -1,0 +1,52 @@
+<%@package = Package.find(params[:package_id])%>
+<h3>Create a new bug in Bugzilla</h3>
+<form onsubmit="return false;">
+  <div class='manage-tbl'>
+    <table>
+      <tr>
+        <td style="text-align: right">
+          Bugzilla account
+        </td>
+        <td style="text-align: left">
+          <input id="nbb_user" value="<%= current_user.email %>"/>
+        </td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+          Bugzilla account password
+        </td>
+        <td style="text-align: left">
+          <input id="nbb_pwd" value="<%= session[:bz_pass] %>" type="password"/>
+        </td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+          Package Version (ver)
+        </td>
+        <td style="text-align: left">
+          <input id="nbb_ver" value="<%= @package.ver %>"/>
+        </td>
+      </tr>
+      <tr>
+        <td style="text-align: right">
+            See Also (Bugzilla ID)
+        </td>
+        <td style="text-align: left">
+          <input id="nbb_wsum_see_also" value=""/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align: right">
+          <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'create_bz_bug_indicator', :msg => "Be patient"} %>
+          <button onclick="createBzBugWithoutSummary()">
+            Create
+          </button>
+          <button onclick="hideBzBugForm('new_bz_bug_wsum')">
+            Cancel
+          </button>
+        </td>
+      </tr>
+    </table>
+  </div>
+</form>
+<%= render :partial => "layouts/sep" %>

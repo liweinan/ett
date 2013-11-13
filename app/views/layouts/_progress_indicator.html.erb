@@ -1,6 +1,7 @@
+<% progress_indicator_id ||= '' %>
 <span id='<%= progress_indicator_id %>' style="display:none">
   <%= image_tag 'ajax-loader1.gif' %>
-  <% msg ||= nil %>
+  <% msg ||= '' %>
   <% unless msg.blank? %>
   <%= msg %>
   <% end %>

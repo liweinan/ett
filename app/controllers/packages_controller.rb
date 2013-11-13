@@ -10,7 +10,6 @@ class PackagesController < ApplicationController
   # GET /packages
   # GET /packages.xml
   def index
-    expire_all_fragments
     unless params[:task_id].blank?
       @packages = get_packages(unescape_url(params[:task_id]), unescape_url(params[:tag]), unescape_url(params[:status]), unescape_url(params[:user]))
     end
@@ -110,6 +109,17 @@ class PackagesController < ApplicationController
   # PUT /packages/1
   # PUT /packages/1.xml
   def update
+    # TODO: we'll refactor this method to make it more modular
+
+    # set local shared vals
+    shared_bzauth_user = extract_username(params[:bzauth_user])
+    shared_bzauth_pass = session[:bz_pass]
+    shared_inline_bz_val = params[:flatten_bzs]
+    shared_inline_bzs = nil
+    unless shared_inline_bz_val.blank?
+      shared_inline_bzs =
+          shared_inline_bz_val.split(/\s+/).map { |bz| bz.to_i if bz.to_i > 0 }.compact
+    end
 
     # for Changelog.package_updated
     @orig_package = Package.find(params[:id])
@@ -129,7 +139,7 @@ class PackagesController < ApplicationController
     last_status_changed_at = @package.status_changed_at
     last_status = Status.find_by_id(@package.status_id)
     old_assignee_email = @package.assignee.email if @package.assignee
-
+    old_version = @package.ver
 
     unless params[:package][:name].blank?
       cleanup_package_name(params[:package][:name])
@@ -142,17 +152,63 @@ class PackagesController < ApplicationController
       assignee_email = ''
     end
 
-    # app/controllers/packages_controller.rb:146:in `update'
-    # TODO
-    # function to support inline editor to update BZ
-    # First we check the input format is like: <Bz1Id> <Bz2Id> <Bz3Id>
-    unless params[:flatten_bzs].blank?
-      puts '*' * 100
+    current_ver = params[:package][:ver] if params[:package].key?(:ver)
+
+    # Function to support inline editor to update BZ
+    # Input syntax: <Bz1Id> <Bz2Id> <Bz3Id>
+    if shared_inline_bz_val != nil && shared_inline_bz_val.blank?
+      Package.transaction do
+        @package.bz_bugs.each do |bz_bug|
+          bz_bug.destroy
+        end
+      end
+    end
+
+    unless shared_inline_bzs.blank?
+      Package.transaction do
+        tx_ok = true
+        bad_queries = []
+        new_bug_info_store = []
+        deprecated_bug_store = @package.bz_bugs.clone
+
+        shared_inline_bzs.each do |bz_id|
+          bz_query_resp = query_bz_bug_info(bz_id, shared_bzauth_user, shared_bzauth_pass)
+          if bz_query_resp.class == Net::HTTPOK
+            bz_body = JSON.parse(bz_query_resp.body)
+            existing_bz_bug = @package.bz_bug_with_bz_id(bz_id)
+
+            if existing_bz_bug.blank?
+              new_bug_info_store << bz_body
+            else
+              deprecated_bug_store.delete(existing_bz_bug)
+            end
+          else
+            tx_ok = false # atomic commit. If one bug input has error, cancel the whole tx.
+            if bz_query_resp.class == Net::HTTPNotFound
+              bad_queries << "Not Found: bz" + bz_id.to_s
+            else
+              bad_queries << bz_query_resp.response.code + bz_query_resp.response.message
+            end
+          end
+        end
+
+        if tx_ok
+          new_bug_info_store.each do |bz_bug_info|
+            BzBug.create_from_bz_info(bz_bug_info, @package.id, current_user)
+          end
+
+          deprecated_bug_store.each do |bz_bug|
+            bz_bug.destroy
+          end
+        else
+          @error_message = "Error: #{bad_queries.flatten}"
+        end
+      end
     end
 
     respond_to do |format|
       Package.transaction do
-        if @package.update_attributes(params[:package])
+        if shared_inline_bz_val.blank? && @package.update_attributes(params[:package])
           @package.reload
           # this is needed since we write to @package later in this section of
           # the code. (@package.status_changed_at = Time.now). This messes up
@@ -165,20 +221,34 @@ class PackagesController < ApplicationController
           end
 
           # update the assignee of the bugs if assignee changed
-          # TODO: we don't check if the bz_bug assignee is the same as the old
+          # TODO: we don't check whether the bz_bug assignee is the same as the old
           # one. Will have to fix this someday
-          if old_assignee_email != assignee_email
-            @package.bz_bugs.each do |bz_bug|
-              if bz_bug.summary.match(/^Upgrade/) && !assignee_email.nil? && (bz_bug.component.include? "RPMs") && (bz_bug.keywords.include? "Rebase")
+          if Rails.env.production?
+            if old_assignee_email != assignee_email
+              @package.bz_bugs.each do |bz_bug|
+                if bz_bug.summary.match(/Upgrade/) && !assignee_email.nil? && (!bz_bug.component.blank? && bz_bug.component.include?("RPMs")) && (bz_bug.keywords.include? "Rebase")
 
-                params_bz = {:assignee => assignee_email, :userid => extract_username(params[:bzauth_user]), :pwd => session[:bz_pass], :status => BzBug::BZ_STATUS[:assigned]}
-                update_bug(bz_bug.bz_id, oneway='true', params_bz)
-                bz_bug.bz_assignee = assignee_email
-                bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
-                bz_bug.save
+                  params_bz = {:assignee => assignee_email, :userid => shared_bzauth_user, :pwd => shared_bzauth_pass, :status => BzBug::BZ_STATUS[:assigned]}
+                  update_bug(bz_bug.bz_id, oneway='true', params_bz)
+                  bz_bug.bz_assignee = assignee_email
+                  bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+                  bz_bug.save
+                end
               end
             end
+
           end
+            if !current_ver.nil? and !old_version.nil? and current_ver != old_version
+              errata_bz = @package.upgrade_bz
+              unless errata_bz.nil?
+                new_errata_bz_summary = errata_bz.summary.gsub(old_version, current_ver)
+                params_bz = {:userid => shared_bzauth_user, :pwd => shared_bzauth_pass, :summary => new_errata_bz_summary}
+                update_bug_summary(errata_bz.bz_id, oneway='true', params_bz)
+                errata_bz.bz_action = BzBug::BZ_ACTIONS[:accepted]
+                errata_bz.save
+              end
+            end
+
 
           # status changed
           new_status = Status.find_by_id(params[:package][:status_id].to_i)
@@ -201,14 +271,16 @@ class PackagesController < ApplicationController
               if new_status.code == Status::CODES[:inprogress] && !assignee_email.blank?
 
                 # the bug statuses are waiting to be updated according to https://docspace.corp.redhat.com/docs/DOC-148169
-                @package.bz_bugs.each do |bz_bug|
-                  if bz_bug.summary.match(/^Upgrade/) && bz_bug.bz_assignee == assignee_email
-                    params_bz = {:assignee => assignee_email, :userid => extract_username(params[:bzauth_user]),
-                                 :pwd => session[:bz_pass], :status => BzBug::BZ_STATUS[:assigned]}
+                if Rails.env.production? # TODO we need to write some unit tests to test all the integrations with SOA
+                  @package.bz_bugs.each do |bz_bug|
+                    if bz_bug.summary.match(/Upgrade/) && bz_bug.bz_assignee == assignee_email
+                      params_bz = {:assignee => assignee_email, :userid => shared_bzauth_user,
+                                   :pwd => shared_bzauth_pass, :status => BzBug::BZ_STATUS[:assigned]}
 
-                    update_bug(bz_bug.bz_id, oneway='true', params_bz)
-                    bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
-                    bz_bug.save
+                      update_bug(bz_bug.bz_id, oneway='true', params_bz)
+                      bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+                      bz_bug.save
+                    end
                   end
                 end
               elsif new_status.code == Status::CODES[:finished]
@@ -218,13 +290,13 @@ class PackagesController < ApplicationController
                     # bugzilla immediately
                     # @package.mead_action = Package::MEAD_ACTIONS[:needsync]
                     get_mead_info(@package)
+                    update_source_url_info(@package)
                   end
                 end
 
                 if Rails.env.production?
                   @package.bz_bugs.each do |bz_bug|
-
-                    if bz_bug.summary.match(/^Upgrade/) && bz_bug.bz_assignee == assignee_email
+                    if bz_bug.summary.match(/Upgrade/) && bz_bug.bz_assignee == assignee_email
 
                       comment = "Source URL: #{@package.git_url}\n" +
                           "Mead-Build: #{@package.mead}\n" +
@@ -234,9 +306,9 @@ class PackagesController < ApplicationController
                       params_bz = {:comment => comment,
                                    :milestone => @package.task.milestone,
                                    :assignee => assignee_email,
-                                   :userid => extract_username(params[:bzauth_user]),
+                                   :userid => shared_bzauth_user,
                                    :status => BzBug::BZ_STATUS[:modified],
-                                   :pwd => session[:bz_pass]}
+                                   :pwd => shared_bzauth_pass}
                       add_comment_milestone_status_to_bug(bz_bug.bz_id, params_bz)
 
                       bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
@@ -245,10 +317,6 @@ class PackagesController < ApplicationController
                   end
                 end
 
-                #if has_mead_integration?(@package.task) && params[:_type] == "inline"
-                #  # for inline editor, we get build info immediately
-                #  get_mead_info(@package)
-                #end
               end
             end
 
@@ -315,12 +383,6 @@ class PackagesController < ApplicationController
 
     respond_to do |format|
       format.html {
-        #if params[:user].blank?
-        #  redirect_to(:controller => :packages, :action => :index, :task_id => escape_url(@package.task.name))
-        #else
-        #  redirect_to(:controller => :packages, :action => :index, :task_id => escape_url(@package.task.name), :user => params[:user])
-        #end
-
         redirect_to(:controller => :packages, :action => :show, :task_id => escape_url(@package.task.name), :id => escape_url(@package.name))
       }
     end
@@ -385,6 +447,22 @@ class PackagesController < ApplicationController
     end
   end
 
+  def get_latest_pkgs_from_brew
+    unless params[:secret_key] == 'birdistheword'
+      render :status => :unauthorized, :text => 'Wrong secret key' and return
+    end
+    @packages = get_packages(unescape_url(params[:task_id]), nil, nil, nil)
+    @packages.each do |package|
+      brew_nvr = package.brew
+      if !brew_nvr.nil? && !brew_nvr.empty?
+        package.latest_brew_nvr = get_brew_name(package)
+        package.save
+      end
+    end
+    render :text => params[:task_id]
+
+  end
+
   def export_to_csv
 
     require 'faster_csv'
@@ -396,14 +474,6 @@ class PackagesController < ApplicationController
     csv_string = FasterCSV.generate do |csv|
       # header row
       header_row = ["name", "status", "tags", "assignee", "version", "bz", "git_url", "mead", "brew"]
-      #
-      #get_xattrs(@task, true, false) do |attr|
-      #  if attr.blank?
-      #    header_row << ""
-      #  else
-      #    header_row << attr.downcase
-      #  end
-      #end
 
       csv << header_row
 
@@ -437,13 +507,7 @@ class PackagesController < ApplicationController
         val << package.git_url
         val << package.mead
         val << package.brew
-        #get_xattrs(@task, true, false) do |attr|
-        #  if package.read_attribute(attr).blank?
-        #    val << ""
-        #  else
-        #    val << package.read_attribute(attr)
-        #  end
-        #end
+
 
         csv << val
       end
@@ -499,6 +563,15 @@ class PackagesController < ApplicationController
   end
 
   protected
+
+  def update_source_url_info(package)
+    package.brew_scm_url = get_scm_url_brew(package)
+
+    if package.git_url.nil? || package.git_url.empty?
+      package.git_url = package.brew_scm_url
+    end
+    package.save
+  end
 
   def get_mead_info(package)
     brew_pkg = get_brew_name(package)

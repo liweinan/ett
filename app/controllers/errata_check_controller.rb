@@ -1,15 +1,22 @@
 require 'json'
 class ErrataCheckController < ApplicationController
+
   def sync
     nvrs = JSON.parse(params["nvrs"])
+
+    # advisory = params['advisory']
+
     render :text => "OK", :status => 202
 
+    task = Task.first(:conditions => ["advisory = ?", params[:advisory]])
+
     nvrs.each do |nvr|
-        package = Package.first(:conditions => ["brew = ?", nvr])
-        if package:
-          package.in_errata = nvr
-          package.save
-        end
+      pac_name = nvr.gsub(/-[0-9].*/, '')
+      package = Package.first(:conditions => ["task_id = ? and name = ?", task.id, pac_name])
+      if package
+        package.in_errata = nvr
+        package.save
+      end
     end
   end
 
@@ -24,5 +31,26 @@ class ErrataCheckController < ApplicationController
         bz_bug.save
       end
     end
+  end
+
+  def sync_rpmdiffs
+
+    rpmdiffs = JSON.parse(params['rpmdiffs'])
+
+    task = Task.first(:conditions => ["advisory = ?", params[:advisory]])
+
+    rpmdiffs.each do |rpmdiff|
+        nvr = rpmdiff['nvr']
+        pac_name = nvr.gsub(/-[0-9].*/, '')
+        package = Package.first(:conditions => ["task_id = ? and name = ?", task.id, pac_name])
+
+        if package
+          package.rpmdiff_status = rpmdiff['status']
+          package.rpmdiff_id = rpmdiff['id']
+          package.save
+        end
+
+    end
+    render :text => "OK", :status => 202
   end
 end

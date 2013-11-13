@@ -40,7 +40,7 @@ class BzBug < ActiveRecord::Base
   end
 
   def bz_id_and_is_in_errata
-    if is_in_errata and is_in_errata == "YES"
+    if !is_in_errata.blank? and is_in_errata == "YES"
       bz_id + " ✔"
     else
       bz_id

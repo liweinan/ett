@@ -7,7 +7,7 @@
 <h2><%= h @package.name %></h2>
 
 <%= render :partial => "layouts/error_messages" %>
-<% form_for(@package, :html => {:onsubmit => 'return validateForm();'}) do |f| %>
+<% form_for(@package, :html => {:onsubmit => 'return false;'}) do |f| %>
     <%= f.error_messages %>
     <% if params[:user] %>
         <input type="hidden" id="user" name="user" value="<%= params[:user] %>"/>
@@ -18,10 +18,8 @@
         <%= render :partial => 'packages/fields/name', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/task', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/status', :locals => {:f => f} %>
-        <% if @package.task.use_bz_integration? %>
-            <%= render :partial => 'bz_bugs/fields/bz_user' %>
-            <%= render :partial => 'bz_bugs/fields/bz_pass' %>
-        <% end %>
+        <%= render :partial => 'bz_bugs/fields/bz_user' %>
+        <%= render :partial => 'bz_bugs/fields/bz_pass' %>
         <%= render :partial => 'packages/fields/tags', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/ver', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/git_url', :locals => {:f => f} %>
@@ -44,7 +42,9 @@
                     }
             %>
 
-            <%= f.submit 'Update' %>
+
+            <input type='submit' value='Update' onclick="validateFormAndPostForm();return false;"/>
+
             <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "validate_bz_auth_indicator", :msg => t('validating_bzauth_info')} %>
             <%= render :partial => 'layouts/notification_link',
                        :locals => {:div_id => 'package_edit'} %>
@@ -58,15 +58,8 @@
 
 <% content_for :js do %>
     <script type="text/javascript">
-        var beforeStatus;
-        document.observe("dom:loaded", function () {
-            beforeStatus = document.getElementById('package_status_id').value;
-        });
-
-
-        function validateForm() {
+        function validateFormAndPostForm() {
             var ver = document.getElementById('package_ver').value;
-
 
             if (ver != "") {
                 if (!checkPackageVersionFormat(ver)) {
@@ -74,11 +67,11 @@
                     return false;
                 }
             }
-            <% if @package.task.use_bz_integration? %>
-                return checkBzAuthInfo(null, beforeStatus, document.getElementById('edit_package_<%=@package.id%>'));
-            <% else %>
-                document.getElementById('edit_package_<%=@package.id%>').submit();
-            <% end %>
+
+            var myForm = document.getElementById('edit_package_<%=@package.id%>');
+            var bzauth_user = document.getElementById('bzauth_user');
+            var bzauth_pwd = document.getElementById('bzauth_pwd');
+            checkBzAuthInfoWithCallback(bzauth_user, bzauth_pwd, validate_bz_auth_indicator, function() {myForm.submit();});
         }
     </script>
 <% end %>

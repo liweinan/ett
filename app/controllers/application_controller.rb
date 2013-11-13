@@ -1,6 +1,10 @@
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
+require "xmlrpc/client"
+require 'open-uri'
+XMLRPC::Config::ENABLE_NIL_PARSER = true
 class ApplicationController < ActionController::Base
+
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
   helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_task?, :count_packages, :can_edit_package?, :current_user, :get_task, :has_status?, :has_tag?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :task_has_tags?, :get_xattrs, :background_style, :confirmed?, :default_style
@@ -89,9 +93,10 @@ class ApplicationController < ActionController::Base
   end
 
   def deleted_style(package)
-    if package.deleted?
+    if !package.blank? && package.deleted?
       'text-decoration:line-through;'
     end
+    ''
   end
 
   def can_delete_comment?(comment)
@@ -411,6 +416,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
+
   def default_style(css)
     if css.blank?
       "background:#808080;"
@@ -464,7 +470,16 @@ class ApplicationController < ActionController::Base
     link = APP_CONFIG["mead_scheduler"] +
         bz_bug_status_update_url.gsub('<id>', id).gsub('<oneway>', oneway)
     params.each do |key, value|
-      link += "&#{key}=#{value}"
+      link += "&#{key}=#{URI::encode(value)}"
+    end
+    link
+  end
+
+  def generate_bug_summary_update_url(id, oneway, params)
+    link = APP_CONFIG["mead_scheduler"] +
+        APP_CONFIG["bz_bug_summary_update_url"].gsub('<id>', id).gsub('<oneway>', oneway)
+    params.each do |key, value|
+      link += "&#{key}=#{URI::encode(value)}"
     end
     link
   end
@@ -498,6 +513,16 @@ class ApplicationController < ActionController::Base
     res
   end
 
+  def update_bug_summary(bz_id, oneway, params)
+    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+    req = Net::HTTP::Put.new(generate_bug_summary_update_url(
+                                  bz_id, oneway, params))
+    res = Net::HTTP.start(uri.host, uri.port) do |http|
+      http.request(req)
+    end
+    res
+  end
+
   def add_comment_milestone_status_to_bug(bz_id, params)
     req_link = "/mead-bzbridge/bug/#{bz_id}?oneway=false"
     params.each do |key, value|
@@ -512,6 +537,24 @@ class ApplicationController < ActionController::Base
     puts res.response
   end
 
+
+  def get_scm_url_brew(pac)
+    server = XMLRPC::Client.new('brewhub.devel.redhat.com', '/brewhub', 80)
+      if pac.mead.nil?
+        return nil
+      end
+    begin
+
+      param = server.call('getBuild', pac.mead)
+      if not param.nil?:
+        server.call('getTaskRequest', param['task_id'])[0]
+      else
+        nil
+      end
+    rescue XMLRPC::FaultException => e
+      nil
+    end
+  end
 
   def get_brew_name(pac)
     # TODO: make the tag more robust
@@ -537,6 +580,15 @@ class ApplicationController < ActionController::Base
     bug_info
   end
 
+  def query_bz_bug_info(bz_id, user, pwd)
+    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+    req = Net::HTTP::Get.new("/mead-bzbridge/bug/#{bz_id}?userid=#{user}&pwd=#{pwd}")
+    req['Accept'] = 'application/json'
+    response = Net::HTTP.start(uri.host, uri.port) do |http|
+      http.request(req)
+    end
+  end
+
   def current_bzuser(params)
     extract_username(params[:bzauth_user])
   end
@@ -550,7 +602,7 @@ class ApplicationController < ActionController::Base
   end
 
   def get_bz_info(bz_id, userid, pwd)
-    @response = Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_query_url"]}#{bz_id}.json?userid=#{userid}&pwd=#{pwd}"))
+    @response = query_bz_bug_info(bz_id, user_id, pwd)
     bz_info = nil
     if @response.class == Net::HTTPOK
       bz_info = JSON.parse(@response.body)
@@ -605,4 +657,14 @@ class ApplicationController < ActionController::Base
       params[:request_path]
     end
   end
+
+  def build_type(package)
+    Net::HTTP.get('mead.usersys.redhat.com', "/mead-scheduler/rest/package/eap6/#{package}/type")
+  end
+
+  def repolib_wrapper_or_rpm?(package)
+    build = build_type(package)
+    return (build == 'REPOLIB_WRAPPER') || (build == "NON_WRAPPER")
+  end
+
 end

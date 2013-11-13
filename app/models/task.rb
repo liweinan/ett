@@ -15,6 +15,8 @@ class Task < ActiveRecord::Base
 
   has_one :setting, :class_name => "Setting", :foreign_key => "task_id"
 
+  belongs_to :workflow
+
   acts_as_textiled :description
 
   LINK = {:tag => 0, :package => 1}

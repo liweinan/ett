@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  workflow_id: 1
+  status_id: 1
+  next_statuses: MyText
+
+two:
+  workflow_id: 1
+  status_id: 1
+  next_statuses: MyText

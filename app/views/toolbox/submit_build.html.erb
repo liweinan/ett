@@ -7,9 +7,10 @@
                    :success => "Element.hide('spinner_build_#{@package_id}');
                ") do %>
               <%= hidden_field_tag :package_id, @package_id %>
+              <p> * <%= raw(Time.new.strftime("%a %b %d %Y ") + @pac.assignee.name + " &lt" + @pac.assignee.email + "&gt") %></p>
               <%= text_area(:clentry, :text, :cols => 80, :rows => 10, :placeholder => "Changelog Entry") %>
               <br />
-              <%= label_tag("Wrapper Build") %>
+              <%= label_tag("Wrapper Build Only") %>
               <%= check_box_tag(:wrapper_build, "1") %>
               <br />
               <br />

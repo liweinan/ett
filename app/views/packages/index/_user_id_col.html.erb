@@ -1,4 +1,5 @@
-<% if !package.user_id.blank? %>
+<% package ||= Package.new %>
+<% unless package.user.blank? %>
     <%= h package.user.name %>
 <% else %>
     -

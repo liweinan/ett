@@ -5,4 +5,6 @@
      style = package.status.style
    end
 %>
+<% unless package.blank? %>
 <%= render :partial => 'packages/index/field_template', :locals => {:package => package, :field_name => 'status_id', :field_type => 'statuses/selection_for_tag', :partial => 'packages/index/status_id_col', :style => 'text-align:center;' + style} %>
+<% end %>

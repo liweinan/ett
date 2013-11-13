@@ -11,14 +11,13 @@
   <%= hidden_field_tag :user, params[:user] %>
   <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
   <%= render :partial => field_type, :locals => {:package => Package.find(pac_id), :field_name => field_name} %>
-  <% if field_name == 'StatusId' && package.task.use_bz_integration? %>
-      <% if package.status.blank? %>
-          <input type='submit' value='Submit' onclick='return checkBzAuthInfo(<%=pac_id%>, null, document.getElementById("pac_<%=pac_id%>_StatusId_form"), "<%=field_name%>");'/>
-      <% else %>
-          <input type='submit' value='Submit' onclick='return checkBzAuthInfo(<%=pac_id%>, <%=package.status.id%>, document.getElementById("pac_<%=pac_id%>_StatusId_form"), "<%=field_name%>");'/>
-      <% end %>
+
+  <% needBzAuth = ['StatusId', 'Bz'].include?(field_name) %>
+
+  <% if needBzAuth %>
+      <input type='submit' value='Submit' onclick='var params={"myId":<%=pac_id%>,"myName":"<%=field_name%>","myForm":this.form};validateBzAccountAndPostInlineEditorForm(params);return false;'/>
       <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "validate_bz_auth_indicator_#{pac_id}", :msg => t('validating_bzauth_info')} %>
-<% elsif field_name == 'Ver' %>
+  <% elsif field_name == 'Ver' %>
       <input type='submit' value='Submit' onclick='if (checkPackageVersionFormat(document.getElementById("pac_<%=pac_id%>_Ver_input").value)) { return true; } else { alert("Version format not correct."); return false; }'/>
   <% else %>
       <%= submit_tag 'Update' %>
@@ -26,9 +25,11 @@
   <input type="button" value="Cancel" onclick="hide_pac_editor('pac_<%= pac_id %>_<%=field_name%>','<%=field_type%>')"/>
   <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "pac_#{pac_id}_#{field_name}_spinner"} %>
 
-  <% if field_name == 'StatusId' && package.task.use_bz_integration? %>
+  <% if needBzAuth %>
       <%= render :partial => 'layouts/sep' %>
       <%= render :partial => 'bz_bugs/bz_auth', :locals => {:id => package.id} %>
   <% end %>
 
 </form>
+
+

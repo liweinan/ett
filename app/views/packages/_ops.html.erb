@@ -1,42 +1,44 @@
-<% if logged_in? && has_task? %>
-      <%= link_to 'New Package', :controller => :packages, :action => :new, 
-        :task_id => params[:task_id] %> /
-      <%# render :partial => 'packages/filter' %>
-<% end %>
-<%= link_to 'Search Packages', "/search/packages?task_id=#{ebtag}" %> /
-<% if logged_in? && has_task? && can_manage? %>
-  <a href="/import/<%= escape_url(params[:task_id]) %>">Import Packages</a>
-  / <a href="/import/<%= escape_url(params[:task_id]) %>?ac=update">Update Packages</a>
-  /
+<% if has_task? %>
+    <%= link_to 'New Package', :controller => :packages, :action => :new,
+                :task_id => params[:task_id] %> /
 <% end %>
 
-<%= link_to "Workload", :controller => :packages, :action => :index, 
-  :task_id => escape_url(params[:task_id]), 
-  :user => params[:user], :style => "workload" %> /
-<%= link_to "Time Report", :controller => :packages, :action => :index, 
-  :task_id => escape_url(params[:task_id]), 
-  :user => params[:user], :style => "time_report" %> /
-<%= link_to "Printable Page", :controller => :packages, :action => :index, 
-  :task_id => escape_url(params[:task_id]), :user => params[:user], 
-  :style => 'printable' %> / 
+<%= link_to 'Search Packages', "/search/packages?task_id=#{ebtag}" %> /
+
+<% if has_task? && can_manage? %>
+    <a href="/import/<%= escape_url(params[:task_id]) %>">Import Packages</a>
+    / <a href="/import/<%= escape_url(params[:task_id]) %>?ac=update">Update Packages</a>
+    /
+<% end %>
+
+<%= link_to "Workload", :controller => :packages, :action => :index,
+            :task_id => escape_url(params[:task_id]),
+            :user => params[:user], :style => "workload" %> /
+<%= link_to "Time Report", :controller => :packages, :action => :index,
+            :task_id => escape_url(params[:task_id]),
+            :user => params[:user], :style => "time_report" %> /
+<%= link_to "Printable Page", :controller => :packages, :action => :index,
+            :task_id => escape_url(params[:task_id]), :user => params[:user],
+            :style => 'printable' %> /
 <%= link_to 'Export to CSV', "/packages/export_to_csv/-1?task_id=#{escape_url(params[:task_id])}&tag=#{escape_url(params[:tag])}&status=#{escape_url(params[:status])}&user=#{escape_url(params[:user])}" %>
-<% if logged_in? && has_task? && can_manage? %>
-  <%
-    task_id = Task.find_by_name(unescape_url(params[:task_id])).id
-    setting = Setting.find_by_task_id(task_id)
-    setting_id = -1
-    unless setting.blank?
-       setting_id = setting.id
-    end
-  %>
-  / <%= link_to "Clone Task", :controller => :tasks, :action => :clone, 
-      :id => escape_url(params[:task_id]) %>
-  / <%= link_to "Task Statuses", :controller => :statuses, 
-      :action => :index, :task_id => escape_url(params[:task_id]) %>
-  / <%= link_to "Task Tags", :controller => :tags, :action => :index, 
-      :task_id => escape_url(params[:task_id]) %>
-  / <%= link_to "Task Settings", :controller => :settings, :action =>:show, 
-      :id => setting_id, :task_id => escape_url(params[:task_id]) %>  
+
+<% if has_task? && can_manage? %>
+    <%
+       task_id = Task.find_by_name(unescape_url(params[:task_id])).id
+       setting = Setting.find_by_task_id(task_id)
+       setting_id = -1
+       unless setting.blank?
+         setting_id = setting.id
+       end
+    %>
+    / <%= link_to "Clone Task", :controller => :tasks, :action => :clone,
+                  :id => escape_url(params[:task_id]) %>
+    / <%= link_to "Task Statuses", :controller => :statuses,
+                  :action => :index, :task_id => escape_url(params[:task_id]) %>
+    / <%= link_to "Task Tags", :controller => :tags, :action => :index,
+                  :task_id => escape_url(params[:task_id]) %>
+    / <%= link_to "Task Settings", :controller => :settings, :action => :show,
+                  :id => setting_id, :task_id => escape_url(params[:task_id]) %>
 <% end %>
 
 

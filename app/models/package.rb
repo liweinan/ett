@@ -1,3 +1,5 @@
+require 'net/http'
+
 class Package < ActiveRecord::Base
   versioned # versioned plugin sucks, try to withdrawal the usage of it.
             #  STATUS = [ 'Open', 'Assigned', 'Finished', 'Uploaded', 'Deleted' ]
@@ -10,6 +12,17 @@ class Package < ActiveRecord::Base
   SKIP_FIELDS = ['id', 'updated_at', 'updated_by', 'created_by', 'created_at']
   MEAD_ACTIONS = {:open => 'open', :needsync => 'needsync', :done => 'done'}
 
+  RPMDIFF_INFO = {
+      0 => {:status => "PASSED", :style => "background-color: #b5f36d;"},
+      1 => {:status => "INFO", :style => "background-color: #b5f36d;"},
+      2 => {:status => "WAIVED", :style => "background-color: #b5f36d;"},
+      3 => {:status => "NEEDS INSPECTION", :style => "background-color: #ff5757;"},
+      4 => {:status => "FAILED", :style => "background-color: #ff5757;"},
+      498 => {:status => "TEST IN PROGRESS", :style => "background-color: #b2f4ff;"},
+      499 => {:status => "UNPACKING FILES", :style => "background-color: #b2f4ff;"},
+      500 => {:status => "QUEUED FOR TEST", :style => "background-color: #b2f4ff;"},
+      -1 => {:status => "DUPLICATE", :style => "background-color: #b2ffa1;"}
+  }
   acts_as_textiled :notes
   acts_as_commentable
 
@@ -42,6 +55,7 @@ class Package < ActiveRecord::Base
   default_value_for :status_changed_at, Time.now
   default_value_for :mead_action, MEAD_ACTIONS[:open]
   default_value_for :in_errata, ''
+  default_value_for :rpmdiff_status, ''
 
   def self.per_page
     10
@@ -49,7 +63,7 @@ class Package < ActiveRecord::Base
 
   def can_edit_version?
     if status.respond_to?(:code)
-        status.code != Status::CODES[:finished]
+      status.code != Status::CODES[:finished]
     else
       true
     end
@@ -110,6 +124,7 @@ class Package < ActiveRecord::Base
 
     return true
   end
+
   def all_relationships_of(relationship_name = nil)
     relationship = Relationship.find_by_name(relationship_name)
     unless relationship.blank?
@@ -121,7 +136,11 @@ class Package < ActiveRecord::Base
   end
 
   def bzs_flatten
-    bz_bugs.map {|bz| bz = bz.bz_id }.join(" ")
+    bz_bugs.map { |bz| bz = bz.bz_id }.join(" ")
+  end
+
+  def upgrade_bz
+    BzBug.first(:conditions => ['package_id = ? and summary like ?', self.id, "%Upgrade%#{self.name}%"])
   end
 
   def to_s
@@ -144,9 +163,9 @@ class Package < ActiveRecord::Base
     bz_bugs.each do |bug|
 
       if (bug.bz_status == "MODIFIED") &&
-         (bug.summary.start_with? "Upgrade") &&
-         (bug.component.include? "RPMs") &&
-         (bug.keywords.include? "Rebase")
+          (bug.summary.include? "Upgrade") &&
+          (bug.component.include? "RPMs") &&
+          (bug.keywords.include? "Rebase")
         errata_bz.push bug.bz_id
       end
     end
@@ -158,21 +177,116 @@ class Package < ActiveRecord::Base
     return bz_bugs.map { |bug| bug["bz_id"] }
   end
 
-  def nvr_and_nvr_in_errata?
-    if in_errata and brew and (in_errata == brew):
+  def nvr_in_errata
+    if in_errata?
       brew + " ✔  In Errata!"
     else
       brew
     end
   end
 
-  def brew_and_is_in_errata?
-    if in_errata and brew and (in_errata == brew)
-        "✔  " + brew
+  def in_shipped_list?
+    ans = ''
+    Net::HTTP.start('mead.usersys.redhat.com') do |http|
+      resp = http.get("/mead-scheduler/rest/package/eap6/#{name}/shipped")
+      ans = resp.body
+    end
+
+    return ans == "YES"
+  end
+
+  def brew_in_errata
+    if in_errata?
+      "✔  " + brew
+    elsif brew and (!can_be_shipped? or !in_shipped_list?)
+      "✘  " + brew
     else
       brew
     end
   end
+
+  def in_errata?
+    !in_errata.blank? and !brew.blank? and (in_errata.strip == brew.strip)
+  end
+
+  def rpmdiff_info
+    if rpmdiff_status
+      RPMDIFF_INFO[rpmdiff_status.to_i][:status]
+    else
+      ''
+    end
+  end
+
+  def rpmdiff_link
+    if rpmdiff_id
+      'https://errata.devel.redhat.com/rpmdiff/show/' + rpmdiff_id
+    else
+      ''
+    end
+  end
+
+  def rpmdiff_style
+    if rpmdiff_status
+      RPMDIFF_INFO[rpmdiff_status.to_i][:style]
+    else
+      ''
+    end
+  end
+
+  def brew_style
+    if brew.nil? || brew.empty? || latest_brew_nvr.nil? || latest_brew_nvr.empty?
+      ''
+    elsif brew == latest_brew_nvr
+      ''
+    else
+      "background-color: yellow;"
+    end
+  end
+
+  def get_scm_url_style
+    if git_url.nil? || git_url.empty? || brew_scm_url.nil? || brew_scm_url.empty?
+      ''
+    elsif git_url != brew_scm_url && !can_edit_version?
+      "background-color: yellow;"
+    else
+      ''
+    end
+  end
+
+  def version_style
+
+    if ver.nil? || ver.empty?
+      return ''
+    end
+
+    first_part_ver = ver.gsub(/\.([^.]*)$/, '').gsub('-', '_')
+    second_part_ver = ver.gsub(first_part_ver + '.', '').gsub('-', '_')
+
+    [mead, brew].each do |item|
+      if !item.nil? && !item.empty?
+        if !item.include?(first_part_ver) || !item.include?(second_part_ver)
+          return "background-color: #ff5757;"
+        end
+      end
+    end
+
+    # if they are valid, return empty
+    return ''
+  end
+
+  def bz_bug_with_bz_id(bz_id)
+    if bz_bugs.blank?
+      nil
+    else
+      bz_bugs.each do |bz_bug|
+        if bz_bug.bz_id == bz_id.to_s
+          return bz_bug
+        end
+      end
+      nil
+    end
+  end
+
   protected
 
   def all_from_packages_of(from_relationships, relationship_name)

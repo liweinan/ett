@@ -1,0 +1,3 @@
+<% unless package.blank? %>
+<%= render :partial => 'packages/index/field_template', :locals => {:package => package, :field_name => 'errata_bz', :field_type => 'packages/index/field_input', :partial => 'packages/index/errata_bz_col'} %>
+<% end %>

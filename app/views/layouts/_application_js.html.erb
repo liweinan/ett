@@ -1,14 +1,27 @@
 <%# we put js here because Rails won't process ruby codes in js file %>
 <script type="text/javascript">
 
-    function validateBzAuthInfo(id, bzauth_user, bzauth_pwd, form, inline) {
-        var indicator;
-        if (id) {
-            indicator = "validate_bz_auth_indicator_" + id;
-        } else {
-            indicator = "validate_bz_auth_indicator";
+    function checkBzAuthInfoWithCallback(bzauth_user, bzauth_pwd, indicator, callback, params) {
+        if (checkBzAuthFieldsNotEmpty(bzauth_user, bzauth_pwd)) {
+            validateBzAuthInfoWithCallback(bzauth_user.value, bzauth_pwd.value, indicator, callback, params);
         }
+    }
 
+    function checkBzAuthFieldsNotEmpty(bzauth_user, bzauth_pwd) {
+        if (bzauth_user) {
+            if (bzauth_pwd) {
+                if (bzauth_user.value) {
+                    if (bzauth_pwd.value) {
+                        return true;
+                    }
+                }
+            }
+        }
+        alert("Please input your Bugzilla account/password.");
+        return false;
+    }
+
+    function validateBzAuthInfoWithCallback(bzauth_user, bzauth_pwd, indicator, callback, params) {
         if (bzauth_user)
             if (bzauth_pwd) {
                 new Ajax.Request('/toolbox/verify_bz_pwd',
@@ -25,19 +38,14 @@
                                     alert("<%=t 'bz_auth_failed'%>");
                                 }
                                 else {
-                                    alert("Internal Error: " + response.status);
+                                    alert("Internal Error: " + response.status + "\n" + response.responseText);
                                 }
-                                return false;
                             },
                             onSuccess: function () {
-                                Element.hide(indicator);
-                                if (inline) {
-                                    postInlineEditorForm(id, inline, form);
-                                } else {
-                                    form.submit();
+                                if (callback) {
+                                    callback(params);
                                 }
-
-                                return true;
+                                Element.hide(indicator);
                             },
                             parameters: {
                                 'bzauth_user': bzauth_user,
@@ -46,74 +54,10 @@
                         }
                 );
             }
-        return false;
-    }
-
-    function checkBzAuthFieldsNotEmpty(bzauth_user, bzauth_pwd) {
-        if (bzauth_user) {
-            if (bzauth_pwd) {
-                if (bzauth_user.value) {
-                    if (bzauth_pwd.value) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
     }
 
     function checkPackageVersionFormat(ver) {
         return ver.match(/[\d\.a-zA-Z\-_]+/) == ver;
     }
 
-    function checkBzAuthInfo(id, beforeStatus, form, inline) {
-        var afterStatusElement;
-        var bzauth_user;
-        var bzauth_pwd;
-
-        if (id) {
-            afterStatusElement = document.getElementById('package_status_id_' + id);
-        } else {
-            afterStatusElement = document.getElementById('package_status_id');
-        }
-
-        var afterStatus;
-        if (afterStatusElement) {
-            afterStatus = afterStatusElement.value;
-        }
-
-        if (beforeStatus == afterStatus) { // user has changed status
-            return true;
-        } else {
-            if (id) {
-                bzauth_user = document.getElementById('bzauth_user_' + id);
-                bzauth_pwd = document.getElementById('bzauth_pwd_' + id);
-            } else {
-                bzauth_user = document.getElementById('bzauth_user');
-                bzauth_pwd = document.getElementById('bzauth_pwd');
-            }
-
-            if (checkBzAuthFieldsNotEmpty(bzauth_user, bzauth_pwd)) {
-                return validateBzAuthInfo(id, bzauth_user.value, bzauth_pwd.value, form, inline);
-            }
-        }
-
-        alert("<%=t'need_bzauth_info'%>");
-        return false;
-    }
-
-    function postInlineEditorForm(id, name, form) {
-        new Ajax.Request('/packages/' + id,
-                {
-                    asynchronous: true, evalScripts: true,
-                    onLoading: function (request) {
-                        Element.show('pac_' + id + '_' + name + '_spinner');
-                    },
-                    onSuccess: function (request) {
-
-                    },
-                    parameters: Form.serialize(form)
-                });
-        return false;
-    }
 </script>
