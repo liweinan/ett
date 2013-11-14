@@ -11,7 +11,14 @@ class ErrataCheckController < ApplicationController
     task = Task.first(:conditions => ["advisory = ?", params[:advisory]])
 
     nvrs.each do |nvr|
-      pac_name = nvr.gsub(/-[0-9].*/, '')
+
+      if nvr.start_with? 'sunws-metadata-2.0-api'
+        # TODO: temporary hack to get the correct package name for sunws
+        pac_name = 'sunws-metadata-2.0-api'
+      else
+        pac_name = nvr.gsub(/-[0-9].*/, '')
+      end
+
       package = Package.first(:conditions => ["task_id = ? and name = ?", task.id, pac_name])
       if package
         package.in_errata = nvr
