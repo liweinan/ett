@@ -12,9 +12,9 @@ class ErrataCheckController < ApplicationController
 
     nvrs.each do |nvr|
 
-      if nvr.start_with? 'sunws-metadata-2.0-api'
+      if nvr.start_with? 'sun-ws-metadata-2.0-api'
         # TODO: temporary hack to get the correct package name for sunws
-        pac_name = 'sunws-metadata-2.0-api'
+        pac_name = 'sun-ws-metadata-2.0-api'
       else
         pac_name = nvr.gsub(/-[0-9].*/, '')
       end
