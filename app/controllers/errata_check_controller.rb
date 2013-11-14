@@ -48,7 +48,12 @@ class ErrataCheckController < ApplicationController
 
     rpmdiffs.each do |rpmdiff|
         nvr = rpmdiff['nvr']
-        pac_name = nvr.gsub(/-[0-9].*/, '')
+        if nvr.start_with? 'sun-ws-metadata-2.0-api'
+          # TODO: temporary hack to get the correct package name for sunws
+          pac_name = 'sun-ws-metadata-2.0-api'
+        else
+          pac_name = nvr.gsub(/-[0-9].*/, '')
+        end
         package = Package.first(:conditions => ["task_id = ? and name = ?", task.id, pac_name])
 
         if package
