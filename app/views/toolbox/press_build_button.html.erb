@@ -2,7 +2,7 @@
     <% if @error.nil? %>
         <div style="text-align: left;">
         <% form_remote_tag(
-                   :url => {:controller => "toolbox", :action => "build_package"},
+                   :url => {:controller => "toolbox", :action => "package_ajax_req"},
                    :loading => "Element.show('spinner_build_#{@package_id}');",
                    :success => "Element.hide('spinner_build_#{@package_id}');
                ") do %>
