@@ -54,7 +54,7 @@ class ToolboxController < ApplicationController
     end
   end
 
-  def build_package
+  def package_ajax_req
     respond_to do |format|
       format.js
     end
@@ -69,6 +69,12 @@ class ToolboxController < ApplicationController
   end
 
   def submit_build
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def press_build_button
     @package_id = params[:id]
 
     @pac = Package.find(@package_id)
@@ -84,6 +90,5 @@ class ToolboxController < ApplicationController
     end
 
     render :layout => false
-
   end
 end
