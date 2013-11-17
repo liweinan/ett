@@ -1,2 +1,3 @@
-<% package ||= Package.new %>
+<% unless package.blank? %>
 <%= package.ver %>
+<% end %>

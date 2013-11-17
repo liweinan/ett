@@ -1,5 +1,7 @@
-<% if package.read_attribute(field_name.underscore).blank? %>
-    -
-<% else %>
-    <%= Extractor.extract_url(package.read_attribute(field_name.underscore)) %>
+<% unless package.blank? %>
+    <% if package.read_attribute(field_name.underscore).blank? %>
+        -
+    <% else %>
+        <%= Extractor.extract_url(package.read_attribute(field_name.underscore)) %>
+    <% end %>
 <% end %>

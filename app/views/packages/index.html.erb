@@ -51,7 +51,7 @@ Statuses:
 <% unless tags.blank? %>
     Tags:
     <% tags.each do |tag| %>
-        <%= link_to "#{tag.key} (#{tag.packages_can_show.size})", :controller => :packages, :action => :index, :task_id => params[:task_id], :tag => tag.key %> /
+        <%= link_to "#{tag.key} (#{tag.packages_can_show.length})", :controller => :packages, :action => :index, :task_id => params[:task_id], :tag => tag.key %> /
     <% end %>
 <% end %>
 <% if logged_in? %>

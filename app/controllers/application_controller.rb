@@ -3,6 +3,7 @@
 require "xmlrpc/client"
 require 'open-uri'
 XMLRPC::Config::ENABLE_NIL_PARSER = true
+
 class ApplicationController < ActionController::Base
 
   helper :all # include all helpers, all the time
@@ -546,7 +547,7 @@ class ApplicationController < ActionController::Base
     begin
 
       param = server.call('getBuild', pac.mead)
-      if not param.nil?:
+      if not param.nil?
         server.call('getTaskRequest', param['task_id'])[0]
       else
         nil

@@ -122,7 +122,7 @@ class Package < ActiveRecord::Base
       end
     end
 
-    return true
+    true
   end
 
   def all_relationships_of(relationship_name = nil)
@@ -244,9 +244,9 @@ class Package < ActiveRecord::Base
   end
 
   def get_scm_url_style
-    if git_url.nil? || git_url.empty? || brew_scm_url.nil? || brew_scm_url.empty?
+    if git_url.blank? || brew_scm_url.blank?
       ''
-    elsif git_url != brew_scm_url && !can_edit_version?
+    elsif (git_url != brew_scm_url) && (!can_edit_version?)
       "background-color: yellow;"
     else
       ''
@@ -343,6 +343,5 @@ class Package < ActiveRecord::Base
       Changelog.package_deleted(self)
     end
   end
-
 
 end

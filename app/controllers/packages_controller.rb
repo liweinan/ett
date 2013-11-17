@@ -715,6 +715,4 @@ class PackagesController < ApplicationController
       params[:task_id] = params[:brew_tag_id]
     end
   end
-
-
 end

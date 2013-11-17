@@ -1,5 +1,7 @@
-<% if package.status %>
-    <%= h package.status.name %>
-<% else %>
-    -
+<% unless package.blank? %>
+    <% if package.status %>
+        <%= h package.status.name %>
+    <% else %>
+        -
+    <% end %>
 <% end %>
