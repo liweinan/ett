@@ -5,7 +5,9 @@ require(File.join(File.dirname(__FILE__), 'config', 'boot'))
 
 require 'rake'
 require 'rake/testtask'
-#require 'rake/rdoctask'
-require 'rdoc/task'
-
+begin
+  require 'rake/rdoctask'
+rescue
+  require 'rdoc/task'
+end
 require 'tasks/rails'

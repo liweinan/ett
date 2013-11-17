@@ -57,4 +57,5 @@ Rails::Initializer.run do |config|
   APP_CONFIG = YAML::load(File.open("#{RAILS_ROOT}/config/appconfig.yml"))
 end
 
-ActionController::Base.cache_store = :file_store, "#{RAILS_ROOT}/cache"  
+ActionController::Base.cache_store = :file_store, "#{RAILS_ROOT}/cache"
+
