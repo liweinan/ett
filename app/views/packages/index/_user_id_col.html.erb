@@ -1,7 +1,8 @@
-<% package ||= Package.new %>
+<% unless package.blank? %>
 <% unless package.user.blank? %>
     <%= h package.user.name %>
 <% else %>
     -
+<% end %>
 <% end %>
 

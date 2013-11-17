@@ -1,8 +1,9 @@
-<% if package.tags.size > 0 %>
-    <% package.tags.each do |tag| %>
-        <%= tag.key %> /
+<% unless package.blank? %>
+    <% if package.tags.size > 0 %>
+        <% package.tags.each do |tag| %>
+            <%= tag.key %> /
+        <% end %>
+    <% else %>
+        -
     <% end %>
-<% else %>
-    -
 <% end %>
-

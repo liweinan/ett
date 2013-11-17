@@ -1,15 +1,17 @@
-<%
-   begin
-     package.reload
-   rescue
-     # do nothing on ActiveRecord::RecordNotFound
-   end
-%>
-<% package.bz_bugs.each do |bz| %>
-    <% ub = package.upgrade_bz %>
-    <% if !bz.blank? && bz != ub %>
-        <% unless bz.bz_id.blank? %>
-            <%= link_to bz.bz_id, "#{APP_CONFIG['bugzilla_prefix']}#{bz.bz_id}", :target => '_blank' %>
+<% unless package.blank? %>
+    <%
+       begin
+         package.reload
+       rescue
+         # do nothing on ActiveRecord::RecordNotFound
+       end
+    %>
+    <% package.bz_bugs.each do |bz| %>
+        <% ub = package.upgrade_bz %>
+        <% if !bz.blank? && bz != ub %>
+            <% unless bz.bz_id.blank? %>
+                <%= link_to bz.bz_id, "#{APP_CONFIG['bugzilla_prefix']}#{bz.bz_id}", :target => '_blank' %>
+            <% end %>
         <% end %>
     <% end %>
 <% end %>
