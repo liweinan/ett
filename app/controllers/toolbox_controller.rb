@@ -54,7 +54,7 @@ class ToolboxController < ApplicationController
     end
   end
 
-  def build_package
+  def package_ajax_req
     respond_to do |format|
       format.js
     end
@@ -69,6 +69,12 @@ class ToolboxController < ApplicationController
   end
 
   def submit_build
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def press_build_button
     @package_id = params[:id]
 
     @pac = Package.find(@package_id)
@@ -78,12 +84,11 @@ class ToolboxController < ApplicationController
     @clentry.text = "- "
     @error = nil
     if @pac.status.blank? || @pac.status.code != 'inprogress' ||
-       @pac.user.nil? || (@pac.git_url.blank? && !repolib_wrapper_or_rpm?(@pac.name))
+       @pac.user.nil? || (@pac.git_url.blank? && need_source_url?(@pac.name))
       @error = "You can only use the Build Button when the Git-Url is provided," \
                " the status is 'InProgress' and there is an assignee to this package"
     end
 
     render :layout => false
-
   end
 end

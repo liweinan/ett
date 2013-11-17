@@ -1,0 +1,34 @@
+pac = Package.find(params[:package_id])
+
+source_pkg = pac.name.sub('-eap6', '')
+warning_string = "This will also build the source '#{source_pkg}' package. " \
+                 "If you only want to build the '#{pac.name}' wrapper of it " \
+                 "please select CANCEL and make sure you check the Wrapper " \
+                 "only option before requesting again"
+
+begin
+  type_build = 'chain'
+  type_build = 'wrapper' if params.include?(:wrapper_build)
+
+  page << "var submit = true;"
+  page << "var x = '#{type_build}';"
+  page << "var clentry = '#{params['clentry']['text']}';"
+  page << "var move_fwd = true;"
+  page << "if (x == 'chain') {"
+  page << "  move_fwd = confirm(\"#{warning_string}\");"
+  page << "}"
+  page << "if (move_fwd) {"
+  page << "  new Ajax.Request('/toolbox/submit_build/' + #{params[:package_id]}, {"
+  page << "    method: 'POST',"
+  page << "    asynchronous: true,"
+  page << "    evalScripts: true,"
+  page << "    parameters: {"
+  page << "      'type_build': x,"
+  page << "      'authenticity_token': '#{form_authenticity_token}',"
+  page << "      'clentry': clentry,"
+  page << "    }"
+  page << "  })"
+  page << "}"
+rescue TypeError => e
+  page.alert(e.message)
+end
