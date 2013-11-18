@@ -11,7 +11,7 @@ begin
   is_eap6_pac = pac.name.include?('-eap6')
   page << "var submit = true;"
   page << "var x = '#{type_build}';"
-  page << "var is_eap6_pac = '#{is_eap6_pac}'"
+  page << "var is_eap6_pac = '#{is_eap6_pac}';"
   page << "var clentry = '#{params['clentry']['text']}';"
   page << "var move_fwd = true;"
   page << "if (x == 'chain' && is_eap6_pac) {"
