@@ -37,7 +37,7 @@ class Task < ActiveRecord::Base
     if setting.blank?
       false
     else
-      setting.use_bz_integration? == 'Yes'
+      setting.use_bz_integration?
     end
   end
 
@@ -45,7 +45,7 @@ class Task < ActiveRecord::Base
     if setting.blank?
       false
     else
-      setting.use_jira_integration? == 'Yes'
+      setting.use_jira_integration?
     end
   end
 
@@ -53,7 +53,7 @@ class Task < ActiveRecord::Base
     if setting.blank?
       false
     else
-      setting.use_mead_integration? == 'Yes'
+      setting.use_mead_integration?
     end
   end
 
