@@ -5,16 +5,16 @@ warning_string = "This will also build the source '#{source_pkg}' package. " \
                  "If you only want to build the '#{pac.name}' wrapper of it " \
                  "please select CANCEL and make sure you check the Wrapper " \
                  "only option before requesting again"
-
 begin
   type_build = 'chain'
   type_build = 'wrapper' if params.include?(:wrapper_build)
-
+  is_eap6_pac = pac.name.include?('-eap6')
   page << "var submit = true;"
   page << "var x = '#{type_build}';"
+  page << "var is_eap6_pac = '#{is_eap6_pac}'"
   page << "var clentry = '#{params['clentry']['text']}';"
   page << "var move_fwd = true;"
-  page << "if (x == 'chain') {"
+  page << "if (x == 'chain' && is_eap6_pac) {"
   page << "  move_fwd = confirm(\"#{warning_string}\");"
   page << "}"
   page << "if (move_fwd) {"
