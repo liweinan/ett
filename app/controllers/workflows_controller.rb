@@ -6,7 +6,7 @@ class WorkflowsController < ApplicationController
 
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render :xml => @workflows }
+      format.xml { render :xml => @workflows }
     end
   end
 
@@ -17,7 +17,7 @@ class WorkflowsController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.xml  { render :xml => @workflow }
+      format.xml { render :xml => @workflow }
     end
   end
 
@@ -28,7 +28,7 @@ class WorkflowsController < ApplicationController
 
     respond_to do |format|
       format.html # new.html.erb
-      format.xml  { render :xml => @workflow }
+      format.xml { render :xml => @workflow }
     end
   end
 
@@ -41,14 +41,17 @@ class WorkflowsController < ApplicationController
   # POST /workflows.xml
   def create
     @workflow = Workflow.new(params[:workflow])
+    # In WildBee we should save workflow and allowedStatus in one transaction.
+    # Currently we have to save workflow to get its primary key
+    if @workflow.save # just to get primary id.
+      @workflow.update_transitions(params[:transitions])
 
-    respond_to do |format|
-      if @workflow.save
+      respond_to do |format|
         format.html { redirect_to(@workflow, :notice => 'Workflow was successfully created.') }
-        format.xml  { render :xml => @workflow, :status => :created, :location => @workflow }
-      else
+      end
+    else
+      respond_to do |format|
         format.html { render :action => "new" }
-        format.xml  { render :xml => @workflow.errors, :status => :unprocessable_entity }
       end
     end
   end
@@ -60,11 +63,10 @@ class WorkflowsController < ApplicationController
 
     respond_to do |format|
       if @workflow.update_attributes(params[:workflow])
+        @workflow.update_transitions(params[:transitions])
         format.html { redirect_to(@workflow, :notice => 'Workflow was successfully updated.') }
-        format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
-        format.xml  { render :xml => @workflow.errors, :status => :unprocessable_entity }
       end
     end
   end
@@ -77,7 +79,11 @@ class WorkflowsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to(workflows_url) }
-      format.xml  { head :ok }
+      format.xml { head :ok }
     end
   end
+
+  protected
+
+
 end
