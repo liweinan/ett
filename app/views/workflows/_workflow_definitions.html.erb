@@ -1,0 +1,28 @@
+<% statuses = Status.all %>
+<% disabled ||= false %>
+<table border=1>
+  <tr>
+    <td>Current⇓ / Next⇒</td>
+    <% statuses.each do |status| %>
+        <td><%= status.name %></td>
+    <% end %>
+  </tr>
+  <% statuses.each do |current| %>
+      <tr>
+        <td><%= current.name %></td>
+        <% statuses.each do |nexte| %>
+            <% transition = "#{current.id}_#{nexte.id}" %>
+            <td>
+              <input type="checkbox" name="transitions[]" value="<%= transition %>"
+                     <% if @workflow.has_transition?(transition) %>
+                     checked
+                     <% end %>
+                     <% if disabled %>
+                     disabled
+                     <% end %>
+                     />
+            </td>
+        <% end %>
+      </tr>
+  <% end %>
+</table>

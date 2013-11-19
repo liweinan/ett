@@ -1,6 +1,7 @@
 <p>
   <b>Name:</b>
   <%=h @workflow.name %>
+  <%= render :partial => 'workflows/workflow_definitions', :locals => {:disabled => true} %>
 </p>
 
 

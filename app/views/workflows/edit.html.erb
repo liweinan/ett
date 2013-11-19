@@ -7,6 +7,7 @@
     <%= f.label :name %><br />
     <%= f.text_field :name %>
   </p>
+  <%= render :partial => 'workflows/workflow_definitions' %>
   <p>
     <%= f.submit 'Update' %>
   </p>
