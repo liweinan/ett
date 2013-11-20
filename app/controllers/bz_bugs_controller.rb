@@ -40,7 +40,7 @@ class BzBugsController < ApplicationController
           # "BZ#999999: Upgrade jboss-aggregator to 7.2.0.Final-redhat-7 (MOCK)"
           bug_info = extract_bz_bug_info(@response.body)
           bz_id = bug_info[:bz_id]
-          @response = query_bz_bug_info(bz_id, params[:user], params[:pwd])
+          @response = query_bz_bug_info(bz_id, extract_username(params[:user]), params[:pwd])
 
           if @response.class == Net::HTTPOK
             bz_info = JSON.parse(@response.body)
