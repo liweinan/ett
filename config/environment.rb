@@ -1,5 +1,6 @@
 # Be sure to restart your server when you modify this file
 
+
 # Specifies gem version of Rails to use when vendor/rails is not present
 RAILS_GEM_VERSION = '2.3.11' unless defined? RAILS_GEM_VERSION
 
@@ -59,3 +60,6 @@ end
 
 ActionController::Base.cache_store = :file_store, "#{RAILS_ROOT}/cache"
 
+require "xmlrpc/client"
+require "open-uri"
+XMLRPC::Config::ENABLE_NIL_PARSER = true
