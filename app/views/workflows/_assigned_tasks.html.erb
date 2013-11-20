@@ -1,0 +1,21 @@
+<% disabled ||= false %>
+<table>
+  <tr>
+    <td>
+      Assigned to:
+    </td>
+    <% Task.all.each do |task| %>
+        <% col = "task_#{task.id}" %>
+        <td>
+          <input id="<%= col %>" type="checkbox" name="tasks[]" value="<%= task.id %>"
+                 <% if @workflow.assigned_to?(task) %>
+                 checked
+                 <% end %>
+                 <% if disabled %>
+                 disabled
+                 <% end %>/>
+          <label for="<%= col %>"><%= task.name %></label>
+        </td>
+    <% end %>
+  </tr>
+</table>

@@ -5,15 +5,16 @@
     <th>Name</th>
   </tr>
 
-<% @workflows.each do |workflow| %>
-  <tr>
-    <td><%=h workflow.name %></td>
-    <td><%= link_to 'Show', workflow %></td>
-    <td><%= link_to 'Edit', edit_workflow_path(workflow) %></td>
-  </tr>
-<% end %>
+  <% @workflows.each do |workflow| %>
+      <tr>
+        <td><%= h workflow.name %></td>
+        <td><%= link_to 'Show', workflow %></td>
+        <td><%= link_to 'Edit', edit_workflow_path(workflow) %></td>
+        <td><%= link_to 'Assign', :controller => :workflows, :action => :assign, :id => workflow.id %></td>
+      </tr>
+  <% end %>
 </table>
 
-<br />
+<br/>
 
 <%= link_to 'New workflow', new_workflow_path %>

@@ -56,17 +56,28 @@ class WorkflowsController < ApplicationController
     end
   end
 
+  def assign
+    @workflow = Workflow.find(params[:id])
+  end
+
   # PUT /workflows/1
   # PUT /workflows/1.xml
   def update
     @workflow = Workflow.find(params[:id])
 
     respond_to do |format|
-      if @workflow.update_attributes(params[:workflow])
-        @workflow.update_transitions(params[:transitions])
-        format.html { redirect_to(@workflow, :notice => 'Workflow was successfully updated.') }
+      if params[:myaction].blank?
+        if @workflow.update_attributes(params[:workflow])
+          @workflow.update_transitions(params[:transitions])
+          format.html { redirect_to(@workflow, :notice => 'Workflow was successfully updated.') }
+        else
+          format.html { render :action => "edit" }
+        end
       else
-        format.html { render :action => "edit" }
+        if params[:myaction] == 'assign'
+          @workflow.assign_to_tasks(params[:tasks])
+          format.html { redirect_to(@workflow, :notice => 'Workflow has been assigned to tasks.') }
+        end
       end
     end
   end
