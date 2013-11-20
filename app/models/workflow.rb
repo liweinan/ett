@@ -1,5 +1,6 @@
 class Workflow < ActiveRecord::Base
   has_many :allowed_statuses
+  has_many :tasks
   validates_presence_of :name
 
   def update_transitions(transitions) # this method should be surrounded with a transaction
@@ -30,5 +31,25 @@ class Workflow < ActiveRecord::Base
     tuple[:current] = _col[0]
     tuple[:next] = _col[1]
     tuple
+  end
+
+  def assigned_to?(task)
+    self == task.workflow
+  end
+
+  def assign_to_tasks(tasks)
+    Task.transaction do
+      Task.find_all_by_workflow_id(id).each do |task|
+        task.workflow_id = nil
+        task.save
+      end
+      unless tasks.blank?
+        tasks.each do |task|
+          task = Task.find(task.to_i)
+          task.workflow_id = id
+          task.save
+        end
+      end
+    end
   end
 end

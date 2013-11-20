@@ -1,9 +1,12 @@
 <p>
   <b>Name:</b>
-  <%=h @workflow.name %>
+  <%= h @workflow.name %>
   <%= render :partial => 'workflows/workflow_definitions', :locals => {:disabled => true} %>
 </p>
-
+<p>
+  <%= render :partial => 'workflows/assigned_tasks', :locals => {:disabled => true} %>
+</p>
 
 <%= link_to 'Edit', edit_workflow_path(@workflow) %> |
+<%= link_to 'Assign', :controller => :workflows, :action => :assign, :id => @workflow.id %> |
 <%= link_to 'Back', workflows_path %>
