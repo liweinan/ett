@@ -83,12 +83,16 @@ Statuses:
           <%= render :partial => 'packages/index/tag', :locals => {:package => package} %>
           <%= render :partial => 'packages/index/user', :locals => {:package => package} %>
           <%= render :partial => 'packages/index/ver', :locals => {:package => package} %>
-          <%= render :partial => 'packages/index/errata_bz', :locals => {:package => package} %>
-          <%= render :partial => 'packages/index/bz', :locals => {:package => package} %>
+          <% if @task.use_bz_integration? %>
+              <%= render :partial => 'packages/index/errata_bz', :locals => {:package => package} %>
+              <%= render :partial => 'packages/index/bz', :locals => {:package => package} %>
+          <% end %>
           <%= render :partial => 'packages/index/git_url', :locals => {:package => package} %>
-          <%= render :partial => 'packages/index/mead', :locals => {:package => package} %>
-          <%= render :partial => 'packages/index/brew', :locals => {:package => package} %>
-          <%= render :partial => 'packages/index/rpmdiff', :locals => {:package => package} %>
+          <% if @task.use_mead_integration? %>
+            <%= render :partial => 'packages/index/mead', :locals => {:package => package} %>
+            <%= render :partial => 'packages/index/brew', :locals => {:package => package} %>
+            <%= render :partial => 'packages/index/rpmdiff', :locals => {:package => package} %>
+          <% end %>
 
           <%# render :partial => 'packages/index/xattr', :locals => {:package => package} %>
         </tr>

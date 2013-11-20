@@ -285,7 +285,7 @@ class PackagesController < ApplicationController
                 end
               elsif new_status.code == Status::CODES[:finished]
                 if Rails.env.production?
-                  if has_mead_integration?(@package.task)
+                  if @package.task.use_mead_integration?
                     # Disable asynchronous update <- we need that data for
                     # bugzilla immediately
                     # @package.mead_action = Package::MEAD_ACTIONS[:needsync]
