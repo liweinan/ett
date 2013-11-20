@@ -1,0 +1,8 @@
+<% id ||= nil %>
+
+<div class='manage-tbl'>
+  <table>
+    <%= render :partial => 'jira_bugs/fields/jira_user', :locals => {:id => id} %>
+    <%= render :partial => 'jira_bugs/fields/jira_pass', :locals => {:id => id} %>
+  </table>
+</div>

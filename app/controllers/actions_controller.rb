@@ -93,6 +93,7 @@ class ActionsController < ApplicationController
             setting.close_status_id = @source_task.setting.close_status_id
             setting.use_bz_integration = @source_task.setting.use_bz_integration
             setting.use_mead_integration = @source_task.setting.use_mead_integration
+            setting.use_jira_integration = @source_task.setting.use_jira_integration
             setting.task_id = @target_task.id
             setting.save
           end
