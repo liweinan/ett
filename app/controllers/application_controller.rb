@@ -620,24 +620,6 @@ class ApplicationController < ActionController::Base
     res.code
   end
 
-  def has_mead_integration?(task)
-  	if task.blank?
-      false
-    else
-      task.setting.use_mead_integration?
-    end
-#     return has_x_integration?(task, ['mead', 'brew'])
-  end
-
-  def has_x_integration?(task, items)
-    if task.setting.blank?
-      false
-    else
-      xattrs = task.setting.xattrs.split(',')
-      # find the 'subset' of the & and see if all the items are in xattrs
-      xattrs & items == items
-    end
-  end
 
   # mode flag needed since for mode=:create,
   # the request_path link is wrong

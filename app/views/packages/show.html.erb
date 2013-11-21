@@ -42,16 +42,18 @@ Tags:
 GitUrl: <%= h @package.git_url %>
 <%= render :partial => 'layouts/sep_tiny' %>
 
-Brew: <%= h @package.nvr_in_errata %>
+<% if @package.task.use_mead_integration? %>
+    Brew: <%= h @package.nvr_in_errata %>
 
-<%= render :partial => 'layouts/sep_tiny' %>
+    <%= render :partial => 'layouts/sep_tiny' %>
 
-Mead: <%= h @package.mead %>
-<%= render :partial => 'layouts/sep_tiny' %>
+    Mead: <%= h @package.mead %>
+    <%= render :partial => 'layouts/sep_tiny' %>
+<% end %>
 
 <%= render :partial => 'packages/fields/build' %>
 
-<% if @package.task.use_bz_integration?%>
+<% if @package.task.use_mead_integration?%>
     <%= render :partial => 'packages/fields/errata' %>
 <% end %>
 
