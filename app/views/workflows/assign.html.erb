@@ -1,8 +1,0 @@
-<h1><%= @workflow.name %></h1>
-<% form_for(@workflow) do |f| %>
-    <input type="hidden" name="myaction" value="assign"/>
-    <%= render :partial => 'workflows/assigned_tasks' %>
-    <p>
-      <%= f.submit 'Update' %>
-    </p>
-<% end %>

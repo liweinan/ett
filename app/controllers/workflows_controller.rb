@@ -44,8 +44,10 @@ class WorkflowsController < ApplicationController
     # In WildBee we should save workflow and allowedStatus in one transaction.
     # Currently we have to save workflow to get its primary key
     if @workflow.save # just to get primary id.
-      @workflow.update_transitions(params[:transitions])
-
+      Workflow.transaction do
+        @workflow.update_transitions(params[:transitions])
+        @workflow.assign_to_tasks(params[:tasks])
+      end
       respond_to do |format|
         format.html { redirect_to(@workflow, :notice => 'Workflow was successfully created.') }
       end
@@ -56,9 +58,6 @@ class WorkflowsController < ApplicationController
     end
   end
 
-  def assign
-    @workflow = Workflow.find(params[:id])
-  end
 
   # PUT /workflows/1
   # PUT /workflows/1.xml
@@ -66,17 +65,13 @@ class WorkflowsController < ApplicationController
     @workflow = Workflow.find(params[:id])
 
     respond_to do |format|
-      if params[:myaction].blank?
+      Workflow.transaction do
         if @workflow.update_attributes(params[:workflow])
           @workflow.update_transitions(params[:transitions])
+          @workflow.assign_to_tasks(params[:tasks])
           format.html { redirect_to(@workflow, :notice => 'Workflow was successfully updated.') }
         else
           format.html { render :action => "edit" }
-        end
-      else
-        if params[:myaction] == 'assign'
-          @workflow.assign_to_tasks(params[:tasks])
-          format.html { redirect_to(@workflow, :notice => 'Workflow has been assigned to tasks.') }
         end
       end
     end

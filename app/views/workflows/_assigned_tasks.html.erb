@@ -4,7 +4,7 @@
     <td>
       Assigned to:
     </td>
-    <% Task.all.each do |task| %>
+    <% Task.all(:order => :name).each do |task| %>
         <% col = "task_#{task.id}" %>
         <td>
           <input id="<%= col %>" type="checkbox" name="tasks[]" value="<%= task.id %>"

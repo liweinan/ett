@@ -1,9 +1,15 @@
 class Workflow < ActiveRecord::Base
+  belongs_to :start_status, :class_name => "Status", :foreign_key => "start_status_id"
+
   has_many :allowed_statuses
   has_many :tasks
+
   validates_presence_of :name
+  validates_presence_of :start_status_id, :message => "is not defined."
 
   def update_transitions(transitions) # this method should be surrounded with a transaction
+    return if transitions.blank?
+
     Workflow.transaction do # this nested transaction should merge with the transaction in caller
       allowed_statuses.each do |as|
         as.destroy
@@ -39,10 +45,12 @@ class Workflow < ActiveRecord::Base
 
   def assign_to_tasks(tasks)
     Task.transaction do
+      # reset current workflow assignment
       Task.find_all_by_workflow_id(id).each do |task|
         task.workflow_id = nil
         task.save
       end
+
       unless tasks.blank?
         tasks.each do |task|
           task = Task.find(task.to_i)

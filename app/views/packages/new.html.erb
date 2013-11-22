@@ -18,9 +18,6 @@
         <%= render :partial => 'packages/fields/git_url', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/ver', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/assignee', :locals => {:f => f} %>
-        <% get_xattrs(Task.find_by_name(unescape_url(params[:task_id])), false, true) do |attr| %>
-            <%= render :partial => 'packages/fields/xattrs', :locals => {:f => f, :xattr => attr} %>
-        <% end %>
         <%= render :partial => 'packages/fields/notes', :locals => {:f => f} %>
         <tr>
           <td colspan=2 style="text-align:left;">

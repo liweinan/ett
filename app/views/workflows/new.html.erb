@@ -7,7 +7,15 @@
       <%= f.label :name %><br/>
       <%= f.text_field :name %>
     </p>
-    <%= render :partial => 'workflows/workflow_definitions' %>
+    <p>
+      <%= render :partial => 'workflows/start_status' %>
+    </p>
+    <p>
+      <%= render :partial => 'workflows/workflow_definitions' %>
+    </p>
+    <p>
+      <%= render :partial => 'workflows/assigned_tasks' %>
+    </p>
     <p>
       <%= f.submit 'Create' %>
     </p>

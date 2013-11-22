@@ -1,4 +1,4 @@
-<% statuses = Status.all %>
+<% statuses = Status.find_all_can_select_only_in_global_scope %>
 <% disabled ||= false %>
 <table border=1>
   <tr>

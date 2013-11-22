@@ -1,0 +1,24 @@
+<% disabled ||= false %>
+<% statuses = Status.find_all_can_select_only_in_global_scope %>
+<table border=1>
+  <tr>
+    <td>
+      Start Status:
+    </td>
+    <td>
+
+      <% statuses.each do |status| %>
+          <% col_id = "start_status_#{status.id}" %>
+          <input type="radio" name='workflow[start_status_id]' id='<%= col_id %>' value="<%= status.id %>"
+                 <% if @workflow.start_status == status %>
+                 checked
+                 <% end %>
+                 <% if disabled %>
+                 disabled
+                 <% end %>
+                 />
+          <label for="<%= col_id %>"><%= status.name %></label>
+      <% end %>
+    </td>
+  </tr>
+</table>

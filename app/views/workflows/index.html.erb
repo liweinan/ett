@@ -10,7 +10,6 @@
         <td><%= h workflow.name %></td>
         <td><%= link_to 'Show', workflow %></td>
         <td><%= link_to 'Edit', edit_workflow_path(workflow) %></td>
-        <td><%= link_to 'Assign', :controller => :workflows, :action => :assign, :id => workflow.id %></td>
       </tr>
   <% end %>
 </table>
