@@ -1,0 +1,10 @@
+<% id ||= nil %>
+<% style ||= 'text-align: left' %>
+<tr>
+  <td style="<%= style %>">
+    JIRA account
+  </td>
+  <td style="<%= style %>">
+   <input id="jira_user" name="jira_user" value="<%= current_user.email.partition('@').first %>"/>
+  </td>
+</tr>

@@ -41,4 +41,20 @@ class Task < ActiveRecord::Base
     end
   end
 
+  def use_jira_integration?
+    if setting.blank?
+      false
+    else
+      setting.use_jira_integration?
+    end
+  end
+
+  def use_mead_integration?
+    if setting.blank?
+      false
+    else
+      setting.use_mead_integration?
+    end
+  end
+
 end

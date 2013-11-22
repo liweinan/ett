@@ -1,9 +1,5 @@
 # Filters added to this controller apply to all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
-require "xmlrpc/client"
-require 'open-uri'
-XMLRPC::Config::ENABLE_NIL_PARSER = true
-
 class ApplicationController < ActionController::Base
 
   helper :all # include all helpers, all the time
@@ -14,7 +10,7 @@ class ApplicationController < ActionController::Base
   before_filter :save_current_link
               # Scrub sensitive parameters from your log
               # filter_parameter_logging :password
-  filter_parameter_logging :bzauth_pwd, :pwd, :ubbs_pwd
+  filter_parameter_logging :bzauth_pwd, :pwd, :ubbs_pwd, :jira_pass
 
   def get_task(name)
     Task.find_by_name(unescape_url(name))
@@ -624,24 +620,6 @@ class ApplicationController < ActionController::Base
     res.code
   end
 
-  def has_mead_integration?(task)
-  	if task.blank?
-      false
-    else
-      task.setting.use_mead_integration?
-    end
-#     return has_x_integration?(task, ['mead', 'brew'])
-  end
-
-  def has_x_integration?(task, items)
-    if task.setting.blank?
-      false
-    else
-      xattrs = task.setting.xattrs.split(',')
-      # find the 'subset' of the & and see if all the items are in xattrs
-      xattrs & items == items
-    end
-  end
 
   # mode flag needed since for mode=:create,
   # the request_path link is wrong

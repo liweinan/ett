@@ -1,0 +1,17 @@
+<h1>Jira Bugs</h1>
+<table>
+<tr>
+<th>ID</th>
+<th>Key</th>
+<th>Summary</th>
+<th>Components</th>
+<th>Issue Type</th>
+<th>Priority</th>
+<th>URL</th>
+</tr>
+<% @jira_bugs.each do |@jira_bug| %>
+	<%= render 'jira_bugs/jira_bug_row' %>
+<% end %>
+
+</tr>
+</table>

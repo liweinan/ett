@@ -1,0 +1,5 @@
+<%= render 'jira_bugs/jira_bug' %>
+<%= form_tag :action => 'update', :id => @jira_bug.key %>
+<%= render 'jira_bugs/jira_auth' %>
+<%= submit_tag("Update with Jira") %>
+
