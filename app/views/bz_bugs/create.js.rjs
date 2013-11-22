@@ -7,7 +7,9 @@ unless @error.blank?
     page.alert("Internal error: #{@error.to_s}")
   end
 else
-  if @response.class == Net::HTTPCreated || @response.class == Net::HTTPOK
+  if @do_nothing
+    page.alert("Bug already added")
+  elsif @response.class == Net::HTTPCreated || @response.class == Net::HTTPOK
     bug = @bz_bug.package.upgrade_bz
     if !bug.nil? && bug.id == @bz_bug.id
       page << "renderByUpgradeBz('#{@bz_bug.id}')"
