@@ -53,6 +53,10 @@ class PackagesController < ApplicationController
   def new
     @package = Package.new
 
+    unless params[:task_id].blank?
+      @package.task = Task.find_by_name(unescape_url(params[:task_id]))
+    end
+
     respond_to do |format|
       format.html # new.html.erb
     end

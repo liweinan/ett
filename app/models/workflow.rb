@@ -60,4 +60,13 @@ class Workflow < ActiveRecord::Base
       end
     end
   end
+
+  def next_statuses_of(current_status)
+    allowed_statuses = AllowedStatus.all(:conditions => ["workflow_id = ? and status_id = ?", id, current_status.id])
+    next_statuses = []
+    allowed_statuses.each do |as|
+      next_statuses << as.next_status
+    end
+    next_statuses
+  end
 end

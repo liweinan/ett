@@ -1,7 +1,9 @@
 <% task = Task.find_by_name(unescape_url(params[:id])) %>
 <h2>Import packages into task: <%= params[:id] %></h2>
 <form action="/import" method="post" onsubmit="return validateForm();">
-  Intital status: <%= render :partial => "statuses/selection_for_tag", :locals => {:task_id => task.id} %>
+  <% package = Package.new
+  	package.task = task %>
+  Intital status: <%= render :partial => "statuses/selection_for_tag", :locals => {:package => package} %>
   <%= render :partial => "layouts/sep" %>
   Initial tags: <%= render :partial => 'tags/tags_selection', :locals => {:task_id => params[:id]} %>
   <%= render :partial => "layouts/sep" %>

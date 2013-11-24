@@ -33,10 +33,6 @@
     %>
     / <%= link_to "Clone Task", :controller => :tasks, :action => :clone,
                   :id => escape_url(params[:task_id]) %>
-    / <%= link_to "Task Statuses", :controller => :statuses,
-                  :action => :index, :task_id => escape_url(params[:task_id]) %>
-    / <%= link_to "Task Tags", :controller => :tags, :action => :index,
-                  :task_id => escape_url(params[:task_id]) %>
     / <%= link_to "Task Settings", :controller => :settings, :action => :show,
                   :id => setting_id, :task_id => escape_url(params[:task_id]) %>
 <% end %>

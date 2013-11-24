@@ -6,7 +6,6 @@ end %>
     Status
   </td>
   <td style="text-align:left;">
-    <%= render :partial => "statuses/selection_for_tag", :locals => { :task_id => Task.find_by_name(unescape_url(params[:task_id])).id, :form => f }%>
-    <%# render :partial => 'sync', :locals => {:key => 'status'} %>
+    <%= render :partial => "statuses/selection_for_tag", :locals => { :package => @package, :form => f }%>
   </td>
 </tr>

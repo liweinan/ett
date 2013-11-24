@@ -84,12 +84,9 @@ class Package < ActiveRecord::Base
     end
   end
 
+  # TODO: deprecate this
   def deleted?
-    if self.status
-      self.status.name == Status.deleted_status.name
-    else
-      false
-    end
+    false
   end
 
   def in_progress?

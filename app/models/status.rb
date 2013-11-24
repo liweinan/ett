@@ -76,6 +76,35 @@ class Status < ActiveRecord::Base
     can_change_code == 'Yes'
   end
 
+  def self.blank_status
+    blank_status = Status.new
+    blank_status.id = ''
+    blank_status.name = '-'
+    blank_status
+  end
+
+  def self.statuses_for_selection(package)
+    statuses = []
+    statuses << Status.blank_status
+
+    if package.task.blank? || package.task.workflow.blank?
+      statuses << Status.all
+    else
+      # get current status of package
+      current_status = package.status
+      # include current status by default
+      statuses << current_status
+
+      # if current_status is blank, get start status
+      if current_status.blank?
+        statuses << package.task.workflow.start_status
+      else # or get next statuses of current status defined in workflow
+        statuses << package.task.workflow.next_statuses_of(current_status)
+      end
+    end
+    statuses.flatten.uniq
+  end
+
   protected
 
   def validate
