@@ -61,14 +61,23 @@ class BzBugsController < ApplicationController
 
         bz_id = params[:bz_id].strip
 
+        bz_bug_exist = (package.bz_bugs.select {|bz| bz.bz_id == bz_id}).length > 0
 
-        @response = query_bz_bug_info(bz_id, extract_username(params[:user]), params[:pwd])
+        if bz_bug_exist
+          @do_nothing = true
+        else
+          @do_nothing = false
+        end
 
-        if @response.class == Net::HTTPOK
+        if !@do_nothing
+          @response = query_bz_bug_info(bz_id, extract_username(params[:user]), params[:pwd])
 
-          bz_info = JSON.parse(@response.body)
-          @bz_bug =
-              BzBug.create_from_bz_info(bz_info, package_id, current_user)
+          if @response.class == Net::HTTPOK
+
+            bz_info = JSON.parse(@response.body)
+            @bz_bug =
+                BzBug.create_from_bz_info(bz_info, package_id, current_user)
+          end
         end
       rescue => e
         @error = e
@@ -86,7 +95,11 @@ class BzBugsController < ApplicationController
             render :status => 500
           end
         else
-          render :status => @response.code
+          if @response
+            render :status => @response.code
+          else
+            render :status => 200
+          end
         end
       }
     end
