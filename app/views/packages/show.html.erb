@@ -51,9 +51,11 @@ GitUrl: <%= h @package.git_url %>
     <%= render :partial => 'layouts/sep_tiny' %>
 <% end %>
 
-<%= render :partial => 'packages/fields/build' %>
+<% if @package.status.code == 'inprogress' %>
+    <%= render :partial => 'packages/fields/build' %>
+<% end %>
 
-<% if @package.task.use_mead_integration?%>
+<% if @package.task.use_mead_integration? && @package.status.code == 'finished' %>
     <%= render :partial => 'packages/fields/errata' %>
 <% end %>
 
