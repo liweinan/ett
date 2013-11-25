@@ -1,15 +1,19 @@
 <div style="width:100%;text-align:right;">
-	<span style="padding-right:20px;"> 
+	<span style="padding-right:20px;">
+      <% if can_manage? %>
 		<%= link_to 'Settings', '/settings/1' %>
-      /
+          /
+      <% end %>
       <%= link_to 'Components', '/components' %>
       /
-      <%= link_to 'Workflow', workflows_path %>
-      /
-      <%= link_to 'Status List', '/statuses' %>
-      /
-      <%= link_to 'Task List', tasks_path %>
-      /
+      <% if can_manage? %>
+          <%= link_to 'Workflow', workflows_path %>
+          /
+          <%= link_to 'Status List', '/statuses' %>
+          /
+          <%= link_to 'Task List', tasks_path %>
+          /
+      <% end %>
       <%= link_to 'User List', users_path %>
       /
       <% unless logged_in? %>
