@@ -83,13 +83,31 @@ class TasksController < ApplicationController
     params[:task][:name].strip!
     params[:task][:name].downcase!
 
+    os_adv_tags = params.keys.select {|key| key.to_s.start_with? "task_os"}
+    os_adv_tags = os_adv_tags.sort_by &:to_s
+
+    # verify if all the fields are filled
+
+    os_adv_tag_error = false
+    modify_any_os_adv_tag = verify_os_options_valid(os_adv_tags, params)
+
+    # if only the first field is filled and they are left blank, ignore
+    os_adv_tag_error = true if (os_adv_tags.size != 1 && !modify_any_os_adv_tag)
+
+    if !os_adv_tag_error && modify_any_os_adv_tag
+      update_and_add_new_os_adv_tag(os_adv_tags, params, @task)
+    end
+
     respond_to do |format|
-      if @task.update_attributes(params[:task])
+      if @task.update_attributes(params[:task]) && !os_adv_tag_error
         expire_all_fragments
         flash[:notice] = 'Task was successfully updated.'
         format.html { redirect_to(:controller => :tasks, :action => :show, :id => escape_url(@task.name)) }
         format.xml { head :ok }
       else
+        if os_adv_tag_error
+          flash[:notice] = "You cannot leave Os, Advisory and Candidate tag blank"
+        end
         format.html { render :action => "edit" }
         format.xml { render :xml => @task.errors, :status => :unprocessable_entity }
       end
@@ -115,11 +133,11 @@ class TasksController < ApplicationController
       unless params[:source_task_name].blank?
         session[:clone_review][:source_task_name] = params[:source_task_name].strip
       end
-      
-      unless params[:target_task_name].blank?      
+
+      unless params[:target_task_name].blank?
         session[:clone_review][:target_task_name] = params[:target_task_name].strip
       end
-      
+
       session[:clone_review][:scopes] = params[:scopes]
       session[:clone_review][:tag_options] = params[:tag_options]
       session[:clone_review][:tag_options] ||= []
@@ -145,6 +163,16 @@ class TasksController < ApplicationController
     task_clone_in_progress
   end
 
+  def render_partial
+    respond_to do |format|
+      format.js {
+        render(:partial => params[:partial], :locals => {:count => params[:count]})
+      }
+    end
+  end
+
+
+
   protected
 
   def clone_form_validation
@@ -166,7 +194,7 @@ class TasksController < ApplicationController
     #    @error_message << "Target task name already used."
     #  end
     end
-    
+
     if params[:source_task_name].strip == params[:target_task_name].strip
       @error_message << "task cannot be cloned to itself."
     end
@@ -198,4 +226,44 @@ class TasksController < ApplicationController
     end
   end
 
+  def verify_os_options_valid(os_adv_tags, params)
+
+    params_os = "task_os_"
+    params_adv = "task_advisory_"
+    params_tag = "task_tag_"
+
+    num_os_adv_tags = os_adv_tags.size
+    (1..num_os_adv_tags).each do |i|
+      if params[params_os + i.to_s].blank? ||
+         params[params_adv + i.to_s].blank? ||
+         params[params_tag + i.to_s].blank?
+        return false
+      end
+    end
+    # if everything valid
+    return true
+  end
+
+  # TODO: optimize this. right now I'm just dumbly deleting and recreating new
+  # ones
+  def update_and_add_new_os_adv_tag(os_adv_tags, params, task)
+
+    params_os = "task_os_"
+    params_adv = "task_advisory_"
+    params_tag = "task_tag_"
+
+    # delete existing ones
+    task.os_advisory_tags.each {|to_delete| to_delete.delete}
+
+    os_adv_tags.each_with_index do |to_insert, x|
+      i = x + 1
+      to_save = OsAdvisoryTag.new
+      to_save.os_arch = params[params_os + i.to_s]
+      to_save.advisory = params[params_adv + i.to_s]
+      to_save.candidate_tag = params[params_tag + i.to_s]
+      to_save.task_id = task.id
+      to_save.priority = i.to_s
+      to_save.save
+    end
+  end
 end

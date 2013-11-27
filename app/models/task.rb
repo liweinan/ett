@@ -10,6 +10,8 @@ class Task < ActiveRecord::Base
   has_many :packages, :dependent => :destroy
   has_many :statuses, :dependent => :destroy
 
+  has_many :os_advisory_tags, :dependent => :destroy
+
   has_many :component_views
   has_many :components, :through => :component_views
 
