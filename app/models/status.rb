@@ -88,7 +88,7 @@ class Status < ActiveRecord::Base
     statuses << Status.blank_status
 
     if package.task.blank? || package.task.workflow.blank?
-      statuses << Status.all
+      statuses << Status.find_all_can_show_by_task_id_in_global_scope(package.task.id)
     else
       # get current status of package
       current_status = package.status
