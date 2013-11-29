@@ -11,7 +11,8 @@
         <%= render :partial => 'tasks/fields/tag_version', :locals => {:f => f} %>
         <%= render :partial => 'tasks/fields/description', :locals => {:f => f} %>
         <%= render :partial => 'tasks/fields/advisory', :locals => {:f => f} %>
-		<%= render :partial => 'statuses/fields/can_show', :locals => {:f => f} %>
+        <%= render :partial => 'statuses/fields/can_show', :locals => {:f => f} %>
+        <%= render :partial => 'tasks/fields/os_arch', :locals => {:f => f} %>
         <tr>
           <td colspan='2'>
             <%= f.submit 'Update' %>

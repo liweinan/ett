@@ -67,6 +67,21 @@
 
 <br/>
 
+  <table id='bz_list_tbl'>
+    <tr>
+        <th class='content-list-head'>OS</th>
+        <th class='content-list-head'>Advisory</th>
+        <th class='content-list-head'>Candidate Tag</th>
+    </tr>
+    <% (@task.os_advisory_tags.each.sort_by {|tag| tag.priority}).each do |tag| %>
+        <tr>
+            <td><%=tag.os_arch%></td>
+            <td><%=tag.advisory%></td>
+            <td><%=tag.candidate_tag%></td>
+        </tr>
+    <% end %>
+    </table>
+
 
 <% if can_manage? %>
     <%= link_to 'Edit', :controller => :tasks, :action => :edit, :id => escape_url(@task.name) %> |
