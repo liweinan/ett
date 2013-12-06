@@ -8,7 +8,7 @@ Manual Time Track:
 </span>
 
 <span id="manual_time_track_component">&nbsp;</span> <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'manual_time_track_component_indicator'} %>
-<% if logged_in? %>
+<% if logged_in? && !@package.task.readonly? %>
     <%= render :partial => 'layouts/sep_tiny' %>
     <% form_remote_tag(
                :url => {:controller => "toolbox", :action => "log_work_done"},
