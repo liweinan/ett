@@ -2,7 +2,7 @@
 <%= render :partial => 'layouts/sep' %>
 <h3>Related Bugzilla Bugs</h3>
 
-<% if logged_in? %>
+<% if logged_in? && !@package.task.readonly? %>
     <form onsubmit="return false;">
       <button onclick="renderBzBugForm('link_bz_bug');">
         Link to an existing bug
@@ -21,7 +21,7 @@
 <div id="new_bz_bug_form_div" style="display:none;"></div>
 <%= render :partial => 'packages/bz_bug_list',
            :locals => {:package => package} %>
-<% if logged_in? %>
+<% if logged_in? && !@package.task.readonly? %>
     <%= render :partial => 'layouts/sep' %>
     <form onsubmit="return false;">
       <button onclick="renderBzBugForm('sync_bz_bug');">

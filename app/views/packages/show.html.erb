@@ -70,16 +70,18 @@ GitUrl: <%= h @package.git_url %>
 <%= render :partial => 'packages/fields/track_time' %>
 
 
-<% if can_edit_package? @package %>
-    <%= link_to 'Edit', :controller => 'packages', :action => 'edit', :id => escape_url(@package.name) %>
-<% end %>
+<% unless @package.task.readonly? %>
+    <% if can_edit_package? @package %>
+        <%= link_to 'Edit', :controller => 'packages', :action => 'edit', :id => escape_url(@package.name) %>
+    <% end %>
 
-<% if can_manage? %>
-    <% unless @package.deleted? %>
-        | <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(@package.name), :task_id => escape_url(@package.task.name) %>
-        | <%= link_to 'Delete', @package,
-                      :confirm => "Are you sure to delete #{escape_url(@package.name)}?",
-                      :method => :delete %>
+    <% if can_manage? %>
+        <% unless @package.deleted? %>
+            | <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(@package.name), :task_id => escape_url(@package.task.name) %>
+            | <%= link_to 'Delete', @package,
+                          :confirm => "Are you sure to delete #{escape_url(@package.name)}?",
+                          :method => :delete %>
+        <% end %>
     <% end %>
 <% end %>
 
@@ -89,8 +91,10 @@ GitUrl: <%= h @package.git_url %>
 <%= render :partial => 'packages/relationships' %>
 <%= render :partial => 'layouts/sep' %>
 
-<%= render :partial => 'packages/attachment' %>
-<%= render :partial => 'layouts/sep' %>
+<% unless @package.task.readonly? %>
+    <%= render :partial => 'packages/attachment' %>
+    <%= render :partial => 'layouts/sep' %>
+<% end %>
 <% if @package.task.use_bz_integration? %>
     <%= render :partial => 'packages/bz_bugs', :locals => {:package => @package} %>
     <%= render :partial => 'layouts/sep' %>
@@ -99,6 +103,6 @@ GitUrl: <%= h @package.git_url %>
 <%= render :partial => 'layouts/sep' %>
 
 <%= render :partial => "comments/index" %>
-<% if logged_in? %>
+<% if logged_in? && !@package.task.readonly? %>
     <%= render :partial => "comments/new" %>
 <% end %>
