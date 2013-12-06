@@ -1,0 +1,14 @@
+<h1>Listing Readonly Tasks</h1>
+<div class='manage-tbl'>
+  <table>
+    <% @readonly_tasks.each do |readonly_task| %>
+        <tr>
+          <td><%= h readonly_task.task.name %></td>
+        </tr>
+    <% end %>
+  </table>
+</div>
+
+<br/>
+
+<%= link_to 'Setting Readonly Tasks', :action => :edit, :id => 0 %>
