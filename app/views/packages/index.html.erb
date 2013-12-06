@@ -54,7 +54,7 @@ Statuses:
         <%= link_to "#{tag.key} (#{tag.packages_can_show.length})", :controller => :packages, :action => :index, :task_id => params[:task_id], :tag => tag.key %> /
     <% end %>
 <% end %>
-<% if logged_in? %>
+<% if logged_in? && (!has_task? || !Task.readonly?(Task.find_by_name(unescape_url(params[:task_id])))) %>
     <%= render :partial => 'layouts/sep' %>
     <span id="inline_editor_switch" style="display:none;">
       <a href="javascript:void(0);" onclick="getPacBtns();">
@@ -75,7 +75,7 @@ Statuses:
         <% end %>
         <tr>
           <% @show_progress = true %>
-          <% if logged_in? %>
+          <% if logged_in? && (!has_task? || !Task.readonly?(Task.find_by_name(unescape_url(params[:task_id])))) %>
               <%= render :partial => 'packages/index/ops', :locals => {:package => package} %>
           <% end %>
           <%= render :partial => 'packages/index/name', :locals => {:package => package} %>

@@ -59,4 +59,12 @@ class Task < ActiveRecord::Base
     end
   end
 
+  def readonly?
+    !ReadonlyTask.find_by_task_id(id).blank?
+  end
+
+  def self.readonly?(task)
+    !ReadonlyTask.find_by_task_id(task.id).blank?
+  end
+
 end
