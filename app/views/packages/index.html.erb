@@ -31,7 +31,9 @@
 <% else %>
     <h2>Listing packages</h2>
 <% end %>
-
+<% if has_task? && Task.readonly?(Task.find_by_name(unescape_url(params[:task_id]))) %>
+    <h2 style="color: red;">This task is read only</h2>
+<% end %>
 <%= render :partial => 'ops' %>
 
 <%= render :partial => 'layouts/sep' %>
@@ -89,9 +91,9 @@ Statuses:
           <% end %>
           <%= render :partial => 'packages/index/git_url', :locals => {:package => package} %>
           <% if @task.use_mead_integration? %>
-            <%= render :partial => 'packages/index/mead', :locals => {:package => package} %>
-            <%= render :partial => 'packages/index/brew', :locals => {:package => package} %>
-            <%= render :partial => 'packages/index/rpmdiff', :locals => {:package => package} %>
+              <%= render :partial => 'packages/index/mead', :locals => {:package => package} %>
+              <%= render :partial => 'packages/index/brew', :locals => {:package => package} %>
+              <%= render :partial => 'packages/index/rpmdiff', :locals => {:package => package} %>
           <% end %>
 
           <%# render :partial => 'packages/index/xattr', :locals => {:package => package} %>
