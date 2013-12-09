@@ -75,7 +75,7 @@ module ApplicationHelper
     uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
 
     # stupid URI.encode cannot encode the '+' sign
-    params_build = "mode=#{mode}&userid=#{pac.user.email.gsub('@redhat.com', '')}" + "&sources=#{url_encode(pac.git_url)}&clentry=#{url_encode(clentry)}"
+    params_build = "mode=#{mode}&userid=#{pac.user.email.gsub('@redhat.com', '')}" + "&sources=#{url_encode(pac.git_url)}&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}"
     puts params_build
     req = Net::HTTP::Post.new("/mead-scheduler/rest/build/sched/#{prod}/#{pac.name}?" + params_build)
 
