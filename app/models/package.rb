@@ -193,7 +193,7 @@ class Package < ActiveRecord::Base
   end
 
   def rpmdiff_info
-    if rpmdiff_status
+    unless rpmdiff_status.blank?
       RPMDIFF_INFO[rpmdiff_status.to_i][:status]
     else
       ''
@@ -201,7 +201,7 @@ class Package < ActiveRecord::Base
   end
 
   def rpmdiff_link
-    if rpmdiff_id
+    unless rpmdiff_id.blank?
       'https://errata.devel.redhat.com/rpmdiff/show/' + rpmdiff_id
     else
       ''
@@ -209,7 +209,7 @@ class Package < ActiveRecord::Base
   end
 
   def rpmdiff_style
-    if rpmdiff_status
+    unless rpmdiff_status.blank?
       RPMDIFF_INFO[rpmdiff_status.to_i][:style]
     else
       ''
