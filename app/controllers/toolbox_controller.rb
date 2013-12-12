@@ -84,7 +84,7 @@ class ToolboxController < ApplicationController
     @clentry.text = "- "
     @error = nil
     if @pac.status.blank? || @pac.status.code != 'inprogress' ||
-       @pac.user.nil? || (@pac.git_url.blank? && need_source_url?(@pac.name))
+       @pac.user.nil? || (@pac.git_url.blank? && need_source_url?(@pac))
       @error = "You can only use the Build Button when the Git-Url is provided," \
                " the status is 'InProgress' and there is an assignee to this package"
     end

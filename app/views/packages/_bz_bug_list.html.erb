@@ -11,8 +11,9 @@
       <th class='content-list-head'>Status</th>
       <th class='content-list-head'>Summary</th>
     </tr>
+    <% upgrade_bz_bugs = package.upgrade_bz %>
     <% package.bz_bugs.each do |bz_bug| %>
-        <% if package.upgrade_bz.nil? || package.upgrade_bz.id != bz_bug.id %>
+        <% unless upgrade_bz_bugs.include? bz_bug  %>
         <tr id='bz_list_row_<%= bz_bug.id %>'>
           <% if logged_in? && !@package.task.readonly? %>
               <td id="col_bz_ops_<%= bz_bug.id %>" class="small_font">

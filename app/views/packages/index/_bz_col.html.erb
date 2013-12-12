@@ -6,12 +6,10 @@
          # do nothing on ActiveRecord::RecordNotFound
        end
     %>
+    <% ub = package.upgrade_bz %>
     <% package.bz_bugs.each do |bz| %>
-        <% ub = package.upgrade_bz %>
-        <% if !bz.blank? && bz != ub %>
-            <% unless bz.bz_id.blank? %>
-                <%= link_to bz.bz_id, "#{APP_CONFIG['bugzilla_prefix']}#{bz.bz_id}", :target => '_blank' %>
-            <% end %>
+        <% unless ub.include? bz %>
+            <%= link_to bz.bz_id, "#{APP_CONFIG['bugzilla_prefix']}#{bz.bz_id}", :target => '_blank' %>
         <% end %>
     <% end %>
 <% end %>

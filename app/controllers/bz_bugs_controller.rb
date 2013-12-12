@@ -16,14 +16,16 @@ class BzBugsController < ApplicationController
         check_param_ver(params)
         end_check_param
 
+        # marker for the view
+        @created = true
+
         parameters = {'pkg' => package.name,
                       'version' => params[:ver],
                       'release' => package.task.target_release,
                       'tagversion' => package.task.tag_version,
                       'userid' => extract_username(params[:user]),
-                      'summary' => "RHEL6 RPMs: Upgrade #{package.name} to #{params[:ver]}",
+                      'summary' => "RPMs: Upgrade #{package.name} to #{params[:ver]}",
                       'pwd' => params[:pwd]}
-
         parameters['seealso'] = params[:see_also] unless params[:see_also].blank?
 
         email = nil
@@ -32,20 +34,21 @@ class BzBugsController < ApplicationController
           parameters['assignee'] = email
         end
 
-        @response = Net::HTTP.post_form(bz_bug_creation_uri, parameters)
-
-        if @response.class == Net::HTTPCreated
-          update_bz_pass(params[:pwd])
-          #  @response.body
-          # "BZ#999999: Upgrade jboss-aggregator to 7.2.0.Final-redhat-7 (MOCK)"
-          bug_info = extract_bz_bug_info(@response.body)
-          bz_id = bug_info[:bz_id]
-          @response = query_bz_bug_info(bz_id, extract_username(params[:user]), params[:pwd])
-
-          if @response.class == Net::HTTPOK
-            bz_info = JSON.parse(@response.body)
-            @bz_bug =
-                BzBug.create_from_bz_info(bz_info, package_id, current_user)
+        if params.has_key?(:summary)
+          parameters['summary'] = params[:summary]
+          @response = create_bzs_from_params(parameters, 'el6')
+        else
+          if package.task.os_advisory_tags.empty?
+            summary = "RHEL6 RPMs: Upgrade #{package.name} to #{params[:ver]}"
+            parameters['summary'] = summary
+            @response = create_bzs_from_params(parameters, 'el6')
+          else
+            # create bzs for each rhels
+            package.task.os_advisory_tags.each do |os_adv_tag|
+              summary = "RHEL" + os_adv_tag.os_arch[-1, 1] + " RPMs: Upgrade #{package.name} to #{params[:ver]}"
+              parameters['summary'] = summary
+              @response = create_bzs_from_params(parameters, os_adv_tag.os_arch)
+            end
           end
         end
       rescue => e
@@ -239,6 +242,28 @@ class BzBugsController < ApplicationController
     unless @err_msg.blank?
       raise ArgumentError, @err_msg
     end
+  end
+
+  def create_bzs_from_params(parameters, os)
+    puts parameters
+    puts bz_bug_creation_uri
+    response = Net::HTTP.post_form(bz_bug_creation_uri, parameters)
+
+    if response.class == Net::HTTPCreated
+      update_bz_pass(params[:pwd])
+      #  @response.body
+      # "BZ#999999: Upgrade jboss-aggregator to 7.2.0.Final-redhat-7 (MOCK)"
+      bug_info = extract_bz_bug_info(@response.body)
+      bz_id = bug_info[:bz_id]
+      response = query_bz_bug_info(bz_id, extract_username(params[:user]), params[:pwd])
+
+      if response.class == Net::HTTPOK
+        bz_info = JSON.parse(@response.body)
+        bz_bug =
+            BzBug.create_from_bz_info(bz_info, package_id, current_user, os)
+      end
+    end
+    response
   end
 
 end

@@ -1,8 +1,7 @@
 if @error.blank?
   if @response.class == Net::HTTPOK
-    bug = @bz_bug.package.upgrade_bz
-    if !bug.nil? && bug.id == @bz_bug.id
-      page << "renderByUpgradeBz('#{@bz_bug.id}')"
+    if @bz_bug.package.upgrade_bz.include? @bz_bug
+      page << "renderByUpgradeBz()"
     else
       page << "updateBzBugRow('#{@bz_bug.id}')"
     end

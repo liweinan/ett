@@ -642,8 +642,10 @@ class ApplicationController < ActionController::Base
   end
 
   def need_source_url?(package)
-    build = build_type(package)
-    return (build == 'WRAPPER') || (build == "MEAD_ONLY")
+    build = build_type(package.name)
+    build_check = (build == 'WRAPPER') || (build == "MEAD_ONLY")
+    has_wrapper_tag = !(package.tags.select { |tag| tag.key == 'wrapper' }).empty?
+    return build_check || has_wrapper_tag
   end
 
 end
