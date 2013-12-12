@@ -300,7 +300,7 @@ class PackagesController < ApplicationController
 
                 if Rails.env.production?
                   @package.bz_bugs.each do |bz_bug|
-                    if bz_bug.summary.match(/Upgrade/) && bz_bug.bz_assignee == assignee_email
+                    if bz_bug.summary.match(/Upgrade/) && bz_bug.summary.match(/RHEL6/) && bz_bug.bz_assignee == assignee_email
 
                       comment = "Source URL: #{@package.git_url}\n" +
                           "Mead-Build: #{@package.mead}\n" +
