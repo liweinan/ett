@@ -10,7 +10,7 @@ class BzBug < ActiveRecord::Base
   default_value_for :last_synced_at, Time.now
   default_value_for :is_in_errata, "NO"
 
-  def self.create_from_bz_info(bz_info, package_id, current_user)
+  def self.create_from_bz_info(bz_info, package_id, current_user, os='el6')
     bz_id = bz_info["id"]
     summary = bz_info["summary"]
     bz_status = bz_info["status"]
@@ -23,6 +23,7 @@ class BzBug < ActiveRecord::Base
     bz_bug.bz_assignee = bz_info["assignee"]
     bz_bug.component = bz_info["component"]
     bz_bug.keywords = bz_info["keywords"].join(',')
+    bz_bug.os_arch = os
     bz_bug.save
     bz_bug
   end

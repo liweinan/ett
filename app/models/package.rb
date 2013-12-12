@@ -137,7 +137,7 @@ class Package < ActiveRecord::Base
   end
 
   def upgrade_bz
-    BzBug.first(:conditions => ['package_id = ? and summary like ?', self.id, "%Upgrade%#{self.name}%"])
+    BzBug.all(:conditions => ['package_id = ? and summary like ?', self.id, "%Upgrade%#{self.name}%"])
   end
 
   def to_s
@@ -153,20 +153,6 @@ class Package < ActiveRecord::Base
 
   def pending_bz_bugs
     BzBug.all(:conditions => ['package_id = ? and bz_action is not null', self.id])
-  end
-
-  def errata_related_bz
-    errata_bz = []
-    bz_bugs.each do |bug|
-
-      if (bug.bz_status == "MODIFIED") &&
-          (bug.summary.include? "Upgrade") &&
-          (bug.component.include? "RPMs") &&
-          (bug.keywords.include? "Rebase")
-        errata_bz.push bug.bz_id
-      end
-    end
-    errata_bz.join(",")
   end
 
   def bz_bug_ids

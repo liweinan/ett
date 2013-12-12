@@ -6,8 +6,7 @@
          # do nothing on ActiveRecord::RecordNotFound
        end
     %>
-    <% ub = package.upgrade_bz %>
-    <% unless ub.blank? %>
+    <% package.upgrade_bz.each do |ub| %>
         <%= link_to ub.bz_id_and_is_in_errata, "#{APP_CONFIG['bugzilla_prefix']}#{ub.bz_id}", :target => '_blank' %>
     <% end %>
 <% end %>

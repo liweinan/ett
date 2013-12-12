@@ -1,8 +1,10 @@
 Errata bz:
 <% if bz_bug %>
+<% @package.upgrade_bz.each do |bz_bug| %>
     <div id="col_bz_id_<%=bz_bug.id%>" style='display:none;'></div>
     <div id="col_bz_action_<%=bz_bug.id%>:<%=bz_bug.bz_action%>" style='display:none;'></div>
     <%= link_to("bz#{bz_bug.bz_id} [#{bz_bug.bz_status}] #{bz_bug.summary}", "#{APP_CONFIG['bugzilla_prefix']}#{bz_bug.bz_id}", :target => '_blank') %>
+<% end %>
 <% elsif logged_in? && !@package.task.readonly? %>
     <form onsubmit="return false;" style='display:inline;'>
         <button onclick="renderBzBugForm('new_bz_bug_wsum');">Create a new Errata bug</button>

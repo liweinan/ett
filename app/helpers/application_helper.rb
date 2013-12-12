@@ -1,4 +1,5 @@
 require 'net/http'
+require 'json'
 # Methods added to this helper will be available to all templates in the application.
 module ApplicationHelper
   def render_changelog(changelog)
@@ -73,9 +74,22 @@ module ApplicationHelper
 
   def submit_build(pac, clentry, prod, mode)
     uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+    bz_bug_structure = []
+
+    pac.task.os_advisory_tags.each do |os_adv_tag|
+      bz_bug_structure.push({:os_arch => os_adv_tag.os_arch, :errata => os_adv_tag.advisory, :bzs => []})
+    end
+
+    pac.upgrade_bz.each do |bz_bug|
+      if bz_bug.os_arch.blank?
+        (bz_bug_structure.select {|x| x[:os_arch] == 'el6'}[0])[:bzs].push(bz_bug.bz_id)
+      else
+        (bz_bug_structure.select {|x| x[:os_arch] == bz_bug.os_arch}[0])[:bzs].push(bz_bug.bz_id)
+      end
+    end
 
     # stupid URI.encode cannot encode the '+' sign
-    params_build = "mode=#{mode}&userid=#{pac.user.email.gsub('@redhat.com', '')}" + "&sources=#{url_encode(pac.git_url)}&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}"
+    params_build = "mode=#{mode}&userid=#{pac.user.email.gsub('@redhat.com', '')}" + "&sources=#{url_encode(pac.git_url)}&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}&bzs=#{bz_bug_structure.to_json}"
     puts params_build
     req = Net::HTTP::Post.new("/mead-scheduler/rest/build/sched/#{prod}/#{pac.name}?" + params_build)
 
@@ -106,16 +120,9 @@ module ApplicationHelper
     else
         uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
         # the errata request is sent to mead-scheduler's rest api:
-        bugs = pac.errata_related_bz
 
-        link = "/mead-scheduler/rest/errata/#{prod}/files?dist=el6&bugs=#{pac.errata_related_bz}&nvr=#{pac.brew}&pkg=#{pac.name}"
+        link = "/mead-scheduler/rest/errata/#{prod}/files?dist=el6&nvr=#{pac.brew}&pkg=#{pac.name}"
         req = Net::HTTP::Post.new(link)
-
-        # TODO: choose which bugs to send to send to mead scheduler
-
-        # may need to update the names of these two parameters:
-        # params = {:bugs => pac.errata_related_bz, :nvr => pac.brew}
-        # req.set_form_data(params)
 
         res = Net::HTTP.start(uri.host, uri.port) do |http|
           http.request(req)

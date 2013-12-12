@@ -10,9 +10,8 @@ else
   if @do_nothing
     page.alert("Bug already added")
   elsif @response.class == Net::HTTPCreated || @response.class == Net::HTTPOK
-    bug = @bz_bug.package.upgrade_bz
-    if !bug.nil? && bug.id == @bz_bug.id
-      page << "renderByUpgradeBz('#{@bz_bug.id}')"
+    if @created
+      page << "renderByUpgradeBz()"
     else
       page << "addBzBugRow('#{@bz_bug.id}')"
     end
@@ -24,7 +23,3 @@ else
     page.alert("Unknown error: #{@response.to_s}")
   end
 end
-
-
-
-
