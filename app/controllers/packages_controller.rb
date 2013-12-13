@@ -243,8 +243,8 @@ class PackagesController < ApplicationController
 
           end
             if !current_ver.nil? and !old_version.nil? and current_ver != old_version
-              errata_bz = @package.upgrade_bz
-              unless errata_bz.nil?
+              errata_bzs = @package.upgrade_bz
+              errata_bzs.each do |errata_bz|
                 new_errata_bz_summary = errata_bz.summary.gsub(old_version, current_ver)
                 params_bz = {:userid => shared_bzauth_user, :pwd => shared_bzauth_pass, :summary => new_errata_bz_summary}
                 update_bug_summary(errata_bz.bz_id, oneway='true', params_bz)
