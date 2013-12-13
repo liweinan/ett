@@ -74,17 +74,13 @@ module ApplicationHelper
 
   def submit_build(pac, clentry, prod, mode)
     uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
-    bz_bug_structure = []
-
-    pac.task.os_advisory_tags.each do |os_adv_tag|
-      bz_bug_structure.push({:os_arch => os_adv_tag.os_arch, :errata => os_adv_tag.advisory, :bzs => []})
-    end
+    bz_bug_structure = {}
 
     pac.upgrade_bz.each do |bz_bug|
       if bz_bug.os_arch.blank?
-        (bz_bug_structure.select {|x| x[:os_arch] == 'el6'}[0])[:bzs].push(bz_bug.bz_id)
+        bz_bug_structure['el6'] = bz_bug.bz_id.to_i
       else
-        (bz_bug_structure.select {|x| x[:os_arch] == bz_bug.os_arch}[0])[:bzs].push(bz_bug.bz_id)
+        bz_bug_structure[bz_bug.os_arch] = bz_bug.bz_id.to_i
       end
     end
 
