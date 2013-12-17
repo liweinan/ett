@@ -5,6 +5,9 @@ warning_string = "This will also build the source '#{source_pkg}' package. " \
                  "If you only want to build the '#{pac.name}' wrapper of it " \
                  "please select CANCEL and make sure you check the Wrapper " \
                  "only option before requesting again"
+warning_chain = "This will build both the MEAD and WRAPPER part of the package. " \
+                "If you only want to build the WRAPPER part, please select CANCEL " \
+                "and make sure you check the Wrapper only option before requesting again"
 begin
   type_build = 'chain'
   type_build = 'wrapper' if params.include?(:wrapper_build)
@@ -16,6 +19,8 @@ begin
   page << "var move_fwd = true;"
   page << "if (x == 'chain' && is_eap6_pac) {"
   page << "  move_fwd = confirm(\"#{warning_string}\");"
+  page << "} else {"
+  page << "  move_fwd = confirm(\"#{warning_chain}\");"
   page << "}"
   page << "if (move_fwd) {"
   page << "  new Ajax.Request('/toolbox/submit_build/' + #{params[:package_id]}, {"
