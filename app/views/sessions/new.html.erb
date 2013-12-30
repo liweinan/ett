@@ -12,8 +12,16 @@
           </td>
         </tr>
         <tr>
+          <td>
+            Password
+          </td>
+          <td>
+            <%= f.password_field :password %>
+          </td>
+        </tr>
+        <tr>
           <td colspan=2 style="text-align:right;">
-            <%= f.submit 'Login' %>
+            Default password is your Email address. <%= f.submit 'Login' %>
           </td>
         </tr>
       </table>

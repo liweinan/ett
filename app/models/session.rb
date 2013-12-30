@@ -1,3 +1,3 @@
 class Session
-  attr_accessor :email
+  attr_accessor :email, :password
 end

@@ -33,4 +33,10 @@ class User < ActiveRecord::Base
       tz.text
     end
   end
+
+  def self.encrypt_password(password)
+    return nil if password.blank?
+    require 'digest/md5'
+    Digest::MD5.hexdigest(password)
+  end
 end

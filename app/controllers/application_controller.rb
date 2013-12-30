@@ -648,4 +648,20 @@ class ApplicationController < ActionController::Base
     return build_check || has_wrapper_tag
   end
 
+  def password_valid?(user, password)
+    if user.blank?
+      false
+    end
+
+    #backward compatibility
+    if user.password.blank?
+      return user.email == password # default password is user email address
+    else
+      return user.password == User.encrypt_password(password)
+    end
+
+    false
+
+  end
+
 end
