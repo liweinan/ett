@@ -1,5 +1,5 @@
 Errata bz:
-<% if bz_bug %>
+<% if !bz_bug.blank? %>
 <% @package.upgrade_bz.each do |bz_bug| %>
     <div id="col_bz_id_<%=bz_bug.id%>" style='display:none;'></div>
     <div id="col_bz_action_<%=bz_bug.id%>:<%=bz_bug.bz_action%>" style='display:none;'></div>
