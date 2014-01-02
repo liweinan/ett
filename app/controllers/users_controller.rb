@@ -43,9 +43,6 @@ class UsersController < ApplicationController
   # GET /users/1/edit
   def edit
     @user = User.find(params[:id])
-    unless its_me?(@user)
-      redirect_to('/packages')
-    end
   end
 
   # POST /users
@@ -73,12 +70,11 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       respond_to do |format|
         params[:user][:email].downcase!
-        if its_me?(@user) && !params[:time_zone].blank?
+        if its_myself?(@user) && !params[:time_zone].blank?
           @user.tz = TimeZone.find(params[:time_zone])
           @user.save
         end
-
-        if its_me?(@user) && @user.update_attributes(params[:user])
+        if validate_input_password(@user, params[:user][:password], params[:user][:confirm_password]) && @user.update_attributes(params[:user])
           flash[:notice] = 'User was successfully updated.'
           format.html { redirect_to(@user) }
         else
@@ -87,6 +83,20 @@ class UsersController < ApplicationController
       end
     end
   end
+
+  def validate_input_password(user, password, confirm_password)
+    if user.blank? || password.blank?
+      return true # bypass checking if password does not change.
+    end
+
+    if (password == confirm_password)
+      return true
+    else
+      user.errors.add(:password, "different from confirm password.")
+      return false
+    end
+  end
+
 
   # DELETE /users/1
   # DELETE /users/1.xml

@@ -14,14 +14,14 @@
       <td><%= @user.zone_name %></td>
     </tr>
     <tr>
-      <td>&nbsp;Can Manage&nbsp;</td>
+      <td>Can Manage</td>
       <td><%= h @user.can_manage %></td>
     </tr>
   </table>
 </div>
 
 <br/>
-<% if its_me?(@user) %>
+<% if its_myself?(@user) || can_manage? %>
     <%= link_to 'Edit', edit_user_path(@user) %> |
 <% end %>
 <%= link_to 'Back', users_path %>

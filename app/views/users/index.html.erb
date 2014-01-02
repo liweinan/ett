@@ -19,7 +19,7 @@
           <td><%= h user.can_manage %></td>
           <% if logged_in? %>
               <td>
-                <% if its_me?(user) %>
+                <% if its_myself?(user) || can_manage? %>
                     <%= link_to 'Edit', edit_user_path(user) %>
                 <% end %>
               </td>

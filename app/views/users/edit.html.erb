@@ -4,10 +4,10 @@
   <% form_for(@user) do |f| %>
       <%= f.error_messages %>
       <table>
-
         <%= render :partial => 'users/fields/name', :locals => {:f => f} %>
         <%= render :partial => 'users/fields/email', :locals => {:f => f} %>
         <%= render :partial => 'users/fields/tz', :locals => {:f => f} %>
+        <%= render :partial => 'users/fields/password', :locals => {:f => f} %>
         <% if can_manage? %>
             <%= render :partial => 'users/fields/can_manage', :locals => {:f => f} %>
         <% end %>

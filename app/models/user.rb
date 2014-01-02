@@ -5,7 +5,7 @@ class User < ActiveRecord::Base
   validates_presence_of :name
   validates_presence_of :email
   belongs_to :tz, :class_name => 'TimeZone', :foreign_key => 'tz_id'
-
+  attr_accessor :confirm_password
   default_value_for :can_manage, "No"
 
   def self.find_by_name_or_email(id)
@@ -38,5 +38,9 @@ class User < ActiveRecord::Base
     return nil if password.blank?
     require 'digest/md5'
     Digest::MD5.hexdigest(password)
+  end
+
+  def password=(password)
+    self[:password] = User.encrypt_password(password)
   end
 end
