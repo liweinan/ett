@@ -117,7 +117,7 @@ module ApplicationHelper
         uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
         # the errata request is sent to mead-scheduler's rest api:
 
-        link = "/mead-scheduler/rest/errata/#{prod}/files?dist=el6&nvr=#{pac.brew}&pkg=#{pac.name}"
+        link = "/mead-scheduler/rest/errata/#{prod}/files?dist=el6&nvr=#{pac.brew}&pkg=#{pac.name}&version=#{pac.task.tag_version}"
         req = Net::HTTP::Post.new(link)
 
         res = Net::HTTP.start(uri.host, uri.port) do |http|
