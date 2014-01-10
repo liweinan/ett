@@ -131,7 +131,7 @@ module ApplicationHelper
         pac.task.os_advisory_tags.each do |os_tag|
           next if os_tag.os_arch == 'el6'
 
-          latest_brew_nvr = get_brew_name(pac, os_tag.candidate_tag)
+          latest_brew_nvr = get_brew_name(pac, os_tag.candidate_tag + '-build')
           link = "/mead-scheduler/rest/errata/#{prod}/files?dist=#{os_tag.os_arch}&nvr=#{latest_brew_nvr}&pkg=#{pac.name}&version=#{pac.task.tag_version}"
           req = Net::HTTP::Post.new(link)
 
