@@ -125,7 +125,23 @@ module ApplicationHelper
         end
 
 
+
+
+        # TODO: remove those copy-pasted code!
+        pac.task.os_advisory_tags.each do |os_tag|
+          next if os_tag.os_arch == 'el6'
+
+          latest_brew_nvr = get_brew_name(pac, os_tag.candidate_tag)
+          link = "/mead-scheduler/rest/errata/#{prod}/files?dist=#{os_tag.os_arch}&nvr=#{latest_brew_nvr}&pkg=#{pac.name}&version=#{pac.task.tag_version}"
+          req = Net::HTTP::Post.new(link)
+
+          res = Net::HTTP.start(uri.host, uri.port) do |http|
+            http.request(req)
+          end
+        end
+
         # Need to update the error codes when we get word on their values:
+        # TODO: huh make it apply for all of them!
         case res.code
         when "202"
             "202: Successfully added package #{pac.name} to Errata"
@@ -139,20 +155,6 @@ module ApplicationHelper
             "#{res.code} error! \n
             Link used: #{link} \n
             #{res.body}"
-        end
-
-
-        # TODO: remove those copy-pasted code!
-        pac.task.os_advisory_tags.each do |os_tag|
-          next if os_tag.os_arch == 'el6'
-
-          latest_brew_nvr = get_brew_name(pac, os_tag.candidate_tag)
-          link = "/mead-scheduler/rest/errata/#{prod}/files?dist=#{pac.os_arch}&nvr=#{latest_brew_nvr}&pkg=#{pac.name}&version=#{pac.task.tag_version}"
-          req = Net::HTTP::Post.new(link)
-
-          res = Net::HTTP.start(uri.host, uri.port) do |http|
-            http.request(req)
-          end
         end
 
       end
