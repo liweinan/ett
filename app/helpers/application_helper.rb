@@ -108,6 +108,7 @@ module ApplicationHelper
   end
 
   def add_errata(pac, prod)
+
     if pac.status.blank? || pac.status.name != 'Finished'
       "You can only add to Errata when the build is Finished."
     elsif !pac.in_shipped_list?
@@ -118,7 +119,6 @@ module ApplicationHelper
 
         link = "/mead-scheduler/rest/errata/#{prod}/files?dist=el6&nvr=#{pac.brew}&pkg=#{pac.name}&version=#{pac.task.tag_version}"
         req = Net::HTTP::Post.new(link)
-
 
         res = Net::HTTP.start(uri.host, uri.port) do |http|
           http.request(req)
@@ -140,21 +140,6 @@ module ApplicationHelper
             Link used: #{link} \n
             #{res.body}"
         end
-
-
-        # TODO: remove those copy-pasted code!
-        pac.task.os_advisory_tags.each do |os_tag|
-          next if os_tag.os_arch == 'el6'
-
-          latest_brew_nvr = get_brew_name(pac, os_tag.candidate_tag)
-          link = "/mead-scheduler/rest/errata/#{prod}/files?dist=#{pac.os_arch}&nvr=#{latest_brew_nvr}&pkg=#{pac.name}&version=#{pac.task.tag_version}"
-          req = Net::HTTP::Post.new(link)
-
-          res = Net::HTTP.start(uri.host, uri.port) do |http|
-            http.request(req)
-          end
-        end
-
       end
   end
 
