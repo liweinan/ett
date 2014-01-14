@@ -194,13 +194,16 @@ class BzBugsController < ApplicationController
 
   def render_partial
     # used in the view...
-    @package = Package.find(params[:package_id])
+    # happens that this is 0 for bz_bugs/bz_assignee... need to investigate why
+    if params[:package_id] != "0"
+      @package = Package.find(params[:package_id])
+    end
     respond_to do |format|
       format.js {
         if params[:id].scan(/\d+/) != ['0'] || params[:id].scan(/\d+/) != [0]
-          bz_bug_temp = nil
-        else
           bz_bug_temp = BzBug.find(params[:id].scan(/\d+/))[0]
+        else
+          bz_bug_temp = nil
         end
         render(:partial => params[:partial], :locals => {:id => params[:id], :package_id => params[:package_id], :bz_bug => bz_bug_temp})
       }
