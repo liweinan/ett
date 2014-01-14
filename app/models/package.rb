@@ -229,7 +229,7 @@ class Package < ActiveRecord::Base
   def get_scm_url_style
     if git_url.blank? || brew_scm_url.blank?
       ''
-    elsif (git_url != brew_scm_url) && (!can_edit_version?)
+    elsif (git_url.strip != brew_scm_url.strip) && (!can_edit_version?)
       "background-color: yellow;"
     else
       ''
