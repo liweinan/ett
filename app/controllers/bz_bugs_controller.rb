@@ -195,7 +195,12 @@ class BzBugsController < ApplicationController
   def render_partial
     respond_to do |format|
       format.js {
-        render(:partial => params[:partial], :locals => {:id => params[:id], :package_id => params[:package_id], :bz_bug => BzBug.find(params[:id].scan(/\d+/))[0]})
+        if params[:id].scan(/\d+/) != '0' || params[:id].scan(/\d+/) != 0
+          bz_bug_temp = nil
+        else
+          bz_bug_temp = BzBug.find(params[:id].scan(/\d+/))[0]
+        end
+        render(:partial => params[:partial], :locals => {:id => params[:id], :package_id => params[:package_id], :bz_bug => bz_bug_temp})
       }
     end
   end
