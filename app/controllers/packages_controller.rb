@@ -298,21 +298,25 @@ class PackagesController < ApplicationController
                   end
                 end
 
+                # TODO: add comment with non-RHEL6 builds too
                 if Rails.env.production?
                   @package.bz_bugs.each do |bz_bug|
-                    if bz_bug.summary.match(/Upgrade/) && bz_bug.summary.match(/RHEL6/) && bz_bug.bz_assignee == assignee_email
-
-                      comment = "Source URL: #{@package.git_url}\n" +
-                          "Mead-Build: #{@package.mead}\n" +
-                          "Brew-Build: #{@package.brew}\n"
+                    if bz_bug.summary.match(/Upgrade/) && bz_bug.bz_assignee == assignee_email
 
                       userid = extract_username(params[:bzauth_user])
-                      params_bz = {:comment => comment,
-                                   :milestone => @package.task.milestone,
+                      params_bz = {:milestone => @package.task.milestone,
                                    :assignee => assignee_email,
                                    :userid => shared_bzauth_user,
                                    :status => BzBug::BZ_STATUS[:modified],
                                    :pwd => shared_bzauth_pass}
+
+                      if bz_bug.summary.match(/RHEL6/)
+                        comment = "Source URL: #{@package.git_url}\n" +
+                            "Mead-Build: #{@package.mead}\n" +
+                            "Brew-Build: #{@package.brew}\n"
+                        params_bz[:comment] = comment
+                      end
+
                       add_comment_milestone_status_to_bug(bz_bug.bz_id, params_bz)
 
                       bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
