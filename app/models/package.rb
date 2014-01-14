@@ -137,7 +137,7 @@ class Package < ActiveRecord::Base
   end
 
   def upgrade_bz
-    BzBug.all(:conditions => ['package_id = ? and summary like ?', self.id, "%Upgrade%#{self.name}%"])
+    BzBug.all(:conditions => ['package_id = ? and summary like ? and component = ?', self.id, "%Upgrade%#{self.name}%", 'RPMS'])
   end
 
   def to_s
