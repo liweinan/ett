@@ -197,7 +197,7 @@ class BzBugsController < ApplicationController
     @package = Package.find(params[:package_id])
     respond_to do |format|
       format.js {
-        if params[:id].scan(/\d+/) != '0' || params[:id].scan(/\d+/) != 0
+        if params[:id].scan(/\d+/) != ['0'] || params[:id].scan(/\d+/) != [0]
           bz_bug_temp = nil
         else
           bz_bug_temp = BzBug.find(params[:id].scan(/\d+/))[0]
