@@ -193,6 +193,8 @@ class BzBugsController < ApplicationController
   end
 
   def render_partial
+    # used in the view...
+    @package = Package.find(params[:package_id])
     respond_to do |format|
       format.js {
         if params[:id].scan(/\d+/) != '0' || params[:id].scan(/\d+/) != 0
