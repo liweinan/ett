@@ -31,6 +31,7 @@ class BzBugsController < ApplicationController
         email = nil
         unless package.assignee.blank?
           email = package.assignee.email
+          email = package.assignee.bugzilla_email unless package.assignee.bugzilla_email.blank?
           parameters['assignee'] = email
         end
 

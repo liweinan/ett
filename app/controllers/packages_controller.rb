@@ -232,6 +232,7 @@ class PackagesController < ApplicationController
               @package.bz_bugs.each do |bz_bug|
                 if bz_bug.summary.match(/Upgrade/) && !assignee_email.nil? && (!bz_bug.component.blank? && bz_bug.component.include?("RPMs")) && (bz_bug.keywords.include? "Rebase")
 
+                  assignee_email = @package.assignee.bugzilla_email unless @package.assignee.bugzilla_email.blank?
                   params_bz = {:assignee => assignee_email, :userid => shared_bzauth_user, :pwd => shared_bzauth_pass, :status => BzBug::BZ_STATUS[:assigned]}
                   update_bug(bz_bug.bz_id, oneway='true', params_bz)
                   bz_bug.bz_assignee = assignee_email
@@ -277,7 +278,8 @@ class PackagesController < ApplicationController
                 # the bug statuses are waiting to be updated according to https://docspace.corp.redhat.com/docs/DOC-148169
                 if Rails.env.production? # TODO we need to write some unit tests to test all the integrations with SOA
                   @package.bz_bugs.each do |bz_bug|
-                    if bz_bug.summary.match(/Upgrade/) && bz_bug.bz_assignee == assignee_email
+                    if bz_bug.summary.match(/Upgrade/) && (bz_bug.bz_assignee == assignee_email || bz_bug.bz_assignee == @package.assignee.bugzilla_email)
+                      assignee_email = @package.assignee.bugzilla_email unless @package.assignee.bugzilla_email.blank?
                       params_bz = {:assignee => assignee_email, :userid => shared_bzauth_user,
                                    :pwd => shared_bzauth_pass, :status => BzBug::BZ_STATUS[:assigned]}
 
@@ -301,7 +303,8 @@ class PackagesController < ApplicationController
                 # TODO: add comment with non-RHEL6 builds too
                 if Rails.env.production?
                   @package.bz_bugs.each do |bz_bug|
-                    if bz_bug.summary.match(/Upgrade/) && bz_bug.bz_assignee == assignee_email
+                    if bz_bug.summary.match(/Upgrade/) && (bz_bug.bz_assignee == assignee_email || bz_bug.bz_assignee == @package.assignee.bugzilla_email)
+                      assignee_email = @package.assignee.bugzilla_email unless @package.assignee.bugzilla_email.blank?
 
                       userid = extract_username(params[:bzauth_user])
                       params_bz = {:milestone => @package.task.milestone,

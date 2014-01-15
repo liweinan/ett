@@ -5,6 +5,7 @@
       <table>
         <%= render :partial => 'users/fields/name', :locals => {:f => f} %>
         <%= render :partial => 'users/fields/email', :locals => {:f => f} %>
+        <%= render :partial => 'users/fields/bugzilla_email', :locals => {:f => f} %>
         <tr>
           <td colspan=2 style="text-align:right;">
             <%= f.submit 'Create' %>
