@@ -316,13 +316,29 @@ class Package < ActiveRecord::Base
       return ''
     end
 
+    # e.g ver = 4.0.19.SP3-redhat-1
+    # first_part_ver = 4.0.19
+    # second_part_ver = SP3_redhat_1
     first_part_ver = ver.gsub(/\.([^.]*)$/, '').gsub('-', '_')
     second_part_ver = ver.gsub(first_part_ver + '.', '').gsub('-', '_')
 
+    # for alt part, e.g ver = 201103-redhat-3
+    # break into two strings at the redhat part
+    # alt_first_part = 201103
+    # alt_second_part = redhat_3
+    # Use alt part only if ver does not contain any dots
+    alt_first_part_ver = ver.gsub(/(.)redhat.*/, '').gsub('-', '_')
+    alt_second_part_ver = ver.gsub(/#{alt_first_part_ver}(.)/, '').gsub('-', '_')
     [mead, brew].each do |item|
       if !item.nil? && !item.empty?
-        if !item.include?(first_part_ver) || !item.include?(second_part_ver)
-          return "background-color: #ff5757;"
+        if ver.include?('.')
+          if !(item.include?(first_part_ver) && item.include?(second_part_ver))
+            return "background-color: #ff5757;"
+          end
+        else
+          if !(item.include?(alt_first_part_ver) && item.include?(alt_second_part_ver))
+            return "background-color: #ff5757;"
+          end
         end
       end
     end
