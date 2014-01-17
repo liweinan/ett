@@ -4,6 +4,7 @@
     <tr>
       <th class='content-list-head'>Name</th>
       <th class='content-list-head'>Email</th>
+      <th class='content-list-head'>Bugzilla Email</th>
       <th class='content-list-head'>Time Zone</th>
       <th class='content-list-head'>&nbsp;Can Manage&nbsp;</th>
       <% if logged_in? %>
@@ -15,6 +16,7 @@
         <tr>
           <td><%= link_to user.name, :controller => :users, :action => :show, :id => user.id %></td>
           <td><%= h user.email %></td>
+          <td><%= h user.bugzilla_email %></td>
           <td><%= h user.zone_name %></td>
           <td><%= h user.can_manage %></td>
           <% if logged_in? %>

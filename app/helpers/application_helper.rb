@@ -108,24 +108,48 @@ module ApplicationHelper
   end
 
   def add_errata(pac, prod)
-
     if pac.status.blank? || pac.status.name != 'Finished'
       "You can only add to Errata when the build is Finished."
     elsif !pac.in_shipped_list?
         "Package not in shipped list. Aborting"
     else
+
+        bz_struct = {}
+        pac.upgrade_bz.each do |bz|
+          bz_struct[bz.os_arch] = bz.bz_id
+        end
+
         uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
         # the errata request is sent to mead-scheduler's rest api:
 
-        link = "/mead-scheduler/rest/errata/#{prod}/files?dist=el6&nvr=#{pac.brew}&pkg=#{pac.name}"
+        link = "/mead-scheduler/rest/errata/#{prod}/files?dist=el6&nvr=#{pac.brew}&pkg=#{pac.name}&version=#{pac.task.tag_version}"
+        link += '&bugs=' + bz_struct['el6'] if bz_struct.has_key? 'el6'
+
         req = Net::HTTP::Post.new(link)
+
 
         res = Net::HTTP.start(uri.host, uri.port) do |http|
           http.request(req)
         end
 
 
+
+        # TODO: remove those copy-pasted code!
+        pac.task.os_advisory_tags.each do |os_tag|
+          next if os_tag.os_arch == 'el6'
+
+          latest_brew_nvr = get_brew_name(pac, os_tag.candidate_tag + '-build')
+          link = "/mead-scheduler/rest/errata/#{prod}/files?dist=#{os_tag.os_arch}&nvr=#{latest_brew_nvr}&pkg=#{pac.name}&version=#{pac.task.tag_version}"
+          link += '&bugs=' + bz_struct[os_tag.os_arch] if bz_struct.has_key? os_tag.os_arch
+          req = Net::HTTP::Post.new(link)
+
+          res = Net::HTTP.start(uri.host, uri.port) do |http|
+            http.request(req)
+          end
+        end
+
         # Need to update the error codes when we get word on their values:
+        # TODO: huh make it apply for all of them!
         case res.code
         when "202"
             "202: Successfully added package #{pac.name} to Errata"
@@ -140,6 +164,7 @@ module ApplicationHelper
             Link used: #{link} \n
             #{res.body}"
         end
+
       end
   end
 

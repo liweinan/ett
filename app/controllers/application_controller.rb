@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
 
   helper :all # include all helpers, all the time
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
-  helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_task?, :count_packages, :can_edit_package?, :current_user, :get_task, :has_status?, :has_tag?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :task_has_tags?, :get_xattrs, :background_style, :confirmed?, :default_style
+  helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_task?, :count_packages, :can_edit_package?, :current_user, :get_task, :has_status?, :has_tag?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :task_has_tags?, :get_xattrs, :background_style, :confirmed?, :default_style, :get_brew_name
   helper_method :btag, :ebtag, :uebtag, :truncate_u, :its_myself?, :extract_username, :has_bz_auth_info?, :has_mead_integration?
   before_filter :process_task_id
   before_filter :save_current_link
@@ -553,9 +553,13 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def get_brew_name(pac)
+  def get_brew_name(pac, candidate_tag=nil)
     # TODO: make the tag more robust
-    tag = pac.task.candidate_tag + '-build'
+    if candidate_tag.nil?
+      tag = pac.task.candidate_tag + '-build'
+    else
+      tag = candidate_tag
+    end
     uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"] +
                                    "/mead-brewbridge/pkg/latest/#{tag}/#{pac.name}"))
     res = Net::HTTP.get_response(uri)
