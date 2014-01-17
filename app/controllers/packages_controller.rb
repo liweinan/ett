@@ -584,10 +584,18 @@ class PackagesController < ApplicationController
     package.save
   end
 
+  # get_mead_info will go get the mead nvr from the rpm repo directly if it
+  # cannot find it via the mead scheduler
   def get_mead_info(package)
     brew_pkg = get_brew_name(package)
     package.brew = brew_pkg
-    package.mead = get_mead_name(brew_pkg) unless brew_pkg.blank?
+    unless brew_pkg.blank?
+      package.mead = get_mead_name(brew_pkg) unless brew_pkg.blank?
+    else
+      uri = URI.parse("http://pkgs.devel.redhat.com/cgit/rpms/#{package.name}/plain/last-mead-build?h=#{package.task.candidate_tag}")
+      res = Net::HTTP.get_response(uri)
+      package.mead = res.body if res.code == '200'
+    end
     package.mead_action = Package::MEAD_ACTIONS[:done]
     package.save
   end
