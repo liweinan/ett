@@ -97,6 +97,22 @@ class UsersController < ApplicationController
     end
   end
 
+  def reset_password
+    if request.post?
+      u = User.find_by_email(params[:email])
+      if u
+        u.reset_code = User.make_token
+        u.save!
+        UserMailer.deliver_reset_password(u.name, "Reset Password", "http://ett.usersys.redhat.com/users/#{u.id}/edit?reset_code=#{u.reset_code}")
+        flash[:notice] = "The password reset code has been sent to your email address."
+      else
+        flash[:error] = "User not found."
+      end
+      redirect_to('/login')
+    else
+
+    end
+  end
 
   # DELETE /users/1
   # DELETE /users/1.xml
