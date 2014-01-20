@@ -446,26 +446,10 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def bz_bug_creation_uri
-    if Rails.env.production?
-      return URI.parse(APP_CONFIG['bz_bug_creation_url'])
-    else
-      return URI.parse(APP_CONFIG['bz_bug_creation_url_mocked'])
-    end
-  end
-
-  def bz_bug_status_update_url
-    if Rails.env.production?
-      return APP_CONFIG['bz_bug_status_update_url']
-    else
-      return APP_CONFIG['bz_bug_status_update_url_mocked']
-    end
-  end
-
   # bz_bug_status_update_url: "http:/mead.usersys.redhat.com/mead-bzbridge/bug/status/<id>?oneway=<oneway>&status=<status>&assignee=<assignee>&userid=<userid>&pwd=<pwd>"
   def generate_bug_status_update_url(id, oneway, params)
     link = APP_CONFIG["mead_scheduler"] +
-        bz_bug_status_update_url.gsub('<id>', id).gsub('<oneway>', oneway)
+        BzBug.bz_bug_status_update_url.gsub('<id>', id).gsub('<oneway>', oneway)
     params.each do |key, value|
       link += "&#{key}=#{URI::encode(value)}"
     end
@@ -570,26 +554,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def extract_bz_bug_info(body)
-    #  @response.body
-    # "999999: Upgrade jboss-aggregator to 7.2.0.Final-redhat-7 (MOCK)"
-    bug_info = Hash.new
-    unless body.blank?
-      bug_info[:bz_id] = body.scan(/^\d+/)[0].to_i
-      bug_info[:summary] = body.split(/^\d+:\s*/)[1]
-    end
-    bug_info
-  end
-
-  def query_bz_bug_info(bz_id, user, pwd)
-    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
-    req = Net::HTTP::Get.new("/mead-bzbridge/bug/#{bz_id}?userid=#{user}&pwd=#{pwd}")
-    req['Accept'] = 'application/json'
-    response = Net::HTTP.start(uri.host, uri.port) do |http|
-      http.request(req)
-    end
-  end
-
   def current_bzuser(params)
     extract_username(params[:bzauth_user])
   end
@@ -603,7 +567,7 @@ class ApplicationController < ActionController::Base
   end
 
   def get_bz_info(bz_id, userid, pwd)
-    @response = query_bz_bug_info(bz_id, user_id, pwd)
+    @response = BzBug.query_bz_bug_info(bz_id, user_id, pwd)
     bz_info = nil
     if @response.class == Net::HTTPOK
       bz_info = JSON.parse(@response.body)

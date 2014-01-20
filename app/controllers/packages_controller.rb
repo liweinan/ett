@@ -176,7 +176,7 @@ class PackagesController < ApplicationController
         deprecated_bug_store = @package.bz_bugs.clone
 
         shared_inline_bzs.each do |bz_id|
-          bz_query_resp = query_bz_bug_info(bz_id, shared_bzauth_user, shared_bzauth_pass)
+          bz_query_resp = BzBug.query_bz_bug_info(bz_id, shared_bzauth_user, shared_bzauth_pass)
           if bz_query_resp.class == Net::HTTPOK
             bz_body = JSON.parse(bz_query_resp.body)
             existing_bz_bug = @package.bz_bug_with_bz_id(bz_id)

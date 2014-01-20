@@ -1,3 +1,6 @@
+require 'net/http'
+require 'json'
+
 class BzBug < ActiveRecord::Base
   belongs_to :creator, :class_name => "User", :foreign_key => "creator_id"
   belongs_to :package, :class_name => "Package", :foreign_key => "package_id"
@@ -86,4 +89,103 @@ class BzBug < ActiveRecord::Base
     return bz_id + " ✔" if !is_in_errata.blank? && is_in_errata == "YES"
     return bz_id # else part
   end
+
+  # Create a bug to bugzilla and also create a new bz_bug object to the database
+  #
+  # Params:
+  # +parameters+: hash of key strings and value strings
+  #  Keys expected in parameters:
+  #  pkg:         package name
+  #  version:     version of the package to be upgraded
+  #  release:     The target release
+  #  tagversion:  The target version
+  #  userid:      Just the username of user that will build package (e.g dcheung)
+  #  pwd:         The password of the user (for bugzilla)
+  #  summary:     The summary of the bugzilla to be created
+  #  seealso:     [optional] optional bugzilla id to link to the bz we will
+  #               create
+  #  assignee:    The email of the assignee of this bugzilla
+  def self.create_bzs_from_params(parameters, os, package_id, current_user)
+    puts parameters
+    puts BzBug.bz_bug_creation_uri
+    response = Net::HTTP.post_form(BzBug.bz_bug_creation_uri, parameters)
+
+    if response.class == Net::HTTPCreated
+      #  @response.body
+      # "BZ#999999: Upgrade jboss-aggregator to 7.2.0.Final-redhat-7 (MOCK)"
+      bug_info = BzBug.extract_bz_bug_info(response.body)
+      bz_id = bug_info[:bz_id]
+      response = BzBug.query_bz_bug_info(bz_id, parameters['userid'], parameters['pwd'])
+
+      if response.class == Net::HTTPOK
+        bz_info = JSON.parse(response.body)
+        bz_bug =
+            BzBug.create_from_bz_info(bz_info, package_id, current_user, os)
+      end
+    end
+    response
+  end
+
+  # From assignee (User) object, determine the best email address of the
+  # assignee
+  #
+  # Params:
+  # +assignee+: User object that represents the assignee of a bugzilla
+  #
+  # Returns: string of email address of assignee, nil if assignee is nil
+  def self.determine_bz_assignee_email(assignee)
+    unless assignee.blank?
+      return assignee.bugzilla_email unless assignee.bugzilla_email.blank?
+      return assignee.email # else
+    else
+      nil
+    end
+  end
+
+  # Get the URI object for creating/updating new bugzilla using the mead
+  # scheduler REST API. The endpoint depends on whether we are in production or
+  # development
+  #
+  # Returns: URI object representing the endpoint
+  def self.bz_bug_creation_uri
+    if Rails.env.production?
+      return URI.parse(APP_CONFIG['bz_bug_creation_url'])
+    else
+      return URI.parse(APP_CONFIG['bz_bug_creation_url_mocked'])
+    end
+  end
+
+  # Get the mead scheduler endpoint for updating current bugzillas. The endpoint
+  # depends on whether we are in production or development.
+  #
+  # Returns: string
+  def self.bz_bug_status_update_url
+    if Rails.env.production?
+      return APP_CONFIG['bz_bug_status_update_url']
+    else
+      return APP_CONFIG['bz_bug_status_update_url_mocked']
+    end
+  end
+
+  def self.extract_bz_bug_info(body)
+    #  @response.body
+    # "999999: Upgrade jboss-aggregator to 7.2.0.Final-redhat-7 (MOCK)"
+    bug_info = Hash.new
+    unless body.blank?
+      bug_info[:bz_id] = body.scan(/^\d+/)[0].to_i
+      bug_info[:summary] = body.split(/^\d+:\s*/)[1]
+    end
+    bug_info
+  end
+
+  # TODO: maybe make it a method function instead?
+  def self.query_bz_bug_info(bz_id, user, pwd)
+    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+    req = Net::HTTP::Get.new("/mead-bzbridge/bug/#{bz_id}?userid=#{user}&pwd=#{pwd}")
+    req['Accept'] = 'application/json'
+    response = Net::HTTP.start(uri.host, uri.port) do |http|
+      http.request(req)
+    end
+  end
+
 end

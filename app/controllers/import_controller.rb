@@ -191,9 +191,9 @@ class ImportController < ApplicationController
                         'tagversion' => bz_bug_obj[:package].task.tag_version,
                         'userid' => extract_username(params[:bzauth_user]),
                         'pwd' => params[:bzauth_pwd]}
-          response = Net::HTTP.post_form(bz_bug_creation_uri, parameters)
+          response = Net::HTTP.post_form(BzBug.bz_bug_creation_uri, parameters)
           if response.class == Net::HTTPCreated
-            bug_info = extract_bz_bug_info(response.body)
+            bug_info = BzBug.extract_bz_bug_info(response.body)
             bz_bug = BzBug.new
             bz_bug.package_id = bz_bug_obj[:package].id
             bz_bug.bz_id = bug_info[:bz_id]
