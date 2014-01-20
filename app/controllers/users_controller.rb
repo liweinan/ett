@@ -42,7 +42,11 @@ class UsersController < ApplicationController
 
   # GET /users/1/edit
   def edit
-    @user = User.find(params[:id])
+    if params[:reset_code].blank?
+      @user = User.find(params[:id])
+    else
+      @user = User.find_by_id_and_reset_code(params[:id], params[:reset_code])
+    end
   end
 
   # POST /users
@@ -70,12 +74,16 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       respond_to do |format|
         params[:user][:email].downcase!
+
         if its_myself?(@user) && !params[:time_zone].blank?
           @user.tz = TimeZone.find(params[:time_zone])
           @user.save
         end
+
         if validate_input_password(@user, params[:user][:password], params[:user][:confirm_password]) && @user.update_attributes(params[:user])
           flash[:notice] = 'User was successfully updated.'
+          @user.reset_code = ''
+          @user.save
           format.html { redirect_to(@user) }
         else
           format.html { render :action => "edit" }
@@ -99,30 +107,37 @@ class UsersController < ApplicationController
 
   def reset_password
     if request.post?
-      u = User.find_by_email(params[:email])
-      if u
-        u.reset_code = User.make_token
-        u.save!
-        UserMailer.deliver_reset_password(u.name, "Reset Password", "http://ett.usersys.redhat.com/users/#{u.id}/edit?reset_code=#{u.reset_code}")
-        flash[:notice] = "The password reset code has been sent to your email address."
+      if params[:task][:email].blank?
+        @user = User.new
+        @user.errors.add(:email, "not found.")
       else
-        flash[:error] = "User not found."
+        @user = User.find_by_email(params[:task][:email])
+        if @user.blank?
+          @user = User.new
+          @user.errors.add(:email, "User not found.")
+          return
+        else
+          @user.make_token
+          Thread.new do
+            UserMailer.deliver_reset_password(@user)
+          end
+          flash[:notice] = "The password reset code has been sent to your email address."
+        end
       end
-      redirect_to('/login')
-    else
-
+    else # GET
+      @user = User.new
     end
   end
 
-  # DELETE /users/1
-  # DELETE /users/1.xml
-  #  def destroy
-  #    @user = User.find(params[:id])
-  #    @user.destroy
-  #
-  #    respond_to do |format|
-  #      format.html { redirect_to(users_url) }
-  #      format.xml  { head :ok }
-  #    end
-  #  end
+# DELETE /users/1
+# DELETE /users/1.xml
+#  def destroy
+#    @user = User.find(params[:id])
+#    @user.destroy
+#
+#    respond_to do |format|
+#      format.html { redirect_to(users_url) }
+#      format.xml  { head :ok }
+#    end
+#  end
 end

@@ -45,7 +45,7 @@ class User < ActiveRecord::Base
   end
 
   def make_token
-    self.reset_code = Time.now.to_s
+    self.reset_code = Time.now.to_i
     self.save
   end
 

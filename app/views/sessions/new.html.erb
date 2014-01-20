@@ -22,6 +22,12 @@
         <tr>
           <td colspan=2 style="text-align:right;">
             Default password is your Email address. <%= f.submit 'Login' %>
+            <br/>
+          </td>
+        </tr>
+        <tr>
+          <td colspan=2 style="text-align:right;">
+            <%= link_to 'Reset Password', :controller => :users, :action => :reset_password, :id => -1 %>
           </td>
         </tr>
       </table>
