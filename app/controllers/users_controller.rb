@@ -42,10 +42,19 @@ class UsersController < ApplicationController
 
   # GET /users/1/edit
   def edit
-    if params[:reset_code].blank?
+    @user = nil
+    if logged_in?
       @user = User.find(params[:id])
-    else
+    elsif !params[:reset_code].blank?
       @user = User.find_by_id_and_reset_code(params[:id], params[:reset_code])
+    end
+
+    respond_to do |format|
+      format.html {
+        if @user.blank?
+          redirect_to '/login'
+        end
+      }
     end
   end
 
