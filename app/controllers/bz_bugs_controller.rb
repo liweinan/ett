@@ -31,23 +31,24 @@ class BzBugsController < ApplicationController
         email = nil
         unless package.assignee.blank?
           email = package.assignee.email
+          email = package.assignee.bugzilla_email unless package.assignee.bugzilla_email.blank?
           parameters['assignee'] = email
         end
 
         if params.has_key?(:summary)
           parameters['summary'] = params[:summary]
-          @response = create_bzs_from_params(parameters, 'el6')
+          @response = create_bzs_from_params(parameters, 'el6', package_id)
         else
           if package.task.os_advisory_tags.empty?
             summary = "RHEL6 RPMs: Upgrade #{package.name} to #{params[:ver]}"
             parameters['summary'] = summary
-            @response = create_bzs_from_params(parameters, 'el6')
+            @response = create_bzs_from_params(parameters, 'el6', package_id)
           else
             # create bzs for each rhels
             package.task.os_advisory_tags.each do |os_adv_tag|
               summary = "RHEL" + os_adv_tag.os_arch[-1, 1] + " RPMs: Upgrade #{package.name} to #{params[:ver]}"
               parameters['summary'] = summary
-              @response = create_bzs_from_params(parameters, os_adv_tag.os_arch)
+              @response = create_bzs_from_params(parameters, os_adv_tag.os_arch, package_id)
             end
           end
         end
@@ -193,9 +194,19 @@ class BzBugsController < ApplicationController
   end
 
   def render_partial
+    # used in the view...
+    # happens that this is 0 for bz_bugs/bz_assignee... need to investigate why
+    if params[:package_id] != "0"
+      @package = Package.find(params[:package_id])
+    end
     respond_to do |format|
       format.js {
-        render(:partial => params[:partial], :locals => {:id => params[:id], :package_id => params[:package_id], :bz_bug => BzBug.find(params[:id].scan(/\d+/))[0]})
+        if params[:id].scan(/\d+/) != ['0']
+          bz_bug_temp = BzBug.find(params[:id].scan(/\d+/))[0]
+        else
+          bz_bug_temp = nil
+        end
+        render(:partial => params[:partial], :locals => {:id => params[:id], :package_id => params[:package_id], :bz_bug => bz_bug_temp})
       }
     end
   end
@@ -244,7 +255,7 @@ class BzBugsController < ApplicationController
     end
   end
 
-  def create_bzs_from_params(parameters, os)
+  def create_bzs_from_params(parameters, os, package_id)
     puts parameters
     puts bz_bug_creation_uri
     response = Net::HTTP.post_form(bz_bug_creation_uri, parameters)

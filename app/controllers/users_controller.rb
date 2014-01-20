@@ -42,7 +42,20 @@ class UsersController < ApplicationController
 
   # GET /users/1/edit
   def edit
-    @user = User.find(params[:id])
+    @user = nil
+    if logged_in?
+      @user = User.find(params[:id])
+    elsif !params[:reset_code].blank?
+      @user = User.find_by_id_and_reset_code(params[:id], params[:reset_code])
+    end
+
+    respond_to do |format|
+      format.html {
+        if @user.blank?
+          redirect_to '/login'
+        end
+      }
+    end
   end
 
   # POST /users
@@ -70,12 +83,16 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       respond_to do |format|
         params[:user][:email].downcase!
+
         if its_myself?(@user) && !params[:time_zone].blank?
           @user.tz = TimeZone.find(params[:time_zone])
           @user.save
         end
+
         if validate_input_password(@user, params[:user][:password], params[:user][:confirm_password]) && @user.update_attributes(params[:user])
           flash[:notice] = 'User was successfully updated.'
+          @user.reset_code = ''
+          @user.save
           format.html { redirect_to(@user) }
         else
           format.html { render :action => "edit" }
@@ -97,16 +114,39 @@ class UsersController < ApplicationController
     end
   end
 
+  def reset_password
+    if request.post?
+      if params[:task][:email].blank?
+        @user = User.new
+        @user.errors.add(:email, "not found.")
+      else
+        @user = User.find_by_email(params[:task][:email])
+        if @user.blank?
+          @user = User.new
+          @user.errors.add(:email, "User not found.")
+          return
+        else
+          @user.make_token
+          Thread.new do
+            UserMailer.deliver_reset_password(@user)
+          end
+          flash[:notice] = "The password reset code has been sent to your email address."
+        end
+      end
+    else # GET
+      @user = User.new
+    end
+  end
 
-  # DELETE /users/1
-  # DELETE /users/1.xml
-  #  def destroy
-  #    @user = User.find(params[:id])
-  #    @user.destroy
-  #
-  #    respond_to do |format|
-  #      format.html { redirect_to(users_url) }
-  #      format.xml  { head :ok }
-  #    end
-  #  end
+# DELETE /users/1
+# DELETE /users/1.xml
+#  def destroy
+#    @user = User.find(params[:id])
+#    @user.destroy
+#
+#    respond_to do |format|
+#      format.html { redirect_to(users_url) }
+#      format.xml  { head :ok }
+#    end
+#  end
 end

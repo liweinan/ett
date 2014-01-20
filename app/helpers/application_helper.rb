@@ -113,10 +113,18 @@ module ApplicationHelper
     elsif !pac.in_shipped_list?
         "Package not in shipped list. Aborting"
     else
+
+        bz_struct = {}
+        pac.upgrade_bz.each do |bz|
+          bz_struct[bz.os_arch] = bz.bz_id
+        end
+
         uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
         # the errata request is sent to mead-scheduler's rest api:
 
         link = "/mead-scheduler/rest/errata/#{prod}/files?dist=el6&nvr=#{pac.brew}&pkg=#{pac.name}&version=#{pac.task.tag_version}"
+        link += '&bugs=' + bz_struct['el6'] if bz_struct.has_key? 'el6'
+
         req = Net::HTTP::Post.new(link)
 
 
@@ -126,13 +134,13 @@ module ApplicationHelper
 
 
 
-
         # TODO: remove those copy-pasted code!
         pac.task.os_advisory_tags.each do |os_tag|
           next if os_tag.os_arch == 'el6'
 
           latest_brew_nvr = get_brew_name(pac, os_tag.candidate_tag + '-build')
           link = "/mead-scheduler/rest/errata/#{prod}/files?dist=#{os_tag.os_arch}&nvr=#{latest_brew_nvr}&pkg=#{pac.name}&version=#{pac.task.tag_version}"
+          link += '&bugs=' + bz_struct[os_tag.os_arch] if bz_struct.has_key? os_tag.os_arch
           req = Net::HTTP::Post.new(link)
 
           res = Net::HTTP.start(uri.host, uri.port) do |http|

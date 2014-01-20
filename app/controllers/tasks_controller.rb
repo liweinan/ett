@@ -171,8 +171,6 @@ class TasksController < ApplicationController
     end
   end
 
-
-
   protected
 
   def clone_form_validation

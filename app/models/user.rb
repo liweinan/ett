@@ -43,4 +43,10 @@ class User < ActiveRecord::Base
   def password=(password)
     self[:password] = User.encrypt_password(password)
   end
+
+  def make_token
+    self.reset_code = Time.now.to_i
+    self.save
+  end
+
 end

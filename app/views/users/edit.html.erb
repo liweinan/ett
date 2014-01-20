@@ -6,6 +6,7 @@
       <table>
         <%= render :partial => 'users/fields/name', :locals => {:f => f} %>
         <%= render :partial => 'users/fields/email', :locals => {:f => f} %>
+        <%= render :partial => 'users/fields/bugzilla_email', :locals => {:f => f} %>
         <%= render :partial => 'users/fields/tz', :locals => {:f => f} %>
         <%= render :partial => 'users/fields/password', :locals => {:f => f} %>
         <% if can_manage? %>
