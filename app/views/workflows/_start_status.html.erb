@@ -7,10 +7,11 @@
     </td>
     <td>
 
+      <% wkflow_start_statuses = @workflow.start_status_workflows.map {|wkf| wkf.status} %>
       <% statuses.each do |status| %>
           <% col_id = "start_status_#{status.id}" %>
-          <input type="radio" name='workflow[start_status_id]' id='<%= col_id %>' value="<%= status.id %>"
-                 <% if @workflow.start_status == status %>
+          <input type="checkbox" name='start_statuses_id[]' id='<%= col_id %>' value="<%= status.id %>"
+                 <% if wkflow_start_statuses.include? status %>
                  checked
                  <% end %>
                  <% if disabled %>

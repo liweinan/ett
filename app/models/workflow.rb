@@ -3,9 +3,9 @@ class Workflow < ActiveRecord::Base
 
   has_many :allowed_statuses
   has_many :tasks
+  has_many :start_status_workflows
 
   validates_presence_of :name
-  validates_presence_of :start_status_id, :message => "is not defined."
 
   def update_transitions(transitions) # this method should be surrounded with a transaction
     return if transitions.blank?
@@ -24,6 +24,11 @@ class Workflow < ActiveRecord::Base
         allowed_status.save
       end
     end
+  end
+
+  def update_start_statuses(start_status_ids)
+    start_status_workflows.each {|wkf| wkf.destroy }
+    start_status_ids.each {|status_id| start_status_workflows.create :status_id => status_id.to_i}
   end
 
   def has_transition?(transition)
@@ -47,15 +52,19 @@ class Workflow < ActiveRecord::Base
     Task.transaction do
       # reset current workflow assignment
       Task.find_all_by_workflow_id(id).each do |task|
-        task.workflow_id = nil
-        task.save
+        unless task.readonly?
+          task.workflow_id = nil
+          task.save
+        end
       end
 
       unless tasks.blank?
         tasks.each do |task|
           task = Task.find(task.to_i)
-          task.workflow_id = id
-          task.save
+          unless task.readonly?
+            task.workflow_id = id
+            task.save
+          end
         end
       end
     end

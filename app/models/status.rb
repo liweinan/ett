@@ -95,7 +95,7 @@ class Status < ActiveRecord::Base
 
       # if current_status is blank, get start status
       if current_status.blank?
-        statuses << package.task.workflow.start_status
+        statuses += package.task.workflow.start_status_workflows.map {|wk| wk.status}
       else # or get next statuses of current status defined in workflow
         # include current status by default
         statuses << current_status
