@@ -1,7 +1,7 @@
-#
-# This class will model a JIRA issue. It'll contain all records related to a JIRA issue, and it will also define all methods needed
-# for creating, updating, syncing JIRA issues in the DB and also for sending RESTful requests to the JIRA server.
-#
+# This class will model a JIRA issue. It'll contain all records related to a
+# JIRA issue, and it will also define all methods needed for creating,
+# updating, syncing JIRA issues in the DB and also for sending RESTful requests
+# to the JIRA server.
 class JiraBug < ActiveRecord::Base
   require 'rubygems'
   require 'net/http'
@@ -10,39 +10,43 @@ class JiraBug < ActiveRecord::Base
   require 'uri'
 
   set_primary_key :key
-  belongs_to :creator, :class_name => "User", :foreign_key => "creator_id"
-  belongs_to :package, :class_name => "Package", :foreign_key => "package_id"
+  belongs_to :creator, :class_name => 'User', :foreign_key => 'creator_id'
+  belongs_to :package, :class_name => 'Package', :foreign_key => 'package_id'
 
   # http://hostname/rest/api/2/<resource-name>
-  JIRA_BASE_URI = "https://issues.jboss.org/rest/api/2/"
-  JIRIA_AUTH_URI = "https://issues.jboss.org/rest/auth/"
-  JIRA_RESOURCES = {:issue => "issue/", :issueLink => "issueLink"} # TODO: verify which JIRA resources are needed with huwang
+  JIRA_BASE_URI = 'https://issues.jboss.org/rest/api/2/'
+  JIRA_AUTH_URI = 'https://issues.jboss.org/rest/auth/'
+  # TODO: verify which JIRA resources are needed
+  JIRA_RESOURCES = {:issue => 'issue/', :issueLink => 'issueLink'}
 
-  # This dict maps the JIRA fields to their types as seen in the jsons JIRA represents issues with.
+  # This dict maps the JIRA fields to their types as seen in the jsons JIRA
+  # represents issues with.
   JIRA_FIELD_TYPES = { 
-    :project => "key", 
-    :summary => "", 
-    :issuetype => "name", 
-    :reporter => "name", 
-    :assignee => "id", 
-    :priority => "id", 
-    :security => "id", 
-    :versions => ["name"], 
-    :fixVersions => ["name"], 
-    :environment => "", 
-    :description => "",
-    :components => ["name"]}
+    :project => 'key',
+    :summary => '',
+    :issuetype => 'name',
+    :reporter => 'name',
+    :assignee => 'id',
+    :priority => 'id',
+    :security => 'id',
+    :versions => ['name'],
+    :fixVersions => ['name'],
+    :environment => '',
+    :description => '',
+    :components => ['name']}
 
   JIRA_INFO = [ :id, :key, :self ]
 
   # Verify that these are all correct JIRA statuses:
-  JIRA_STATUS = {:open => "Open", :resolved => "Resolved", :closed => "Closed", :in_progress => "In Progress", :reopened => "Reopened"}
+  JIRA_STATUS = {:open => 'Open', :resolved => 'Resolved',
+                 :closed => 'Closed', :in_progress => 'In Progress',
+                 :reopened => 'Reopened'}
 
 
   # DB JIRA Issue methods: create, update.
 
-  # Create a new instance of a jira bug from the info passed to us from a RESTful
-  # request to JIRA.
+  # Create a new instance of a jira bug from the info passed to us from a
+  # RESTful request to JIRA.
   # Save this new instance into the database.
   def self.create_from_jira_info(jira_info)
     jira_bug = JiraBug.new
@@ -53,20 +57,20 @@ class JiraBug < ActiveRecord::Base
   # and then save it to the DB.
   def self.update_from_jira_info(jira_info, jira_bug)
     # Grab whatever fields we need for this bug from the jira_info hash.
-    jira_bug.jid = jira_info["id"].to_i
-    jira_bug.summary = jira_info["summary"]
-    jira_bug.key = jira_info["key"]
-    jira_bug.security = jira_info["security"]
+    jira_bug.jid = jira_info['id'].to_i
+    jira_bug.summary = jira_info['summary']
+    jira_bug.key = jira_info['key']
+    jira_bug.security = jira_info['security']
     #jira_bug.package_id = package_id
-    jira_bug.self = jira_info["self"]
-    jira_bug.reporter = jira_info["reporter"]
-    jira_bug.issuetype = jira_info["issuetype"]
-    jira_bug.priority = jira_info["priority"]
-    jira_bug.components = jira_info["components"].join(',')
-    jira_bug.affected_versions = jira_info["versions"].join(',')
-    jira_bug.affected_versions = jira_info["fixVersions"].join(',')
-    jira_bug.depends_on = jira_info["depends_on"].join(',')
-    jira_bug.depended_on_by = jira_info["depended_on_by"].join(',')
+    jira_bug.self = jira_info['self']
+    jira_bug.reporter = jira_info['reporter']
+    jira_bug.issuetype = jira_info['issuetype']
+    jira_bug.priority = jira_info['priority']
+    jira_bug.components = jira_info['components'].join(',')
+    jira_bug.affected_versions = jira_info['versions'].join(',')
+    jira_bug.affected_versions = jira_info['fixVersions'].join(',')
+    jira_bug.depends_on = jira_info['depends_on'].join(',')
+    jira_bug.depended_on_by = jira_info['depended_on_by'].join(',')
     jira_bug.save
     jira_bug
   end
@@ -169,7 +173,7 @@ class JiraBug < ActiveRecord::Base
       @response.verify_mode = OpenSSL::SSL::VERIFY_NONE
       @response = @response.start { |http| http.request(request) }
 
-      puts "Response: " + @response.code + ":" + @response.message
+      puts 'Response: ' + @response.code + ':' + @response.message
 
       # Response Handler
       if @response.class == Net::HTTPOK
@@ -177,7 +181,7 @@ class JiraBug < ActiveRecord::Base
         dictionary = create_dict_from_json(JSON.parse(@response.body))  
         return dictionary
       elsif @response.class == Net::HTTPUnauthorized
-        raise ArgumentError, "Jira did not recognize that username and/or password."
+        raise ArgumentError, 'Jira did not recognize that username and/or password.'
       end
       
     # If any of the following errors or Net codes are thrown/returned:
@@ -296,8 +300,8 @@ class JiraBug < ActiveRecord::Base
     end
 
     # Grab the depends_on
-    d["depends_on"] = JiraBug.extract_depends_on(jira_json)
-    d["depended_on_by"] = JiraBug.extract_depended_on_by(jira_json)
+    d['depends_on'] = JiraBug.extract_depends_on(jira_json)
+    d['depended_on_by'] = JiraBug.extract_depended_on_by(jira_json)
 
     d # give the d
   end
@@ -305,13 +309,13 @@ class JiraBug < ActiveRecord::Base
   # Gets all "depends on" issue keys from
   # this bug json
   def self.extract_dependency(json, inout)
-    if !json.has_key?("fields") or !json["fields"].has_key?("issuelinks")
+    if !json.has_key?('fields') or !json['fields'].has_key?('issuelinks')
       return []
     end
-    linksj = json["fields"]["issuelinks"]
+    linksj = json['fields']['issuelinks']
 
     unless linksj.empty?
-      linksl = linksj.map { |issue| issue[inout]["key"] if issue.has_key?(inout) and issue["type"]["name"].eql? "Dependency" }.reject(&:nil?)
+      linksl = linksj.map { |issue| issue[inout]['key'] if issue.has_key?(inout) and issue['type']['name'].eql? 'Dependency' }.reject(&:nil?)
     else
       return []
     end
@@ -319,11 +323,11 @@ class JiraBug < ActiveRecord::Base
   end
 
   def self.extract_depends_on(json)
-    return JiraBug.extract_dependency(json, "outwardIssue")
+    return JiraBug.extract_dependency(json, 'outwardIssue')
   end
 
   def self.extract_depended_on_by(json)
-    return JiraBug.extract_dependency(json, "inwardIssue")
+    return JiraBug.extract_dependency(json, 'inwardIssue')
   end
 
   # Takes a list of hashes with lot's of
@@ -342,45 +346,39 @@ class JiraBug < ActiveRecord::Base
 
   # Generates an issueLink json for use with
   # POST issuelink request to JIRA
-  def self.generate_issuelink_json(inwardIssue, outwardIssue, info)
+  def self.generate_issuelink_json(inward_issue, outward_issue, info)
     j = { 
-      "type" => { 
-        "name" => "Dependency"},
-      "inwardIssue" => { 
-        "key" => inwardIssue },
-      "outwardIssue" => { 
-        "key" => outwardIssue},
-      "comment" => {
-          "body" => info["body"],
-          "visibility" => {
-            "type" => info["type"],
-            "value" => info["value"]
-          }
-        } 
-      }.to_json
+      :type => {:name => 'Dependency'},
+      :inwardIssue => {:key => inward_issue},
+      :outwardIssue => {:key => outward_issue},
+      :comment => {:body => info['body'],
+                   :visibility => {:type => info['type'],
+                                   :value => info['value']}
+      }
+    }.to_json
   end
 
   def self.generate_update_json(edits)
-    j = { "fields" => {} }
+    j = { 'fields' => {} }
 
     edits.each do |k,v|
-      j["fields"][k.to_s] = v.to_s
+      j['fields'][k.to_s] = v.to_s
     end
 
   end
 
 
   def self.generate_ref(key)
-    return "<a href=\"/jira_bugs/" + key.to_s + "\">" + key.to_s + "</a> "
+    return "<a href=\"/jira_bugs/#{key.to_s}\">#{key.to_s}</a>"
   end
 
   def self.url(jira_bug)
-    return "<a href=" + jira_bug.self + ">" + jira_bug.self + "</a>"
+    return "<a href=#{jira_bug.self}>#{jira_bug.self}</a>"
   end
 
   def self.browse_url(jira_bug)
-    url = "http://issues.jboss.org/browse/" + jira_bug.key
-    return "<a href=" + url + ">" + url + "</a>"
+    url = 'http://issues.jboss.org/browse/' + jira_bug.key
+    return "<a href=#{url}>#{url}</a>"
   end
 
 end

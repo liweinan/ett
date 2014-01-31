@@ -2,26 +2,26 @@ require 'net/http'
 require 'json'
 
 class BzBug < ActiveRecord::Base
-  belongs_to :creator, :class_name => "User", :foreign_key => "creator_id"
-  belongs_to :package, :class_name => "Package", :foreign_key => "package_id"
+  belongs_to :creator, :class_name => 'User', :foreign_key => 'creator_id'
+  belongs_to :package, :class_name => 'Package', :foreign_key => 'package_id'
 
   BZ_ACTIONS = {:movetoassigned => 'movetoassigned',
                 :movetomodified => 'movetomodified',
                 :accepted => 'accepted',
                 :outofdate => 'outofdate',
                 :done => 'done'}
-  BZ_STATUS = {:new => "NEW",
-               :assigned => "ASSIGNED",
-               :post => "POST",
-               :modified => "MODIFIED",
-               :onqa => "ON_QA",
-               :verified => "VERIFIED",
-               :ondev => "ON_DEV"}
+  BZ_STATUS = {:new => 'NEW',
+               :assigned => 'ASSIGNED',
+               :post => 'POST',
+               :modified => 'MODIFIED',
+               :onqa => 'ON_QA',
+               :verified => 'VERIFIED',
+               :ondev => 'ON_DEV'}
 
   default_value_for :bz_status, 'NEW'
   default_value_for :bz_action, BZ_ACTIONS[:done]
   default_value_for :last_synced_at, Time.now
-  default_value_for :is_in_errata, "NO"
+  default_value_for :is_in_errata, 'NO'
 
   # Creates a new bz_bug entry in the database based on the information provided
   #
@@ -43,15 +43,7 @@ class BzBug < ActiveRecord::Base
     bz_bug.creator_id = current_user.id
     bz_bug.os_arch = os
 
-    bz_bug.bz_id = bz_info["id"]
-    bz_bug.summary = bz_info["summary"]
-    bz_bug.bz_status = bz_info["status"]
-    bz_bug.bz_assignee = bz_info["assignee"]
-    bz_bug.component = bz_info["component"]
-    bz_bug.keywords = bz_info["keywords"].join(',')
-
-    bz_bug.save
-    bz_bug
+    BzBug.update_from_bz_info(bz_info, bz_bug)
   end
 
   # Update a current bugzilla row entry in the database
@@ -64,12 +56,12 @@ class BzBug < ActiveRecord::Base
   #
   # Returns: the updated bugzilla object
   def self.update_from_bz_info(bz_info, bz_bug)
-    bz_bug.bz_id = bz_info["id"]
-    bz_bug.summary = bz_info["summary"]
-    bz_bug.bz_status = bz_info["status"]
-    bz_bug.bz_assignee = bz_info["assignee"]
-    bz_bug.component = bz_info["component"]
-    bz_bug.keywords = bz_info["keywords"].join(',')
+    bz_bug.bz_id = bz_info['id']
+    bz_bug.summary = bz_info['summary']
+    bz_bug.bz_status = bz_info['status']
+    bz_bug.bz_assignee = bz_info['assignee']
+    bz_bug.component = bz_info['component']
+    bz_bug.keywords = bz_info['keywords'].join(',')
     bz_bug.last_synced_at = Time.now
 
     bz_bug.save
@@ -86,8 +78,11 @@ class BzBug < ActiveRecord::Base
   #
   # Returns: string
   def bz_id_and_is_in_errata
-    return bz_id + " ✔" if !is_in_errata.blank? && is_in_errata == "YES"
-    return bz_id # else part
+    if !is_in_errata.blank? && is_in_errata == 'YES'
+      bz_id + ' ✔'
+    else
+      bz_id # else part
+    end
   end
 
   # Create a bug to bugzilla and also create a new bz_bug object to the database
@@ -119,8 +114,7 @@ class BzBug < ActiveRecord::Base
 
       if response.class == Net::HTTPOK
         bz_info = JSON.parse(response.body)
-        bz_bug =
-            BzBug.create_from_bz_info(bz_info, package_id, current_user, os)
+        BzBug.create_from_bz_info(bz_info, package_id, current_user, os)
       end
     end
     response
@@ -134,11 +128,14 @@ class BzBug < ActiveRecord::Base
   #
   # Returns: string of email address of assignee, nil if assignee is nil
   def self.determine_bz_assignee_email(assignee)
-    unless assignee.blank?
-      return assignee.bugzilla_email unless assignee.bugzilla_email.blank?
-      return assignee.email # else
-    else
+    if assignee.blank?
       nil
+    else
+      if assignee.bugzilla_email.blank?
+        assignee.email
+      else
+        assignee.bugzilla_email
+      end
     end
   end
 
@@ -180,10 +177,10 @@ class BzBug < ActiveRecord::Base
 
   # TODO: maybe make it a method function instead?
   def self.query_bz_bug_info(bz_id, user, pwd)
-    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+    uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
     req = Net::HTTP::Get.new("/mead-bzbridge/bug/#{bz_id}?userid=#{user}&pwd=#{pwd}")
     req['Accept'] = 'application/json'
-    response = Net::HTTP.start(uri.host, uri.port) do |http|
+    Net::HTTP.start(uri.host, uri.port) do |http|
       http.request(req)
     end
   end

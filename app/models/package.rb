@@ -5,47 +5,47 @@ class Package < ActiveRecord::Base
             #  STATUS = [ 'Open', 'Assigned', 'Finished', 'Uploaded', 'Deleted' ]
             #  STATUS_FOR_CHOICE = [ 'Assigned', 'Finished', 'Uploaded', 'Deleted' ]
             #  SORTED_STATUS = ['Open', 'Assigned', 'Finished', 'Uploaded', 'Deleted']
-  SKIP_FIELDS = ['id', 'updated_at', 'updated_by', 'created_by', 'created_at']
+  SKIP_FIELDS = %w(id updated_at updated_by created_by created_at)
   MEAD_ACTIONS = {:open => 'open', :needsync => 'needsync', :done => 'done'}
 
   # info obtained from errata code
   RPMDIFF_INFO = {
-      0 => {:status => "PASSED", :style => "background-color: #b5f36d;"},
-      1 => {:status => "INFO", :style => "background-color: #b5f36d;"},
-      2 => {:status => "WAIVED", :style => "background-color: #b5f36d;"},
-      3 => {:status => "NEEDS INSPECTION", :style => "background-color: #ff5757;"},
-      4 => {:status => "FAILED", :style => "background-color: #ff5757;"},
-      498 => {:status => "TEST IN PROGRESS", :style => "background-color: #b2f4ff;"},
-      499 => {:status => "UNPACKING FILES", :style => "background-color: #b2f4ff;"},
-      500 => {:status => "QUEUED FOR TEST", :style => "background-color: #b2f4ff;"},
-      -1 => {:status => "DUPLICATE", :style => "background-color: #b2ffa1;"}
+      0 => {:status => 'PASSED', :style => 'background-color: #b5f36d;'},
+      1 => {:status => 'INFO', :style => 'background-color: #b5f36d;'},
+      2 => {:status => 'WAIVED', :style => 'background-color: #b5f36d;'},
+      3 => {:status => 'NEEDS INSPECTION', :style => 'background-color: #ff5757;'},
+      4 => {:status => 'FAILED', :style => 'background-color: #ff5757;'},
+      498 => {:status => 'TEST IN PROGRESS', :style => 'background-color: #b2f4ff;'},
+      499 => {:status => 'UNPACKING FILES', :style => 'background-color: #b2f4ff;'},
+      500 => {:status => 'QUEUED FOR TEST', :style => 'background-color: #b2f4ff;'},
+      -1 => {:status => 'DUPLICATE', :style => 'background-color: #b2ffa1;'}
   }
   acts_as_textiled :notes
   acts_as_commentable
 
   belongs_to :user #assignee
-  belongs_to :assignee, :class_name => "User", :foreign_key => "user_id"
-  belongs_to :creator, :class_name => "User", :foreign_key => "created_by"
+  belongs_to :assignee, :class_name => 'User', :foreign_key => 'user_id'
+  belongs_to :creator, :class_name => 'User', :foreign_key => 'created_by'
   belongs_to :task
   belongs_to :status
 
   has_many :assignments, :dependent => :destroy
   has_many :tags, :through => :assignments
-  has_many :bz_bugs, :class_name => "BzBug",
-           :foreign_key => "package_id", :order => "created_at"
+  has_many :bz_bugs, :class_name => 'BzBug',
+           :foreign_key => 'package_id', :order => 'created_at'
 
   #has_and_belongs_to_many :components
 
-  has_many :to_relationships, :class_name => "PackageRelationship",
-           :foreign_key => "from_package_id", :dependent => :destroy
+  has_many :to_relationships, :class_name => 'PackageRelationship',
+           :foreign_key => 'from_package_id', :dependent => :destroy
 
-  has_many :from_relationships, :class_name => "PackageRelationship",
-           :foreign_key => "to_package_id", :dependent => :destroy
+  has_many :from_relationships, :class_name => 'PackageRelationship',
+           :foreign_key => 'to_package_id', :dependent => :destroy
 
   has_many :p_attachments, :dependent => :destroy
 
-  has_many :changelogs, :class_name => "Changelog",
-           :foreign_key => "package_id", :dependent => :destroy
+  has_many :changelogs, :class_name => 'Changelog',
+           :foreign_key => 'package_id', :dependent => :destroy
 
   validates_presence_of :name
   validates_presence_of :task_id
@@ -111,7 +111,7 @@ class Package < ActiveRecord::Base
     else
       relationship = Relationship.find_by_name(relationship_name)
       unless relationship.blank?
-        unless PackageRelationship.all(:conditions => ["(from_package_id = ? or to_package_id = ?) and relationship_id = ?", self.id, self.id, relationship.id]).blank?
+        unless PackageRelationship.all(:conditions =>  ['(from_package_id = ? or to_package_id = ?) and relationship_id = ?', self.id, self.id, relationship.id]).blank?
           return true
         end
       end
@@ -131,7 +131,6 @@ class Package < ActiveRecord::Base
         return false
       end
     end
-
     true
   end
 
@@ -165,12 +164,12 @@ class Package < ActiveRecord::Base
   #
   # Returns: string
   def to_s
-    str = "Name: " + name + "\n"
-    str += "Created By: " + creator.name + "(#{creator.email})" + "\n"
-    str += "Created At: " + created_at.to_s + "\n"
-    str += "Belongs To: " + task.name + "\n"
+    str = "Name: #{name}\n"
+    str += "Created By: #{creator.name}(#{creator.email})\n"
+    str += "Created At: #{created_at.to_s}\n"
+    str += "Belongs To: #{task.name}\n"
     unless assignee.blank?
-      str += "Assignee: " + assignee.name + "(#{assignee.email})" + "\n"
+      str += "Assignee: #{assignee.name}(#{assignee.email})\n"
     end
     str
   end
@@ -183,7 +182,7 @@ class Package < ActiveRecord::Base
   # FIXME: not used anywhere, candidate for removal
   def bz_bug_ids
     # want to return a list of all the ids in the :bz_bugs field
-    return bz_bugs.map { |bug| bug["bz_id"] }
+    bz_bugs.map { |bug| bug['bz_id'] }
   end
 
   # Return string of the brew nvr; append a tick and 'In Errata!' text if the
@@ -193,8 +192,11 @@ class Package < ActiveRecord::Base
   # e.g 'haha' # if package 'haha' has in_errata? false
   # Returns: string
   def nvr_in_errata
-    return brew + " ✔  In Errata!" if in_errata?
-    return brew # else
+    if in_errata?
+      brew + ' ✔  In Errata!'
+    else
+      brew
+    end
   end
 
   # A variant of nvr_in_errata. Return a string containing a tick and brew nvr
@@ -203,8 +205,8 @@ class Package < ActiveRecord::Base
   #
   # Returns: string
   def brew_in_errata
-    return "✔  " + brew if in_errata?
-    return "✘  " + brew if brew && (!can_be_shipped? || !in_shipped_list?)
+    return '✔  ' + brew if in_errata?
+    return '✘  ' + brew if brew && (!can_be_shipped? || !in_shipped_list?)
     return  brew # else
   end
 
@@ -217,7 +219,7 @@ class Package < ActiveRecord::Base
       resp = http.get("/mead-scheduler/rest/package/eap6/#{name}/shipped")
       ans = resp.body
     end
-    ans == "YES"
+    ans == 'YES'
   end
 
   # Determines whether this package is already included inside an errata or not.
@@ -233,10 +235,10 @@ class Package < ActiveRecord::Base
   #
   # Returns: string
   def rpmdiff_info
-    unless rpmdiff_status.blank?
-      RPMDIFF_INFO[rpmdiff_status.to_i][:status]
-    else
+    if rpmdiff_status.blank?
       ''
+    else
+      RPMDIFF_INFO[rpmdiff_status.to_i][:status]
     end
   end
 
@@ -246,10 +248,10 @@ class Package < ActiveRecord::Base
   #
   # Returns: string
   def rpmdiff_link
-    unless rpmdiff_id.blank?
-      'https://errata.devel.redhat.com/rpmdiff/show/' + rpmdiff_id
-    else
+    if rpmdiff_id.blank?
       ''
+    else
+      'https://errata.devel.redhat.com/rpmdiff/show/' + rpmdiff_id
     end
   end
 
@@ -257,10 +259,10 @@ class Package < ActiveRecord::Base
   #
   # Returns: string
   def rpmdiff_style
-    unless rpmdiff_status.blank?
-      RPMDIFF_INFO[rpmdiff_status.to_i][:style]
-    else
+    if rpmdiff_status.blank?
       ''
+    else
+      RPMDIFF_INFO[rpmdiff_status.to_i][:style]
     end
   end
 
@@ -277,7 +279,7 @@ class Package < ActiveRecord::Base
     elsif brew == latest_brew_nvr
       ''
     else
-      "background-color: yellow;"
+      'background-color: yellow;'
     end
   end
 
@@ -293,7 +295,7 @@ class Package < ActiveRecord::Base
     if git_url.blank? || brew_scm_url.blank?
       ''
     elsif (!can_edit_version?) && (git_url.strip != brew_scm_url.strip)
-      "background-color: yellow;"
+      'background-color: yellow;'
     else
       ''
     end
@@ -332,12 +334,12 @@ class Package < ActiveRecord::Base
     [mead, brew].each do |item|
       if !item.nil? && !item.empty?
         if ver.include?('.')
-          if !(item.include?(first_part_ver) && item.include?(second_part_ver))
-            return "background-color: #ff5757;"
+          unless item.include?(first_part_ver) && item.include?(second_part_ver)
+            return 'background-color: #ff5757;'
           end
         else
-          if !(item.include?(alt_first_part_ver) && item.include?(alt_second_part_ver))
-            return "background-color: #ff5757;"
+          unless item.include?(alt_first_part_ver) && item.include?(alt_second_part_ver)
+            return 'background-color: #ff5757;'
           end
         end
       end
@@ -392,7 +394,9 @@ class Package < ActiveRecord::Base
   end
 
   def self.distinct_in_tasks(tasks)
-    Package.all(:select => "distinct name", :conditions => ["task_id in (?)", Task.tasks_to_ids(tasks)], :order => "name")
+    Package.all(:select => 'distinct name',
+                :conditions => ['task_id in (?)', Task.tasks_to_ids(tasks)],
+                :order => 'name')
   end
 
   def self.distinct_in_tasks_can_show(tasks)
@@ -404,13 +408,15 @@ class Package < ActiveRecord::Base
       end
     end
 
-    Package.all(:select => "distinct name", :conditions => ["task_id in (?) and (status_id in (?) or status_id is NULL)", task_ids, can_show_status_ids.uniq], :order => "name")
+    Package.all(:select => 'distinct name',
+                :conditions => ['task_id in (?) and (status_id in (?) or status_id is NULL)', task_ids, can_show_status_ids.uniq],
+                :order => 'name')
   end
 
   def validate
     p = Package.find_by_name_and_task_id(self.name.strip, self.task_id)
     if p && p.id != self.id
-      errors.add(:name, " - Package name cannot be duplicate under one task!")
+      errors.add(:name, ' - Package name cannot be duplicate under one task!')
     end
   end
 
@@ -423,5 +429,4 @@ class Package < ActiveRecord::Base
       Changelog.package_deleted(self)
     end
   end
-
 end

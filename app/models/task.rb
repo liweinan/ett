@@ -15,7 +15,7 @@ class Task < ActiveRecord::Base
   has_many :component_views
   has_many :components, :through => :component_views
 
-  has_one :setting, :class_name => "Setting", :foreign_key => "task_id"
+  has_one :setting, :class_name => 'Setting', :foreign_key => 'task_id'
 
   belongs_to :workflow
 
@@ -32,7 +32,7 @@ class Task < ActiveRecord::Base
   end
 
   def self.all_that_have_package_with_name(name)
-    Task.all(:conditions => ["id in (select task_id from packages where name = ?)", name])
+    Task.all(:conditions => ['id in (select task_id from packages where name = ?)', name])
   end
 
   def use_bz_integration?
