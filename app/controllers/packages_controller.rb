@@ -11,7 +11,10 @@ class PackagesController < ApplicationController
   # GET /packages.xml
   def index
     unless params[:task_id].blank?
-      @packages = get_packages(unescape_url(params[:task_id]), unescape_url(params[:tag]), unescape_url(params[:status]), unescape_url(params[:user]))
+      @packages = get_packages(unescape_url(params[:task_id]),
+                               unescape_url(params[:tag]),
+                               unescape_url(params[:status]),
+                               unescape_url(params[:user]))
     end
 
     respond_to do |format|
@@ -38,7 +41,9 @@ class PackagesController < ApplicationController
   def show
     respond_to do |format|
       format.html {
-        @package = Package.find_by_name_and_task_id(unescape_url(params[:id]), Task.find_by_name(unescape_url(params[:task_id])).id, :include => :p_attachments)
+        @package = Package.find_by_name_and_task_id(unescape_url(params[:id]),
+                                                    Task.find_by_name(unescape_url(params[:task_id])).id,
+                                                    :include => :p_attachments)
         if @package.blank?
           flash[:notice] = 'Package not found.'
           redirect_to("/tasks/#{escape_url(params[:task_id])}/packages")
@@ -64,7 +69,8 @@ class PackagesController < ApplicationController
 
   # GET /packages/1/edit
   def edit
-    @package = Package.find_by_name_and_task_id(unescape_url(params[:id]), Task.find_by_name(unescape_url(params[:task_id])).id)
+    @package = Package.find_by_name_and_task_id(unescape_url(params[:id]),
+                                                Task.find_by_name(unescape_url(params[:task_id])).id)
     #@package.revert_to(params[:version].to_i) unless params[:version].blank?
     unless can_edit_package? @package
       redirect_to('/')
@@ -91,16 +97,27 @@ class PackagesController < ApplicationController
           url = get_package_link(params, @package, :create)
 
           if Setting.activated?(@package.task, Setting::ACTIONS[:created])
-            Notify::Package.create(current_user, url, @package, Setting.all_recipients_of_package(@package, nil, :create))
+            Notify::Package.create(current_user,
+                                   url,
+                                   @package,
+                                   Setting.all_recipients_of_package(@package, nil, :create))
           end
 
           unless params[:div_package_create_notification_area].blank?
-            Notify::Package.create(current_user, url, @package, params[:div_package_create_notification_area])
+            Notify::Package.create(current_user,
+                                   url,
+                                   @package,
+                                   params[:div_package_create_notification_area])
           end
         end
 
-        format.html { redirect_to(:controller => :packages, :action => :show,
-                                  :id => escape_url(@package.name), :task_id => escape_url(@package.task.name), :user => params[:user]) }
+        format.html {
+          redirect_to(:controller => :packages,
+                      :action => :show,
+                      :id => escape_url(@package.name),
+                      :task_id => escape_url(@package.task.name),
+                      :user => params[:user])
+        }
       else
 
         @user = params[:user]
@@ -176,7 +193,9 @@ class PackagesController < ApplicationController
         deprecated_bug_store = @package.bz_bugs.clone
 
         shared_inline_bzs.each do |bz_id|
-          bz_query_resp = BzBug.query_bz_bug_info(bz_id, shared_bzauth_user, shared_bzauth_pass)
+          bz_query_resp = BzBug.query_bz_bug_info(bz_id,
+                                                  shared_bzauth_user,
+                                                  shared_bzauth_pass)
           if bz_query_resp.class == Net::HTTPOK
             bz_body = JSON.parse(bz_query_resp.body)
             existing_bz_bug = @package.bz_bug_with_bz_id(bz_id)
