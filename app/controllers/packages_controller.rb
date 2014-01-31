@@ -594,10 +594,32 @@ class PackagesController < ApplicationController
     else
       uri = URI.parse("http://pkgs.devel.redhat.com/cgit/rpms/#{package.name}/plain/last-mead-build?h=#{package.task.candidate_tag}")
       res = Net::HTTP.get_response(uri)
+      # TODO: error handling
+      package_old_mead = res.body if res.code == '200'
+      package_name = parse_NVR(package_old_mead)[:name]
+
+      uri = URI.parse("http://mead.usersys.redhat.com/mead-brewbridge/pkg/latest/#{package.task.candidate_tag}-build/#{package_name}")
+      res = Net::HTTP.get_response(uri)
       package.mead = res.body if res.code == '200'
     end
+
     package.mead_action = Package::MEAD_ACTIONS[:done]
     package.save
+  end
+
+  # based on the brew koji code, move it to package model afterwards
+  # error checking omitted
+  def parse_NVR(nvr)
+    ret = {}
+    p2 = nvr.rindex("-")
+    p1 = nvr.rindex("-", p2 - 1)
+    puts p1
+    puts p2
+    ret[:release] = nvr[(p2 + 1)..-1]
+    ret[:version] = nvr[(p1 + 1)...p2]
+    ret[:name] = nvr[0...p1]
+
+    ret
   end
 
   def do_sync(fields)

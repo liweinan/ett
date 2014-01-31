@@ -46,6 +46,7 @@ class WorkflowsController < ApplicationController
     if @workflow.save # just to get primary id.
       Workflow.transaction do
         @workflow.update_transitions(params[:transitions])
+        @workflow.update_start_statuses(params[:start_statuses_id])
         @workflow.assign_to_tasks(params[:tasks])
       end
       respond_to do |format|
@@ -68,6 +69,7 @@ class WorkflowsController < ApplicationController
       Workflow.transaction do
         if @workflow.update_attributes(params[:workflow])
           @workflow.update_transitions(params[:transitions])
+          @workflow.update_start_statuses(params[:start_statuses_id])
           @workflow.assign_to_tasks(params[:tasks])
           format.html { redirect_to(@workflow, :notice => 'Workflow was successfully updated.') }
         else
