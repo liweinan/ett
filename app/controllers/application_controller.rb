@@ -2,9 +2,11 @@
 # Likewise, all the methods added will be available for all controllers.
 class ApplicationController < ActionController::Base
 
-  helper :all # include all helpers, all the time
+  # include all helpers, all the time
+  helper :all
 
-  protect_from_forgery # See ActionController::RequestForgeryProtection for details
+  # See ActionController::RequestForgeryProtection for details
+  protect_from_forgery
 
   helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?,
                 :has_task?, :count_packages, :can_edit_package?, :current_user,
@@ -18,6 +20,7 @@ class ApplicationController < ActionController::Base
 
   before_filter :process_task_id
   before_filter :save_current_link
+
   # Scrub sensitive parameters from your log
   # filter_parameter_logging :password
   filter_parameter_logging :bzauth_pwd, :pwd, :ubbs_pwd, :jira_pass
@@ -57,7 +60,11 @@ class ApplicationController < ActionController::Base
 
   def can_edit_package?(package)
     _package = Package.find(package.id)
-    (logged_in? && _package.user_id == session[:current_user].id) || can_manage?
+    logged_in_and_owner_package(_package) || can_manage?
+  end
+
+  def logged_in_and_owner_package(_package)
+    logged_in? && _package.user_id == session[:current_user].id
   end
 
   def count_packages(bt, status_name)
@@ -118,7 +125,6 @@ class ApplicationController < ActionController::Base
 
   def clone_is_done
     clone_is_in_status('done')
-
   end
 
   def clone_is_failed
@@ -387,19 +393,16 @@ class ApplicationController < ActionController::Base
 
   def has_bz_auth_info?(params=Hash.new)
     # TODO not complete
-    (!current_user.blank? && !session[:bz_pass].blank?) || (!params[:bzauth_user].blank? && !params[:bzauth_pwd].blank?) || (!params[:ubbs_user].blank? && !params[:ubbs_pwd].blank?)
+    (!current_user.blank? && !session[:bz_pass].blank?) ||
+    (!params[:bzauth_user].blank? && !params[:bzauth_pwd].blank?) ||
+    (!params[:ubbs_user].blank? && !params[:ubbs_pwd].blank?)
   end
 
   def get_mead_name(brew_pkg)
     uri = URI.parse(URI.encode("#{APP_CONFIG['mead_scheduler']}/mead-brewbridge/pkg/wrapped/#{brew_pkg}"))
     res = Net::HTTP.get_response(uri)
 
-    if res.code == '200' && !res.body.include?('ERROR')
-      res.body
-    else
-      nil
-    end
-
+    (res.code == '200' && !res.body.include?('ERROR')) ? res.body : nil
   end
 
   def update_bug(bz_id, oneway, params)
@@ -434,9 +437,7 @@ class ApplicationController < ActionController::Base
     uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
     req = Net::HTTP::Put.new(req_link)
 
-    res = Net::HTTP.start(uri.host, uri.port) do |http|
-      http.request(req)
-    end
+    res = Net::HTTP.start(uri.host, uri.port) { |http| http.request(req) }
 
     puts res.response
   end
@@ -521,7 +522,7 @@ class ApplicationController < ActionController::Base
 
   def password_valid?(user, password)
 
-    false if user.blank?
+    return false if user.blank?
 
     #backward compatibility
     if user.password.blank?
