@@ -64,11 +64,15 @@ class TasksController < ApplicationController
         if @task.save
           expire_all_fragments
           flash[:notice] = 'Task was successfully created.'
-          format.html { redirect_to(:controller => :tasks, :action => :show, :id => escape_url(@task.name)) }
+
+          format.html do
+            redirect_to(:controller => :tasks,
+                        :action => :show,
+                        :id => escape_url(@task.name))
+          end
+
         else
-          format.html {
-            render :action => "new"
-          }
+          format.html { render :action => 'new' }
         end
       else
         format.html { redirect_to('/') }
@@ -83,7 +87,7 @@ class TasksController < ApplicationController
     params[:task][:name].strip!
     params[:task][:name].downcase!
 
-    os_adv_tags = params.keys.select {|key| key.to_s.start_with? "task_os"}
+    os_adv_tags = params.keys.select {|key| key.to_s.start_with? 'task_os' }
     os_adv_tags = os_adv_tags.sort_by &:to_s
 
     # verify if all the fields are filled
@@ -102,13 +106,17 @@ class TasksController < ApplicationController
       if @task.update_attributes(params[:task]) && !os_adv_tag_error
         expire_all_fragments
         flash[:notice] = 'Task was successfully updated.'
-        format.html { redirect_to(:controller => :tasks, :action => :show, :id => escape_url(@task.name)) }
+        format.html do
+          redirect_to(:controller => :tasks,
+                      :action => :show,
+                      :id => escape_url(@task.name))
+        end
         format.xml { head :ok }
       else
         if os_adv_tag_error
-          flash[:notice] = "You cannot leave Os, Advisory and Candidate tag blank"
+          flash[:notice] = 'You cannot leave Os, Advisory and Candidate tag blank'
         end
-        format.html { render :action => "edit" }
+        format.html { render :action => 'edit' }
         format.xml { render :xml => @task.errors, :status => :unprocessable_entity }
       end
     end
@@ -166,7 +174,8 @@ class TasksController < ApplicationController
   def render_partial
     respond_to do |format|
       format.js {
-        render(:partial => params[:partial], :locals => {:count => params[:count]})
+        render(:partial => params[:partial],
+               :locals => {:count => params[:count]})
       }
     end
   end
@@ -181,11 +190,11 @@ class TasksController < ApplicationController
     @error_message = []
 
     if params[:source_task_name].blank?
-      @error_message << "Source task name not specified."
+      @error_message << 'Source task name not specified.'
     end
 
     if params[:target_task_name].blank?
-      @error_message << "Target task name not specified."
+      @error_message << 'Target task name not specified.'
     #else
     #  @task = Task.find_by_name(unescape_url(params[:target_task_name].downcase.strip))
     #  if @task
@@ -194,25 +203,25 @@ class TasksController < ApplicationController
     end
 
     if params[:source_task_name].strip == params[:target_task_name].strip
-      @error_message << "task cannot be cloned to itself."
+      @error_message << 'task cannot be cloned to itself.'
     end
 
     if params[:scopes].blank?
-      @error_message << "Nothing set to clone."
+      @error_message << 'Nothing set to clone.'
     else
       if params[:scopes].include? 'package'
         if params[:status_option] == 'new_value'
           if params[:initial_status_value].blank?
-            @error_message << "Initial status not set."
+            @error_message << 'Initial status not set.'
           elsif Status.find_in_global_scope(params[:initial_status_value].downcase.strip, unescape_url(params[:target_task_name]).downcase.strip)
-            @error_message << "Initial status name already used."
+            @error_message << 'Initial status name already used.'
 
           end
         end
 
         if !params[:tag_options].blank? && params[:tag_options].include?('new_value')
           if params[:initial_tag_values].blank?
-            @error_message << "Initial tags not set."
+            @error_message << 'Initial tags not set.'
           end
         end
       end
@@ -226,9 +235,9 @@ class TasksController < ApplicationController
 
   def verify_os_options_valid(os_adv_tags, params)
 
-    params_os = "task_os_"
-    params_adv = "task_advisory_"
-    params_tag = "task_tag_"
+    params_os = 'task_os_'
+    params_adv = 'task_advisory_'
+    params_tag = 'task_tag_'
 
     num_os_adv_tags = os_adv_tags.size
     (1..num_os_adv_tags).each do |i|
@@ -239,21 +248,21 @@ class TasksController < ApplicationController
       end
     end
     # if everything valid
-    return true
+    true
   end
 
   # TODO: optimize this. right now I'm just dumbly deleting and recreating new
   # ones
   def update_and_add_new_os_adv_tag(os_adv_tags, params, task)
 
-    params_os = "task_os_"
-    params_adv = "task_advisory_"
-    params_tag = "task_tag_"
+    params_os = 'task_os_'
+    params_adv = 'task_advisory_'
+    params_tag = 'task_tag_'
 
     # delete existing ones
     task.os_advisory_tags.each {|to_delete| to_delete.delete}
 
-    os_adv_tags.each_with_index do |to_insert, x|
+    os_adv_tags.each_with_index do |_, x|
       i = x + 1
       to_save = OsAdvisoryTag.new
       to_save.os_arch = params[params_os + i.to_s]

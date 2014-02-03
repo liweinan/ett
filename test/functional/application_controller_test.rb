@@ -29,4 +29,33 @@ class ApplicationControllerTest < ActionController::TestCase
     assert !@app.has_task?('task_cannot_be_found')
     assert @app.has_task?('task_test')
   end
+
+  test 'generate request should return an empty string' do
+    mock = Object.new
+
+    def mock.port
+      80
+    end
+
+    def mock.host
+      'localhost'
+    end
+
+    def mock.path
+      '/test'
+    end
+
+    assert @app.generate_request_path(nil) == ''
+    assert_equal @app.generate_request_path(mock), 'http://localhost/test'
+    assert_equal @app.generate_request_path(mock, 'frag'),
+                 'http://localhost/frag'
+
+    def mock.port
+     443
+    end
+
+    assert_equal @app.generate_request_path(mock), 'http://localhost:443/test'
+    assert_equal @app.generate_request_path(mock, 'frag'),
+                 'http://localhost:443/frag'
+  end
 end

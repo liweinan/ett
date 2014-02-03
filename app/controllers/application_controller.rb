@@ -368,6 +368,7 @@ class ApplicationController < ActionController::Base
     session[:bz_pass] = pwd if session[:bz_pass].blank? || session[:bz_pass] != pwd
   end
 
+  # TODO: move me to a model
   # bz_bug_status_update_url: "http:/mead.usersys.redhat.com/mead-bzbridge/bug/status/<id>?oneway=<oneway>&status=<status>&assignee=<assignee>&userid=<userid>&pwd=<pwd>"
   def generate_bug_status_update_url(id, oneway, params)
     link = APP_CONFIG['mead_scheduler'] +
@@ -380,6 +381,7 @@ class ApplicationController < ActionController::Base
     link
   end
 
+  # TODO: move me to model
   def generate_bug_summary_update_url(id, oneway, params)
     link = APP_CONFIG['mead_scheduler'] +
         APP_CONFIG['bz_bug_summary_update_url'].gsub('<id>', id).gsub('<oneway>', oneway)
@@ -398,6 +400,7 @@ class ApplicationController < ActionController::Base
     (!params[:ubbs_user].blank? && !params[:ubbs_pwd].blank?)
   end
 
+  # TODO: move to a model
   def get_mead_name(brew_pkg)
     uri = URI.parse(URI.encode("#{APP_CONFIG['mead_scheduler']}/mead-brewbridge/pkg/wrapped/#{brew_pkg}"))
     res = Net::HTTP.get_response(uri)
@@ -405,6 +408,7 @@ class ApplicationController < ActionController::Base
     (res.code == '200' && !res.body.include?('ERROR')) ? res.body : nil
   end
 
+  # TODO: move to a model
   def update_bug(bz_id, oneway, params)
     uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
 
@@ -418,6 +422,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # TODO: move to a model
   def update_bug_summary(bz_id, oneway, params)
     uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
 
@@ -427,6 +432,7 @@ class ApplicationController < ActionController::Base
     Net::HTTP.start(uri.host, uri.port) { |http| http.request(req) }
   end
 
+  # TODO: move to a model
   def add_comment_milestone_status_to_bug(bz_id, params)
     req_link = "/mead-bzbridge/bug/#{bz_id}?oneway=false"
 
@@ -442,7 +448,7 @@ class ApplicationController < ActionController::Base
     puts res.response
   end
 
-
+  # TODO: move to a model
   def get_scm_url_brew(pac)
     server = XMLRPC::Client.new('brewhub.devel.redhat.com', '/brewhub', 80)
 
@@ -456,6 +462,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # TODO: move to a model
   def get_brew_name(pac, candidate_tag=nil)
     # TODO: make the tag more robust
     tag = candidate_tag.nil? ? "#{pac.task.candidate_tag}-build" : candidate_tag
@@ -494,7 +501,6 @@ class ApplicationController < ActionController::Base
     res.code
   end
 
-
   # mode flag needed since for mode=:create,
   # the request_path link is wrong
   def get_package_link(params, package, mode=:edit)
@@ -509,10 +515,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # TODO: move to a model
   def build_type(package)
     Net::HTTP.get('mead.usersys.redhat.com', "/mead-scheduler/rest/package/eap6/#{package}/type")
   end
 
+  # TODO: move to a model
   def need_source_url?(package)
     build = build_type(package.name)
     build_check = (build == 'WRAPPER') || (build == 'MEAD_ONLY')

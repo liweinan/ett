@@ -44,11 +44,24 @@ class ChangelogsController < ApplicationController
 
     respond_to do |format|
       if @changelog.save
-        format.html { redirect_to(@changelog, :notice => 'Changelog was successfully created.') }
-        format.xml  { render :xml => @changelog, :status => :created, :location => @changelog }
+
+        format.html do
+          redirect_to(@changelog,
+                      :notice => 'Changelog was successfully created.')
+        end
+
+        format.xml do
+          render :xml => @changelog,
+                 :status => :created,
+                 :location => @changelog
+        end
       else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @changelog.errors, :status => :unprocessable_entity }
+        format.html { render :action => 'new' }
+
+        format.xml do
+          render :xml => @changelog.errors, :status => :unprocessable_entity
+        end
+
       end
     end
   end
@@ -60,11 +73,19 @@ class ChangelogsController < ApplicationController
 
     respond_to do |format|
       if @changelog.update_attributes(params[:changelog])
-        format.html { redirect_to(@changelog, :notice => 'Changelog was successfully updated.') }
+
+        format.html do
+          redirect_to(@changelog,
+                      :notice => 'Changelog was successfully updated.')
+        end
+
         format.xml  { head :ok }
       else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @changelog.errors, :status => :unprocessable_entity }
+        format.html { render :action => 'edit' }
+
+        format.xml do
+          render :xml => @changelog.errors, :status => :unprocessable_entity
+        end
       end
     end
   end

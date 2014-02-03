@@ -45,18 +45,27 @@ class BzBugsController < ApplicationController
 
         if params.has_key?(:summary)
           parameters['summary'] = params[:summary]
-          @response = BzBug.create_bzs_from_params(parameters, 'el6', package_id, current_user)
+          @response = BzBug.create_bzs_from_params(parameters,
+                                                   'el6',
+                                                   package_id,
+                                                   current_user)
         else
           if package.task.os_advisory_tags.empty?
             summary = "RHEL6 RPMs: Upgrade #{package.name} to #{params[:ver]}"
             parameters['summary'] = summary
-            @response = BzBug.create_bzs_from_params(parameters, 'el6', package_id, current_user)
+            @response = BzBug.create_bzs_from_params(parameters,
+                                                     'el6',
+                                                     package_id,
+                                                     current_user)
           else
             # create bzs for each rhels
             package.task.os_advisory_tags.each do |os_adv_tag|
-              summary = "RHEL" + os_adv_tag.os_arch[-1, 1] + " RPMs: Upgrade #{package.name} to #{params[:ver]}"
+              summary = "RHEL#{os_adv_tag.os_arch[-1, 1]} RPMs: Upgrade #{package.name} to #{params[:ver]}"
               parameters['summary'] = summary
-              @response = BzBug.create_bzs_from_params(parameters, os_adv_tag.os_arch, package_id, current_user)
+              @response = BzBug.create_bzs_from_params(parameters,
+                                                       os_adv_tag.os_arch,
+                                                       package_id,
+                                                       current_user)
             end
           end
         end
@@ -73,7 +82,8 @@ class BzBugsController < ApplicationController
 
         bz_id = params[:bz_id].strip
 
-        bz_bug_exist = (package.bz_bugs.select {|bz| bz.bz_id == bz_id}).length > 0
+        __bz_bugs = package.bz_bugs.select { |bz| bz.bz_id == bz_id }
+        bz_bug_exist = __bz_bugs.length > 0
 
         if bz_bug_exist
           @do_nothing = true
@@ -81,14 +91,17 @@ class BzBugsController < ApplicationController
           @do_nothing = false
         end
 
-        if !@do_nothing
-          @response = BzBug.query_bz_bug_info(bz_id, extract_username(params[:user]), params[:pwd])
+        unless @do_nothing
+          @response = BzBug.query_bz_bug_info(bz_id,
+                                              extract_username(params[:user]),
+                                              params[:pwd])
 
           if @response.class == Net::HTTPOK
 
             bz_info = JSON.parse(@response.body)
-            @bz_bug =
-                BzBug.create_from_bz_info(bz_info, package_id, current_user)
+            @bz_bug = BzBug.create_from_bz_info(bz_info,
+                                                package_id,
+                                                current_user)
           end
         end
       rescue => e
@@ -98,19 +111,19 @@ class BzBugsController < ApplicationController
 
     respond_to do |format|
       format.js {
-        unless @error.blank?
+        if @error.blank?
+          if @response
+            render :status => @response.code
+          else
+            render :status => 200
+          end
+        else
           if @error.class == ArgumentError
             # 400 Bad Request
             render :status => 400
           else
             # 500 Internal Server Error
             render :status => 500
-          end
-        else
-          if @response
-            render :status => @response.code
-          else
-            render :status => 200
           end
         end
       }
@@ -143,19 +156,21 @@ class BzBugsController < ApplicationController
 
     respond_to do |format|
       format.js {
-        unless @error.blank?
+        if @error.blank?
+          if params[:bz_action] == BzBug::BZ_ACTIONS[:movetoassigned]
+            render :partial => 'bz_bugs/movetoassigned',
+                   :status => @response.code
+          elsif params[:bz_action] == BzBug::BZ_ACTIONS[:movetomodified]
+            render :partial => 'bz_bugs/movetomodified',
+                   :status => @response.code
+          end
+        else
           if @error.class == ArgumentError
             # 400 Bad Request
             render :status => 400
           else
             # 500 Internal Server Error
             render :status => 500
-          end
-        else
-          if params[:bz_action] == BzBug::BZ_ACTIONS[:movetoassigned]
-            render :partial => 'bz_bugs/movetoassigned', :status => @response.code
-          elsif params[:bz_action] == BzBug::BZ_ACTIONS[:movetomodified]
-            render :partial => 'bz_bugs/movetomodified', :status => @response.code
           end
         end
       }
@@ -170,7 +185,9 @@ class BzBugsController < ApplicationController
       end_check_param
 
       @bz_bug = BzBug.find(params[:id])
-      @response = BzBug.query_bz_bug_info(@bz_bug.bz_id, extract_username(params[:user]), params[:pwd])
+      @response = BzBug.query_bz_bug_info(@bz_bug.bz_id,
+                                          extract_username(params[:user]),
+                                          params[:pwd])
 
       if @response.class == Net::HTTPOK
         bz_info = JSON.parse(@response.body)
@@ -182,7 +199,9 @@ class BzBugsController < ApplicationController
 
     respond_to do |format|
       format.js {
-        unless @error.blank?
+        if @error.blank?
+          render :status => @response.code
+        else
           if @error.class == ArgumentError
             # 400 Bad Request
             render :status => 400
@@ -190,8 +209,6 @@ class BzBugsController < ApplicationController
             # 500 Internal Server Error
             render :status => 500
           end
-        else
-          render :status => @response.code
         end
       }
     end
@@ -204,18 +221,22 @@ class BzBugsController < ApplicationController
   def render_partial
     # used in the view...
     # happens that this is 0 for bz_bugs/bz_assignee... need to investigate why
-    if params[:package_id] != "0"
+    if params[:package_id] != '0'
       @package = Package.find(params[:package_id])
     end
     respond_to do |format|
-      format.js {
+
+      format.js do
         if params[:id].scan(/\d+/) != ['0']
           bz_bug_temp = BzBug.find(params[:id].scan(/\d+/))[0]
         else
           bz_bug_temp = nil
         end
-        render(:partial => params[:partial], :locals => {:id => params[:id], :package_id => params[:package_id], :bz_bug => bz_bug_temp})
-      }
+        render(:partial => params[:partial],
+               :locals => {:id => params[:id],
+                           :package_id => params[:package_id],
+                           :bz_bug => bz_bug_temp})
+      end
     end
   end
 
@@ -248,11 +269,11 @@ class BzBugsController < ApplicationController
 
   def begin_check_param
     @err_msg = ''
-    if (!current_user.blank? && params[:user].blank?)
+    if !current_user.blank? && params[:user].blank?
       params[:user] = current_user.email
     end
 
-    if (!session[:bz_pass].blank? && params[:pwd].blank?)
+    if !session[:bz_pass].blank? && params[:pwd].blank?
       params[:pwd] = session[:bz_pass]
     end
   end

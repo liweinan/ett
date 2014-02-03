@@ -5,7 +5,7 @@ class TagsController < ApplicationController
   # GET /attributes
   # GET /attributes.xml
   def index
-    @tags = Tag.all(:conditions => ["task_id = ?", get_task(params[:task_id]).id])
+    @tags = Tag.all(:conditions => ['task_id = ?', get_task(params[:task_id]).id])
 
     respond_to do |format|
       format.html # index.html.erb
@@ -49,7 +49,13 @@ class TagsController < ApplicationController
     respond_to do |format|
       if @tag.save
         flash[:notice] = 'Tag was successfully created.'
-        format.html { redirect_to(:action => :show, :id => @tag.id, :task_id => escape_url(@tag.task.name)) }
+
+        format.html do
+          redirect_to(:action => :show,
+                      :id => @tag.id,
+                      :task_id => escape_url(@tag.task.name))
+        end
+
       else
         format.html { render :action => :new }
       end
@@ -65,7 +71,12 @@ class TagsController < ApplicationController
     respond_to do |format|
       if @tag.update_attributes(params[:tag])
         flash[:notice] = 'Tag was successfully updated.'
-        format.html { redirect_to(:action => :show, :id => @tag.id, :task_id => @tag.task.name) }
+
+        format.html do
+          redirect_to(:action => :show,
+                      :id => @tag.id,
+                      :task_id => @tag.task.name)
+        end
       else
         format.html { render :action => :edit }
       end

@@ -2,13 +2,13 @@ require 'json'
 class ErrataCheckController < ApplicationController
 
   def sync
-    nvrs = JSON.parse(params["nvrs"])
+    nvrs = JSON.parse(params['nvrs'])
 
     # advisory = params['advisory']
 
-    render :text => "OK", :status => 202
+    render :text => 'OK', :status => 202
 
-    task = Task.first(:conditions => ["advisory = ?", params[:advisory]])
+    task = Task.first(:conditions => ['advisory = ?', params[:advisory]])
 
     nvrs.each do |nvr|
 
@@ -19,7 +19,9 @@ class ErrataCheckController < ApplicationController
         pac_name = nvr.gsub(/-[0-9].*/, '')
       end
 
-      package = Package.first(:conditions => ["task_id = ? and name = ?", task.id, pac_name])
+      package = Package.first(:conditions => ['task_id = ? and name = ?',
+                                              task.id,
+                                              pac_name])
       if package
         package.in_errata = nvr
         package.save
@@ -28,13 +30,13 @@ class ErrataCheckController < ApplicationController
   end
 
   def sync_bz
-    bz_bugs = JSON.parse(params["bz_bugs"])
-    render :text => "OK", :status => 202
+    bz_bugs = JSON.parse(params['bz_bugs'])
+    render :text => 'OK', :status => 202
 
     bz_bugs.each do |bug|
-      bz_bug = BzBug.first(:conditions => ["bz_id = ?", bug.to_s])
-      if bz_bug:
-        bz_bug.is_in_errata = "YES"
+      bz_bug = BzBug.first(:conditions => ['bz_id = ?', bug.to_s])
+      if bz_bug
+        bz_bug.is_in_errata = 'YES'
         bz_bug.save
       end
     end
@@ -44,7 +46,7 @@ class ErrataCheckController < ApplicationController
 
     rpmdiffs = JSON.parse(params['rpmdiffs'])
 
-    task = Task.first(:conditions => ["advisory = ?", params[:advisory]])
+    task = Task.first(:conditions => ['advisory = ?', params[:advisory]])
 
     rpmdiffs.each do |rpmdiff|
         nvr = rpmdiff['nvr']
@@ -54,7 +56,9 @@ class ErrataCheckController < ApplicationController
         else
           pac_name = nvr.gsub(/-[0-9].*/, '')
         end
-        package = Package.first(:conditions => ["task_id = ? and name = ?", task.id, pac_name])
+        package = Package.first(:conditions => ['task_id = ? and name = ?',
+                                                task.id,
+                                                pac_name])
 
         if package
           package.rpmdiff_status = rpmdiff['status']
@@ -63,6 +67,6 @@ class ErrataCheckController < ApplicationController
         end
 
     end
-    render :text => "OK", :status => 202
+    render :text => 'OK', :status => 202
   end
 end

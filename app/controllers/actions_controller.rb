@@ -34,7 +34,6 @@ class ActionsController < ApplicationController
   end
 
   def process_clone
-
     begin
       Package.transaction do
         session[:not_cloned_packages] = Hash.new
@@ -111,9 +110,9 @@ class ActionsController < ApplicationController
           if session[:clone_review][:status_option] == 'new_value'
             @new_status = Status.new
             @new_status.name = session[:clone_review][:initial_status_value].strip
-            @new_status.can_select = "Yes"
-            @new_status.can_show = "Yes"
-            @new_status.global = "N"
+            @new_status.can_select = 'Yes'
+            @new_status.can_show = 'Yes'
+            @new_status.global = 'N'
             @new_status.task = @target_task
             _status = Status.find_by_name_and_task_id(@new_status.name, @new_status.task.id)
             if _status

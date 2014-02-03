@@ -10,7 +10,8 @@ class CommentsController < ApplicationController
     @comment.created_at = current_time
     @package = Package.find(params[:package_id])
 
-    dup_comment = Comment.find_by_comment_and_source(@comment.comment(:source), request.remote_ip)
+    dup_comment = Comment.find_by_comment_and_source(@comment.comment(:source),
+                                                     request.remote_ip)
 
     if dup_comment.blank? || dup_comment.is_older_than(10.minutes.ago)
       @comment.user_id = current_user.id if current_user
@@ -21,11 +22,21 @@ class CommentsController < ApplicationController
         if Setting.activated?(@package.task, Setting::ACTIONS[:commented])
           debugger
 
-          Notify::Comment.create(current_user, get_package_link(params, @package), @package, @comment, Setting.all_recipients_of_package(@package, @comment.user, :comment))
+          Notify::Comment.create(current_user,
+                                 get_package_link(params, @package),
+                                 @package,
+                                 @comment,
+                                 Setting.all_recipients_of_package(@package,
+                                                                   @comment.user,
+                                                                   :comment))
         end
 
         unless params[:div_comment_notification_area].blank?
-          Notify::Comment.create(current_user, get_package_link(params, @package), @package, @comment, params[:div_comment_notification_area])
+          Notify::Comment.create(current_user,
+                                 get_package_link(params, @package),
+                                 @package,
+                                 @comment,
+                                 params[:div_comment_notification_area])
         end
       end
     end

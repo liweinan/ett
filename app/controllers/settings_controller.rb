@@ -15,9 +15,7 @@ class SettingsController < ApplicationController
   # GET /settings/1
   # GET /settings/1.xml
   def show
-    unless params[:id] == '-1'
-      @setting = Setting.find(params[:id])
-    else
+    if params[:id] == '-1'
       task = Task.find_by_name(unescape_url(params[:task_id]))
       @setting = Setting.find_by_task_id(task.id)
       if @setting.blank?
@@ -25,9 +23,9 @@ class SettingsController < ApplicationController
         @setting.task = task
         @setting.save
       end
-
+    else
+      @setting = Setting.find(params[:id])
     end
-
 
     respond_to do |format|
       format.html # show.html.erb
@@ -58,10 +56,16 @@ class SettingsController < ApplicationController
 
     respond_to do |format|
       if @setting.save
-        format.html { redirect_to(@setting, :notice => 'Setting was successfully created.') }
+
+        format.html do
+          redirect_to(@setting,
+                      :notice => 'Setting was successfully created.')
+        end
+
         format.xml { render :xml => @setting, :status => :created, :location => @setting }
+
       else
-        format.html { render :action => "new" }
+        format.html { render :action => 'new' }
         format.xml { render :xml => @setting.errors, :status => :unprocessable_entity }
       end
     end
@@ -94,7 +98,7 @@ class SettingsController < ApplicationController
         format.html { redirect_to(@setting, :notice => 'Setting was successfully updated.') }
         format.xml { head :ok }
       else
-        format.html { render :action => "edit" }
+        format.html { render :action => 'edit' }
         format.xml { render :xml => @setting.errors, :status => :unprocessable_entity }
       end
     end
