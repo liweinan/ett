@@ -1,5 +1,6 @@
 class Workflow < ActiveRecord::Base
-  belongs_to :start_status, :class_name => "Status", :foreign_key => "start_status_id"
+  belongs_to :start_status, :class_name => 'Status',
+             :foreign_key => 'start_status_id'
 
   has_many :allowed_statuses
   has_many :tasks
@@ -7,10 +8,12 @@ class Workflow < ActiveRecord::Base
 
   validates_presence_of :name
 
-  def update_transitions(transitions) # this method should be surrounded with a transaction
+  # TODO: this method should be surrounded with a transaction
+  def update_transitions(transitions)
     return if transitions.blank?
 
-    Workflow.transaction do # this nested transaction should merge with the transaction in caller
+    # TODO: this nested transaction should merge with the transaction in caller
+    Workflow.transaction do
       allowed_statuses.each do |as|
         as.destroy
       end
@@ -28,7 +31,9 @@ class Workflow < ActiveRecord::Base
 
   def update_start_statuses(start_status_ids)
     start_status_workflows.each {|wkf| wkf.destroy }
-    start_status_ids.each {|status_id| start_status_workflows.create :status_id => status_id.to_i}
+    start_status_ids.each do |status_id|
+      start_status_workflows.create :status_id => status_id.to_i
+    end
   end
 
   def has_transition?(transition)
@@ -71,7 +76,7 @@ class Workflow < ActiveRecord::Base
   end
 
   def next_statuses_of(current_status)
-    allowed_statuses = AllowedStatus.all(:conditions => ["workflow_id = ? and status_id = ?", id, current_status.id])
+    allowed_statuses = AllowedStatus.all(:conditions => ['workflow_id = ? and status_id = ?', id, current_status.id])
     next_statuses = []
     allowed_statuses.each do |as|
       next_statuses << as.next_status

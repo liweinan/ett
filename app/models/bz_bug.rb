@@ -81,7 +81,7 @@ class BzBug < ActiveRecord::Base
     if !is_in_errata.blank? && is_in_errata == 'YES'
       bz_id + ' ✔'
     else
-      bz_id # else part
+      bz_id
     end
   end
 

@@ -9,7 +9,6 @@ class User < ActiveRecord::Base
   default_value_for :can_manage, 'No'
 
   def self.find_by_name_or_email(id)
-    user = nil
     if id.count('@') > 0
       user = User.find_by_email(id)
     else
@@ -28,7 +27,7 @@ class User < ActiveRecord::Base
 
   def zone_name
     if tz.blank?
-      return 'N/A'
+      'N/A'
     else
       tz.text
     end

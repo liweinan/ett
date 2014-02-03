@@ -1,7 +1,7 @@
 class UserMailer < ActionMailer::Base
 
   def reset_password(recipient)
-    subject "Reset Password (ETT)"
+    subject 'Reset Password (ETT)'
     recipients recipient.email
     from 'ett_usersys@redhat.com'
     sent_on Time.now

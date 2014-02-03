@@ -97,7 +97,7 @@ class Package < ActiveRecord::Base
   end
 
   def in_progress?
-    return !time_point.blank? && time_point > 0
+    !time_point.blank? && time_point > 0
   end
 
   def set_deleted
@@ -127,7 +127,7 @@ class Package < ActiveRecord::Base
   # Returns: boolean
   def can_be_shipped?
     self.tags.each do |tag|
-      if tag.key == "Not Shipped"
+      if tag.key == 'Not Shipped'
         return false
       end
     end
@@ -145,7 +145,7 @@ class Package < ActiveRecord::Base
   end
 
   def bzs_flatten
-    bz_bugs.map { |bz| bz = bz.bz_id }.join(" ")
+    bz_bugs.map { |bz| bz.bz_id }.join(' ')
   end
 
   # Find all the bugzillas that qualify as an 'errata bz'
@@ -155,9 +155,11 @@ class Package < ActiveRecord::Base
   #
   # Returns: List of BzBugs objects
   def upgrade_bz
-    BzBug.all(:conditions => ['package_id = ? and summary like ? '\
-                              'and component = ?',
-                              self.id, "%Upgrade%#{self.name}%", 'RPMs'])
+    BzBug.all(:conditions =>
+                  ['package_id = ? and summary like ? and component = ?',
+                    self.id,
+                    "%Upgrade%#{self.name}%",
+                    'RPMs'])
   end
 
   # Return the string representation of the object
@@ -346,7 +348,7 @@ class Package < ActiveRecord::Base
     end
 
     # if they are valid, return empty
-    return ''
+    ''
   end
 
   # For all bugzillas associated with this package, return the one with bugzilla
