@@ -15,7 +15,7 @@ test:
    database: ett_test
    pool: 15
    timeout: 2000
-   username: weinan
+   username: dcheung
 
 production:
     adapter: postgresql

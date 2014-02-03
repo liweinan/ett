@@ -371,6 +371,11 @@ class Package < ActiveRecord::Base
     end
   end
 
+  def update_user_id(id)
+    self.user_id = id
+    save
+  end
+
   protected
 
   def all_from_packages_of(from_relationships, relationship_name)
