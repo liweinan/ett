@@ -4,6 +4,7 @@ class WorkloadController < ApplicationController
     @wl = WeeklyWorkload.find(params[:id])
   end
 
+  # This method needs to be run by cron in a weekly basis
   def generate_weekly_workload
     Package.transaction do
       tasks = Task.all
@@ -14,12 +15,17 @@ class WorkloadController < ApplicationController
           current_date = Date.parse(params[:from]) # format: 2012-1-1
         end
 
+        # Define the scope of current week.
         begin_of_current_week = current_date.at_beginning_of_week.to_datetime
         end_of_current_week = current_date.at_end_of_week.to_datetime
 
+        # Find the package that is updated to a "finished status" in current week.
         packages = Package.find_by_sql(["select * from packages where task_id=? and status_id IN (select id from statuses where is_finish_state='Yes') and updated_at >= ? and updated_at <= ?", task.id, begin_of_current_week, end_of_current_week])
+
+        # The candidates are the packages that need to be calucated into weekly workload.
         candidates = []
 
+        # The logic to search for candidates.
         packages.each do |package|
           # search for changelog, to see if the package has statuses changed during this week.
           cnt = Changelog.count_by_sql(["select * from changelogs where package_id=? and category='UPDATE' and 'references'='status' and changed_at >= ? and changed_at <= ?", package.id, begin_of_current_week, end_of_current_week])
@@ -28,12 +34,13 @@ class WorkloadController < ApplicationController
           end
         end
 
-        # in case this is a rerun
+        # If a cron job is run multiple times during a week, we need to destroy the older result and replace it with the newer result.
         wl = WeeklyWorkload.find(:first, :conditions => ["start_of_week=? and end_of_week=? and task_id=?", begin_of_current_week, end_of_current_week, task.id])
         unless wl.blank?
           wl.destroy
         end
 
+        # Generate a new weekly workload report.
         wl = WeeklyWorkload.new
         wl.start_of_week = begin_of_current_week
         wl.end_of_week = end_of_current_week
@@ -79,6 +86,7 @@ class WorkloadController < ApplicationController
             entry.save
           end
 
+          # Deprecated
           # Collect data of manual log entries
           entries = ManualLogEntry.all(:conditions => ["package_id = ? and start_time >= ? and end_time <= ?", package.id, begin_of_current_week, end_of_current_week])
           entries.each do |entry|
