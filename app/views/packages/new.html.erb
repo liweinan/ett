@@ -21,9 +21,12 @@
         <%= render :partial => 'packages/fields/notes', :locals => {:f => f} %>
         <tr>
           <td colspan=2 style="text-align:left;">
-            <%= render :partial => 'layouts/notification', :locals => {:title => 'Notify the package creation to:', :div_id => 'package_create'} %>
+            <%= render :partial => 'layouts/notification',
+                       :locals => {:title => 'Notify the package creation to:',
+                                   :div_id => 'package_create'} %>
             <%= f.submit 'Create' %>
-            <%= render :partial => 'layouts/notification_link', :locals => {:div_id => 'package_create'} %>
+            <%= render :partial => 'layouts/notification_link',
+                       :locals => {:div_id => 'package_create'} %>
           </td>
         </tr>
       </table>

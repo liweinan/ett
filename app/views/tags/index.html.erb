@@ -30,10 +30,21 @@
 
 <br/>
 <% if params[:task_id].blank? %>
-    <%= link_to 'New tag', :controller => :tags, :action => :new, :task_id => params[:task_id] %>
+    <%= link_to 'New tag',
+                :controller => :tags,
+                :action => :new,
+                :task_id => params[:task_id] %>
 <% else %>
-    <%= link_to "New tag of #{unescape_url(params[:task_id])}", :controller => :tags, :action => :new, :task_id => params[:task_id] %>
+    <%= link_to "New tag of #{unescape_url(params[:task_id])}",
+                :controller => :tags,
+                :action => :new,
+                :task_id => params[:task_id] %>
+
     <%= render :partial => 'layouts/sep_tiny' %>
-    <%= link_to "Back to #{unescape_url(params[:task_id])}", :controller => :packages, :action => :index, :task_id => escape_url(params[:task_id]) %>
+
+    <%= link_to "Back to #{unescape_url(params[:task_id])}",
+                :controller => :packages,
+                :action => :index,
+                :task_id => escape_url(params[:task_id]) %>
 
 <% end %>

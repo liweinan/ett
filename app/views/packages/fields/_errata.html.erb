@@ -1,7 +1,7 @@
-<% if logged_in? && !@package.status.blank? && @package.status.name == "Finished" && @package.can_be_shipped? %>
+<% if logged_in? && !@package.status.blank? && @package.status.name == 'Finished' && @package.can_be_shipped? %>
     <span style="text-align: left;">
       <% form_remote_tag(
-                 :url => {:controller => "toolbox", :action => "add_errata"},
+                 :url => {:controller => 'toolbox', :action => 'add_errata'},
                  :loading => "Element.show('spinner_errata_#{@package.id}');",
                  :success => "Element.hide('spinner_errata_#{@package.id}');
            ") do %>

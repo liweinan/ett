@@ -50,11 +50,6 @@ class ReadonlyTasksController < ApplicationController
         redirect_to(readonly_tasks_path,
                     :notice => 'ReadonlyTask was successfully updated.')
       end
-      #  format.xml  { head :ok }
-      #else
-      #  format.html { render :action => "edit" }
-      #  format.xml  { render :xml => @readonly_task.errors, :status => :unprocessable_entity }
-      #end
     end
   end
 

@@ -22,7 +22,11 @@ Manual Time Track:
     </tr>
     <% @wl.package_stats.each do |ps| %>
         <tr>
-          <td style='font-size:10px;'><%= link_to ps.package.name, :controller => 'packages', :action => :show, :id => escape_url(ps.package.name), :task_id => escape_url(ps.package.task.name) %></td>
+          <td style='font-size:10px;'><%= link_to ps.package.name,
+                                      :controller => 'packages',
+                                      :action => :show,
+                                      :id => escape_url(ps.package.name),
+                                      :task_id => escape_url(ps.package.task.name) %></td>
           <td style='font-size:10px;'>
             <% if ps.assignee.blank? %>
                 -
@@ -40,7 +44,9 @@ Manual Time Track:
           <td style="font-size:10px;<%= ps.package.status.style %>"><%= ps.package.status.name %></td>
           <td style='font-size:10px;text-align: left;'>
             <% ps.status_stats.each do |ls| %>
-                <%= render :partial => 'packages/fields/auto_track_time_display', :locals => {:status => ls.status, :time_consumed => ls.minutes} %>
+                <%= render :partial => 'packages/fields/auto_track_time_display',
+                           :locals => {:status => ls.status,
+                                       :time_consumed => ls.minutes} %>
             <% end %>
           </td>
           <td style='font-size:10px;'><%= display_track_time_in_real_time(ps.minutes) %></td>

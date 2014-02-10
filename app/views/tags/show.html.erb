@@ -9,5 +9,12 @@
 </p>
 
 
-<%= link_to 'Edit', :controller => :tags, :action => :edit, :id => @tag.id, :task_id => params[:task_id] %> |
-<%= link_to 'Back', :controller => :tags, :action => :index, :task_id => params[:task_id] %>
+<%= link_to 'Edit',
+            :controller => :tags,
+            :action => :edit,
+            :id => @tag.id,
+            :task_id => params[:task_id] %> |
+<%= link_to 'Back',
+            :controller => :tags,
+            :action => :index,
+            :task_id => params[:task_id] %>

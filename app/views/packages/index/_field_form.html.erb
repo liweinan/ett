@@ -10,20 +10,35 @@
   <%= hidden_field_tag :div, "pac_#{pac_id}_#{field_name}" %>
   <%= hidden_field_tag :user, params[:user] %>
   <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-  <%= render :partial => field_type, :locals => {:package => Package.find(pac_id), :field_name => field_name} %>
+
+  <%= render :partial => field_type,
+             :locals => {:package => Package.find(pac_id),
+                         :field_name => field_name} %>
 
   <% needBzAuth = ['StatusId', 'Bz'].include?(field_name) %>
 
   <% if needBzAuth %>
-      <input type='submit' value='Submit' onclick='var params={"myId":<%=pac_id%>,"myName":"<%=field_name%>","myForm":this.form};validateBzAccountAndPostInlineEditorForm(params);return false;'/>
-      <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "validate_bz_auth_indicator_#{pac_id}", :msg => t('validating_bzauth_info')} %>
+      <input type='submit'
+             value='Submit'
+             onclick='var params={"myId":<%=pac_id%>,"myName":"<%=field_name%>","myForm":this.form};validateBzAccountAndPostInlineEditorForm(params);return false;'/>
+
+      <%= render :partial => 'layouts/progress_indicator',
+                 :locals => {:progress_indicator_id => "validate_bz_auth_indicator_#{pac_id}",
+                             :msg => t('validating_bzauth_info')} %>
+
   <% elsif field_name == 'Ver' %>
-      <input type='submit' value='Submit' onclick='if (checkPackageVersionFormat(document.getElementById("pac_<%=pac_id%>_Ver_input").value)) { return true; } else { alert("Version format not correct."); return false; }'/>
+      <input type='submit'
+             value='Submit'
+             onclick='if (checkPackageVersionFormat(document.getElementById("pac_<%=pac_id%>_Ver_input").value)) { return true; } else { alert("Version format not correct."); return false; }'/>
   <% else %>
       <%= submit_tag 'Update' %>
   <% end %>
-  <input type="button" value="Cancel" onclick="hide_pac_editor('pac_<%= pac_id %>_<%=field_name%>','<%=field_type%>')"/>
-  <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "pac_#{pac_id}_#{field_name}_spinner"} %>
+  <input type="button"
+         value="Cancel"
+         onclick="hide_pac_editor('pac_<%= pac_id %>_<%=field_name%>','<%=field_type%>')"/>
+
+  <%= render :partial => 'layouts/progress_indicator',
+             :locals => {:progress_indicator_id => "pac_#{pac_id}_#{field_name}_spinner"} %>
 
   <% if needBzAuth %>
       <%= render :partial => 'layouts/sep' %>

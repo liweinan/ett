@@ -1,3 +1,8 @@
 <% unless package.blank? %>
-<%= render :partial => 'packages/index/field_template', :locals => {:package => package, :field_name => 'git_url', :field_type => 'packages/index/field_input', :partial => 'packages/index/git_url_col', :style => package.get_scm_url_style} %>
+<%= render :partial => 'packages/index/field_template',
+           :locals => {:package => package,
+                       :field_name => 'git_url',
+                       :field_type => 'packages/index/field_input',
+                       :partial => 'packages/index/git_url_col',
+                       :style => package.get_scm_url_style} %>
 <% end %>

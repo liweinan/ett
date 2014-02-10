@@ -5,7 +5,11 @@ if logged_in?
     field_type = pac.split('-')[1]
     package = Package.find(pac_id)
     if can_edit_package?(package) || can_manage?
-      page.replace_html pac, :partial => '/packages/index/edit_btn', :locals => {:package => package, :field_name => field_name, :field_type => field_type}
+      page.replace_html pac,
+                        :partial => '/packages/index/edit_btn',
+                        :locals => {:package => package,
+                                    :field_name => field_name,
+                                    :field_type => field_type}
     end
   end
 end

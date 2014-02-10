@@ -12,7 +12,7 @@
           <% if changelog.category == Changelog::CATEGORY[:update] %>
                   <%= render :partial => 'layouts/sep_tiny' %>
               <% if changelog.references == 'notes' %>
-                      <%= Extractor.extract_url(changelog.to_value.gsub(/\n/, "<br/>")) %>
+                      <%= Extractor.extract_url(changelog.to_value.gsub(/\n/, '<br/>')) %>
                   <% else %>
                     <%= changelog.references %>:
                   <%= Extractor.extract_url(changelog.from_value) %>

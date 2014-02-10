@@ -1,2 +1,4 @@
 package = Package.find(params[:id])
-page.replace_html "log_area_#{params[:id]}", :partial => 'packages/log', :locals => {:package => package}
+page.replace_html "log_area_#{params[:id]}",
+                  :partial => 'packages/log',
+                  :locals => {:package => package}

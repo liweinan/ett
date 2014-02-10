@@ -44,11 +44,21 @@ class PackageRelationshipsController < ApplicationController
 
     respond_to do |format|
       if @package_relationship.save
-        format.html { redirect_to(@package_relationship, :notice => 'PackageRelationship was successfully created.') }
-        format.xml { render :xml => @package_relationship, :status => :created, :location => @package_relationship }
+        format.html do
+          redirect_to(@package_relationship,
+                      :notice => 'PackageRelationship was successfully created.')
+        end
+        format.xml do
+          render :xml => @package_relationship,
+                 :status => :created,
+                 :location => @package_relationship
+        end
       else
-        format.html { render :action => "new" }
-        format.xml { render :xml => @package_relationship.errors, :status => :unprocessable_entity }
+        format.html { render :action => 'new' }
+        format.xml do
+          render :xml => @package_relationship.errors,
+                 :status => :unprocessable_entity
+        end
       end
     end
   end
@@ -60,11 +70,17 @@ class PackageRelationshipsController < ApplicationController
 
     respond_to do |format|
       if @package_relationship.update_attributes(params[:package_relationship])
-        format.html { redirect_to(@package_relationship, :notice => 'PackageRelationship was successfully updated.') }
+        format.html do
+          redirect_to(@package_relationship,
+                      :notice => 'PackageRelationship was successfully updated.')
+        end
         format.xml { head :ok }
       else
-        format.html { render :action => "edit" }
-        format.xml { render :xml => @package_relationship.errors, :status => :unprocessable_entity }
+        format.html { render :action => 'edit' }
+        format.xml do
+          render :xml => @package_relationship.errors,
+                 :status => :unprocessable_entity
+        end
       end
     end
   end

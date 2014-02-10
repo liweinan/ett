@@ -1,7 +1,10 @@
 <h2>
 <span style="<%= deleted_style(@package) %>">
 <%= h @package.name %>
-  @<%= link_to @package.task.name, :controller => 'packages', :action => 'index', :task_id => escape_url(@package.task.name) %>
+  @<%= link_to @package.task.name,
+               :controller => 'packages',
+               :action => 'index',
+               :task_id => escape_url(@package.task.name) %>
 </span>
 </h2>
 <%= render :partial => 'packages/fields/mead_sync' %>
@@ -61,7 +64,8 @@ GitUrl: <%= h @package.git_url %>
 
 <% if @package.task.use_bz_integration? %>
     <div id="upgrade_bz_unique">
-        <%= render :partial => 'bz_bugs/upgrade_bz_bug', :locals => {:bz_bug => @package.upgrade_bz} %>
+        <%= render :partial => 'bz_bugs/upgrade_bz_bug',
+                   :locals => {:bz_bug => @package.upgrade_bz} %>
     </div>
 <% end %>
 
@@ -72,12 +76,18 @@ GitUrl: <%= h @package.git_url %>
 
 <% unless @package.task.readonly? %>
     <% if can_edit_package? @package %>
-        <%= link_to 'Edit', :controller => 'packages', :action => 'edit', :id => escape_url(@package.name) %>
+        <%= link_to 'Edit', :controller => 'packages',
+                    :action => 'edit',
+                    :id => escape_url(@package.name) %>
     <% end %>
 
     <% if can_manage? %>
         <% unless @package.deleted? %>
-            | <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(@package.name), :task_id => escape_url(@package.task.name) %>
+            | <%= link_to 'Clone',
+                          :controller => :packages, :action => :clone,
+                          :id => escape_url(@package.name),
+                          :task_id => escape_url(@package.task.name) %>
+
             | <%= link_to 'Delete', @package,
                           :confirm => "Are you sure to delete #{escape_url(@package.name)}?",
                           :method => :delete %>
@@ -96,13 +106,14 @@ GitUrl: <%= h @package.git_url %>
     <%= render :partial => 'layouts/sep' %>
 <% end %>
 <% if @package.task.use_bz_integration? %>
-    <%= render :partial => 'packages/bz_bugs', :locals => {:package => @package} %>
+    <%= render :partial => 'packages/bz_bugs',
+               :locals => {:package => @package} %>
     <%= render :partial => 'layouts/sep' %>
 <% end %>
 <%= render :partial => 'changelog' %>
 <%= render :partial => 'layouts/sep' %>
 
-<%= render :partial => "comments/index" %>
+<%= render :partial => 'comments/index' %>
 <% if logged_in? && !@package.task.readonly? %>
-    <%= render :partial => "comments/new" %>
+    <%= render :partial => 'comments/new' %>
 <% end %>

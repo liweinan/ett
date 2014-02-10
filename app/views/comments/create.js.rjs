@@ -1,23 +1,38 @@
 params[:pos] ||= 'default'
 
-unless @package.blank?
-  div = 'added_comment'
+def hide_default_pos(comment, page, params)
   if params[:pos] == 'default'
-    count = Comment.count(:conditions => "commentable_type='Package' and commentable_id = #{@package.id}")
-    page.insert_html :bottom, div, :partial => '/comments/show', :locals => {:comment => @comment, :index => @comment.id}
+    page.select('form').each { |f| f.reset }
+    div = 'send_comment'
+    page.replace_html(div, comment)
+    page.visual_effect :highlight, div
   end
 end
 
-if params[:pos] == 'default'
-  page.select('form').each { |f| f.reset }
-  div = 'send_comment'
-  page.replace_html(div, 'Comment posted.')
-  page.visual_effect :highlight, div
+def hide_mini_pos(comment, page, params)
+  if params[:pos] == 'mini'
+    div = "comment_mini_form_#{@package.id}"
+    page.replace_html div, comment
+    page.visual_effect :highlight, div
+    page.visual_effect :fade, div
+  end
 end
 
-if params[:pos] == 'mini'
-  div = "comment_mini_form_#{@package.id}"
-  page.replace_html div, 'Comment added!'
-  page.visual_effect :highlight, div
-  page.visual_effect :fade, div
+unless @comment.nil?
+  unless @package.blank?
+    div = 'added_comment'
+    if params[:pos] == 'default'
+      page.insert_html :bottom, div,
+                       :partial => '/comments/show',
+                       :locals => {:comment => @comment,
+                                   :index => @comment.id}
+    end
+  end
+
+  hide_default_pos 'Comment posted.', page, params
+  hide_mini_pos 'Comment added!', page, params
+
+else
+  hide_default_pos 'Duplicate comment', page, params
+  hide_mini_pos 'Duplicate comment', page, params
 end

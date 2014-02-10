@@ -1,6 +1,6 @@
 <%= render :partial => 'layouts/sep_tiny' %>
 Automatic Time Track:
-<%= render :partial => "packages/display_auto_tt", :locals => {:package => @package} %>
+<%= render :partial => 'packages/display_auto_tt', :locals => {:package => @package} %>
 <%= render :partial => 'layouts/sep_tiny' %>
 Manual Time Track:
 <span id="manual_tracked_time">
@@ -11,7 +11,7 @@ Manual Time Track:
 <% if logged_in? && !@package.task.readonly? %>
     <%= render :partial => 'layouts/sep_tiny' %>
     <% form_remote_tag(
-               :url => {:controller => "toolbox", :action => "log_work_done"},
+               :url => {:controller => 'toolbox', :action => 'log_work_done'},
                :loading => "Element.show('spinner_log_#{@package.id}');",
                :success => "Element.hide('spinner_log_#{@package.id}');
            document.getElementById('work_time_col').value='';

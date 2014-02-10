@@ -15,14 +15,15 @@
         <% if can_delete_comment?(comment) %>
             <div id='delete-comment-<%= comment.id %>' style='text-align:left;display:none;padding-bottom:3px;'>
               <% form_remote_tag(
-                         :url => {:controller => "comments", :action => 'destroy', :id => comment.id},
+                         :url => {:controller => 'comments', :action => 'destroy', :id => comment.id},
                          :html => {:id => "comment-form-#{comment.id}"},
                          :loading => "Element.show('spinner-delete-comment-#{comment.id}');",
                          :success => "Element.hide('div-comment-#{comment.id}');",
-                         :confirm => "Are you sure?") do %>
+                         :confirm => 'Are you sure?') do %>
                   <%= hidden_field_tag '_method', 'delete' %>
                   <%= hidden_field_tag :id, comment.id %>
-                  <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "spinner-delete-comment-#{comment.id}"} %>
+                  <%= render :partial => 'layouts/progress_indicator',
+                             :locals => {:progress_indicator_id => "spinner-delete-comment-#{comment.id}"} %>
                   <%= submit_tag 'Delete' %>
               <% end %>
             </div>

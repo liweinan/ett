@@ -1,7 +1,9 @@
 <%#@package = Package.find(params[:package_id])%>
 <% if @package.has_the_relationships_of?('clone') %>
-    <%= render :partial => "layouts/sep_tiny" %>
+    <%= render :partial => 'layouts/sep_tiny' %>
     <label>
-      <input type="checkbox" name="sync_<%=key%>" value="yes"/>&nbsp;sync among cloned packages
+      <input type="checkbox"
+             name="sync_<%=key%>"
+             value="yes"/>&nbsp;sync among cloned packages
     </label>
 <% end %>

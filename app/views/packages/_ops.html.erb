@@ -11,16 +11,22 @@
     /
 <% end %>
 
-<%= link_to "Workload", :controller => :packages, :action => :index,
+<%= link_to 'Workload',
+            :controller => :packages, :action => :index,
             :task_id => escape_url(params[:task_id]),
-            :user => params[:user], :style => "workload" %> /
-<%= link_to "Time Report", :controller => :packages, :action => :index,
+            :user => params[:user],
+            :style => 'workload' %> /
+<%= link_to 'Time Report',
+            :controller => :packages, :action => :index,
             :task_id => escape_url(params[:task_id]),
-            :user => params[:user], :style => "time_report" %> /
-<%= link_to "Printable Page", :controller => :packages, :action => :index,
+            :user => params[:user],
+            :style => 'time_report' %> /
+<%= link_to 'Printable Page',
+            :controller => :packages, :action => :index,
             :task_id => escape_url(params[:task_id]), :user => params[:user],
             :style => 'printable' %> /
-<%= link_to 'Export to CSV', "/packages/export_to_csv/-1?task_id=#{escape_url(params[:task_id])}&tag=#{escape_url(params[:tag])}&status=#{escape_url(params[:status])}&user=#{escape_url(params[:user])}" %>
+<%= link_to 'Export to CSV',
+            "/packages/export_to_csv/-1?task_id=#{escape_url(params[:task_id])}&tag=#{escape_url(params[:tag])}&status=#{escape_url(params[:status])}&user=#{escape_url(params[:user])}" %>
 
 <% if has_task? && can_manage? %>
     <%
@@ -31,10 +37,13 @@
          setting_id = setting.id
        end
     %>
-    / <%= link_to "Clone Task", :controller => :tasks, :action => :clone,
+    / <%= link_to 'Clone Task',
+                  :controller => :tasks, :action => :clone,
                   :id => escape_url(params[:task_id]) %>
-    / <%= link_to "Task Settings", :controller => :settings, :action => :show,
-                  :id => setting_id, :task_id => escape_url(params[:task_id]) %>
+    / <%= link_to 'Task Settings',
+                  :controller => :settings, :action => :show,
+                  :id => setting_id,
+                  :task_id => escape_url(params[:task_id]) %>
 <% end %>
 
 

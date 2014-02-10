@@ -2,8 +2,10 @@
     <h3>Changelog</h3>
 
     <%= render :partial => 'layouts/line' %>
-    <a href="javascript:void(0);" onclick="toggle_changelog()"><span id='toggle_changelog_btn'>[SHOW]</span></a>
-    <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "toggle_changelog_indicator"} %>
+    <a href="javascript:void(0);"
+       onclick="toggle_changelog()"><span id='toggle_changelog_btn'>[SHOW]</span></a>
+    <%= render :partial => 'layouts/progress_indicator',
+               :locals => {:progress_indicator_id => 'toggle_changelog_indicator'} %>
     <%= render :partial => 'layouts/sep' %>
     <span id="toggle_changelog_area"></span>
 
@@ -13,20 +15,20 @@
             function toggle_changelog() {
                 var btn_val = document.getElementById('toggle_changelog_btn').innerHTML;
                 new Ajax.Request('/toolbox/toggle_changelog',
-                        {
-                            asynchronous: true,
-                            evalScripts: true,
-                            onLoading: function (request) {
-                                Element.show('toggle_changelog_indicator')
-                            },
-                            onSuccess: function (response) {
-                                Element.hide('toggle_changelog_indicator')
-                            },
-                            parameters: {
-                                'id': '<%=@package.id%>',
-                                'btn_val': btn_val,
-                                'authenticity_token': '<%=form_authenticity_token%>'}
-                        });
+                    {
+                        asynchronous: true,
+                        evalScripts: true,
+                        onLoading: function (request) {
+                            Element.show('toggle_changelog_indicator')
+                        },
+                        onSuccess: function (response) {
+                            Element.hide('toggle_changelog_indicator')
+                        },
+                        parameters: {
+                            'id': '<%=@package.id%>',
+                            'btn_val': btn_val,
+                            'authenticity_token': '<%=form_authenticity_token%>'}
+                    });
             }
             //]]>
         </script>

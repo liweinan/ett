@@ -71,7 +71,7 @@ class PackagesController < ApplicationController
   # POST /packages.xml
   def create
     @package = Package.new(params[:package])
-    cleanup_package_name(@package.name)
+    cleanup_pac_name!(@package.name)
 
     @package.created_by = current_user.id
     @package.updated_by = current_user.id
@@ -84,145 +84,92 @@ class PackagesController < ApplicationController
         flash[:notice] = 'Package was successfully created.'
 
         if Rails.env.production?
-          url = get_package_link(params, @package, :create)
-
-          if Setting.activated?(@package.task, Setting::ACTIONS[:created])
-            Notify::Package.create(current_user,
-                                   url,
-                                   @package,
-                                   Setting.all_recipients_of_package(@package, nil, :create))
-          end
-
-          unless params[:div_package_create_notification_area].blank?
-            Notify::Package.create(current_user,
-                                   url,
-                                   @package,
-                                   params[:div_package_create_notification_area])
-          end
+          notify_package_created(params, @package)
         end
 
-        format.html {
+        format.html do
           redirect_to(:controller => :packages,
                       :action => :show,
                       :id => escape_url(@package.name),
                       :task_id => escape_url(@package.task.name),
                       :user => params[:user])
-        }
+        end
       else
-
         @user = params[:user]
         format.html { render :action => :new }
       end
     end
   end
 
+  def notify_package_created(params, package)
+    url = get_package_link(params, package, :create)
+
+    if Setting.activated?(package.task, Setting::ACTIONS[:created])
+      Notify::Package.create(current_user,
+                             url,
+                             package,
+                             Setting.all_recipients_of_package(package, nil, :create))
+    end
+
+    unless params[:div_package_create_notification_area].blank?
+      Notify::Package.create(current_user,
+                             url,
+                             package,
+                             params[:div_package_create_notification_area])
+    end
+  end
+
 
   # PUT /packages/1
   # PUT /packages/1.xml
+  # params[:flatten_bzs] seems to be only used for inline bugzilla
+  # params[:process_tags] ??
   # TODO: we'll refactor this method to make it more modular
   def update
-    # set local shared vals
+
+    ###########################################################################
+    ########################### Bugzilla ######################################
+    ###########################################################################
+    update_bz_pass(params[:bzauth_pwd])
     shared_bzauth_user = extract_username(params[:bzauth_user])
     shared_bzauth_pass = session[:bz_pass]
-    shared_inline_bz_val = params[:flatten_bzs]
-    shared_inline_bzs = nil
-    unless shared_inline_bz_val.blank?
-      shared_inline_bzs =
-          shared_inline_bz_val.split(/\s+/).map { |bz| bz.to_i if bz.to_i > 0 }.compact
-    end
+    shared_inline_bzs = get_shared_inline_bz(params[:flatten_bzs])
+    ###########################################################################
+    ###########################################################################
 
     # for Changelog.package_updated
     @orig_package = Package.find(params[:id])
-    @orig_tags = @orig_package.tags.clone
-
     @package = Package.find(params[:id])
 
-    params[:package] ||= Hash.new
-    params[:package][:id] = @package.id
+    @orig_tags = @orig_package.tags.clone
 
-    if @package.created_by.blank?
-      params[:package][:created_by] = current_user.id
-    end
-
-    params[:package][:updated_by] = current_user.id
-
-    last_status_changed_at = @package.status_changed_at
-    last_status = Status.find_by_id(@package.status_id)
-    old_assignee_email = @package.assignee.email if @package.assignee
-    old_version = @package.ver
-
-    unless params[:package][:name].blank?
-      cleanup_package_name(params[:package][:name])
-    end
-    update_bz_pass(params[:bzauth_pwd])
-
-    if params[:package].key?(:user_id) && !params[:package][:user_id].blank?
-      assignee_email = User.find_by_id(params[:package][:user_id]).email
-    else
-      assignee_email = ''
-    end
-
-    current_ver = params[:package][:ver] if params[:package].key?(:ver)
+    update_params_hash!(params, @package)
 
     # Function to support inline editor to update BZ
     # Input syntax: <Bz1Id> <Bz2Id> <Bz3Id>
-    if shared_inline_bz_val != nil && shared_inline_bz_val.blank?
-      Package.transaction do
-        @package.bz_bugs.each do |bz_bug|
-          bz_bug.destroy
-        end
-      end
-    end
+    update_inline_bz(shared_bzauth_user,
+                     shared_bzauth_pass,
+                     shared_inline_bzs,
+                     @package)
 
-    unless shared_inline_bzs.blank?
-      Package.transaction do
-        tx_ok = true
-        bad_queries = []
-        new_bug_info_store = []
-        deprecated_bug_store = @package.bz_bugs.clone
+    ###########################################################################
+    ################## Lots of variable definitions ... #######################
+    ###########################################################################
+    last_status_changed_at = @package.status_changed_at
+    last_status = Status.find_by_id(@package.status_id)
 
-        shared_inline_bzs.each do |bz_id|
-          bz_query_resp = BzBug.query_bz_bug_info(bz_id,
-                                                  shared_bzauth_user,
-                                                  shared_bzauth_pass)
-          if bz_query_resp.class == Net::HTTPOK
-            bz_body = JSON.parse(bz_query_resp.body)
-            existing_bz_bug = @package.bz_bug_with_bz_id(bz_id)
+    old_assignee_email = @package.assignee.email if @package.assignee
+    assignee_email = new_assignee_email(params)
 
-            if existing_bz_bug.blank?
-              new_bug_info_store << bz_body
-            else
-              deprecated_bug_store.delete(existing_bz_bug)
-            end
-          else
-            # atomic commit. If one bug input has error, cancel the whole tx.
-            tx_ok = false
-            if bz_query_resp.class == Net::HTTPNotFound
-              bad_queries << 'Not Found: bz' + bz_id.to_s
-            else
-              bad_queries << bz_query_resp.response.code + bz_query_resp.response.message
-            end
-          end
-        end
-
-        if tx_ok
-          new_bug_info_store.each do |bz_bug_info|
-            BzBug.create_from_bz_info(bz_bug_info, @package.id, current_user)
-          end
-
-          deprecated_bug_store.each do |bz_bug|
-            bz_bug.destroy
-          end
-        else
-          @error_message = "Error: #{bad_queries.flatten}"
-        end
-      end
-    end
+    old_version = @package.ver
+    current_ver = get_current_version(params)
+    ###########################################################################
+    ###########################################################################
 
     respond_to do |format|
       Package.transaction do
-        if shared_inline_bz_val.blank? &&
-           @package.update_attributes(params[:package])
+        if shared_inline_bzs.blank?
+          @package.update_attributes(params[:package])
 
           @package.reload
           # this is needed since we write to @package later in this section of
@@ -230,167 +177,49 @@ class PackagesController < ApplicationController
           # with the latest_changes command since the latest_change will be that
           # instead of what the user changed in the website.
           latest_changes_package = @package.latest_changes
-
-          if params[:process_tags] == 'Yes'
-            @package.tags = process_tags(params[:tags], @package.task_id)
-          end
+          puts "*******************************"
+          puts "*******************************"
+          puts "*******************************"
+          puts "*******************************"
+          puts "*******************************"
+          puts latest_changes_package
+          puts "==============================="
+          puts "==============================="
+          puts "==============================="
+          puts "==============================="
+          update_tags(params, @package)
 
           # update the assignee of the bugs if assignee changed
           # TODO: we don't check whether the bz_bug assignee is the same as the old
           # one. Will have to fix this someday
-          if Rails.env.production?
-            if old_assignee_email != assignee_email
-              @package.bz_bugs.each do |bz_bug|
-                if bz_bug.summary.match(/Upgrade/) &&
-                   !assignee_email.nil? &&
-                    (!bz_bug.component.blank? &&
-                     bz_bug.component.include?('RPMs')) &&
-                    (bz_bug.keywords.include? 'Rebase')
+          update_bz_assignee_and_version(old_assignee_email, assignee_email,
+                                         old_version, current_ver,
+                                         shared_bzauth_pass,
+                                         shared_bzauth_user,
+                                         @package)
 
-                  unless @package.assignee.bugzilla_email.blank?
-                    assignee_email = @package.assignee.bugzilla_email
-                  end
-
-                  params_bz = {:assignee => assignee_email,
-                               :userid => shared_bzauth_user,
-                               :pwd => shared_bzauth_pass,
-                               :status => BzBug::BZ_STATUS[:assigned]}
-
-                  update_bug(bz_bug.bz_id, oneway='true', params_bz)
-
-                  bz_bug.bz_assignee = assignee_email
-                  bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
-                  bz_bug.save
-
-                end
-              end
-            end
-
-          end
-            if !current_ver.nil? &&
-               !old_version.nil? &&
-               current_ver != old_version
-
-              errata_bzs = @package.upgrade_bz
-              errata_bzs.each do |errata_bz|
-                new_errata_bz_summary = errata_bz.summary.gsub(old_version,
-                                                               current_ver)
-
-                params_bz = {:userid => shared_bzauth_user,
-                             :pwd => shared_bzauth_pass,
-                             :summary => new_errata_bz_summary}
-
-                update_bug_summary(errata_bz.bz_id, oneway='true', params_bz)
-                errata_bz.bz_action = BzBug::BZ_ACTIONS[:accepted]
-                errata_bz.save
-              end
-            end
-
+          ######################################################################
+          ######################################################################
 
           # status changed
-          new_status = Status.find_by_id(params[:package][:status_id].to_i)
+          new_status = get_new_status(params)
           if new_status != last_status
-            @package.status_changed_at = Time.now
+            last_status_changed_at = time_track_package(last_status,
+                                                        last_status_changed_at,
+                                                        @package)
 
-            if !last_status.blank? && last_status.is_time_tracked?
-              @tt = TrackTime.all(:conditions => ['package_id=? and status_id=?',
-                                                  @package.id,
-                                                  last_status.id])[0]
-              @tt = TrackTime.new if @tt.blank?
-              @tt.package_id = @package.id
-              @tt.status_id = last_status.id
+            ####################################################################
+            ############################ Bugzilla ##############################
+            ####################################################################
+            update_bz_status_if_status_changed(assignee_email,
+                                               new_status,
+                                               shared_bzauth_pass,
+                                               shared_bzauth_user,
+                                               @package)
+            ####################################################################
+            ####################################################################
 
-              last_status_changed_at ||= @package.status_changed_at
-              @tt.time_consumed ||= 0
-              @tt.time_consumed += (@package.status_changed_at.to_i - last_status_changed_at.to_i)/60
-              @tt.save
-            end
-
-            unless new_status.blank?
-              if new_status.code == Status::CODES[:inprogress] &&
-                 !assignee_email.blank?
-
-                # the bug statuses are waiting to be updated according to
-                # https://docspace.corp.redhat.com/docs/DOC-148169
-                # TODO we need to write some unit tests to test all the
-                # integrations with SOA
-                if Rails.env.production?
-                  @package.bz_bugs.each do |bz_bug|
-                    if bz_bug.summary.match(/Upgrade/) &&
-                        (bz_bug.bz_assignee == assignee_email ||
-                         bz_bug.bz_assignee == @package.assignee.bugzilla_email)
-
-                      unless @package.assignee.bugzilla_email.blank?
-                        assignee_email = @package.assignee.bugzilla_email
-                      end
-
-                      params_bz = {:assignee => assignee_email,
-                                   :userid => shared_bzauth_user,
-                                   :pwd => shared_bzauth_pass,
-                                   :status => BzBug::BZ_STATUS[:assigned]}
-
-                      update_bug(bz_bug.bz_id, oneway='true', params_bz)
-                      bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
-                      bz_bug.save
-                    end
-                  end
-                end
-              elsif new_status.code == Status::CODES[:finished]
-                if Rails.env.production?
-                  if @package.task.use_mead_integration?
-                    # Disable asynchronous update <- we need that data for
-                    # bugzilla immediately
-                    # @package.mead_action = Package::MEAD_ACTIONS[:needsync]
-                    get_mead_info(@package)
-                    update_source_url_info(@package)
-                  end
-                end
-
-                # TODO: add comment with non-RHEL6 builds too
-                if Rails.env.production?
-                  @package.bz_bugs.each do |bz_bug|
-                    if bz_bug.summary.match(/Upgrade/) &&
-                       (bz_bug.bz_assignee == assignee_email ||
-                        bz_bug.bz_assignee == @package.assignee.bugzilla_email)
-
-                      unless @package.assignee.bugzilla_email.blank?
-                        assignee_email = @package.assignee.bugzilla_email
-                      end
-
-                      userid = extract_username(params[:bzauth_user])
-                      params_bz = {:milestone => @package.task.milestone,
-                                   :assignee => assignee_email,
-                                   :userid => shared_bzauth_user,
-                                   :status => BzBug::BZ_STATUS[:modified],
-                                   :pwd => shared_bzauth_pass}
-
-                      if bz_bug.summary.match(/RHEL6/)
-                        comment = "Source URL: #{@package.git_url}\n" +
-                            "Mead-Build: #{@package.mead}\n" +
-                            "Brew-Build: #{@package.brew}\n"
-                        params_bz[:comment] = comment
-                      end
-
-                      add_comment_milestone_status_to_bug(bz_bug.bz_id,
-                                                          params_bz)
-
-                      bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
-                      bz_bug.save
-                    end
-                  end
-                end
-
-              end
-            end
-
-            log_entry = AutoLogEntry.new
-            last_status_changed_at ||= @package.status_changed_at
-            log_entry.start_time = last_status_changed_at
-            log_entry.end_time = @package.status_changed_at
-            log_entry.who = current_user
-            log_entry.package = @package
-            log_entry.status = last_status
-            log_entry.save
+            update_log_entry(last_status, last_status_changed_at, @package)
           end
 
           @package.save
@@ -405,29 +234,11 @@ class PackagesController < ApplicationController
           flash[:notice] = 'Package was successfully updated.'
 
           if Rails.env.production?
-            url = get_package_link(params, @package).gsub('/edit', '')
-
-            if Setting.activated?(@package.task, Setting::ACTIONS[:updated])
-              Notify::Package.update(current_user,
-                                     url,
-                                     @package,
-                                     Setting.all_recipients_of_package(@package,
-                                                                       current_user,
-                                                                       :edit),
-                                     latest_changes_package)
-            end
-
-            unless params[:div_package_edit_notification_area].blank?
-              Notify::Package.update(current_user,
-                                     url,
-                                     @package,
-                                     params[:div_package_edit_notification_area],
-                                     latest_changes_package)
-            end
+            notify_package_updated(latest_changes_package, params, @package)
           end
 
           @output = true
-        else
+        else # we are here since it is shared_bz_ids? wtf
           unless @package.errors[:name].blank?
             @error_message = "Package #{@package.name} already exists. Here's the <a href='/tasks/#{escape_url(@package.task.name)}/packages/#{unescape_url(@package.name)}' target='_blank'>link</a>."
           end
@@ -451,6 +262,342 @@ class PackagesController < ApplicationController
         format.html { render :action => :edit }
         format.js
       end
+    end
+  end
+
+  def update_bz_assignee_and_version(old_assignee_email, assignee_email,
+      old_version, current_ver, shared_bzauth_pass, shared_bzauth_user,
+      package)
+    if Rails.env.production?
+      if old_assignee_email != assignee_email
+        update_bz_assignee(assignee_email,
+                           shared_bzauth_pass,
+                           shared_bzauth_user,
+                           package)
+      end
+
+      if version_changed(current_ver, old_version)
+        update_bz_version(current_ver,
+                          old_version,
+                          shared_bzauth_pass,
+                          shared_bzauth_user,
+                          package)
+      end
+    end
+  end
+
+  def update_bz_status_if_status_changed(assignee_email,
+      new_status, shared_bzauth_pass, shared_bzauth_user, package)
+    unless new_status.blank?
+      if new_status.code == Status::CODES[:inprogress] &&
+          !assignee_email.blank?
+
+        # the bug statuses are waiting to be updated according to
+        # https://docspace.corp.redhat.com/docs/DOC-148169
+        # TODO we need to write some unit tests to test all the
+        # integrations with SOA
+        if Rails.env.production?
+          update_bz_status(assignee_email, shared_bzauth_pass,
+                           shared_bzauth_user, package)
+        end
+      elsif new_status.code == Status::CODES[:finished]
+        if Rails.env.production?
+          if package.task.use_mead_integration?
+            # Disable asynchronous update <- we need that data for
+            # bugzilla immediately
+            # @package.mead_action = Package::MEAD_ACTIONS[:needsync]
+            get_mead_info(package)
+            update_source_url_info(package)
+          end
+        end
+
+        # TODO: add comment with non-RHEL6 builds too
+        if Rails.env.production?
+          update_bz_status_finished(assignee_email,
+                                    shared_bzauth_pass,
+                                    shared_bzauth_user, package)
+        end
+      end
+    end
+  end
+
+  def get_new_status(params)
+    Status.find_by_id(params[:package][:status_id].to_i)
+  end
+
+  def version_changed(current_ver, old_version)
+    !current_ver.nil? &&
+        !old_version.nil? &&
+        current_ver != old_version
+  end
+
+  def get_current_version(params)
+    params[:package][:ver] if params[:package].key?(:ver)
+  end
+
+  def new_assignee_email(params)
+    if params[:package].key?(:user_id) && !params[:package][:user_id].blank?
+      User.find_by_id(params[:package][:user_id]).email
+    else
+      ''
+    end
+  end
+
+  def update_bz_status_finished(assignee_email, shared_bzauth_pass,
+      shared_bzauth_user, package)
+
+    package.bz_bugs.each do |bz_bug|
+      if bz_bug.summary.match(/Upgrade/) &&
+          (bz_bug.bz_assignee == assignee_email ||
+              bz_bug.bz_assignee == package.assignee.bugzilla_email)
+
+        unless package.assignee.bugzilla_email.blank?
+          assignee_email = package.assignee.bugzilla_email
+        end
+
+        params_bz = {:milestone => package.task.milestone,
+                     :assignee => assignee_email,
+                     :userid => shared_bzauth_user,
+                     :status => BzBug::BZ_STATUS[:modified],
+                     :pwd => shared_bzauth_pass}
+
+        if bz_bug.summary.match(/RHEL6/)
+          comment = "Source URL: #{package.git_url}\n" +
+              "Mead-Build: #{package.mead}\n" +
+              "Brew-Build: #{package.brew}\n"
+          params_bz[:comment] = comment
+        end
+
+        add_comment_milestone_status_to_bug(bz_bug.bz_id,
+                                            params_bz)
+
+        bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+        bz_bug.save
+      end
+    end
+  end
+
+  def update_bz_status(assignee_email, shared_bzauth_pass,
+      shared_bzauth_user, package)
+    package.bz_bugs.each do |bz_bug|
+      if bz_bug.summary.match(/Upgrade/) &&
+          (bz_bug.bz_assignee == assignee_email ||
+              bz_bug.bz_assignee == package.assignee.bugzilla_email)
+
+        unless package.assignee.bugzilla_email.blank?
+          assignee_email = package.assignee.bugzilla_email
+        end
+
+        params_bz = {:assignee => assignee_email,
+                     :userid => shared_bzauth_user,
+                     :pwd => shared_bzauth_pass,
+                     :status => BzBug::BZ_STATUS[:assigned]}
+
+        update_bug(bz_bug.bz_id, oneway='true', params_bz)
+        bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+        bz_bug.save
+      end
+    end
+  end
+
+  def update_bz_version(current_ver, old_version, shared_bzauth_pass,
+      shared_bzauth_user, package)
+    errata_bzs = package.upgrade_bz
+    errata_bzs.each do |errata_bz|
+      new_errata_bz_summary = errata_bz.summary.gsub(old_version,
+                                                     current_ver)
+
+      params_bz = {:userid => shared_bzauth_user,
+                   :pwd => shared_bzauth_pass,
+                   :summary => new_errata_bz_summary}
+
+      update_bug_summary(errata_bz.bz_id, oneway='true', params_bz)
+      errata_bz.bz_action = BzBug::BZ_ACTIONS[:accepted]
+      errata_bz.save
+    end
+  end
+
+  def update_bz_assignee(assignee_email, shared_bzauth_pass,
+      shared_bzauth_user, package)
+
+    package.bz_bugs.each do |bz_bug|
+      if bz_bug.summary.match(/Upgrade/) &&
+          !assignee_email.nil? &&
+          (!bz_bug.component.blank? &&
+              bz_bug.component.include?('RPMs')) &&
+          (bz_bug.keywords.include? 'Rebase')
+
+        unless package.assignee.bugzilla_email.blank?
+          assignee_email = package.assignee.bugzilla_email
+        end
+
+        params_bz = {:assignee => assignee_email,
+                     :userid => shared_bzauth_user,
+                     :pwd => shared_bzauth_pass,
+                     :status => BzBug::BZ_STATUS[:assigned]}
+
+        update_bug(bz_bug.bz_id, oneway='true', params_bz)
+
+        bz_bug.bz_assignee = assignee_email
+        bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
+        bz_bug.save
+      end
+    end
+  end
+
+  def update_tags(params, package)
+    if params[:process_tags] == 'Yes'
+      package.tags = process_tags(params[:tags], package.task_id)
+    end
+  end
+
+  def update_inline_bz(shared_bzauth_user,
+                       shared_bzauth_pass,
+                       shared_inline_bzs,
+                       package)
+
+    delete_all_bzs(package) if empty_list(shared_inline_bzs)
+    return if shared_inline_bzs.blank? # nothing to do
+
+    Package.transaction do
+      require 'set'
+      inline_bz_set = Set.new shared_inline_bzs
+      all_bz_bugs_set = Set.new package.bz_bug_ids
+
+      deprecated = all_bz_bugs_set - inline_bz_set
+      new_bzs = inline_bz_set - all_bz_bugs_set
+
+      bz_queried = []
+      error = false
+
+      new_bzs.each do |bz_id|
+        bz_query_resp = BzBug.query_bz_bug_info(bz_id,
+                                                shared_bzauth_user,
+                                                shared_bzauth_pass)
+        if bz_query_resp.class == Net::HTTPOK
+          bz_queried << JSON.parse(bz_query_resp.body)
+        else
+          # TODO: find some way to deal with error
+          @error_message = "Error: Not Found: bz #{bz_id}"
+          error = true
+          break
+        end
+      end
+
+      unless error
+        bz_queried.each do |bz_info|
+          BzBug.create_from_bz_info(bz_info, package.id, current_user)
+        end
+
+        deprecated.each { |bz_bug| package.bz_bug_with_bz_id(bz_bug).destroy }
+      end
+    end
+  end
+
+  def empty_list(str)
+    !str.nil? && str.blank?
+  end
+
+  def delete_all_bzs(package)
+    Package.transaction do
+      package.bz_bugs.each { |bz_bug| bz_bug.destroy }
+    end
+  end
+
+  def update_params_hash!(params, package)
+    params[:package] ||= Hash.new
+    params[:package][:id] = package.id
+
+    package_name = params[:package][:name]
+    cleanup_pac_name!(params[:package][:name]) unless package_name.blank?
+
+    # set for update_attributes
+    params[:package][:created_by] = current_user.id if package.created_by.blank?
+    params[:package][:updated_by] = current_user.id
+  end
+
+  # shared_inline_bz_val will be a space delimited string containing bugzilla
+  # ids
+  #
+  # e.g '12345 54321 123456'
+  #
+  # We'll try to transform that string into a list of ints
+  # Method returns nil if it the parameter is 'nil' or empty
+  #
+  # Parameters:
+  # +shared_inline_bz_val+: string to break down
+  #
+  # Returns:
+  # nil: if parameter is 'nil' or empty
+  # list of ints otherwise
+  def get_shared_inline_bz(shared_inline_bz_val)
+
+    shared_inline_bzs = nil
+
+    unless shared_inline_bz_val.blank?
+      shared_inline_bzs =
+          shared_inline_bz_val.split(/\s+/).map do |bz|
+            bz.to_i if bz.to_i > 0
+          end
+      shared_inline_bzs.compact!
+    end
+    shared_inline_bzs
+  end
+
+  def time_track_package(last_status, last_status_changed, package)
+    package.status_changed_at = Time.now
+
+    if !last_status.blank? && last_status.is_time_tracked?
+      time_track = TrackTime.all(:conditions => ['package_id=? and status_id=?',
+                                                 package.id,
+                                                 last_status.id])[0]
+      time_track = TrackTime.new if time_track.blank?
+
+      time_track.package_id = package.id
+      time_track.status_id = last_status.id
+      last_status_changed ||= package.status_changed_at
+
+      time_track.time_consumed ||= 0
+      time_track.time_consumed +=
+          (package.status_changed_at.to_i - last_status_changed.to_i)/60
+
+      time_track.save
+    end
+    last_status_changed
+  end
+
+  def update_log_entry(last_status, last_status_change, package)
+    log_entry = AutoLogEntry.new
+
+    last_status_change ||= package.status_changed_at
+    log_entry.start_time = last_status_change
+    log_entry.end_time = package.status_changed_at
+    log_entry.who = current_user
+    log_entry.package = package
+    log_entry.status = last_status
+
+    log_entry.save
+  end
+
+  def notify_package_updated(latest_changes, params, package)
+    url = get_package_link(params, package).gsub('/edit', '')
+
+    if Setting.activated?(package.task, Setting::ACTIONS[:updated])
+      Notify::Package.update(current_user,
+                             url,
+                             package,
+                             Setting.all_recipients_of_package(package,
+                                                               current_user,
+                                                               :edit),
+                             latest_changes)
+    end
+
+    unless params[:div_package_edit_notification_area].blank?
+      Notify::Package.update(current_user,
+                             url,
+                             package,
+                             params[:div_package_edit_notification_area],
+                             latest_changes)
     end
   end
 
@@ -791,11 +938,8 @@ class PackagesController < ApplicationController
 
   end
 
-  def cleanup_package_name(name)
-    unless name.blank?
-      name.strip!
-#      name.downcase!
-    end
+  def cleanup_pac_name!(name)
+    name.strip! unless name.blank?
   end
 
   def user_view_index

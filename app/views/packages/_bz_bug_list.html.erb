@@ -21,22 +21,22 @@
               </td>
           <% end %>
           <td id="col_bz_id_<%= bz_bug.id %>" class="small_font">
-            <%= render :partial => "bz_bugs/bz_id", :locals => {:bz_bug => bz_bug} %>
+            <%= render :partial => 'bz_bugs/bz_id', :locals => {:bz_bug => bz_bug} %>
           </td>
           <td id="col_bz_creator_<%= bz_bug.id %>" class="small_font">
-            <%= render :partial => "bz_bugs/creator", :locals => {:bz_bug => bz_bug} %>
+            <%= render :partial => 'bz_bugs/creator', :locals => {:bz_bug => bz_bug} %>
           </td>
           <td id="col_bz_assignee_<%= bz_bug.id %>" class="small_font">
-            <%= render :partial => "bz_bugs/bz_assignee", :locals => {:bz_bug => bz_bug} %>
+            <%= render :partial => 'bz_bugs/bz_assignee', :locals => {:bz_bug => bz_bug} %>
           </td>
           <td id="col_bz_last_synced_at_<%= bz_bug.id %>" class="small_font">
-            <%= render :partial => "bz_bugs/last_synced_at", :locals => {:bz_bug => bz_bug} %>
+            <%= render :partial => 'bz_bugs/last_synced_at', :locals => {:bz_bug => bz_bug} %>
           </td>
           <td id="col_bz_status_<%= bz_bug.id %>" class="small_font">
-            <%= render :partial => "bz_bugs/bz_status", :locals => {:bz_bug => bz_bug} %>
+            <%= render :partial => 'bz_bugs/bz_status', :locals => {:bz_bug => bz_bug} %>
           </td>
           <td id="col_bz_summary_<%= bz_bug.id %>" class="small_font">
-            <%= render :partial => "bz_bugs/summary", :locals => {:bz_bug => bz_bug} %>
+            <%= render :partial => 'bz_bugs/summary', :locals => {:bz_bug => bz_bug} %>
           </td>
           <td id="col_bz_action_<%= bz_bug.id %>:<%= bz_bug.bz_action %>" class="small_font" style="display: none">
           </td>

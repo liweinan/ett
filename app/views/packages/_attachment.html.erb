@@ -10,10 +10,13 @@
           <p>
             <%= f.file_field :attachment %>
           </p>
-          <%= render :partial => 'layouts/notification', :locals => {:title => 'Notify the attachment uploading to:', :div_id => 'attachment'} %>
+          <%= render :partial => 'layouts/notification',
+                     :locals => {:title => 'Notify the attachment uploading to:',
+                                 :div_id => 'attachment'} %>
           <p>
             <%= f.submit 'Upload' %>
-            <%= render :partial => 'layouts/notification_link', :locals => {:div_id => 'attachment'} %>
+            <%= render :partial => 'layouts/notification_link',
+                       :locals => {:div_id => 'attachment'} %>
           </p>
 
       <% end %>

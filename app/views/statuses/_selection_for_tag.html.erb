@@ -2,9 +2,14 @@
 <% @statuses = Status.statuses_for_selection(package) %>
 <% if form.blank? %>
     <% if package.blank? || package.status.blank? %>
-        <%= select_tag('package[status_id]', options_from_collection_for_select(@statuses, :id, :name)) %>
+        <%= select_tag('package[status_id]',
+                       options_from_collection_for_select(@statuses, :id, :name)) %>
     <% else %>
-        <%= select_tag('package[status_id]', options_from_collection_for_select(@statuses, :id, :name, package.status.id)).gsub("id=\"package_status_id\"", "id=\"package_status_id_#{package.id}\"") %>
+        <%= select_tag('package[status_id]',
+                       options_from_collection_for_select(@statuses,
+                                                          :id,
+                                                          :name,
+                                                          package.status.id)).gsub("id=\"package_status_id\"", "id=\"package_status_id_#{package.id}\"") %>
     <% end %>
 <% else %>
     <%= form.collection_select :status_id, @statuses, :id, :name %>

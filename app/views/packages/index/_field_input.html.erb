@@ -6,9 +6,12 @@
 <% tag_name = "package[#{field_name.underscore}]" %>
 <% field_val = package[field_name.underscore] %>
 
-<% if field_name == "Bz" %>
-    <% tag_name = "flatten_bzs" %>
+<% if field_name == 'Bz' %>
+    <% tag_name = 'flatten_bzs' %>
     <% field_val = package.bzs_flatten %>
 <% end %>
 
-<%= text_field_tag tag_name, field_val, :id => "pac_#{package.id}_#{field_name}_input", :disabled => disabled %>
+<%= text_field_tag tag_name,
+                   field_val,
+                   :id => "pac_#{package.id}_#{field_name}_input",
+                   :disabled => disabled %>

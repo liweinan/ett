@@ -14,7 +14,6 @@
           <tr>
             <td><%= link_to "#{component.name}", :controller => :components, :action => :show, :id => escape_url(component.name) %>
             <td><%component.tasks.each do |task|%><%=task.name %> / <%end%></td>
-            </td>
             <% if can_manage? %>
                 <td>
                   <%= link_to 'Edit', :action => :edit, :id => escape_url(component.name) %> /

@@ -8,17 +8,22 @@
     Add Comment: <%= render :partial => 'layouts/syntax_help' %>
   </p>
   <% form_remote_tag(
-             :url => {:controller => "comments", :action => "create"},
+             :url => {:controller => 'comments', :action => 'create'},
              :loading => "Element.show('spinner-comment');",
              :success => "Element.hide('spinner-comment');") do %>
 
-      <%= text_area_tag :comment, nil, :class => "comment_text_area" %>
+      <%= text_area_tag :comment, nil, :class => 'comment_text_area' %>
       <%= render :partial => 'layouts/sep' %>
-      <%= render :partial => 'layouts/notification', :locals => {:title => 'Notify the comment to:', :div_id => 'comment'} %>
+
+      <%= render :partial => 'layouts/notification',
+                 :locals => {:title => 'Notify the comment to:',
+                             :div_id => 'comment'} %>
+
       <%= render :partial => 'layouts/sep' %>
       <table border=0>
         <tr>
-          <td><%= submit_tag 'Post' %> <%= render :partial => 'layouts/notification_link', :locals => {:div_id => 'comment'} %></td>
+          <td><%= submit_tag 'Post' %> <%= render :partial => 'layouts/notification_link',
+                                                  :locals => {:div_id => 'comment'} %></td>
           <td><span id="spinner-comment" style="display:none;"><%= image_tag 'ajax-loader1.gif' %></span></td>
         </tr>
       </table>

@@ -1,5 +1,10 @@
 <% unless package.blank? %>
 <% get_xattrs(@task, true, false) do |attr| %>
-    <%= render :partial => 'packages/index/field_template', :locals => {:field_type => 'packages/index/field_input', :package => package, :field_name => attr.camelcase, :is_xattr => 'yes', :partial => 'packages/index/xattr_col'} %>
+    <%= render :partial => 'packages/index/field_template',
+               :locals => {:field_type => 'packages/index/field_input',
+                           :package => package,
+                           :field_name => attr.camelcase,
+                           :is_xattr => 'yes',
+                           :partial => 'packages/index/xattr_col'} %>
 <% end %>
 <% end %>

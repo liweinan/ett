@@ -25,6 +25,9 @@ class BzBug < ActiveRecord::Base
 
   # Creates a new bz_bug entry in the database based on the information provided
   #
+  # Parameter is generally obtained from querying the bugzilla using the
+  # appropriate method
+  #
   # Params:
   # +bz_info+:: hash of key and value strings. The following keys are required:
   #             id, summary, status, assignee, component, keywords (array of
