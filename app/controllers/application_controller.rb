@@ -13,7 +13,8 @@ class ApplicationController < ActionController::Base
                 :get_task, :has_status?, :has_tag?, :deleted_style,
                 :can_delete_comment?, :generate_request_path, :is_global?,
                 :current_user_email, :task_has_tags?, :get_xattrs,
-                :background_style, :confirmed?, :default_style, :get_brew_name
+                :background_style, :confirmed?, :default_style, :get_brew_name,
+                :find_task
 
   helper_method :btag, :ebtag, :uebtag, :truncate_u, :its_myself?,
                 :extract_username, :has_bz_auth_info?
@@ -352,6 +353,10 @@ class ApplicationController < ActionController::Base
 
   def layout_exist?(layout)
     File.exist?("#{RAILS_ROOT}/app/views/layouts/#{layout}.html.erb")
+  end
+
+  def find_task(name)
+    Task.find_by_name(unescape_url(name))
   end
 
   def its_myself?(user)

@@ -9,15 +9,23 @@
 <% unless session[:not_cloned_packages].blank? %>
     Not Cloned Packages:
     <% session[:not_cloned_packages].keys.each do |key| %>
-        <%= key %><%#session[:clone_reports][key]%> /
+        <%= key %> /
     <% end %>
     <% session[:not_cloned_packages] = nil %>
 <% end %>
 
+<!--
+  - GLOBAL VARIABLES
+  -->
 <% if has_task? %>
-    <% @task = Task.find_by_name(unescape_url(params[:task_id])) %>
+  <% unescape_task = unescape_url(params[:task_id]) %>
+  <% task_erb = Task.find_by_name(unescape_task) %>
+<% end %>
+
+<% if has_task? %>
+    <% @task = task_erb %>
     <h2>
-      Listing packages of <%= unescape_url(params[:task_id]) %>
+      Listing packages of <%= unescape_task %>
       <% if has_status? %>
           / <%= unescape_url(params[:status]) %>
       <% end %>
@@ -25,45 +33,61 @@
           / <%= unescape_url(params[:tag]) %>
       <% end %>
     </h2>
-    <% unless @task.description.blank? %>
+    <% unless task_erb.description.blank? %>
         <%= @task.description %>
     <% end %>
 <% else %>
     <h2>Listing packages</h2>
 <% end %>
-<% if has_task? && Task.readonly?(Task.find_by_name(unescape_url(params[:task_id]))) %>
+<% if has_task_and_readonly? params[:task_id] %>
     <h2 style="color: red;">This task is read only</h2>
 <% end %>
+
 <%= render :partial => 'ops' %>
 
 <%= render :partial => 'layouts/sep' %>
 
 Statuses:
-<%= link_to "All (#{@all_packages_count})", :controller => :packages, :action => :index, :task_id => params[:task_id] %> /
+<%= link_to "All (#{@all_packages_count})",
+            :controller => :packages,
+            :action => :index,
+            :task_id => params[:task_id] %> /
 
 <% if logged_in? %>
-    <%= link_to "My (#{@my_packages_count})", :controller => :packages, :action => :index, :task_id => params[:task_id], :user => session[:current_user].email %> /
+    <%= link_to "My (#{@my_packages_count})",
+                :controller => :packages,
+                :action => :index,
+                :task_id => params[:task_id],
+                :user => session[:current_user].email %> /
 <% end %>
 
-<% Status.find_all_can_show_by_task_id_in_global_scope(Task.find_by_name(unescape_url(params[:task_id])).id).each do |status| %>
-    <%= link_to "#{status.name} (#{count_packages(unescape_url(params[:task_id]), status.name)})", :controller => :packages, :action => :index, :task_id => params[:task_id], :status => escape_url(status.name) %> /
+<% Status.find_all_can_show_by_task_id_in_global_scope(task_erb.id).each do |status| %>
+    <%= link_to "#{status.name} (#{count_packages(unescape_task, status.name)})",
+                :controller => :packages,
+                :action => :index,
+                :task_id => params[:task_id],
+                :status => escape_url(status.name) %> /
 <% end %>
 <%= render :partial => 'layouts/sep' %>
-<% tags = Task.find_by_name(unescape_url(params[:task_id])).tags %>
+<% tags = task_erb.tags %>
 <% unless tags.blank? %>
     Tags:
     <% tags.each do |tag| %>
-        <%= link_to "#{tag.key} (#{tag.packages_can_show.length})", :controller => :packages, :action => :index, :task_id => params[:task_id], :tag => tag.key %> /
+        <%= link_to "#{tag.key} (#{tag.packages_can_show.length})",
+                    :controller => :packages,
+                    :action => :index,
+                    :task_id => params[:task_id], :tag => tag.key %> /
     <% end %>
 <% end %>
-<% if logged_in? && (!has_task? || !Task.readonly?(Task.find_by_name(unescape_url(params[:task_id])))) %>
+<% if logged_in? && (!has_task? || !Task.readonly?(task_erb)) %>
     <%= render :partial => 'layouts/sep' %>
     <span id="inline_editor_switch" style="display:none;">
       <a href="javascript:void(0);" onclick="getPacBtns();">
         [ENABLE INLINE EDITOR]
       </a>
     </span>
-    <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "inline_editor_indicator"} %>
+    <%= render :partial => 'layouts/progress_indicator',
+               :locals => {:progress_indicator_id => 'inline_editor_indicator'} %>
 <% end %>
 <p> ✔ : nvr added to errata. ✘ : nvr not in shipped-list </p>
 
@@ -77,7 +101,7 @@ Statuses:
         <% end %>
         <tr>
           <% @show_progress = true %>
-          <% if logged_in? && (!has_task? || !Task.readonly?(Task.find_by_name(unescape_url(params[:task_id])))) %>
+          <% if logged_in? && (!has_task? || !Task.readonly?(task_erb)) %>
               <%= render :partial => 'packages/index/ops', :locals => {:package => package} %>
           <% end %>
           <%= render :partial => 'packages/index/name', :locals => {:package => package} %>
@@ -95,8 +119,6 @@ Statuses:
               <%= render :partial => 'packages/index/brew', :locals => {:package => package} %>
               <%= render :partial => 'packages/index/rpmdiff', :locals => {:package => package} %>
           <% end %>
-
-          <%# render :partial => 'packages/index/xattr', :locals => {:package => package} %>
         </tr>
     <% end %>
   </table>
@@ -112,22 +134,22 @@ Statuses:
             Element.hide(div + '_field');
             Element.hide(build_pac_btn_id(div, field_type));
             new Ajax.Request('/toolbox/get_pac_form',
-                    {
-                        asynchronous: true,
-                        evalScripts: true,
-                        onLoading: function (request) {
-                            Element.show(div + '_indicator');
-                        },
-                        onSuccess: function (response) {
-                            Element.hide(div + '_indicator');
-                        },
-                        parameters: {
-                            'form_id': div + '_editor',
-                            'pac_id': pac_id,
-                            'field_name': field_name,
-                            'field_type': field_type,
-                            'authenticity_token': '<%=form_authenticity_token%>'}
-                    });
+                {
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function (request) {
+                        Element.show(div + '_indicator');
+                    },
+                    onSuccess: function (response) {
+                        Element.hide(div + '_indicator');
+                    },
+                    parameters: {
+                        'form_id': div + '_editor',
+                        'pac_id': pac_id,
+                        'field_name': field_name,
+                        'field_type': field_type,
+                        'authenticity_token': '<%=form_authenticity_token%>'}
+                });
             Element.show(div + '_editor');
             Element.setStyle(div + '_td', {'text-decoration': 'none', 'background': 'none'});
             document.getElementById(div + "_switch").innerHTML = 'off';
@@ -161,17 +183,17 @@ Statuses:
             // inject [EDIT] link switch
             var pacBtnSwitches = document.getElementsByRegex('^pac.*switch');
             new Ajax.Request('/toolbox/get_initial_pac_btn_switch',
-                    {
-                        asynchronous: true,
-                        evalScripts: true,
-                        onLoading: function (request) {
-                            document.getElementById('inline_editor_switch').innerHTML = "LOADING INLINE EDITOR...";
-                            Element.show('inline_editor_indicator');
-                        },
-                        parameters: {
-                            'ids': pacBtnSwitches.toString(),
-                            'authenticity_token': '<%=form_authenticity_token%>'}
-                    });
+                {
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function (request) {
+                        document.getElementById('inline_editor_switch').innerHTML = "LOADING INLINE EDITOR...";
+                        Element.show('inline_editor_indicator');
+                    },
+                    parameters: {
+                        'ids': pacBtnSwitches.toString(),
+                        'authenticity_token': '<%=form_authenticity_token%>'}
+                });
 
             new Ajax.Request('/toolbox/get_pac_btns',
                     {
@@ -195,40 +217,40 @@ Statuses:
 
         function showLog(pac_id) {
             new Ajax.Request('/toolbox/show_log_dialog',
-                    {
-                        asynchronous: true,
-                        evalScripts: true,
-                        onLoading: function (request) {
-                            Element.show('log_area_indicator_' + pac_id);
-                        },
-                        onSuccess: function (response) {
-                            Element.hide('log_area_indicator_' + pac_id);
-                            Element.show('log_area_' + pac_id);
-                        },
-                        parameters: {
-                            'id': pac_id,
-                            'authenticity_token': '<%=form_authenticity_token%>'
-                        }
-                    });
+                {
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function (request) {
+                        Element.show('log_area_indicator_' + pac_id);
+                    },
+                    onSuccess: function (response) {
+                        Element.hide('log_area_indicator_' + pac_id);
+                        Element.show('log_area_' + pac_id);
+                    },
+                    parameters: {
+                        'id': pac_id,
+                        'authenticity_token': '<%=form_authenticity_token%>'
+                    }
+                });
         }
 
         function showCommentDialog(pac_id) {
             new Ajax.Request('/toolbox/show_comment_dialog',
-                    {
-                        asynchronous: true,
-                        evalScripts: true,
-                        onLoading: function (request) {
-                            Element.show('comment_area_indicator_' + pac_id);
-                        },
-                        onSuccess: function (response) {
-                            Element.hide('comment_area_indicator_' + pac_id);
-                            Element.show('comment_area_' + pac_id);
-                        },
-                        parameters: {
-                            'id': pac_id,
-                            'authenticity_token': '<%=form_authenticity_token%>'
-                        }
-                    });
+                {
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function (request) {
+                        Element.show('comment_area_indicator_' + pac_id);
+                    },
+                    onSuccess: function (response) {
+                        Element.hide('comment_area_indicator_' + pac_id);
+                        Element.show('comment_area_' + pac_id);
+                    },
+                    parameters: {
+                        'id': pac_id,
+                        'authenticity_token': '<%=form_authenticity_token%>'
+                    }
+                });
         }
     </script>
 
@@ -245,16 +267,16 @@ Statuses:
 
         function postInlineEditorForm(id, name, form) {
             new Ajax.Request('/packages/' + id,
-                    {
-                        asynchronous: true, evalScripts: true,
-                        onLoading: function (request) {
-                            Element.show('pac_' + id + '_' + name + '_spinner');
-                        },
-                        onSuccess: function (request) {
+                {
+                    asynchronous: true, evalScripts: true,
+                    onLoading: function (request) {
+                        Element.show('pac_' + id + '_' + name + '_spinner');
+                    },
+                    onSuccess: function (request) {
 
-                        },
-                        parameters: Form.serialize(form)
-                    });
+                    },
+                    parameters: Form.serialize(form)
+                });
             return false;
         }
     </script>

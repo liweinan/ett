@@ -20,18 +20,13 @@ class PackagesController < ApplicationController
     respond_to do |format|
       params[:style] ||= nil
       params[:perspective] ||= nil
-      format.html {
+      format.html do
         if !params[:style].blank?
-          if layout_exist?(params[:style])
-            render params[:style], :layout => params[:style]
-          else
-            render params[:style]
-          end
-
+          render params[:style]
         elsif params[:task_id].blank?
           render 'layouts/welcome'
         end
-      }
+      end
     end
   end
 
@@ -42,7 +37,7 @@ class PackagesController < ApplicationController
     respond_to do |format|
       format.html {
         @package = Package.find_by_name_and_task_id(unescape_url(params[:id]),
-                                                    Task.find_by_name(unescape_url(params[:task_id])).id,
+                                                    find_task(params[:task_id]).id,
                                                     :include => :p_attachments)
         if @package.blank?
           flash[:notice] = 'Package not found.'
@@ -58,9 +53,7 @@ class PackagesController < ApplicationController
   def new
     @package = Package.new
 
-    unless params[:task_id].blank?
-      @package.task = Task.find_by_name(unescape_url(params[:task_id]))
-    end
+    @package.task = find_task(params[:task_id]) unless params[:task_id].blank?
 
     respond_to do |format|
       format.html # new.html.erb
@@ -70,11 +63,8 @@ class PackagesController < ApplicationController
   # GET /packages/1/edit
   def edit
     @package = Package.find_by_name_and_task_id(unescape_url(params[:id]),
-                                                Task.find_by_name(unescape_url(params[:task_id])).id)
-    #@package.revert_to(params[:version].to_i) unless params[:version].blank?
-    unless can_edit_package? @package
-      redirect_to('/')
-    end
+                                                find_task(params[:task_id]).id)
+    redirect_to('/') unless can_edit_package? @package
   end
 
   # POST /packages
@@ -483,14 +473,14 @@ class PackagesController < ApplicationController
   def clone
     if request.post?
       Package.transaction do
-        source_task = Task.find_by_name(unescape_url(params[:task_id]))
+        source_task = find_task(params[:task_id])
         @source_package = Package.find_by_name_and_task_id(unescape_url(params[:id]), source_task.id)
 
         @source_package.updated_by = current_user.id
         @source_package.save
 
         @target_package = @source_package.clone
-        target_task = Task.find_by_name(unescape_url(params[:target_task_name]))
+        target_task = find_task(params[:target_task_name])
         @target_package.task = target_task
 
         if params[:clone_assignee_option] == 'Yes'
@@ -570,7 +560,7 @@ class PackagesController < ApplicationController
                              unescape_url(params[:status]),
                              unescape_url(params[:user]))
 
-    @task = Task.find_by_name(unescape_url(params[:task_id]))
+    @task = find_task(params[:task_id])
 
     csv_string = FasterCSV.generate do |csv|
       # header row
@@ -679,9 +669,7 @@ class PackagesController < ApplicationController
   def get_mead_info(package)
     brew_pkg = get_brew_name(package)
     package.brew = brew_pkg
-    unless brew_pkg.blank?
-      package.mead = get_mead_name(brew_pkg) unless brew_pkg.blank?
-    else
+    if brew_pkg.blank?
       uri = URI.parse("http://pkgs.devel.redhat.com/cgit/rpms/#{package.name}/plain/last-mead-build?h=#{package.task.candidate_tag}")
       res = Net::HTTP.get_response(uri)
       # TODO: error handling
@@ -691,6 +679,8 @@ class PackagesController < ApplicationController
       uri = URI.parse("http://mead.usersys.redhat.com/mead-brewbridge/pkg/latest/#{package.task.candidate_tag}-build/#{package_name}")
       res = Net::HTTP.get_response(uri)
       package.mead = res.body if res.code == '200'
+    else
+      package.mead = get_mead_name(brew_pkg) unless brew_pkg.blank?
     end
 
     package.mead_action = Package::MEAD_ACTIONS[:done]
@@ -725,7 +715,10 @@ class PackagesController < ApplicationController
 
   def sync_tags
     @package.all_relationships_of('clone').each do |target_package|
-      unless @package.tags.blank?
+      if @package.tags.blank?
+        target_package.tags = nil
+        target_package.save
+      else
         target_tags = []
         @package.tags.each do |source_tag|
           target_tag = Tag.find_by_key_and_task_id(source_tag.key,
@@ -740,9 +733,6 @@ class PackagesController < ApplicationController
           end
         end
         target_package.tags = target_tags
-        target_package.save
-      else
-        target_package.tags = nil
         target_package.save
       end
     end
@@ -780,7 +770,7 @@ class PackagesController < ApplicationController
 
     @error_message = []
 
-    target_task = Task.find_by_name(unescape_url(params[:target_task_name]))
+    target_task = find_task(params[:target_task_name])
 
     if target_task.blank?
       @error_message << 'Target task not found.'
