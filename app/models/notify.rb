@@ -26,8 +26,8 @@ class Notify
     end
 
     def self.strip_html(str)
-      str ||= ""
-      str.gsub(/<\/?[^>]*>/, "")
+      str ||= ''
+      str.gsub(/<\/?[^>]*>/, '')
     end
 
     def self.update(editor, link, package, recipients, latest_changes_package=nil)
@@ -38,10 +38,10 @@ class Notify
       body[:action] = "edited package #{package.name}"
 
       detail = ''
-      unless latest_changes_package.nil?
-        hashes = latest_changes_package
-      else
+      if latest_changes_package.nil?
         hashes = package.latest_changes
+      else
+        hashes = latest_changes_package
       end
       hashes.keys.each do |key|
         if key == 'notes'
@@ -58,7 +58,7 @@ class Notify
           prev = Status.find(hashes[key][0]).name unless hashes[key][0].blank?
           now = Status.find(hashes[key][1]).name unless hashes[key][1].blank?
           detail += "\nStatus\n--------------------\n***Was***\n #{prev}\n\n***Now***\n #{now}\n\n"
-        elsif key != "status_changed_at"
+        elsif key != 'status_changed_at'
           prev = hashes[key][0]
           now = hashes[key][1]
           detail += "\n#{key} changed\n--------------------\n***Was***\n #{prev}\n\n***Now***\n #{now}\n\n"

@@ -5,11 +5,14 @@ class UsersController < ApplicationController
     if params[:search].blank?
       @users = User.all(:order => :name)
     else
-      @users = User.find(:all, :conditions => ['name ILIKE ? OR email ILIKE ?', "%#{params[:search]}%", "%#{params[:search]}%"])
+      @users = User.find(:all,
+                         :conditions => ['name ILIKE ? OR email ILIKE ?',
+                                         "%#{params[:search]}%",
+                                         "%#{params[:search]}%"])
     end
 
     respond_to do |format|
-      format.html # index.html.erb
+      format.html
       format.js
     end
   end
@@ -24,7 +27,7 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
 
     respond_to do |format|
-      format.html # show.html.erb
+      format.html
       format.xml { render :xml => @user }
     end
   end
@@ -35,7 +38,7 @@ class UsersController < ApplicationController
     @user = User.new
 
     respond_to do |format|
-      format.html # new.html.erb
+      format.html
       format.xml { render :xml => @user }
     end
   end
@@ -43,6 +46,7 @@ class UsersController < ApplicationController
   # GET /users/1/edit
   def edit
     @user = nil
+
     if logged_in?
       @user = User.find(params[:id])
     elsif !params[:reset_code].blank?
@@ -50,11 +54,7 @@ class UsersController < ApplicationController
     end
 
     respond_to do |format|
-      format.html {
-        if @user.blank?
-          redirect_to '/login'
-        end
-      }
+      format.html { redirect_to '/login' if @user.blank? }
     end
   end
 
@@ -70,7 +70,7 @@ class UsersController < ApplicationController
         format.html { redirect_to(@user) }
         format.xml { render :xml => @user, :status => :created, :location => @user }
       else
-        format.html { render :action => "new" }
+        format.html { render :action => 'new' }
         format.xml { render :xml => @user.errors, :status => :unprocessable_entity }
       end
     end
@@ -89,28 +89,32 @@ class UsersController < ApplicationController
           @user.save
         end
 
-        if validate_input_password(@user, params[:user][:password], params[:user][:confirm_password]) && @user.update_attributes(params[:user])
+        if validate_input_password(@user,
+                                   params[:user][:password],
+                                   params[:user][:confirm_password]) &&
+            @user.update_attributes(params[:user])
+
           flash[:notice] = 'User was successfully updated.'
           @user.reset_code = ''
           @user.save
+
           format.html { redirect_to(@user) }
         else
-          format.html { render :action => "edit" }
+          format.html { render :action => 'edit' }
         end
       end
     end
   end
 
   def validate_input_password(user, password, confirm_password)
-    if user.blank? || password.blank?
-      return true # bypass checking if password does not change.
-    end
+    # bypass checking if password does not change.
+    return true if user.blank? || password.blank?
 
-    if (password == confirm_password)
-      return true
+    if password == confirm_password
+      true
     else
-      user.errors.add(:password, "different from confirm password.")
-      return false
+      user.errors.add(:password, 'different from confirm password.')
+      false
     end
   end
 
@@ -118,35 +122,23 @@ class UsersController < ApplicationController
     if request.post?
       if params[:task][:email].blank?
         @user = User.new
-        @user.errors.add(:email, "not found.")
+        @user.errors.add(:email, 'not found.')
       else
         @user = User.find_by_email(params[:task][:email])
+
         if @user.blank?
           @user = User.new
-          @user.errors.add(:email, "User not found.")
+          @user.errors.add(:email, 'User not found.')
           return
         else
           @user.make_token
-          Thread.new do
-            UserMailer.deliver_reset_password(@user)
-          end
-          flash[:notice] = "The password reset code has been sent to your email address."
+          Thread.new { UserMailer.deliver_reset_password(@user) }
+
+          flash[:notice] = 'The password reset code has been sent to your email address.'
         end
       end
     else # GET
       @user = User.new
     end
   end
-
-# DELETE /users/1
-# DELETE /users/1.xml
-#  def destroy
-#    @user = User.find(params[:id])
-#    @user.destroy
-#
-#    respond_to do |format|
-#      format.html { redirect_to(users_url) }
-#      format.xml  { head :ok }
-#    end
-#  end
 end

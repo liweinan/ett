@@ -23,9 +23,13 @@ class ComponentsController < ApplicationController
 
     respond_to do |format|
       if @component.save
-        format.html { redirect_to(:action => :show, :id => escape_url(@component.name), :notice => 'Component was successfully created.') }
+        format.html do
+          redirect_to(:action => :show,
+                      :id => escape_url(@component.name),
+                      :notice => 'Component was successfully created.')
+        end
       else
-        format.html { render :action => "new" }
+        format.html { render :action => 'new' }
       end
     end
   end
@@ -39,9 +43,9 @@ class ComponentsController < ApplicationController
         @component.save
 
         flash[:notice] = 'Component was successfully updated.'
-        format.html { render :action => "updated" }
+        format.html { render :action => 'updated' }
       else
-        format.html { render :action => "edit" }
+        format.html { render :action => 'edit' }
       end
     end
 

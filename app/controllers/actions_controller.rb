@@ -6,23 +6,27 @@ class ActionsController < ApplicationController
 
   def take
     expire_all_fragments
+    @package = Package.find_by_name_and_task_id(
+        unescape_url(params[:id]),
+        Task.find_by_name(unescape_url(params[:task_id])).id)
 
-    @package = Package.find_by_name_and_task_id(unescape_url(params[:id]), Task.find_by_name(unescape_url(params[:task_id])).id)
-    @package.user_id = session[:current_user].id
-    @package.save
+    @package.update_user_id(session[:current_user].id)
 
     flash[:notice] = "You have taken #{@package.name} successfully."
 
-    redirect_to(:controller => :packages, :action => :show,
-                :id => escape_url(@package.name), :task_id => escape_url(@package.task.name), :user => params[:user])
+    redirect_to(:controller => :packages,
+                :action => :show,
+                :id => escape_url(@package.name),
+                :task_id => escape_url(@package.task.name),
+                :user => params[:user])
   end
 
   def check_clone_progress
     if clone_is_done
-      flash[:notice] = "Clone finished."
+      flash[:notice] = 'Clone finished.'
       render :text => 'Done'
     elsif clone_is_failed
-      flash[:notice] = "Clone failed."
+      flash[:notice] = 'Clone failed.'
       render :text => 'Failed'
     else
       render :text => Time.now
@@ -30,7 +34,6 @@ class ActionsController < ApplicationController
   end
 
   def process_clone
-
     begin
       Package.transaction do
         session[:not_cloned_packages] = Hash.new
@@ -40,6 +43,7 @@ class ActionsController < ApplicationController
         # 2. check the target task name is same within session
         target_task_name = session[:clone_review][:target_task_name].downcase.strip
         @target_task = Task.find_by_name(target_task_name)
+
         unless @target_task
           @target_task = Task.new
           @target_task.name = target_task_name
@@ -106,9 +110,9 @@ class ActionsController < ApplicationController
           if session[:clone_review][:status_option] == 'new_value'
             @new_status = Status.new
             @new_status.name = session[:clone_review][:initial_status_value].strip
-            @new_status.can_select = "Yes"
-            @new_status.can_show = "Yes"
-            @new_status.global = "N"
+            @new_status.can_select = 'Yes'
+            @new_status.can_show = 'Yes'
+            @new_status.global = 'N'
             @new_status.task = @target_task
             _status = Status.find_by_name_and_task_id(@new_status.name, @new_status.task.id)
             if _status
@@ -198,9 +202,10 @@ class ActionsController < ApplicationController
 
   protected
   def package_taken
-    @package = Package.find_by_name_and_task_id(unescape_url(params[:id]), Task.find_by_name(unescape_url(params[:task_id])).id)
-    if @package.user_id
-      redirect_to('/')
-    end
+    @package = Package.find_by_name_and_task_id(
+                          unescape_url(params[:id]),
+                          Task.find_by_name(unescape_url(params[:task_id])).id)
+
+    redirect_to('/') if @package.user_id
   end
 end

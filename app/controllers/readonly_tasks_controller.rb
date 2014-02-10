@@ -46,7 +46,10 @@ class ReadonlyTasksController < ApplicationController
 
     respond_to do |format|
       #if @readonly_task.update_attributes(params[:readonly_task])
-      format.html { redirect_to(readonly_tasks_path, :notice => 'ReadonlyTask was successfully updated.') }
+      format.html do
+        redirect_to(readonly_tasks_path,
+                    :notice => 'ReadonlyTask was successfully updated.')
+      end
       #  format.xml  { head :ok }
       #else
       #  format.html { render :action => "edit" }

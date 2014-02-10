@@ -1,18 +1,19 @@
 class Changelog < ActiveRecord::Base
   belongs_to :package
-  belongs_to :user, :class_name => "User", :foreign_key => "changed_by"
+  belongs_to :user, :class_name => 'User', :foreign_key => 'changed_by'
   validates_presence_of :package_id
   validates_presence_of :changed_at
 
-  default_scope :order => "changed_at DESC"
+  default_scope :order => 'changed_at DESC'
 
-  CATEGORY = {:comment => "COMMENT", :update => "UPDATE", :create => "CREATE", :clone => "CLONE", :delete => "DELETE"}
+  CATEGORY = {:comment => 'COMMENT', :update => 'UPDATE',
+              :create => 'CREATE', :clone => 'CLONE', :delete => 'DELETE'}
   TEMPLATE = {
-      :comment => "%s has added a comment: %s",
-      :update => "%s has updated package information:",
-      :create => "%s has created the package.",
-      :clone => "%s has cloned the package to %s",
-      :delete => "%s has deleted the package."
+      :comment => '%s has added a comment: %s',
+      :update => '%s has updated package information:',
+      :create => '%s has created the package.',
+      :clone => '%s has cloned the package to %s',
+      :delete => '%s has deleted the package.'
   }
 
   def self.package_created(package)
@@ -135,12 +136,12 @@ class Changelog < ActiveRecord::Base
 
       changelog.from_value = ''
       orig_package.tags.each do |tag|
-        changelog.from_value <<  tag.key + " / "
+        changelog.from_value <<  tag.key + ' / '
       end
 
       changelog.to_value = ''
       package.tags.each do |tag|
-        changelog.to_value << tag.key + " / "
+        changelog.to_value << tag.key + ' / '
       end
 
       changelog.save

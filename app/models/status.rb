@@ -19,14 +19,14 @@ class Status < ActiveRecord::Base
   end
 
   def is_time_tracked?
-    return is_track_time?
+    is_track_time?
   end
 
   def is_track_time?
     if is_track_time.blank?
       return false
     end
-    return is_track_time == 'Yes'
+    is_track_time == 'Yes'
   end
 
   def can_show?
@@ -34,20 +34,24 @@ class Status < ActiveRecord::Base
   end
 
   def self.deleted_status
-    Status.find_by_code("deleted")
+    Status.find_by_code('deleted')
   end
 
   def self.find_all_can_select_only_in_global_scope
-    Status.find(:all, :conditions => ["(global='Y') AND can_select='Yes'"], :order => "lower(name)")
+    Status.find(:all,
+                :conditions => ["(global='Y') AND can_select='Yes'"],
+                :order => 'lower(name)')
   end
 
   def self.find_all_can_show_by_task_id_in_global_scope(task_id)
-    Status.find(:all, :conditions => ["(task_id = ? OR global='Y') AND can_show='Yes'", task_id], :order => 'lower(name)')
+    Status.find(:all,
+                :conditions => ["(task_id = ? OR global='Y') AND can_show='Yes'", task_id],
+                :order => 'lower(name)')
   end
 
   def self.ids_can_show_by_task_name_in_global_scope(task_name)
     statuses = Status.find_all_can_show_by_task_id_in_global_scope(Task.find_by_name(task_name).id)
-    __str = ""
+    __str = ''
     statuses.each do |status|
       __str << "#{status.id} ,"
     end
@@ -55,18 +59,23 @@ class Status < ActiveRecord::Base
   end
 
   def self.find_all_can_select_by_task_id_in_global_scope(task_id)
-    Status.find(:all, :conditions => ["(task_id = ? or global='Y') AND can_select='Yes'", task_id], :order => "lower(name)")
+    Status.find(:all,
+                :conditions => ["(task_id = ? or global='Y') AND can_select='Yes'", task_id],
+                :order => 'lower(name)')
   end
 
   def self.find_all_can_select_by_task_id(task_id)
-    Status.find(:all, :conditions => ["(task_id = ?) AND can_select='Yes'", task_id], :order => "lower(name)")
+    Status.find(:all,
+                :conditions => ["(task_id = ?) AND can_select='Yes'", task_id],
+                :order => 'lower(name)')
   end
 
   def self.find_in_global_scope(status_name, task_name)
-    status_id = -1
-    global_status = Status.find(:first, :conditions => ["name = ? and global='Y'", status_name])
-    if global_status == nil
-      return Status.find_by_name_and_task_id(status_name, Task.find_by_name(task_name).id)
+    global_status = Status.find(:first,
+                                :conditions => ["name = ? and global='Y'", status_name])
+    if global_status.nil?
+      return Status.find_by_name_and_task_id(status_name,
+                                             Task.find_by_name(task_name).id)
     else
       return global_status
     end
@@ -110,11 +119,12 @@ class Status < ActiveRecord::Base
   def validate
     status = Status.find_by_name_and_task_id(self.name.strip, self.task_id)
     if status == nil
-      status = Status.find(:first, :conditions => ["global='Y' and name = ?", self.name.strip])
+      status = Status.find(:first,
+                           :conditions => ["global='Y' and name = ?", self.name.strip])
     end
 
     if status && status.id != self.id
-      errors.add(:name, " - Status name cannot be duplicate under one task!")
+      errors.add(:name, ' - Status name cannot be duplicate under one task!')
     end
   end
 

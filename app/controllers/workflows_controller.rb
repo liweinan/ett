@@ -45,16 +45,17 @@ class WorkflowsController < ApplicationController
     # Currently we have to save workflow to get its primary key
     if @workflow.save # just to get primary id.
       Workflow.transaction do
-        @workflow.update_transitions(params[:transitions])
-        @workflow.update_start_statuses(params[:start_statuses_id])
-        @workflow.assign_to_tasks(params[:tasks])
+        update_workflow
       end
       respond_to do |format|
-        format.html { redirect_to(@workflow, :notice => 'Workflow was successfully created.') }
+        format.html do
+          redirect_to(@workflow,
+                      :notice => 'Workflow was successfully created.')
+        end
       end
     else
       respond_to do |format|
-        format.html { render :action => "new" }
+        format.html { render :action => 'new' }
       end
     end
   end
@@ -68,15 +69,23 @@ class WorkflowsController < ApplicationController
     respond_to do |format|
       Workflow.transaction do
         if @workflow.update_attributes(params[:workflow])
-          @workflow.update_transitions(params[:transitions])
-          @workflow.update_start_statuses(params[:start_statuses_id])
-          @workflow.assign_to_tasks(params[:tasks])
-          format.html { redirect_to(@workflow, :notice => 'Workflow was successfully updated.') }
+          update_workflow
+
+          format.html do
+            redirect_to(@workflow,
+                        :notice => 'Workflow was successfully updated.')
+          end
         else
-          format.html { render :action => "edit" }
+          format.html { render :action => 'edit' }
         end
       end
     end
+  end
+
+  def update_workflow
+    @workflow.update_transitions(params[:transitions])
+    @workflow.update_start_statuses(params[:start_statuses_id])
+    @workflow.assign_to_tasks(params[:tasks])
   end
 
   # DELETE /workflows/1
@@ -92,6 +101,4 @@ class WorkflowsController < ApplicationController
   end
 
   protected
-
-
 end

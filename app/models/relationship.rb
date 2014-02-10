@@ -5,7 +5,7 @@ class Relationship < ActiveRecord::Base
   default_value_for :is_global, 'Yes'
 
   def self.clone_relationship
-    Relationship.find_by_name("clone")
+    Relationship.find_by_name('clone')
   end
 
 end

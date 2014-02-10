@@ -44,11 +44,21 @@ class ManualLogEntriesController < ApplicationController
 
     respond_to do |format|
       if @manual_log_entry.save
-        format.html { redirect_to(@manual_log_entry, :notice => 'ManualLogEntry was successfully created.') }
-        format.xml  { render :xml => @manual_log_entry, :status => :created, :location => @manual_log_entry }
+        format.html do
+          redirect_to(@manual_log_entry,
+                      :notice => 'ManualLogEntry was successfully created.')
+        end
+        format.xml do
+          render :xml => @manual_log_entry,
+                 :status => :created,
+                 :location => @manual_log_entry
+        end
       else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @manual_log_entry.errors, :status => :unprocessable_entity }
+        format.html { render :action => 'new' }
+        format.xml do
+          render :xml => @manual_log_entry.errors,
+                 :status => :unprocessable_entity
+        end
       end
     end
   end
@@ -60,11 +70,18 @@ class ManualLogEntriesController < ApplicationController
 
     respond_to do |format|
       if @manual_log_entry.update_attributes(params[:manual_log_entry])
-        format.html { redirect_to(@manual_log_entry, :notice => 'ManualLogEntry was successfully updated.') }
+
+        format.html do
+          redirect_to(@manual_log_entry,
+                      :notice => 'ManualLogEntry was successfully updated.')
+        end
         format.xml  { head :ok }
       else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @manual_log_entry.errors, :status => :unprocessable_entity }
+        format.html { render :action => 'edit' }
+        format.xml do
+          render :xml => @manual_log_entry.errors,
+                 :status => :unprocessable_entity
+        end
       end
     end
   end

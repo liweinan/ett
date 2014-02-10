@@ -34,7 +34,8 @@ class ImportController < ApplicationController
         task_name = unescape_url(params[:id])
         begin
           json_obj = JSON.parse(package_json)
-          orig_package = Package.find_by_name_and_task_id(json_obj['name'], Task.find_by_name(task_name).id)
+          orig_package = Package.find_by_name_and_task_id(json_obj['name'],
+                                                          Task.find_by_name(task_name).id)
 
           # for Changelog.package_updated
           orig_package_clone = orig_package.clone
@@ -62,7 +63,8 @@ class ImportController < ApplicationController
               if json_obj['status'].blank?
                 orig_package.status_id = nil
               else
-                status = Status.find_in_global_scope(json_obj['status'], task_name)
+                status = Status.find_in_global_scope(json_obj['status'],
+                                                     task_name)
                 unless status.blank?
                   orig_package.status_id = status.id
                 end
@@ -172,7 +174,7 @@ class ImportController < ApplicationController
         package.created_by = current_user.id
         package.updated_by = current_user.id
         result = package.save
-        if result == true
+        if result
           @packages << package
           bz_bug = {:name => package_name, :ver => package_ver, :package => package}
           @bz_bugs << bz_bug
@@ -191,9 +193,9 @@ class ImportController < ApplicationController
                         'tagversion' => bz_bug_obj[:package].task.tag_version,
                         'userid' => extract_username(params[:bzauth_user]),
                         'pwd' => params[:bzauth_pwd]}
-          response = Net::HTTP.post_form(bz_bug_creation_uri, parameters)
+          response = Net::HTTP.post_form(BzBug.bz_bug_creation_uri, parameters)
           if response.class == Net::HTTPCreated
-            bug_info = extract_bz_bug_info(response.body)
+            bug_info = BzBug.extract_bz_bug_info(response.body)
             bz_bug = BzBug.new
             bz_bug.package_id = bz_bug_obj[:package].id
             bz_bug.bz_id = bug_info[:bz_id]

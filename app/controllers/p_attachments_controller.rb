@@ -58,15 +58,22 @@ class PAttachmentsController < ApplicationController
             body[:detail] = @p_attachment.attachment_file_name
             body[:updated_at] = @p_attachment.created_at
 
-            notify(text_to_array(params[:div_attachment_notification_area]), subject, body)
+            notify(text_to_array(params[:div_attachment_notification_area]),
+                   subject,
+                   body)
           end
 
           if params[:user].blank?
-            redirect_to(:controller => :packages, :action => :show,
-                        :id => escape_url(@package.name), :task_id => escape_url(@package.task.name))
+            redirect_to(:controller => :packages,
+                        :action => :show,
+                        :id => escape_url(@package.name),
+                        :task_id => escape_url(@package.task.name))
           else
-            redirect_to(:controller => :packages, :action => :show,
-                        :id => escape_url(@package.name), :task_id => escape_url(@package.task.name), :user => params[:user])
+            redirect_to(:controller => :packages,
+                        :action => :show,
+                        :id => escape_url(@package.name),
+                        :task_id => escape_url(@package.task.name),
+                        :user => params[:user])
           end
         }
       end
@@ -80,11 +87,16 @@ class PAttachmentsController < ApplicationController
 
     respond_to do |format|
       if @p_attachment.update_attributes(params[:p_attachment])
-        format.html { redirect_to(@p_attachment, :notice => 'PAttachment was successfully updated.') }
+        format.html do
+          redirect_to(@p_attachment,
+                      :notice => 'PAttachment was successfully updated.')
+        end
         format.xml { head :ok }
       else
-        format.html { render :action => "edit" }
-        format.xml { render :xml => @p_attachment.errors, :status => :unprocessable_entity }
+        format.html { render :action => 'edit' }
+        format.xml do
+          render :xml => @p_attachment.errors, :status => :unprocessable_entity
+        end
       end
     end
   end

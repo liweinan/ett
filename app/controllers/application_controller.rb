@@ -2,14 +2,28 @@
 # Likewise, all the methods added will be available for all controllers.
 class ApplicationController < ActionController::Base
 
-  helper :all # include all helpers, all the time
-  protect_from_forgery # See ActionController::RequestForgeryProtection for details
-  helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?, :has_task?, :count_packages, :can_edit_package?, :current_user, :get_task, :has_status?, :has_tag?, :deleted_style, :can_delete_comment?, :generate_request_path, :is_global?, :current_user_email, :task_has_tags?, :get_xattrs, :background_style, :confirmed?, :default_style, :get_brew_name
-  helper_method :btag, :ebtag, :uebtag, :truncate_u, :its_myself?, :extract_username, :has_bz_auth_info?, :has_mead_integration?
+  # include all helpers, all the time
+  helper :all
+
+  # See ActionController::RequestForgeryProtection for details
+  protect_from_forgery
+
+  helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?,
+                :has_task?, :count_packages, :can_edit_package?, :current_user,
+                :get_task, :has_status?, :has_tag?, :deleted_style,
+                :can_delete_comment?, :generate_request_path, :is_global?,
+                :current_user_email, :task_has_tags?, :get_xattrs,
+                :background_style, :confirmed?, :default_style, :get_brew_name,
+                :find_task
+
+  helper_method :btag, :ebtag, :uebtag, :truncate_u, :its_myself?,
+                :extract_username, :has_bz_auth_info?
+
   before_filter :process_task_id
   before_filter :save_current_link
-              # Scrub sensitive parameters from your log
-              # filter_parameter_logging :password
+
+  # Scrub sensitive parameters from your log
+  # filter_parameter_logging :password
   filter_parameter_logging :bzauth_pwd, :pwd, :ubbs_pwd, :jira_pass
 
   def get_task(name)
@@ -17,19 +31,11 @@ class ApplicationController < ActionController::Base
   end
 
   def escape_url(url)
-    if url.blank?
-      nil
-    else
-      url.gsub(/\./, '-dot-').gsub(/\//, '-slash-')
-    end
+    url.blank? ? nil : url.gsub(/\./, '-dot-').gsub(/\//, '-slash-')
   end
 
   def unescape_url(url)
-    if url.blank?
-      nil
-    else
-      url.gsub(/-dot-/, '.').gsub(/-slash-/, '/')
-    end
+    url.blank? ? nil : url.gsub(/-dot-/, '.').gsub(/-slash-/, '/')
   end
 
   def can_manage?
@@ -41,15 +47,8 @@ class ApplicationController < ActionController::Base
   end
 
   def has_task?(id = params[:task_id])
-    if id.blank?
-      false
-    else
-      if Task.find_by_name(unescape_url(id)).blank?
-        false
-      else
-        true
-      end
-    end
+    return false if id.blank?
+    Task.find_by_name(unescape_url(id)).blank? ? false : true
   end
 
   def has_status?
@@ -62,23 +61,28 @@ class ApplicationController < ActionController::Base
 
   def can_edit_package?(package)
     _package = Package.find(package.id)
-#    _package.revert_to(_package.last_version)
-    (logged_in? && _package.user_id == session[:current_user].id) || can_manage?
+    logged_in_and_owner_package(_package) || can_manage?
+  end
+
+  def logged_in_and_owner_package(_package)
+    logged_in? && _package.user_id == session[:current_user].id
   end
 
   def count_packages(bt, status_name)
     bt_quoted = "'#{bt}'"
-    global_status = Status.find(:first, :conditions => ["global='Y' AND name=?", status_name])
-    status_id = -1
-    if global_status == nil
-      status_id = Status.find_by_name_and_task_id(status_name, Task.find_by_name(bt).id).id
+    global_status = Status.find(:first,
+                                :conditions => ["global='Y' AND name=?",
+                                                status_name])
+    if global_status.nil?
+      status_id = Status.find_by_name_and_task_id(status_name,
+                                                  Task.find_by_name(bt).id).id
     else
       status_id = global_status.id
     end
 
-#    children = "union select children.id as id from tasks parent join tasks children on parent.id = children.parent_id and parent.name = #{bt_quoted} "
     hierarchy = "select id from tasks where name = #{bt_quoted}"
-    Package.count(:conditions => ["status_id = ? AND task_id IN (#{hierarchy})", status_id])
+    Package.count(:conditions => ["status_id = ? AND task_id IN (#{hierarchy})",
+                                  status_id])
   end
 
   def current_user
@@ -92,26 +96,18 @@ class ApplicationController < ActionController::Base
   def deleted_style(package)
     if !package.blank? && package.deleted?
       'text-decoration:line-through;'
+    else
+      ''
     end
-    ''
   end
 
   def can_delete_comment?(comment)
-    if logged_in?
-      if can_manage?
-        return true
-      else
-        return comment.user_id == current_user.id
-      end
-    else
-      false
-    end
+    return false unless logged_in?
+    can_manage? ? true : comment.user_id == current_user.id
   end
 
   def generate_request_path(request, frag=nil)
-    if request.blank?
-      return ''
-    end
+    return '' if request.blank?
 
     if request.port != 80
       if frag.blank?
@@ -130,7 +126,6 @@ class ApplicationController < ActionController::Base
 
   def clone_is_done
     clone_is_in_status('done')
-
   end
 
   def clone_is_failed
@@ -147,89 +142,9 @@ class ApplicationController < ActionController::Base
 
   def task_clone_failed(e)
     task_clone_in_status('failed')
-    open('/tmp/ett_clone_in_progress_marker', 'a') { |f|
+    open('/tmp/ett_clone_in_progress_marker', 'a') do |f|
       f.puts e.message
       f.puts e.backtrace.inspect
-    }
-
-  end
-
-  def get_xattrs(task = nil, check_show_xattrs = true, check_enable_xattrs = true)
-    if task.blank? || !Setting.enabled_in_task?(task) # check the system settings
-      if validate_xattr_options(check_show_xattrs, check_enable_xattrs, task)
-        Setting.system_settings.xattrs.split(',').each do |attr|
-          unless attr.blank?
-            yield attr.strip
-          end
-        end
-      end
-    else #if the tag has local settings and set to show extended attributes, get all extended attributes name and display here.
-      if validate_xattr_options(check_show_xattrs, check_enable_xattrs, task)
-        task.setting.xattrs.split(',').each do |attr|
-          unless attr.blank?
-            yield attr.strip
-          end
-        end
-      end
-    end
-  end
-
-  def validate_xattr_options(check_show_xattrs, check_enable_xattrs, task)
-    if task.blank? || !Setting.enabled_in_task?(task) # check the system settings
-      flag = true
-      if check_show_xattrs == true
-        if Setting.system_settings.show_xattrs?
-          flag = true
-        else
-          flag = false
-        end
-      else
-        flag = true
-      end
-
-      if flag == false
-        return false
-      end
-
-      if check_enable_xattrs == true
-        if Setting.system_settings.enable_xattrs?
-          flag = true
-        else
-          flag = false
-        end
-      else
-        flag = true
-      end
-
-      flag
-    else #if the tag has local settings and set to show extended attributes, get all extended attributes name and display here.
-      flag = true
-      if check_show_xattrs == true
-        if task.setting.show_xattrs?
-          flag = true
-        else
-          flag = false
-        end
-      else
-        flag = true
-      end
-
-      if flag == false
-        return false
-      end
-
-      if check_enable_xattrs == true
-        if task.setting.enable_xattrs?
-          flag = true
-        else
-          flag = false
-        end
-      else
-        flag = true
-      end
-
-      flag
-
     end
   end
 
@@ -241,24 +156,58 @@ class ApplicationController < ActionController::Base
     File.open('/tmp/ett_clone_in_progress_marker', 'w') { |f| f.write(status) }
   end
 
-  def task_has_tags?(task_name)
-    task = Task.find_by_name(task_name)
-    if task
-      if task.tags.size > 0
-        return true
-      end
+  def get_xattrs(task = nil, check_show_xattrs = true, check_enable_xattrs = true)
+
+    if task_empty_or_setting_not_enabled(task)
+      attributes = Setting.system_settings.xattrs
+    else
+      attributes = task.setting.xattrs
     end
 
-    false
+    if validate_xattr_options(check_show_xattrs, check_enable_xattrs, task)
+      attributes.split(',').each { |attr| yield attr.strip unless attr.blank? }
+    end
   end
 
+  def validate_xattr_options(check_show_xattrs, check_enable_xattrs, task)
+    if task_empty_or_setting_not_enabled(task)
+      return false unless check_xattrs(check_show_xattrs,
+                                       Setting.system_settings.show_xattrs?)
 
-  def truncate_u(text, length = 30, truncate_string = "...")
+      check_xattrs(check_enable_xattrs, Setting.system_settings.enable_xattrs?)
+    else
+      # if the tag has local settings and set to show extended attributes,
+      # get all extended attributes name and display here.
+      return false unless check_xattrs(check_show_xattrs,
+                                       task.setting.show_xattrs?)
+
+      check_xattrs(check_enable_xattrs, task.setting.enable_xattrs?)
+    end
+  end
+
+  def task_empty_or_setting_not_enabled(task)
+    task.blank? || !Setting.enabled_in_task?(task)
+  end
+
+  def check_xattrs(check_show_xattrs, show_xattrs)
+    if check_show_xattrs
+      show_xattrs ? true : false
+    else
+      true
+    end
+  end
+
+  def task_has_tags?(task_name)
+    task = Task.find_by_name(task_name)
+    (task && task.tags.size > 0) ? true : false
+  end
+
+  def truncate_u(text, length = 30, truncate_string = '...')
     return '' if text.blank?
     text = text.dup.strip
 
     l = 0
-    char_array = text.unpack("U*")
+    char_array = text.unpack('U*')
     # 32 and 12288 are spaces
     char_array.delete_if { |c| [10, 13].include?(c) } # delete returns
     char_array.each_with_index do |c, i|
@@ -284,7 +233,7 @@ class ApplicationController < ActionController::Base
       end
 
       if l >= length
-        return char_array[0..i].pack("U*") + (i < char_array.length - 1 ? truncate_string : "")
+        return char_array[0..i].pack('U*') + (i < char_array.length - 1 ? truncate_string : '')
       end
     end
     text
@@ -301,9 +250,7 @@ class ApplicationController < ActionController::Base
   end
 
   def check_can_manage
-    unless can_manage?
-      home_page
-    end
+    home_page unless can_manage?
   end
 
   def check_task
@@ -342,9 +289,7 @@ class ApplicationController < ActionController::Base
   end
 
   def check_logged_in
-    unless logged_in?
-      home_page
-    end
+    home_page unless logged_in?
   end
 
   def process_tags(tag_keys, task_id)
@@ -363,9 +308,7 @@ class ApplicationController < ActionController::Base
   end
 
   def process_task_id
-    unless params[:task_id].blank?
-      params[:task_id] = escape_url(params[:task_id])
-    end
+    params[:task_id] = escape_url(params[:task_id]) unless params[:task_id].blank?
   end
 
   def save_current_link
@@ -381,11 +324,7 @@ class ApplicationController < ActionController::Base
   end
 
   def background_style(idx)
-    if idx % 2 == 0
-      '#fff'
-    else
-      '#f5f5f5'
-    end
+    (idx % 2 == 0) ? '#fff' : '#f5f5f5'
   end
 
   def confirmed?
@@ -406,24 +345,20 @@ class ApplicationController < ActionController::Base
 
   def btagid
     bt = Task.find_by_name(uebtag)
-    if bt.blank?
-      nil
-    else
-      bt.id
-    end
+    bt.blank? ? nil : bt.id
   end
 
 
   def default_style(css)
-    if css.blank?
-      "background:#808080;"
-    else
-      css
-    end
+    css.blank? ? 'background:#808080;' : css
   end
 
   def layout_exist?(layout)
-    File.exist?(RAILS_ROOT + "/app/views/layouts/" + layout + ".html.erb")
+    File.exist?("#{RAILS_ROOT}/app/views/layouts/#{layout}.html.erb")
+  end
+
+  def find_task(name)
+    Task.find_by_name(unescape_url(name))
   end
 
   def its_myself?(user)
@@ -433,161 +368,117 @@ class ApplicationController < ActionController::Base
   end
 
   def extract_username(email)
-    if email.blank?
-      ''
-    else
-      email.split('@')[0]
-    end
+    email.blank? ? '' : email.split('@')[0]
   end
 
   def update_bz_pass(pwd)
-    if session[:bz_pass].blank? || session[:bz_pass] != pwd
-      session[:bz_pass] = pwd
-    end
+    session[:bz_pass] = pwd if session[:bz_pass].blank? || session[:bz_pass] != pwd
   end
 
-  def bz_bug_creation_uri
-    if Rails.env.production?
-      return URI.parse(APP_CONFIG['bz_bug_creation_url'])
-    else
-      return URI.parse(APP_CONFIG['bz_bug_creation_url_mocked'])
-    end
-  end
-
-  def bz_bug_status_update_url
-    if Rails.env.production?
-      return APP_CONFIG['bz_bug_status_update_url']
-    else
-      return APP_CONFIG['bz_bug_status_update_url_mocked']
-    end
-  end
-
+  # TODO: move me to a model
   # bz_bug_status_update_url: "http:/mead.usersys.redhat.com/mead-bzbridge/bug/status/<id>?oneway=<oneway>&status=<status>&assignee=<assignee>&userid=<userid>&pwd=<pwd>"
   def generate_bug_status_update_url(id, oneway, params)
-    link = APP_CONFIG["mead_scheduler"] +
-        bz_bug_status_update_url.gsub('<id>', id).gsub('<oneway>', oneway)
+    link = APP_CONFIG['mead_scheduler'] +
+        BzBug.bz_bug_status_update_url.gsub('<id>', id).gsub('<oneway>', oneway)
+
     params.each do |key, value|
       link += "&#{key}=#{URI::encode(value)}"
     end
+
     link
   end
 
+  # TODO: move me to model
   def generate_bug_summary_update_url(id, oneway, params)
-    link = APP_CONFIG["mead_scheduler"] +
-        APP_CONFIG["bz_bug_summary_update_url"].gsub('<id>', id).gsub('<oneway>', oneway)
+    link = APP_CONFIG['mead_scheduler'] +
+        APP_CONFIG['bz_bug_summary_update_url'].gsub('<id>', id).gsub('<oneway>', oneway)
+
     params.each do |key, value|
       link += "&#{key}=#{URI::encode(value)}"
     end
+
     link
   end
 
   def has_bz_auth_info?(params=Hash.new)
     # TODO not complete
-    (!current_user.blank? && !session[:bz_pass].blank?) || (!params[:bzauth_user].blank? && !params[:bzauth_pwd].blank?) || (!params[:ubbs_user].blank? && !params[:ubbs_pwd].blank?)
+    (!current_user.blank? && !session[:bz_pass].blank?) ||
+    (!params[:bzauth_user].blank? && !params[:bzauth_pwd].blank?) ||
+    (!params[:ubbs_user].blank? && !params[:ubbs_pwd].blank?)
   end
 
+  # TODO: move to a model
   def get_mead_name(brew_pkg)
-    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"] +
-                                   "/mead-brewbridge/pkg/wrapped/#{brew_pkg}"))
+    uri = URI.parse(URI.encode("#{APP_CONFIG['mead_scheduler']}/mead-brewbridge/pkg/wrapped/#{brew_pkg}"))
     res = Net::HTTP.get_response(uri)
-    if res.code == "200" && !res.body.include?("ERROR")
-      res.body
-    else
-      nil
-    end
+
+    (res.code == '200' && !res.body.include?('ERROR')) ? res.body : nil
   end
 
+  # TODO: move to a model
   def update_bug(bz_id, oneway, params)
-    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+    uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
+
     req = Net::HTTP::Post.new(generate_bug_status_update_url(
                                   bz_id, oneway, params))
 
     puts generate_bug_status_update_url(bz_id, oneway, params)
 
-    res = Net::HTTP.start(uri.host, uri.port) do |http|
+    Net::HTTP.start(uri.host, uri.port) do |http|
       http.request(req)
     end
-    res
   end
 
+  # TODO: move to a model
   def update_bug_summary(bz_id, oneway, params)
-    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+    uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
+
     req = Net::HTTP::Put.new(generate_bug_summary_update_url(
                                   bz_id, oneway, params))
-    res = Net::HTTP.start(uri.host, uri.port) do |http|
-      http.request(req)
-    end
-    res
+
+    Net::HTTP.start(uri.host, uri.port) { |http| http.request(req) }
   end
 
+  # TODO: move to a model
   def add_comment_milestone_status_to_bug(bz_id, params)
     req_link = "/mead-bzbridge/bug/#{bz_id}?oneway=false"
+
     params.each do |key, value|
       req_link += "&#{key}=#{URI::encode(value)}" if value != nil
     end
-    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+
+    uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
     req = Net::HTTP::Put.new(req_link)
 
-    res = Net::HTTP.start(uri.host, uri.port) do |http|
-      http.request(req)
-    end
+    res = Net::HTTP.start(uri.host, uri.port) { |http| http.request(req) }
+
     puts res.response
   end
 
-
+  # TODO: move to a model
   def get_scm_url_brew(pac)
     server = XMLRPC::Client.new('brewhub.devel.redhat.com', '/brewhub', 80)
-      if pac.mead.nil?
-        return nil
-      end
-    begin
 
+    return nil if pac.mead.nil?
+
+    begin
       param = server.call('getBuild', pac.mead)
-      if not param.nil?
-        server.call('getTaskRequest', param['task_id'])[0]
-      else
-        nil
-      end
-    rescue XMLRPC::FaultException => e
+      param.nil? ? nil : server.call('getTaskRequest', param['task_id'])[0]
+    rescue XMLRPC::FaultException
       nil
     end
   end
 
+  # TODO: move to a model
   def get_brew_name(pac, candidate_tag=nil)
     # TODO: make the tag more robust
-    if candidate_tag.nil?
-      tag = pac.task.candidate_tag + '-build'
-    else
-      tag = candidate_tag
-    end
-    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"] +
-                                   "/mead-brewbridge/pkg/latest/#{tag}/#{pac.name}"))
+    tag = candidate_tag.nil? ? "#{pac.task.candidate_tag}-build" : candidate_tag
+
+    uri = URI.parse(URI.encode("#{APP_CONFIG['mead_scheduler']}/mead-brewbridge/pkg/latest/#{tag}/#{pac.name}"))
+
     res = Net::HTTP.get_response(uri)
-    if res.code == "200" && !res.body.include?("ERROR")
-      res.body
-    else
-      nil
-    end
-  end
 
-  def extract_bz_bug_info(body)
-    #  @response.body
-    # "999999: Upgrade jboss-aggregator to 7.2.0.Final-redhat-7 (MOCK)"
-    bug_info = Hash.new
-    unless body.blank?
-      bug_info[:bz_id] = body.scan(/^\d+/)[0].to_i
-      bug_info[:summary] = body.split(/^\d+:\s*/)[1]
-    end
-    bug_info
-  end
-
-  def query_bz_bug_info(bz_id, user, pwd)
-    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
-    req = Net::HTTP::Get.new("/mead-bzbridge/bug/#{bz_id}?userid=#{user}&pwd=#{pwd}")
-    req['Accept'] = 'application/json'
-    response = Net::HTTP.start(uri.host, uri.port) do |http|
-      http.request(req)
-    end
+    (res.code == '200' && !res.body.include?('ERROR')) ? res.body : nil
   end
 
   def current_bzuser(params)
@@ -595,19 +486,14 @@ class ApplicationController < ActionController::Base
   end
 
   def current_bzpass(params)
-    if session[:bz_pass].blank?
-      return params[:bzauth_pwd]
-    else
-      return session[:bz_pass]
-    end
+    session[:bz_pass].blank? ? params[:bzauth_pwd] : session[:bz_pass]
   end
 
   def get_bz_info(bz_id, userid, pwd)
-    @response = query_bz_bug_info(bz_id, user_id, pwd)
+    @response = BzBug.query_bz_bug_info(bz_id, user_id, pwd)
+
     bz_info = nil
-    if @response.class == Net::HTTPOK
-      bz_info = JSON.parse(@response.body)
-    end
+    bz_info = JSON.parse(@response.body) if @response.class == Net::HTTPOK
 
     bz_info
   end
@@ -616,21 +502,16 @@ class ApplicationController < ActionController::Base
     bzauth_user = extract_username(params[:bzauth_user])
     bzauth_pwd = params[:bzauth_pwd]
 
-    if bzauth_user.blank? || bzauth_pwd.blank?
-      return 401 # authentication failure
-    end
+    return 401 if bzauth_user.blank? || bzauth_pwd.blank?
 
-    res = Net::HTTP.get_response(URI("#{APP_CONFIG["bz_bug_check"]}#{bzauth_user}?pwd=#{bzauth_pwd}"))
+    res = Net::HTTP.get_response(URI("#{APP_CONFIG['bz_bug_check']}#{bzauth_user}?pwd=#{bzauth_pwd}"))
     res.code
   end
-
 
   # mode flag needed since for mode=:create,
   # the request_path link is wrong
   def get_package_link(params, package, mode=:edit)
-    hardcoded_string = APP_CONFIG["site_prefix"] +
-        "tasks/" + escape_url(@package.task.name) +
-        "/packages/" + escape_url(@package.name)
+    hardcoded_string = "#{APP_CONFIG['site_prefix']}tasks/#{escape_url(@package.task.name)}/packages/#{escape_url(@package.name)}"
 
     if mode == :create
       hardcoded_string
@@ -641,27 +522,28 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # TODO: move to a model
   def build_type(package)
     Net::HTTP.get('mead.usersys.redhat.com', "/mead-scheduler/rest/package/eap6/#{package}/type")
   end
 
+  # TODO: move to a model
   def need_source_url?(package)
     build = build_type(package.name)
-    build_check = (build == 'WRAPPER') || (build == "MEAD_ONLY")
+    build_check = (build == 'WRAPPER') || (build == 'MEAD_ONLY')
     has_wrapper_tag = !(package.tags.select { |tag| tag.key == 'wrapper' }).empty?
-    return build_check || has_wrapper_tag
+    build_check || has_wrapper_tag
   end
 
   def password_valid?(user, password)
-    if user.blank?
-      false
-    end
+
+    return false if user.blank?
+
     #backward compatibility
     if user.password.blank?
-      return user.email == password # default password is user email address
+      user.email == password # default password is user email address
     else
-      return user.password == User.encrypt_password(password)
+      user.password == User.encrypt_password(password)
     end
   end
-
 end

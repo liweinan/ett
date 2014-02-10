@@ -15,7 +15,7 @@ class Setting < ActiveRecord::Base
   belongs_to :task
 
   def self.system_settings
-    Setting.find(:first, :conditions => "task_id IS NULL")
+    Setting.find(:first, :conditions => 'task_id IS NULL')
   end
 
   def is_system_setting?
@@ -46,7 +46,7 @@ class Setting < ActiveRecord::Base
 
     if action == :edit
       # send notifications to creators and assignee and commenters
-      if (props & Setting::PROPS[:creator] > 0)
+      if props & Setting::PROPS[:creator] > 0
         unless same_person?(package.creator, editor)
           recipients += ", #{package.creator.email}"
         end
@@ -70,7 +70,7 @@ class Setting < ActiveRecord::Base
 
     if action == :comment
       # send notifications to creators and assignee and other commenters
-      if (props & Setting::PROPS[:creator] > 0)
+      if props & Setting::PROPS[:creator] > 0
         unless same_person?(package.creator, editor)
           recipients += ", #{package.creator.email}"
         end

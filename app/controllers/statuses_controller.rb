@@ -8,7 +8,9 @@ class StatusesController < ApplicationController
     if params[:task_id].blank?
       @statuses = Status.all(:conditions => "global = 'Y'", :order => 'name')
     else
-      @statuses = Status.all(:conditions => ["task_id = ?", Task.find_by_name(unescape_url(params[:task_id])).id], :order => 'name')
+      @statuses = Status.all(:conditions => ['task_id = ?',
+                                             Task.find_by_name(unescape_url(params[:task_id])).id],
+                             :order => 'name')
     end
 
     respond_to do |format|
@@ -21,9 +23,12 @@ class StatusesController < ApplicationController
   # GET /statuses/1.xml
   def show
     if params[:task_id].blank?
-      @status = Status.find(:first, :conditions => ["global = 'Y' and name = ?", unescape_url(params[:id])])
+      @status = Status.find(:first,
+                            :conditions => ["global = 'Y' and name = ?",
+                                            unescape_url(params[:id])])
     else
-      @status = Status.find_by_name_and_task_id(unescape_url(params[:id]), Task.find_by_name(unescape_url(params[:task_id])).id)
+      @status = Status.find_by_name_and_task_id(unescape_url(params[:id]),
+                                                Task.find_by_name(unescape_url(params[:task_id])).id)
     end
 
     respond_to do |format|
@@ -46,9 +51,12 @@ class StatusesController < ApplicationController
   # GET /statuses/1/edit
   def edit
     if params[:task_id].blank?
-      @status = Status.find(:first, :conditions => ["name = ? AND global='Y'", unescape_url(params[:id])])
+      @status = Status.find(:first,
+                            :conditions => ["name = ? AND global='Y'",
+                                            unescape_url(params[:id])])
     else
-      @status = Status.find_by_name_and_task_id(unescape_url(params[:id]), Task.find_by_name(unescape_url(params[:task_id])).id)
+      @status = Status.find_by_name_and_task_id(unescape_url(params[:id]),
+                                                Task.find_by_name(unescape_url(params[:task_id])).id)
     end
   end
 
@@ -63,14 +71,19 @@ class StatusesController < ApplicationController
         flash[:notice] = 'Status was successfully created.'
         format.html {
           if is_global?(@status)
-            redirect_to :controller => :statuses, :action => :show, :id => escape_url(@status.name)
+            redirect_to :controller => :statuses,
+                        :action => :show,
+                        :id => escape_url(@status.name)
           else
-            redirect_to :controller => :statuses, :action => :show, :id => escape_url(@status.name), :task_id => escape_url(@status.task.name)
+            redirect_to :controller => :statuses,
+                        :action => :show,
+                        :id => escape_url(@status.name),
+                        :task_id => escape_url(@status.task.name)
           end
 
         }
       else
-        format.html { render :action => "new" }
+        format.html { render :action => 'new' }
       end
     end
   end
@@ -84,15 +97,20 @@ class StatusesController < ApplicationController
     respond_to do |format|
       if @status.update_attributes(params[:status])
         flash[:notice] = 'Status was successfully updated.'
-        format.html {
-          unless is_global?(@status)
-            redirect_to :controller => :statuses, :action => :show, :id => escape_url(@status.name), :task_id => escape_url(@status.task.name)
+        format.html do
+          if is_global?(@status)
+            redirect_to :controller => :statuses,
+                        :action => :show,
+                        :id => escape_url(@status.name)
           else
-            redirect_to :controller => :statuses, :action => :show, :id => escape_url(@status.name)
+            redirect_to :controller => :statuses,
+                        :action => :show,
+                        :id => escape_url(@status.name),
+                        :task_id => escape_url(@status.task.name)
           end
-        }
+        end
       else
-        format.html { render :action => "edit" }
+        format.html { render :action => 'edit' }
       end
     end
   end

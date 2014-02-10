@@ -9,12 +9,12 @@ class JiraBugsController < ApplicationController
   def show 
     begin
         # Is it already in database?
-      if JiraBug.exists?(:key => params[:id]) then
+      if JiraBug.exists?(:key => params[:id])
         # Update the local copy
-        puts params[:id] + " found."
+        puts "#{params[:id]} found."
         @jira_bug = JiraBug.find(params[:id])
       else
-        puts params[:id] + " not found."
+        puts "#{params[:id]} not found."
       end
     rescue => e
       # Handle errors here
@@ -50,7 +50,7 @@ class JiraBugsController < ApplicationController
   end
 
   def edit
-      if JiraBug.exists?(:key => params[:id]) then
+      if JiraBug.exists?(:key => params[:id])
         # Update the local copy
         @jira_bug = JiraBug.find(params[:id])
       else
@@ -75,11 +75,11 @@ class JiraBugsController < ApplicationController
 
     if @info.nil?
       # handle 
-      raise ArgumentError, "Jira did not find an issue by that key."
+      raise ArgumentError, 'Jira did not find an issue by that key.'
     end
 
       # Is it already in database?
-      if JiraBug.exists?(:key => params[:id]) then
+      if JiraBug.exists?(:key => params[:id])
         # Update the local copy
         @jira_bug = JiraBug.find(params[:id])
 

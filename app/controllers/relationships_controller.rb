@@ -44,11 +44,21 @@ class RelationshipsController < ApplicationController
 
     respond_to do |format|
       if @relationship.save
-        format.html { redirect_to(@relationship, :notice => 'Relationship was successfully created.') }
-        format.xml { render :xml => @relationship, :status => :created, :location => @relationship }
+        format.html do
+          redirect_to(@relationship,
+                      :notice => 'Relationship was successfully created.')
+        end
+        format.xml do
+          render :xml => @relationship,
+                 :status => :created,
+                 :location => @relationship
+        end
       else
-        format.html { render :action => "new" }
-        format.xml { render :xml => @relationship.errors, :status => :unprocessable_entity }
+        format.html { render :action => 'new' }
+
+        format.xml do
+          render :xml => @relationship.errors, :status => :unprocessable_entity
+        end
       end
     end
   end
@@ -60,11 +70,20 @@ class RelationshipsController < ApplicationController
 
     respond_to do |format|
       if @relationship.update_attributes(params[:relationship])
-        format.html { redirect_to(@relationship, :notice => 'Relationship was successfully updated.') }
+
+        format.html do
+          redirect_to(@relationship,
+                      :notice => 'Relationship was successfully updated.')
+        end
+
         format.xml { head :ok }
       else
-        format.html { render :action => "edit" }
-        format.xml { render :xml => @relationship.errors, :status => :unprocessable_entity }
+        format.html { render :action => 'edit' }
+
+        format.xml do
+          render :xml => @relationship.errors, :status => :unprocessable_entity
+        end
+
       end
     end
   end
