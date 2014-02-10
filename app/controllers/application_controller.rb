@@ -279,11 +279,13 @@ class ApplicationController < ActionController::Base
   end
 
   def redirect_back_or_default(url)
-    redirect_to(url) if session[:prev_url].blank?
-
-    prev_url = session[:prev_url].clone
-    session[:prev_url] = nil
-    redirect_to(prev_url)
+    if session[:prev_url].blank?
+      redirect_to(url)
+    else
+      prev_url = session[:prev_url].clone
+      session[:prev_url] = nil
+      redirect_to(prev_url)
+    end
   end
 
   def check_logged_in
