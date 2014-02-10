@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  task_workload_summary_id: 1
+  package_id: 1
+  workload_per_status_in_minutes: MyText
+
+two:
+  task_workload_summary_id: 1
+  package_id: 1
+  workload_per_status_in_minutes: MyText
