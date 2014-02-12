@@ -91,9 +91,7 @@ class PackagesController < ApplicationController
           notify_package_created(params, @package)
         end
 
-        format.html do
-          show_package(params, @package)
-        end
+        format.html { show_package(params, @package) }
       else
         @user = params[:user]
         format.html { render :action => :new }
@@ -135,15 +133,10 @@ class PackagesController < ApplicationController
   # TODO: we'll refactor this method to make it more modular
   def update
 
-    ###########################################################################
-    ########################### Bugzilla ######################################
-    ###########################################################################
     update_bz_pass(params[:bzauth_pwd])
     shared_bzauth_user = extract_username(params[:bzauth_user])
     shared_bzauth_pass = session[:bz_pass]
     shared_inline_bzs = get_shared_inline_bz(params[:flatten_bzs])
-    ###########################################################################
-    ###########################################################################
 
     # for Changelog.package_updated
     @orig_package = Package.find(params[:id])
@@ -160,9 +153,6 @@ class PackagesController < ApplicationController
                      shared_inline_bzs,
                      @package)
 
-    ###########################################################################
-    ################## Lots of variable definitions ... #######################
-    ###########################################################################
     last_status_changed_at = @package.status_changed_at
     last_status = Status.find_by_id(@package.status_id)
 
@@ -171,8 +161,6 @@ class PackagesController < ApplicationController
 
     old_version = @package.ver
     current_ver = get_current_version(params)
-    ###########################################################################
-    ###########################################################################
 
     respond_to do |format|
       Package.transaction do
@@ -185,16 +173,6 @@ class PackagesController < ApplicationController
           # with the latest_changes command since the latest_change will be that
           # instead of what the user changed in the website.
           latest_changes_package = @package.latest_changes
-          puts "*******************************"
-          puts "*******************************"
-          puts "*******************************"
-          puts "*******************************"
-          puts "*******************************"
-          puts latest_changes_package
-          puts "==============================="
-          puts "==============================="
-          puts "==============================="
-          puts "==============================="
           update_tags(params, @package)
 
           # update the assignee of the bugs if assignee changed
@@ -206,29 +184,11 @@ class PackagesController < ApplicationController
                                          shared_bzauth_user,
                                          @package)
 
-          ######################################################################
-          ######################################################################
-
           # status changed
-          new_status = get_new_status(params)
-          if new_status != last_status
-            last_status_changed_at = time_track_package(last_status,
-                                                        last_status_changed_at,
-                                                        @package)
-
-            ####################################################################
-            ############################ Bugzilla ##############################
-            ####################################################################
-            update_bz_status_if_status_changed(assignee_email,
-                                               new_status,
-                                               shared_bzauth_pass,
-                                               shared_bzauth_user,
-                                               @package)
-            ####################################################################
-            ####################################################################
-
-            update_log_entry(last_status, last_status_changed_at, @package)
-          end
+          status_changed_actions(assignee_email,
+                                 last_status, last_status_changed_at,
+                                 shared_bzauth_pass, shared_bzauth_user,
+                                 @package, params)
 
           @package.save
 
@@ -236,8 +196,7 @@ class PackagesController < ApplicationController
 
           do_sync(%w(name notes ver assignee brew_link group_id artifact_id project_name project_url license scm))
 
-          sync_status if params[:sync_status] == 'yes'
-          sync_tags if params[:sync_tags] == 'yes'
+          sync_actions(params)
 
           flash[:notice] = 'Package was successfully updated.'
 
@@ -246,9 +205,12 @@ class PackagesController < ApplicationController
           end
 
           @output = true
-        else # we are here since it is shared_bz_ids? wtf
+        else
           unless @package.errors[:name].blank?
-            @error_message = "Package #{@package.name} already exists. Here's the <a href='/tasks/#{escape_url(@package.task.name)}/packages/#{unescape_url(@package.name)}' target='_blank'>link</a>."
+            @error_message =
+                "Package #{@package.name} already exists. Here's the " \
+                "<a href='/tasks/#{escape_url(@package.task.name)}/packages/#{unescape_url(@package.name)}'" \
+                " target='_blank'>link</a>."
           end
           @user = params[:user]
           @output = false
@@ -258,14 +220,39 @@ class PackagesController < ApplicationController
 
       if @output
         expire_all_fragments
-        format.html do
-          show_package(params, @package)
-        end
+        format.html { show_package(params, @package) }
         format.js
       else
         format.html { render :action => :edit }
         format.js
       end
+    end
+  end
+
+  def sync_actions(params)
+    sync_status if params[:sync_status] == 'yes'
+    sync_tags if params[:sync_tags] == 'yes'
+  end
+
+  def status_changed_actions(assignee_email, last_status,
+      last_status_changed, shared_bzauth_pass, shared_bzauth_user,
+      package, params)
+    new_status = get_new_status(params)
+    if new_status != last_status
+      last_status_changed = time_track_package(last_status,
+                                               last_status_changed,
+                                               package)
+      ####################################################################
+      ############################ Bugzilla ##############################
+      ####################################################################
+      update_bz_status_if_status_changed(assignee_email,
+                                         new_status,
+                                         shared_bzauth_pass,
+                                         shared_bzauth_user,
+                                         package)
+      ####################################################################
+      ####################################################################
+      update_log_entry(last_status, last_status_changed, @package)
     end
   end
 
