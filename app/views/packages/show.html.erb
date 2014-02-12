@@ -1,5 +1,5 @@
 <h2>
-<span style="<%= deleted_style(@package) %>">
+<span style="<%= @package.deleted_style %>">
 <%= h @package.name %>
   @<%= link_to @package.task.name,
                :controller => 'packages',

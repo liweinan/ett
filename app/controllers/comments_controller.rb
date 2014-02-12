@@ -38,7 +38,7 @@ class CommentsController < ApplicationController
       debugger
 
       Notify::Comment.create(current_user,
-                             get_package_link(params, package),
+                             package.get_package_link(params),
                              package,
                              comment,
                              Setting.all_recipients_of_package(package,
@@ -48,7 +48,7 @@ class CommentsController < ApplicationController
 
     unless params[:div_comment_notification_area].blank?
       Notify::Comment.create(current_user,
-                             get_package_link(params, package),
+                             package.get_package_link(params),
                              package,
                              comment,
                              params[:div_comment_notification_area])

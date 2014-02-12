@@ -119,7 +119,7 @@ module ApplicationHelper
           bz_struct[bz.os_arch] = bz.bz_id
         end
 
-        uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+        uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
         # the errata request is sent to mead-scheduler's rest api:
 
         link = "/mead-scheduler/rest/errata/#{prod}/files?dist=el6&nvr=#{pac.brew}&pkg=#{pac.name}&version=#{pac.task.tag_version}"
@@ -138,7 +138,7 @@ module ApplicationHelper
         pac.task.os_advisory_tags.each do |os_tag|
           next if os_tag.os_arch == 'el6'
 
-          latest_brew_nvr = get_brew_name(pac, os_tag.candidate_tag + '-build')
+          latest_brew_nvr = pac.get_brew_name(os_tag.candidate_tag + '-build')
           link = "/mead-scheduler/rest/errata/#{prod}/files?dist=#{os_tag.os_arch}&nvr=#{latest_brew_nvr}&pkg=#{pac.name}&version=#{pac.task.tag_version}"
           link += '&bugs=' + bz_struct[os_tag.os_arch] if bz_struct.has_key? os_tag.os_arch
           req = Net::HTTP::Post.new(link)

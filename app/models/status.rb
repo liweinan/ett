@@ -114,6 +114,14 @@ class Status < ActiveRecord::Base
     statuses.flatten.uniq.reject {|status| status.nil?}
   end
 
+  def status_in_finished
+    self.code == Status::CODES[:finished]
+  end
+
+  def status_in_progress
+    self.code == Status::CODES[:inprogress]
+  end
+
   protected
 
   def validate
@@ -127,5 +135,6 @@ class Status < ActiveRecord::Base
       errors.add(:name, ' - Status name cannot be duplicate under one task!')
     end
   end
+
 
 end

@@ -10,10 +10,10 @@ class ApplicationController < ActionController::Base
 
   helper_method :escape_url, :unescape_url, :can_manage?, :logged_in?,
                 :has_task?, :count_packages, :can_edit_package?, :current_user,
-                :get_task, :has_status?, :has_tag?, :deleted_style,
+                :get_task, :has_status?, :has_tag?,
                 :can_delete_comment?, :generate_request_path, :is_global?,
                 :current_user_email, :task_has_tags?, :get_xattrs,
-                :background_style, :confirmed?, :default_style, :get_brew_name,
+                :background_style, :confirmed?, :default_style,
                 :find_task
 
   helper_method :btag, :ebtag, :uebtag, :truncate_u, :its_myself?,
@@ -60,6 +60,7 @@ class ApplicationController < ActionController::Base
   end
 
   def can_edit_package?(package)
+    # FIXME: why create another package???
     _package = Package.find(package.id)
     logged_in_and_owner_package(_package) || can_manage?
   end
@@ -91,14 +92,6 @@ class ApplicationController < ActionController::Base
 
   def current_user_email
     session[:current_user].email if session[:current_user]
-  end
-
-  def deleted_style(package)
-    if !package.blank? && package.deleted?
-      'text-decoration:line-through;'
-    else
-      ''
-    end
   end
 
   def can_delete_comment?(comment)
@@ -407,13 +400,6 @@ class ApplicationController < ActionController::Base
     (!params[:ubbs_user].blank? && !params[:ubbs_pwd].blank?)
   end
 
-  # TODO: move to a model
-  def get_mead_name(brew_pkg)
-    uri = URI.parse(URI.encode("#{APP_CONFIG['mead_scheduler']}/mead-brewbridge/pkg/wrapped/#{brew_pkg}"))
-    res = Net::HTTP.get_response(uri)
-
-    (res.code == '200' && !res.body.include?('ERROR')) ? res.body : nil
-  end
 
   # TODO: move to a model
   def update_bug(bz_id, oneway, params)
@@ -455,32 +441,6 @@ class ApplicationController < ActionController::Base
     puts res.response
   end
 
-  # TODO: move to a model
-  def get_scm_url_brew(pac)
-    server = XMLRPC::Client.new('brewhub.devel.redhat.com', '/brewhub', 80)
-
-    return nil if pac.mead.nil?
-
-    begin
-      param = server.call('getBuild', pac.mead)
-      param.nil? ? nil : server.call('getTaskRequest', param['task_id'])[0]
-    rescue XMLRPC::FaultException
-      nil
-    end
-  end
-
-  # TODO: move to a model
-  def get_brew_name(pac, candidate_tag=nil)
-    # TODO: make the tag more robust
-    tag = candidate_tag.nil? ? "#{pac.task.candidate_tag}-build" : candidate_tag
-
-    uri = URI.parse(URI.encode("#{APP_CONFIG['mead_scheduler']}/mead-brewbridge/pkg/latest/#{tag}/#{pac.name}"))
-
-    res = Net::HTTP.get_response(uri)
-
-    (res.code == '200' && !res.body.include?('ERROR')) ? res.body : nil
-  end
-
   def current_bzuser(params)
     extract_username(params[:bzauth_user])
   end
@@ -489,7 +449,7 @@ class ApplicationController < ActionController::Base
     session[:bz_pass].blank? ? params[:bzauth_pwd] : session[:bz_pass]
   end
 
-  def get_bz_info(bz_id, userid, pwd)
+  def get_bz_info(bz_id, user_id, pwd)
     @response = BzBug.query_bz_bug_info(bz_id, user_id, pwd)
 
     bz_info = nil
@@ -508,32 +468,7 @@ class ApplicationController < ActionController::Base
     res.code
   end
 
-  # mode flag needed since for mode=:create,
-  # the request_path link is wrong
-  def get_package_link(params, package, mode=:edit)
-    hardcoded_string = "#{APP_CONFIG['site_prefix']}tasks/#{escape_url(@package.task.name)}/packages/#{escape_url(@package.name)}"
 
-    if mode == :create
-      hardcoded_string
-    elsif params[:request_path].blank?
-      hardcoded_string
-    else
-      params[:request_path]
-    end
-  end
-
-  # TODO: move to a model
-  def build_type(package)
-    Net::HTTP.get('mead.usersys.redhat.com', "/mead-scheduler/rest/package/eap6/#{package}/type")
-  end
-
-  # TODO: move to a model
-  def need_source_url?(package)
-    build = build_type(package.name)
-    build_check = (build == 'WRAPPER') || (build == 'MEAD_ONLY')
-    has_wrapper_tag = !(package.tags.select { |tag| tag.key == 'wrapper' }).empty?
-    build_check || has_wrapper_tag
-  end
 
   def password_valid?(user, password)
 

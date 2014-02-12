@@ -166,10 +166,10 @@ class Package < ActiveRecord::Base
   #
   # Returns: string
   def to_s
-    str = "Name: #{name}\n"
-    str += "Created By: #{creator.name}(#{creator.email})\n"
-    str += "Created At: #{created_at.to_s}\n"
-    str += "Belongs To: #{task.name}\n"
+    str = "Name: #{name}\n" \
+          "Created By: #{creator.name}(#{creator.email})\n" \
+          "Created At: #{created_at.to_s}\n" \
+          "Belongs To: #{task.name}\n"
     unless assignee.blank?
       str += "Assignee: #{assignee.name}(#{assignee.email})\n"
     end
@@ -351,6 +351,287 @@ class Package < ActiveRecord::Base
     ''
   end
 
+  def get_bz_email
+    assignee_email = nil
+    unless assignee.bugzilla_email.blank?
+      assignee_email = assignee.bugzilla_email
+    end
+    assignee_email
+  end
+
+  def generate_bz_comment
+    "Source URL: #{git_url}\n" +
+    "Mead-Build: #{mead}\n" +
+    "Brew-Build: #{brew}\n"
+  end
+
+  def update_mead_information
+    if task.use_mead_integration?
+      update_mead_brew_info
+      update_source_url_info
+    end
+  end
+
+  # TODO: move to a model
+  def get_mead_name(brew_pkg)
+    uri = URI.parse(URI.encode("#{APP_CONFIG['mead_scheduler']}/mead-brewbridge/pkg/wrapped/#{brew_pkg}"))
+    res = Net::HTTP.get_response(uri)
+
+    (res.code == '200' && !res.body.include?('ERROR')) ? res.body : nil
+  end
+
+  def sync_tags
+    self.all_relationships_of('clone').each do |target_package|
+      if self.tags.blank?
+        target_package.tags = nil
+        target_package.save
+      else
+        target_tags = []
+        self.tags.each do |source_tag|
+          target_tag = Tag.find_by_key_and_task_id(source_tag.key,
+                                                   target_package.task_id)
+          if target_tag.blank?
+            target_tag = source_tag.clone
+            target_tag.task_id = target_package.task_id
+            target_tag.save
+            target_tags << target_tag
+          else
+            target_tags << target_tag
+          end
+        end
+        target_package.tags = target_tags
+        target_package.save
+      end
+    end
+  end
+
+  def sync_status
+    self.all_relationships_of('clone').each do |target_package|
+      # User has unset the status of source package, so we unset all the
+      # statuses assigned to target packages.
+      if self.status.blank?
+        target_package.status = nil
+        target_package.save
+      else
+        target_status = Status.find_in_global_scope(self.status.name,
+                                                    target_package.task.name)
+
+        if target_status.blank?
+          target_status = self.status.clone
+          target_status.task = target_package.task
+          target_status.save
+          target_package.status = target_status
+          target_package.save
+        else
+          target_package.status = target_status
+          target_package.save
+        end
+      end
+    end
+  end
+
+  def create_log_entry(start_time, now, current_user)
+    log_entry = ManualLogEntry.new
+    log_entry.start_time = Time.at(start_time)
+    log_entry.end_time = Time.at(now)
+    log_entry.who = current_user
+    log_entry.package = self
+    log_entry.save
+  end
+
+
+  def notify_package_created(params)
+    url = self.get_package_link(params, :create)
+
+    if Setting.activated?(self.task, Setting::ACTIONS[:created])
+      Notify::Package.create(current_user,
+                             url,
+                             self,
+                             Setting.all_recipients_of_package(self, nil, :create))
+    end
+
+    unless params[:div_package_create_notification_area].blank?
+      Notify::Package.create(current_user,
+                             url,
+                             self,
+                             params[:div_package_create_notification_area])
+    end
+  end
+
+  def notify_package_updated(latest_changes, params)
+    url = self.get_package_link(params).gsub('/edit', '')
+
+    if Setting.activated?(self.task, Setting::ACTIONS[:updated])
+      Notify::Package.update(current_user,
+                             url,
+                             self,
+                             Setting.all_recipients_of_package(self,
+                                                               current_user,
+                                                               :edit),
+                             latest_changes)
+    end
+
+    unless params[:div_package_edit_notification_area].blank?
+      Notify::Package.update(current_user,
+                             url,
+                             self,
+                             params[:div_package_edit_notification_area],
+                             latest_changes)
+    end
+  end
+
+  # mode flag needed since for mode=:create,
+  # the request_path link is wrong
+  def get_package_link(params, mode=:edit)
+    hardcoded_string = "#{APP_CONFIG['site_prefix']}tasks/#{escape_url(self.task.name)}/packages/#{escape_url(self.name)}"
+
+    if mode == :create
+      hardcoded_string
+    elsif params[:request_path].blank?
+      hardcoded_string
+    else
+      params[:request_path]
+    end
+  end
+
+  def time_track_package(last_status, last_status_changed)
+    self.status_changed_at = Time.now
+
+    if !last_status.blank? && last_status.is_time_tracked?
+      time_track = TrackTime.all(:conditions => ['package_id=? and status_id=?',
+                                                 self.id,
+                                                 last_status.id])[0]
+      time_track = TrackTime.new if time_track.blank?
+
+      time_track.package_id = self.id
+      time_track.status_id = last_status.id
+      last_status_changed ||= self.status_changed_at
+
+      time_track.time_consumed ||= 0
+      time_track.time_consumed +=
+          (self.status_changed_at.to_i - last_status_changed.to_i)/60
+
+      time_track.save
+    end
+    last_status_changed
+  end
+
+  def update_log_entry(last_status, last_status_change, current_user)
+    log_entry = AutoLogEntry.new
+
+    last_status_change ||= self.status_changed_at
+    log_entry.start_time = last_status_change
+    log_entry.end_time = self.status_changed_at
+    log_entry.who = current_user
+    log_entry.package = self
+    log_entry.status = last_status
+
+    log_entry.save
+  end
+
+  def build_type
+    Net::HTTP.get('mead.usersys.redhat.com',
+                  "/mead-scheduler/rest/package/eap6/#{self.name}/type")
+  end
+
+  def need_source_url?
+    build = self.build_type
+    build_check = (build == 'WRAPPER') || (build == 'MEAD_ONLY')
+    has_wrapper_tag = !((self.tags.select { |tag| tag.key == 'wrapper' }).empty?)
+    build_check || has_wrapper_tag
+  end
+
+
+  # get_mead_info will go get the mead nvr from the rpm repo directly if it
+  # cannot find it via the mead scheduler
+  def update_mead_brew_info
+    brew_pkg = self.get_brew_name
+    self.brew = brew_pkg
+    if brew_pkg.blank?
+      uri = URI.parse("http://pkgs.devel.redhat.com/cgit/rpms/#{self.name}/plain/last-mead-build?h=#{self.task.candidate_tag}")
+      res = Net::HTTP.get_response(uri)
+      # TODO: error handling
+      package_old_mead = res.body if res.code == '200'
+      package_name = self.parse_nvr(package_old_mead)[:name]
+
+      uri = URI.parse("http://mead.usersys.redhat.com/mead-brewbridge/pkg/latest/#{self.task.candidate_tag}-build/#{package_name}")
+      res = Net::HTTP.get_response(uri)
+      self.mead = res.body if res.code == '200'
+    else
+      self.mead = get_mead_name(brew_pkg) unless brew_pkg.blank?
+    end
+
+    self.mead_action = Package::MEAD_ACTIONS[:done]
+    self.save
+  end
+
+  def deleted_style
+    if self.deleted?
+      'text-decoration:line-through;'
+    else
+      ''
+    end
+  end
+
+  def get_scm_url_brew
+    server = XMLRPC::Client.new('brewhub.devel.redhat.com', '/brewhub', 80)
+
+    return nil if mead.nil?
+
+    begin
+      param = server.call('getBuild', mead)
+      param.nil? ? nil : server.call('getTaskRequest', param['task_id'])[0]
+    rescue XMLRPC::FaultException
+      nil
+    end
+  end
+
+  def get_brew_name(candidate_tag=nil)
+    # TODO: make the tag more robust
+    tag = candidate_tag.nil? ? "#{task.candidate_tag}-build" : candidate_tag
+
+    uri = URI.parse(URI.encode("#{APP_CONFIG['mead_scheduler']}/mead-brewbridge/pkg/latest/#{tag}/#{name}"))
+
+    res = Net::HTTP.get_response(uri)
+
+    (res.code == '200' && !res.body.include?('ERROR')) ? res.body : nil
+  end
+
+  # based on the brew koji code, move it to package model afterwards
+  # error checking omitted
+  def parse_nvr(nvr)
+    ret = {}
+    p2 = nvr.rindex('-')
+    p1 = nvr.rindex('-', p2 - 1)
+    puts p1
+    puts p2
+    ret[:release] = nvr[(p2 + 1)..-1]
+    ret[:version] = nvr[(p1 + 1)...p2]
+    ret[:name] = nvr[0...p1]
+
+    ret
+  end
+
+  def update_source_url_info
+    self.brew_scm_url = get_scm_url_brew
+
+    if self.git_url.nil? || self.git_url.empty?
+      self.git_url = self.brew_scm_url
+    end
+    save
+  end
+
+  def duplicate_package_msg
+    "Package #{self.name} already exists. Here's the " \
+    "<a href='/tasks/#{escape_url(self.task.name)}/packages/#{unescape_url(self.name)}'" \
+    " target='_blank'>link</a>."
+  end
+
+  def delete_all_bzs
+    Package.transaction do
+      bz_bugs.each { |bz_bug| bz_bug.destroy }
+    end
+  end
   # For all bugzillas associated with this package, return the one with bugzilla
   # id bz_id. If nothing is found, return nil.
   #
@@ -379,22 +660,23 @@ class Package < ActiveRecord::Base
   protected
 
   def all_from_packages_of(from_relationships, relationship_name)
-    packages = []
-    from_relationships.each do |from_relationship|
-      if from_relationship.relationship.name == relationship_name
-        packages << from_relationship.from_package
-        packages << all_from_packages_of(from_relationship.from_package.from_relationships, relationship_name)
-      end
-    end
-    packages.flatten.uniq
+    all_packages_of(from_relationships, relationship_name,
+                    :from_package, :from_relationships)
   end
 
   def all_to_packages_of(to_relationships, relationship_name)
+    all_packages_of(to_relationships, relationship_name,
+                    :to_package, :to_relationships)
+  end
+
+  def all_packages_of(relationships, relationship_name, pac_mtd, pac_rel_mtd)
     packages = []
-    to_relationships.each do |to_relationship|
-      if to_relationship.relationship.name == relationship_name
-        packages << to_relationship.to_package
-        packages << all_to_packages_of(to_relationship.to_package.to_relationships, relationship_name)
+    relationships.each do |relationship|
+      if relationship.relationship.name == relationship_name
+        packages << relationship.send(pac_mtd)
+        packages << all_packages_of(relationship.send(pac_mtd).send(pac_rel_mtd),
+                                         relationship_name,
+                                         pac_mtd, pac_rel_mtd)
       end
     end
     packages.flatten.uniq
