@@ -2,34 +2,22 @@
   - <%= at_zone(@wl.end_of_week, '%Y-%m-%d') %></h2>
 Packages Built: <%= @wl.package_count %>
 <%= render :partial => 'layouts/sep_tiny' %>
-Automatic Time Track:
+Total Time Spent On Each Status:
 <% @wl.auto_sum_details.each do |asd| %>
     <%= render :partial => 'packages/fields/auto_track_time_display', :locals => {:status => asd.status, :time_consumed => asd.minutes} %>
 <% end %>
-<%= render :partial => 'layouts/sep_tiny' %>
-Manual Time Track:
-<%= display_track_time_in_real_time(@wl.manual_sum) %>
 <%= render :partial => 'layouts/sep' %>
 <div class='manage-tbl'>
   <table>
     <tr>
       <th class='content-list-head'>Package Name</th>
-      <th class='content-list-head'>Assignee (Was)</th>
-      <th class='content-list-head'>Assignee (Current)</th>
+      <th class='content-list-head'>Assignee</th>
       <th class='content-list-head'>Current Status</th>
-      <th class='content-list-head'>Automatic Time Track</th>
-      <th class='content-list-head'>Manual Time Track</th>
+      <th class='content-list-head'>Time Spent On Each Status</th>
     </tr>
     <% @wl.package_stats.each do |ps| %>
         <tr>
           <td style='font-size:10px;'><%= link_to ps.package.name, :controller => 'packages', :action => :show, :id => escape_url(ps.package.name), :task_id => escape_url(ps.package.task.name) %></td>
-          <td style='font-size:10px;'>
-            <% if ps.assignee.blank? %>
-                -
-            <% else %>
-                <%= ps.assignee.name %>
-            <% end %>
-          </td>
           <td style='font-size:10px;'>
             <% if ps.package.assignee.blank? %>
                 -
@@ -43,7 +31,6 @@ Manual Time Track:
                 <%= render :partial => 'packages/fields/auto_track_time_display', :locals => {:status => ls.status, :time_consumed => ls.minutes} %>
             <% end %>
           </td>
-          <td style='font-size:10px;'><%= display_track_time_in_real_time(ps.minutes) %></td>
         </tr>
     <% end %>
   </table>
