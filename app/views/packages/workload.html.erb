@@ -1,40 +1,26 @@
 <h2>Workload Report</h2>
 
-<% wls = WeeklyWorkload.all(:conditions => ['task_id=?',
-                                            Task.find_by_name(unescape_url(params[:task_id])).id],
-                            :order => 'start_of_week DESC') %>
+<% wls = WeeklyWorkload.all(:conditions => ["task_id=?", Task.find_by_name(unescape_url(params[:task_id])).id], :order => "start_of_week DESC") %>
 
 
 <div class='manage-tbl'>
   <table>
     <tr>
-      <th class='content-list-head'>Operation</th>
-      <th class='content-list-head'>Start Of Week</th>
-      <th class='content-list-head'>End Of Week</th>
-      <th class='content-list-head'>Updated At</th>
+      <th class='content-list-head'>Detail</th>
+      <th class='content-list-head'>Week</th>
       <th class='content-list-head'>Packages Built</th>
-      <th class='content-list-head'>Automatic Time Track</th>
-      <th class='content-list-head'>Manual Time Track</th>
+      <th class='content-list-head'>Time Spent On Each Status</th>
     </tr>
     <% wls.each do |wl| %>
         <tr>
-          <td style='font-size:10px;'><%= link_to 'Detail',
-                                      :controller => :workload,
-                                      :action => :show,
-                                      :id => wl.id %></td>
-
-          <td style='font-size:10px;text-align:left;'><%= at_zone(wl.start_of_week, '%Y-%m-%d') %></td>
-          <td style='font-size:10px;text-align:left;'><%= at_zone(wl.end_of_week, '%Y-%m-%d') %></td>
-          <td style='font-size:10px;text-align:left;'><%= at_zone(wl.updated_at) %></td>
+          <td style='font-size:10px;'><%= link_to 'Detail', :controller => :workload, :action => :show, :id => wl.id %></td>
+          <td style='font-size:10px;text-align:left;'><%= at_zone(wl.start_of_week, '%Y-%m-%d') %> ~ <%= at_zone(wl.end_of_week, '%Y-%m-%d') %></td>
           <td style='font-size:10px;text-align:left;'><%= wl.package_count %></td>
           <td style='font-size:10px;text-align:left;'>
             <% wl.auto_sum_details.each do |asd| %>
-                <%= render :partial => 'packages/fields/auto_track_time_display',
-                           :locals => {:status => asd.status,
-                                       :time_consumed => asd.minutes} %>
+                <%= render :partial => 'packages/fields/auto_track_time_display', :locals => {:status => asd.status, :time_consumed => asd.minutes} %>
             <% end %>
           </td>
-          <td style='font-size:10px;text-align:left;'><%= display_track_time_in_real_time(wl.manual_sum) %></td>
         </tr>
     <% end %>
   </table>

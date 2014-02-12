@@ -4,6 +4,23 @@ class WorkloadController < ApplicationController
     @wl = WeeklyWorkload.find(params[:id])
   end
 
+  # This method will delete the older reports and generate a new set
+  def generate_task_workload_summary_report
+    # Delete older data
+    ActiveRecord::Base.connection.execute("delete from task_workload_summaries")
+    ActiveRecord::Base.connection.execute("delete from task_workload_per_package_summaries")
+
+    all_tasks = Task.all
+    all_tasks.each do |task|
+      active_packages = task.active_packages
+
+      task_workload_summary = TaskWorkloadSummary.new
+      task_workload_summary.total_number_of_packages = active_packages.size
+
+
+    end
+  end
+
   # This method needs to be run by cron in a weekly basis
   def generate_weekly_workload
     Package.transaction do

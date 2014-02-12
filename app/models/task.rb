@@ -67,4 +67,12 @@ class Task < ActiveRecord::Base
     !ReadonlyTask.find_by_task_id(task.id).blank?
   end
 
+  def active_packages # find the packages of the task which the workload time need to be tracked.
+    # If the package status's 'is_track_time' field is not 'No', then the workload of this package needs to be tracked.
+    # So we will consider this package as active.
+    # For example if the package is in 'Deleted' status, and because 'Deleted' status's 'is_track_time' is set to 'No',
+    # so we think the packages marked in 'Delete' status is inactive.
+    Package.all(:conditions => ["task_id = ? and status_id in (select id from statuses where is_track_time != 'No')", id])
+  end
+
 end
