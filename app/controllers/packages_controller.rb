@@ -125,17 +125,20 @@ class PackagesController < ApplicationController
     end
   end
 
+  # list of 2 elements, first element is bz_user, and second element is
+  # bz_password
+  def bz_user_pass(params, session)
+    [extract_username(params[:bzauth_user]), session[:bz_pass]]
+  end
 
   # PUT /packages/1
   # PUT /packages/1.xml
   # params[:flatten_bzs] seems to be only used for inline bugzilla
   # params[:process_tags] ??
-  # TODO: we'll refactor this method to make it more modular
   def update
 
     update_bz_pass(params[:bzauth_pwd])
-    shared_bzauth_user = extract_username(params[:bzauth_user])
-    shared_bzauth_pass = session[:bz_pass]
+    bz_cred = bz_user_pass(params, session)
     shared_inline_bzs = get_shared_inline_bz(params[:flatten_bzs])
 
     # for Changelog.package_updated
@@ -148,10 +151,7 @@ class PackagesController < ApplicationController
 
     # Function to support inline editor to update BZ
     # Input syntax: <Bz1Id> <Bz2Id> <Bz3Id>
-    update_inline_bz(shared_bzauth_user,
-                     shared_bzauth_pass,
-                     shared_inline_bzs,
-                     @package)
+    update_inline_bz(bz_cred, shared_inline_bzs, @package)
 
     last_status_changed_at = @package.status_changed_at
     last_status = Status.find_by_id(@package.status_id)
@@ -180,14 +180,12 @@ class PackagesController < ApplicationController
           # one. Will have to fix this someday
           update_bz_assignee_and_version(old_assignee_email, assignee_email,
                                          old_version, current_ver,
-                                         shared_bzauth_pass,
-                                         shared_bzauth_user,
-                                         @package)
+                                         bz_cred, @package)
 
           # status changed
           status_changed_actions(assignee_email,
                                  last_status, last_status_changed_at,
-                                 shared_bzauth_pass, shared_bzauth_user,
+                                 bz_cred,
                                  @package, params)
 
           @package.save
@@ -207,16 +205,12 @@ class PackagesController < ApplicationController
           @output = true
         else
           unless @package.errors[:name].blank?
-            @error_message =
-                "Package #{@package.name} already exists. Here's the " \
-                "<a href='/tasks/#{escape_url(@package.task.name)}/packages/#{unescape_url(@package.name)}'" \
-                " target='_blank'>link</a>."
+            @error_message = duplicate_package_msg(@package)
           end
           @user = params[:user]
           @output = false
         end
       end
-
 
       if @output
         expire_all_fragments
@@ -229,14 +223,19 @@ class PackagesController < ApplicationController
     end
   end
 
+  def duplicate_package_msg(package)
+    "Package #{package.name} already exists. Here's the " \
+    "<a href='/tasks/#{escape_url(package.task.name)}/packages/#{unescape_url(package.name)}'" \
+    " target='_blank'>link</a>."
+  end
+
   def sync_actions(params)
     sync_status if params[:sync_status] == 'yes'
     sync_tags if params[:sync_tags] == 'yes'
   end
 
   def status_changed_actions(assignee_email, last_status,
-      last_status_changed, shared_bzauth_pass, shared_bzauth_user,
-      package, params)
+      last_status_changed, bz_cred, package, params)
     new_status = get_new_status(params)
     if new_status != last_status
       last_status_changed = time_track_package(last_status,
@@ -245,11 +244,8 @@ class PackagesController < ApplicationController
       ####################################################################
       ############################ Bugzilla ##############################
       ####################################################################
-      update_bz_status_if_status_changed(assignee_email,
-                                         new_status,
-                                         shared_bzauth_pass,
-                                         shared_bzauth_user,
-                                         package)
+      update_bz_status_if_status_changed(assignee_email, new_status,
+                                         bz_cred, package)
       ####################################################################
       ####################################################################
       update_log_entry(last_status, last_status_changed, @package)
@@ -257,28 +253,20 @@ class PackagesController < ApplicationController
   end
 
   def update_bz_assignee_and_version(old_assignee_email, assignee_email,
-      old_version, current_ver, shared_bzauth_pass, shared_bzauth_user,
-      package)
+      old_version, current_ver, bz_cred, package)
     if Rails.env.production?
       if old_assignee_email != assignee_email
-        update_bz_assignee(assignee_email,
-                           shared_bzauth_pass,
-                           shared_bzauth_user,
-                           package)
+        update_bz_assignee(assignee_email, bz_cred, package)
       end
 
       if version_changed(current_ver, old_version)
-        update_bz_version(current_ver,
-                          old_version,
-                          shared_bzauth_pass,
-                          shared_bzauth_user,
-                          package)
+        update_bz_version(current_ver, old_version, bz_cred, package)
       end
     end
   end
 
-  def update_bz_status_if_status_changed(assignee_email,
-      new_status, shared_bzauth_pass, shared_bzauth_user, package)
+  def update_bz_status_if_status_changed(assignee_email, new_status,
+      bz_cred, package)
 
     if !new_status.blank? && Rails.env.production?
       if status_in_progress(assignee_email, new_status)
@@ -287,14 +275,11 @@ class PackagesController < ApplicationController
         # https://docspace.corp.redhat.com/docs/DOC-148169
         # TODO we need to write some unit tests to test all the
         # integrations with SOA
-        update_bz_status(assignee_email, shared_bzauth_pass,
-                         shared_bzauth_user, package)
+        update_bz_status(assignee_email, bz_cred, package)
       elsif status_in_finished(new_status)
         update_mead_information(package)
 
-        update_bz_status_finished(assignee_email,
-                                  shared_bzauth_pass,
-                                  shared_bzauth_user, package)
+        update_bz_status_finished(assignee_email, bz_cred, package)
       end
     end
   end
@@ -336,9 +321,9 @@ class PackagesController < ApplicationController
     end
   end
 
-  def update_bz_status_finished(assignee_email, shared_bzauth_pass,
-      shared_bzauth_user, package)
+  def update_bz_status_finished(assignee_email, bz_cred, package)
 
+    shared_bz_user, shared_bz_pass = bz_cred
     package.bz_bugs.each do |bz_bug|
       if upgrade_bz?(assignee_email, bz_bug, package)
 
@@ -346,9 +331,9 @@ class PackagesController < ApplicationController
 
         params_bz = {:milestone => package.task.milestone,
                      :assignee => assignee_email,
-                     :userid => shared_bzauth_user,
+                     :userid => shared_bz_user,
                      :status => BzBug::BZ_STATUS[:modified],
-                     :pwd => shared_bzauth_pass}
+                     :pwd => shared_bz_pass}
 
         update_rhel6_bz(bz_bug, package, params_bz)
 
@@ -361,6 +346,7 @@ class PackagesController < ApplicationController
   end
 
   def get_bz_email(package)
+    assignee_email = nil
     unless package.assignee.bugzilla_email.blank?
       assignee_email = package.assignee.bugzilla_email
     end
@@ -386,16 +372,16 @@ class PackagesController < ApplicationController
     bz_bug.bz_assignee == package.assignee.bugzilla_email)
   end
 
-  def update_bz_status(assignee_email, shared_bzauth_pass,
-      shared_bzauth_user, package)
+  def update_bz_status(assignee_email, bz_cred, package)
+    shared_bz_user, shared_bz_pass = bz_cred
     package.bz_bugs.each do |bz_bug|
       if upgrade_bz?(assignee_email, bz_bug, package)
 
         assignee_email = get_bz_email(package)
 
         params_bz = {:assignee => assignee_email,
-                     :userid => shared_bzauth_user,
-                     :pwd => shared_bzauth_pass,
+                     :userid => shared_bz_user,
+                     :pwd => shared_bz_pass,
                      :status => BzBug::BZ_STATUS[:assigned]}
 
         update_bug(bz_bug.bz_id, oneway='true', params_bz)
@@ -405,15 +391,15 @@ class PackagesController < ApplicationController
     end
   end
 
-  def update_bz_version(current_ver, old_version, shared_bzauth_pass,
-      shared_bzauth_user, package)
+  def update_bz_version(current_ver, old_version, bz_cred, package)
+    shared_bz_user, shared_bz_pass = bz_cred
     errata_bzs = package.upgrade_bz
     errata_bzs.each do |errata_bz|
       new_errata_bz_summary = errata_bz.summary.gsub(old_version,
                                                      current_ver)
 
-      params_bz = {:userid => shared_bzauth_user,
-                   :pwd => shared_bzauth_pass,
+      params_bz = {:userid => shared_bz_user,
+                   :pwd => shared_bz_pass,
                    :summary => new_errata_bz_summary}
 
       update_bug_summary(errata_bz.bz_id, oneway='true', params_bz)
@@ -422,17 +408,17 @@ class PackagesController < ApplicationController
     end
   end
 
-  def update_bz_assignee(assignee_email, shared_bzauth_pass,
-      shared_bzauth_user, package)
+  def update_bz_assignee(assignee_email, bz_cred, package)
 
+    shared_bz_user, shared_bz_pass = bz_cred
     package.bz_bugs.each do |bz_bug|
       if upgrade_bz2?(assignee_email, bz_bug)
 
         assignee_email = get_bz_email(package)
 
         params_bz = {:assignee => assignee_email,
-                     :userid => shared_bzauth_user,
-                     :pwd => shared_bzauth_pass,
+                     :userid => shared_bz_user,
+                     :pwd => shared_bz_pass,
                      :status => BzBug::BZ_STATUS[:assigned]}
 
         update_bug(bz_bug.bz_id, oneway='true', params_bz)
@@ -458,11 +444,9 @@ class PackagesController < ApplicationController
     end
   end
 
-  def update_inline_bz(shared_bzauth_user,
-                       shared_bzauth_pass,
-                       shared_inline_bzs,
-                       package)
+  def update_inline_bz(bz_cred, shared_inline_bzs, package)
 
+    shared_bz_user, shared_bz_pass = bz_cred
     delete_all_bzs(package) if empty_list(shared_inline_bzs)
     return if shared_inline_bzs.blank? # nothing to do
 
@@ -478,9 +462,7 @@ class PackagesController < ApplicationController
       error = false
 
       new_bzs.each do |bz_id|
-        bz_query_resp = BzBug.query_bz_bug_info(bz_id,
-                                                shared_bzauth_user,
-                                                shared_bzauth_pass)
+        bz_query_resp = BzBug.query_bz_bug_info(bz_id, shared_bz_user, shared_bz_pass)
         if bz_query_resp.class == Net::HTTPOK
           bz_queried << JSON.parse(bz_query_resp.body)
         else
