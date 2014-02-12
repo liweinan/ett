@@ -340,13 +340,9 @@ class PackagesController < ApplicationController
       shared_bzauth_user, package)
 
     package.bz_bugs.each do |bz_bug|
-      if bz_bug.summary.match(/Upgrade/) &&
-          (bz_bug.bz_assignee == assignee_email ||
-              bz_bug.bz_assignee == package.assignee.bugzilla_email)
+      if upgrade_bz?(assignee_email, bz_bug, package)
 
-        unless package.assignee.bugzilla_email.blank?
-          assignee_email = package.assignee.bugzilla_email
-        end
+        assignee_email = get_bz_email(package)
 
         params_bz = {:milestone => package.task.milestone,
                      :assignee => assignee_email,
@@ -354,15 +350,9 @@ class PackagesController < ApplicationController
                      :status => BzBug::BZ_STATUS[:modified],
                      :pwd => shared_bzauth_pass}
 
-        if bz_bug.summary.match(/RHEL6/)
-          comment = "Source URL: #{package.git_url}\n" +
-              "Mead-Build: #{package.mead}\n" +
-              "Brew-Build: #{package.brew}\n"
-          params_bz[:comment] = comment
-        end
+        update_rhel6_bz(bz_bug, package, params_bz)
 
-        add_comment_milestone_status_to_bug(bz_bug.bz_id,
-                                            params_bz)
+        add_comment_milestone_status_to_bug(bz_bug.bz_id, params_bz)
 
         bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
         bz_bug.save
@@ -370,16 +360,38 @@ class PackagesController < ApplicationController
     end
   end
 
+  def get_bz_email(package)
+    unless package.assignee.bugzilla_email.blank?
+      assignee_email = package.assignee.bugzilla_email
+    end
+    assignee_email
+  end
+
+  def update_rhel6_bz(bz_bug, package, params_bz)
+    if bz_bug.summary.match(/RHEL6/)
+      comment = generate_bz_comment(package)
+      params_bz[:comment] = comment
+    end
+  end
+
+  def generate_bz_comment(package)
+    "Source URL: #{package.git_url}\n" +
+        "Mead-Build: #{package.mead}\n" +
+        "Brew-Build: #{package.brew}\n"
+  end
+
+  def upgrade_bz?(assignee_email, bz_bug, package)
+    bz_bug.summary.match(/Upgrade/) &&
+    (bz_bug.bz_assignee == assignee_email ||
+    bz_bug.bz_assignee == package.assignee.bugzilla_email)
+  end
+
   def update_bz_status(assignee_email, shared_bzauth_pass,
       shared_bzauth_user, package)
     package.bz_bugs.each do |bz_bug|
-      if bz_bug.summary.match(/Upgrade/) &&
-          (bz_bug.bz_assignee == assignee_email ||
-              bz_bug.bz_assignee == package.assignee.bugzilla_email)
+      if upgrade_bz?(assignee_email, bz_bug, package)
 
-        unless package.assignee.bugzilla_email.blank?
-          assignee_email = package.assignee.bugzilla_email
-        end
+        assignee_email = get_bz_email(package)
 
         params_bz = {:assignee => assignee_email,
                      :userid => shared_bzauth_user,
@@ -414,15 +426,9 @@ class PackagesController < ApplicationController
       shared_bzauth_user, package)
 
     package.bz_bugs.each do |bz_bug|
-      if bz_bug.summary.match(/Upgrade/) &&
-          !assignee_email.nil? &&
-          (!bz_bug.component.blank? &&
-              bz_bug.component.include?('RPMs')) &&
-          (bz_bug.keywords.include? 'Rebase')
+      if upgrade_bz2?(assignee_email, bz_bug)
 
-        unless package.assignee.bugzilla_email.blank?
-          assignee_email = package.assignee.bugzilla_email
-        end
+        assignee_email = get_bz_email(package)
 
         params_bz = {:assignee => assignee_email,
                      :userid => shared_bzauth_user,
@@ -436,6 +442,14 @@ class PackagesController < ApplicationController
         bz_bug.save
       end
     end
+  end
+
+  def upgrade_bz2?(assignee_email, bz_bug)
+    bz_bug.summary.match(/Upgrade/) &&
+    !assignee_email.nil? &&
+    (!bz_bug.component.blank? &&
+     bz_bug.component.include?('RPMs')) &&
+    (bz_bug.keywords.include? 'Rebase')
   end
 
   def update_tags(params, package)
