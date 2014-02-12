@@ -11,10 +11,7 @@ class PackagesController < ApplicationController
   # GET /packages.xml
   def index
     unless params[:task_id].blank?
-      @packages = get_packages(unescape_url(params[:task_id]),
-                               unescape_url(params[:tag]),
-                               unescape_url(params[:status]),
-                               unescape_url(params[:user]))
+      @packages = get_pacs(params)
     end
 
     respond_to do |format|
@@ -28,6 +25,13 @@ class PackagesController < ApplicationController
         end
       end
     end
+  end
+
+  def get_pacs(params)
+    get_packages(unescape_url(params[:task_id]),
+                 unescape_url(params[:tag]),
+                 unescape_url(params[:status]),
+                 unescape_url(params[:user]))
   end
 
 
@@ -88,17 +92,21 @@ class PackagesController < ApplicationController
         end
 
         format.html do
-          redirect_to(:controller => :packages,
-                      :action => :show,
-                      :id => escape_url(@package.name),
-                      :task_id => escape_url(@package.task.name),
-                      :user => params[:user])
+          show_package(params, @package)
         end
       else
         @user = params[:user]
         format.html { render :action => :new }
       end
     end
+  end
+
+  def show_package(params, package)
+    redirect_to(:controller => :packages,
+                :action => :show,
+                :id => escape_url(package.name),
+                :task_id => escape_url(package.task.name),
+                :user => params[:user])
   end
 
   def notify_package_created(params, package)
@@ -251,11 +259,7 @@ class PackagesController < ApplicationController
       if @output
         expire_all_fragments
         format.html do
-          redirect_to(:controller => :packages,
-                      :action => :show,
-                      :id => escape_url(@package.name),
-                      :task_id => escape_url(@package.task.name),
-                      :user => params[:user])
+          show_package(params, @package)
         end
         format.js
       else
@@ -702,10 +706,7 @@ class PackagesController < ApplicationController
 
     require 'faster_csv'
 
-    @packages = get_packages(unescape_url(params[:task_id]),
-                             unescape_url(params[:tag]),
-                             unescape_url(params[:status]),
-                             unescape_url(params[:user]))
+    @packages = get_pacs(params)
 
     @task = find_task(params[:task_id])
 
