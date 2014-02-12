@@ -279,37 +279,39 @@ class PackagesController < ApplicationController
 
   def update_bz_status_if_status_changed(assignee_email,
       new_status, shared_bzauth_pass, shared_bzauth_user, package)
-    unless new_status.blank?
-      if new_status.code == Status::CODES[:inprogress] &&
-          !assignee_email.blank?
+
+    if !new_status.blank? && Rails.env.production?
+      if status_in_progress(assignee_email, new_status)
 
         # the bug statuses are waiting to be updated according to
         # https://docspace.corp.redhat.com/docs/DOC-148169
         # TODO we need to write some unit tests to test all the
         # integrations with SOA
-        if Rails.env.production?
-          update_bz_status(assignee_email, shared_bzauth_pass,
-                           shared_bzauth_user, package)
-        end
-      elsif new_status.code == Status::CODES[:finished]
-        if Rails.env.production?
-          if package.task.use_mead_integration?
-            # Disable asynchronous update <- we need that data for
-            # bugzilla immediately
-            # @package.mead_action = Package::MEAD_ACTIONS[:needsync]
-            get_mead_info(package)
-            update_source_url_info(package)
-          end
-        end
+        update_bz_status(assignee_email, shared_bzauth_pass,
+                         shared_bzauth_user, package)
+      elsif status_in_finished(new_status)
+        update_mead_information(package)
 
-        # TODO: add comment with non-RHEL6 builds too
-        if Rails.env.production?
-          update_bz_status_finished(assignee_email,
-                                    shared_bzauth_pass,
-                                    shared_bzauth_user, package)
-        end
+        update_bz_status_finished(assignee_email,
+                                  shared_bzauth_pass,
+                                  shared_bzauth_user, package)
       end
     end
+  end
+
+  def update_mead_information(package)
+    if package.task.use_mead_integration?
+      get_mead_info(package)
+      update_source_url_info(package)
+    end
+  end
+
+  def status_in_finished(new_status)
+    new_status.code == Status::CODES[:finished]
+  end
+
+  def status_in_progress(assignee_email, new_status)
+    new_status.code == Status::CODES[:inprogress] && !assignee_email.blank?
   end
 
   def get_new_status(params)
