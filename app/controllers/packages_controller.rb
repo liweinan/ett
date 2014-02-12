@@ -690,16 +690,20 @@ class PackagesController < ApplicationController
     unless params[:secret_key] == 'birdistheword'
       render :status => :unauthorized, :text => 'Wrong secret key' and return
     end
-    @packages = get_packages(unescape_url(params[:task_id]), nil, nil, nil)
-    @packages.each do |package|
+    update_package_brew_nvr(params)
+    render :text => params[:task_id]
+
+  end
+
+  def update_package_brew_nvr(params)
+    packages = get_packages(unescape_url(params[:task_id]), nil, nil, nil)
+    packages.each do |package|
       brew_nvr = package.brew
       if !brew_nvr.nil? && !brew_nvr.empty?
         package.latest_brew_nvr = get_brew_name(package)
         package.save
       end
     end
-    render :text => params[:task_id]
-
   end
 
   def export_to_csv
@@ -777,16 +781,20 @@ class PackagesController < ApplicationController
       @package.time_point = 0
       @package.save
 
-      log_entry = ManualLogEntry.new
-      log_entry.start_time = Time.at(start_time)
-      log_entry.end_time = Time.at(now)
-      log_entry.who = current_user
-      log_entry.package = @package
-      log_entry.save
+      create_log_entry(now, start_time, package)
     end
     respond_to do |format|
       format.js
     end
+  end
+
+  def create_log_entry(now, start_time, package)
+    log_entry = ManualLogEntry.new
+    log_entry.start_time = Time.at(start_time)
+    log_entry.end_time = Time.at(now)
+    log_entry.who = current_user
+    log_entry.package = package
+    log_entry.save
   end
 
   def process_mead_info
