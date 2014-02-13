@@ -399,7 +399,7 @@ class Package < ActiveRecord::Base
   def need_source_url?
     build = self.build_type
     build_check = (build == 'WRAPPER') || (build == 'MEAD_ONLY')
-    has_wrapper_tag = !(self.tags.select { |tag| tag.key == 'wrapper' }).empty?
+    has_wrapper_tag = !((self.tags.select { |tag| tag.key == 'wrapper' }).empty?)
     build_check || has_wrapper_tag
   end
 
@@ -528,22 +528,23 @@ class Package < ActiveRecord::Base
   protected
 
   def all_from_packages_of(from_relationships, relationship_name)
-    packages = []
-    from_relationships.each do |from_relationship|
-      if from_relationship.relationship.name == relationship_name
-        packages << from_relationship.from_package
-        packages << all_from_packages_of(from_relationship.from_package.from_relationships, relationship_name)
-      end
-    end
-    packages.flatten.uniq
+    all_packages_of(from_relationships, relationship_name,
+                    :from_package, :from_relationships)
   end
 
   def all_to_packages_of(to_relationships, relationship_name)
+    all_packages_of(to_relationships, relationship_name,
+                    :to_package, :to_relationships)
+  end
+
+  def all_packages_of(relationships, relationship_name, pac_mtd, pac_rel_mtd)
     packages = []
-    to_relationships.each do |to_relationship|
-      if to_relationship.relationship.name == relationship_name
-        packages << to_relationship.to_package
-        packages << all_to_packages_of(to_relationship.to_package.to_relationships, relationship_name)
+    relationships.each do |relationship|
+      if relationship.relationship.name == relationship_name
+        packages << relationship.send(pac_mtd)
+        packages << all_packages_of(relationship.send(pac_mtd).send(pac_rel_mtd),
+                                         relationship_name,
+                                         pac_mtd, pac_rel_mtd)
       end
     end
     packages.flatten.uniq
