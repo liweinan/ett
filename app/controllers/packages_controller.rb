@@ -248,7 +248,7 @@ class PackagesController < ApplicationController
                                          bz_cred, package)
       ####################################################################
       ####################################################################
-      update_log_entry(last_status, last_status_changed, @package)
+      @package.update_log_entry(last_status, last_status_changed, current_user)
     end
   end
 
@@ -268,28 +268,22 @@ class PackagesController < ApplicationController
   def update_bz_status_if_status_changed(assignee_email, new_status,
       bz_cred, package)
 
-    if !new_status.blank? && Rails.env.production?
+    if !new_status.blank? # && Rails.env.production?
       if status_in_progress(assignee_email, new_status)
 
         # the bug statuses are waiting to be updated according to
         # https://docspace.corp.redhat.com/docs/DOC-148169
         # TODO we need to write some unit tests to test all the
         # integrations with SOA
-        update_bz_status(assignee_email, bz_cred, package)
+        #update_bz_status(assignee_email, bz_cred, package)
       elsif status_in_finished(new_status)
-        update_mead_information(package)
+        package.update_mead_information
 
-        update_bz_status_finished(assignee_email, bz_cred, package)
+        #update_bz_status_finished(assignee_email, bz_cred, package)
       end
     end
   end
 
-  def update_mead_information(package)
-    if package.task.use_mead_integration?
-      get_mead_info(package)
-      update_source_url_info(package)
-    end
-  end
 
   def status_in_finished(new_status)
     new_status.code == Status::CODES[:finished]
@@ -327,7 +321,7 @@ class PackagesController < ApplicationController
     package.bz_bugs.each do |bz_bug|
       if upgrade_bz?(assignee_email, bz_bug, package)
 
-        assignee_email = get_bz_email(package)
+        assignee_email = package.get_bz_email
 
         params_bz = {:milestone => package.task.milestone,
                      :assignee => assignee_email,
@@ -345,25 +339,11 @@ class PackagesController < ApplicationController
     end
   end
 
-  def get_bz_email(package)
-    assignee_email = nil
-    unless package.assignee.bugzilla_email.blank?
-      assignee_email = package.assignee.bugzilla_email
-    end
-    assignee_email
-  end
-
   def update_rhel6_bz(bz_bug, package, params_bz)
     if bz_bug.summary.match(/RHEL6/)
-      comment = generate_bz_comment(package)
+      comment = package.generate_bz_comment
       params_bz[:comment] = comment
     end
-  end
-
-  def generate_bz_comment(package)
-    "Source URL: #{package.git_url}\n" +
-        "Mead-Build: #{package.mead}\n" +
-        "Brew-Build: #{package.brew}\n"
   end
 
   def upgrade_bz?(assignee_email, bz_bug, package)
@@ -377,7 +357,7 @@ class PackagesController < ApplicationController
     package.bz_bugs.each do |bz_bug|
       if upgrade_bz?(assignee_email, bz_bug, package)
 
-        assignee_email = get_bz_email(package)
+        assignee_email = package.get_bz_email
 
         params_bz = {:assignee => assignee_email,
                      :userid => shared_bz_user,
@@ -414,7 +394,7 @@ class PackagesController < ApplicationController
     package.bz_bugs.each do |bz_bug|
       if upgrade_bz2?(assignee_email, bz_bug)
 
-        assignee_email = get_bz_email(package)
+        assignee_email = package.get_bz_email
 
         params_bz = {:assignee => assignee_email,
                      :userid => shared_bz_user,
@@ -447,7 +427,7 @@ class PackagesController < ApplicationController
   def update_inline_bz(bz_cred, shared_inline_bzs, package)
 
     shared_bz_user, shared_bz_pass = bz_cred
-    delete_all_bzs(package) if empty_list(shared_inline_bzs)
+    package.delete_all_bzs if empty_list(shared_inline_bzs)
     return if shared_inline_bzs.blank? # nothing to do
 
     Package.transaction do
@@ -485,12 +465,6 @@ class PackagesController < ApplicationController
 
   def empty_list(str)
     !str.nil? && str.blank?
-  end
-
-  def delete_all_bzs(package)
-    Package.transaction do
-      package.bz_bugs.each { |bz_bug| bz_bug.destroy }
-    end
   end
 
   def update_params_hash!(params, package)
@@ -553,19 +527,6 @@ class PackagesController < ApplicationController
       time_track.save
     end
     last_status_changed
-  end
-
-  def update_log_entry(last_status, last_status_change, package)
-    log_entry = AutoLogEntry.new
-
-    last_status_change ||= package.status_changed_at
-    log_entry.start_time = last_status_change
-    log_entry.end_time = package.status_changed_at
-    log_entry.who = current_user
-    log_entry.package = package
-    log_entry.status = last_status
-
-    log_entry.save
   end
 
   def notify_package_updated(latest_changes, params, package)
@@ -685,7 +646,7 @@ class PackagesController < ApplicationController
     packages.each do |package|
       brew_nvr = package.brew
       if !brew_nvr.nil? && !brew_nvr.empty?
-        package.latest_brew_nvr = get_brew_name(package)
+        package.latest_brew_nvr = package.get_brew_name
         package.save
       end
     end
@@ -766,26 +727,18 @@ class PackagesController < ApplicationController
       @package.time_point = 0
       @package.save
 
-      create_log_entry(now, start_time, package)
+      package.create_log_entry(start_time, now, current_user)
     end
     respond_to do |format|
       format.js
     end
   end
 
-  def create_log_entry(now, start_time, package)
-    log_entry = ManualLogEntry.new
-    log_entry.start_time = Time.at(start_time)
-    log_entry.end_time = Time.at(now)
-    log_entry.who = current_user
-    log_entry.package = package
-    log_entry.save
-  end
 
   def process_mead_info
     @package = Package.find(params[:id])
 
-    get_mead_info(@package)
+    @package.update_mead_brew_info
 
     respond_to do |format|
       format.js {
@@ -796,52 +749,6 @@ class PackagesController < ApplicationController
 
   protected
 
-  def update_source_url_info(package)
-    package.brew_scm_url = get_scm_url_brew(package)
-
-    if package.git_url.nil? || package.git_url.empty?
-      package.git_url = package.brew_scm_url
-    end
-    package.save
-  end
-
-  # get_mead_info will go get the mead nvr from the rpm repo directly if it
-  # cannot find it via the mead scheduler
-  def get_mead_info(package)
-    brew_pkg = get_brew_name(package)
-    package.brew = brew_pkg
-    if brew_pkg.blank?
-      uri = URI.parse("http://pkgs.devel.redhat.com/cgit/rpms/#{package.name}/plain/last-mead-build?h=#{package.task.candidate_tag}")
-      res = Net::HTTP.get_response(uri)
-      # TODO: error handling
-      package_old_mead = res.body if res.code == '200'
-      package_name = parse_NVR(package_old_mead)[:name]
-
-      uri = URI.parse("http://mead.usersys.redhat.com/mead-brewbridge/pkg/latest/#{package.task.candidate_tag}-build/#{package_name}")
-      res = Net::HTTP.get_response(uri)
-      package.mead = res.body if res.code == '200'
-    else
-      package.mead = get_mead_name(brew_pkg) unless brew_pkg.blank?
-    end
-
-    package.mead_action = Package::MEAD_ACTIONS[:done]
-    package.save
-  end
-
-  # based on the brew koji code, move it to package model afterwards
-  # error checking omitted
-  def parse_NVR(nvr)
-    ret = {}
-    p2 = nvr.rindex('-')
-    p1 = nvr.rindex('-', p2 - 1)
-    puts p1
-    puts p2
-    ret[:release] = nvr[(p2 + 1)..-1]
-    ret[:version] = nvr[(p1 + 1)...p2]
-    ret[:name] = nvr[0...p1]
-
-    ret
-  end
 
   def do_sync(fields)
     fields.each do |field|

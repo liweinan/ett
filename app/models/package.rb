@@ -351,6 +351,155 @@ class Package < ActiveRecord::Base
     ''
   end
 
+  def get_bz_email
+    assignee_email = nil
+    unless assignee.bugzilla_email.blank?
+      assignee_email = assignee.bugzilla_email
+    end
+    assignee_email
+  end
+
+  def generate_bz_comment
+    "Source URL: #{git_url}\n" +
+    "Mead-Build: #{mead}\n" +
+    "Brew-Build: #{brew}\n"
+  end
+
+  def update_mead_information
+    if task.use_mead_integration?
+      update_mead_brew_info
+      update_source_url_info
+    end
+  end
+
+  # TODO: move to a model
+  def get_mead_name(brew_pkg)
+    uri = URI.parse(URI.encode("#{APP_CONFIG['mead_scheduler']}/mead-brewbridge/pkg/wrapped/#{brew_pkg}"))
+    res = Net::HTTP.get_response(uri)
+
+    (res.code == '200' && !res.body.include?('ERROR')) ? res.body : nil
+  end
+
+  def create_log_entry(start_time, now, current_user)
+    log_entry = ManualLogEntry.new
+    log_entry.start_time = Time.at(start_time)
+    log_entry.end_time = Time.at(now)
+    log_entry.who = current_user
+    log_entry.package = self
+    log_entry.save
+  end
+
+  # TODO: move to a model
+  def build_type
+    Net::HTTP.get('mead.usersys.redhat.com',
+                  "/mead-scheduler/rest/package/eap6/#{self.name}/type")
+  end
+
+  # TODO: move to a model
+  def need_source_url?
+    build = self.build_type
+    build_check = (build == 'WRAPPER') || (build == 'MEAD_ONLY')
+    has_wrapper_tag = !(self.tags.select { |tag| tag.key == 'wrapper' }).empty?
+    build_check || has_wrapper_tag
+  end
+
+  def update_log_entry(last_status, last_status_change, current_user)
+    log_entry = AutoLogEntry.new
+
+    last_status_change ||= self.status_changed_at
+    log_entry.start_time = last_status_change
+    log_entry.end_time = self.status_changed_at
+    log_entry.who = current_user
+    log_entry.package = self
+    log_entry.status = last_status
+
+    log_entry.save
+  end
+
+  # get_mead_info will go get the mead nvr from the rpm repo directly if it
+  # cannot find it via the mead scheduler
+  def update_mead_brew_info
+    brew_pkg = self.get_brew_name
+    self.brew = brew_pkg
+    if brew_pkg.blank?
+      uri = URI.parse("http://pkgs.devel.redhat.com/cgit/rpms/#{self.name}/plain/last-mead-build?h=#{self.task.candidate_tag}")
+      res = Net::HTTP.get_response(uri)
+      # TODO: error handling
+      package_old_mead = res.body if res.code == '200'
+      package_name = self.parse_nvr(package_old_mead)[:name]
+
+      uri = URI.parse("http://mead.usersys.redhat.com/mead-brewbridge/pkg/latest/#{self.task.candidate_tag}-build/#{package_name}")
+      res = Net::HTTP.get_response(uri)
+      self.mead = res.body if res.code == '200'
+    else
+      self.mead = get_mead_name(brew_pkg) unless brew_pkg.blank?
+    end
+
+    self.mead_action = Package::MEAD_ACTIONS[:done]
+    self.save
+  end
+
+  def deleted_style
+    if self.deleted?
+      'text-decoration:line-through;'
+    else
+      ''
+    end
+  end
+
+  def get_scm_url_brew
+    server = XMLRPC::Client.new('brewhub.devel.redhat.com', '/brewhub', 80)
+
+    return nil if mead.nil?
+
+    begin
+      param = server.call('getBuild', mead)
+      param.nil? ? nil : server.call('getTaskRequest', param['task_id'])[0]
+    rescue XMLRPC::FaultException
+      nil
+    end
+  end
+
+  def get_brew_name(candidate_tag=nil)
+    # TODO: make the tag more robust
+    tag = candidate_tag.nil? ? "#{task.candidate_tag}-build" : candidate_tag
+
+    uri = URI.parse(URI.encode("#{APP_CONFIG['mead_scheduler']}/mead-brewbridge/pkg/latest/#{tag}/#{name}"))
+
+    res = Net::HTTP.get_response(uri)
+
+    (res.code == '200' && !res.body.include?('ERROR')) ? res.body : nil
+  end
+
+  # based on the brew koji code, move it to package model afterwards
+  # error checking omitted
+  def parse_nvr(nvr)
+    ret = {}
+    p2 = nvr.rindex('-')
+    p1 = nvr.rindex('-', p2 - 1)
+    puts p1
+    puts p2
+    ret[:release] = nvr[(p2 + 1)..-1]
+    ret[:version] = nvr[(p1 + 1)...p2]
+    ret[:name] = nvr[0...p1]
+
+    ret
+  end
+
+  def update_source_url_info
+    self.brew_scm_url = get_scm_url_brew
+
+    if self.git_url.nil? || self.git_url.empty?
+      self.git_url = self.brew_scm_url
+    end
+    save
+  end
+
+  def delete_all_bzs
+    Package.transaction do
+      bz_bugs.each { |bz_bug| bz_bug.destroy }
+    end
+  end
   # For all bugzillas associated with this package, return the one with bugzilla
   # id bz_id. If nothing is found, return nil.
   #

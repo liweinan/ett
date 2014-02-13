@@ -9,7 +9,7 @@
 <%
    if tos.size > 0
      tos.each do |to|
-%>  <span style="<%= deleted_style(to.to_package) %>">
+%>  <span style="<%= to.to_package.deleted_style %>">
 
         <%= to.relationship.to_name %> <%= link_to to.to_package.name,
                                                    :controller => :packages,
@@ -30,7 +30,7 @@
    if froms.size > 0
      froms.each do |from|
 %>
-        <span style="<%= deleted_style(from.from_package) %>">
+        <span style="<%= from.from_package.deleted_style %>">
         <%= from.relationship.from_name %> <%= link_to from.from_package.name,
                                                        :controller => :packages,
                                                        :action => :show,
