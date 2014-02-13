@@ -380,6 +380,56 @@ class Package < ActiveRecord::Base
     (res.code == '200' && !res.body.include?('ERROR')) ? res.body : nil
   end
 
+  def sync_tags
+    self.all_relationships_of('clone').each do |target_package|
+      if self.tags.blank?
+        target_package.tags = nil
+        target_package.save
+      else
+        target_tags = []
+        self.tags.each do |source_tag|
+          target_tag = Tag.find_by_key_and_task_id(source_tag.key,
+                                                   target_package.task_id)
+          if target_tag.blank?
+            target_tag = source_tag.clone
+            target_tag.task_id = target_package.task_id
+            target_tag.save
+            target_tags << target_tag
+          else
+            target_tags << target_tag
+          end
+        end
+        target_package.tags = target_tags
+        target_package.save
+      end
+    end
+  end
+
+  def sync_status
+    self.all_relationships_of('clone').each do |target_package|
+      # User has unset the status of source package, so we unset all the
+      # statuses assigned to target packages.
+      if self.status.blank?
+        target_package.status = nil
+        target_package.save
+      else
+        target_status = Status.find_in_global_scope(self.status.name,
+                                                    target_package.task.name)
+
+        if target_status.blank?
+          target_status = self.status.clone
+          target_status.task = target_package.task
+          target_status.save
+          target_package.status = target_status
+          target_package.save
+        else
+          target_package.status = target_status
+          target_package.save
+        end
+      end
+    end
+  end
+
   def create_log_entry(start_time, now, current_user)
     log_entry = ManualLogEntry.new
     log_entry.start_time = Time.at(start_time)
@@ -389,18 +439,81 @@ class Package < ActiveRecord::Base
     log_entry.save
   end
 
-  # TODO: move to a model
-  def build_type
-    Net::HTTP.get('mead.usersys.redhat.com',
-                  "/mead-scheduler/rest/package/eap6/#{self.name}/type")
+
+  def notify_package_created(params)
+    url = self.get_package_link(params, :create)
+
+    if Setting.activated?(self.task, Setting::ACTIONS[:created])
+      Notify::Package.create(current_user,
+                             url,
+                             self,
+                             Setting.all_recipients_of_package(self, nil, :create))
+    end
+
+    unless params[:div_package_create_notification_area].blank?
+      Notify::Package.create(current_user,
+                             url,
+                             self,
+                             params[:div_package_create_notification_area])
+    end
   end
 
-  # TODO: move to a model
-  def need_source_url?
-    build = self.build_type
-    build_check = (build == 'WRAPPER') || (build == 'MEAD_ONLY')
-    has_wrapper_tag = !((self.tags.select { |tag| tag.key == 'wrapper' }).empty?)
-    build_check || has_wrapper_tag
+  def notify_package_updated(latest_changes, params)
+    url = self.get_package_link(params).gsub('/edit', '')
+
+    if Setting.activated?(self.task, Setting::ACTIONS[:updated])
+      Notify::Package.update(current_user,
+                             url,
+                             self,
+                             Setting.all_recipients_of_package(self,
+                                                               current_user,
+                                                               :edit),
+                             latest_changes)
+    end
+
+    unless params[:div_package_edit_notification_area].blank?
+      Notify::Package.update(current_user,
+                             url,
+                             self,
+                             params[:div_package_edit_notification_area],
+                             latest_changes)
+    end
+  end
+
+  # mode flag needed since for mode=:create,
+  # the request_path link is wrong
+  def get_package_link(params, mode=:edit)
+    hardcoded_string = "#{APP_CONFIG['site_prefix']}tasks/#{escape_url(self.task.name)}/packages/#{escape_url(self.name)}"
+
+    if mode == :create
+      hardcoded_string
+    elsif params[:request_path].blank?
+      hardcoded_string
+    else
+      params[:request_path]
+    end
+  end
+
+  def time_track_package(last_status, last_status_changed)
+    self.status_changed_at = Time.now
+
+    if !last_status.blank? && last_status.is_time_tracked?
+      time_track = TrackTime.all(:conditions => ['package_id=? and status_id=?',
+                                                 self.id,
+                                                 last_status.id])[0]
+      time_track = TrackTime.new if time_track.blank?
+
+      time_track.package_id = self.id
+      time_track.status_id = last_status.id
+      last_status_changed ||= self.status_changed_at
+
+      time_track.time_consumed ||= 0
+      time_track.time_consumed +=
+          (self.status_changed_at.to_i - last_status_changed.to_i)/60
+
+      time_track.save
+    end
+    last_status_changed
   end
 
   def update_log_entry(last_status, last_status_change, current_user)
@@ -415,6 +528,19 @@ class Package < ActiveRecord::Base
 
     log_entry.save
   end
+
+  def build_type
+    Net::HTTP.get('mead.usersys.redhat.com',
+                  "/mead-scheduler/rest/package/eap6/#{self.name}/type")
+  end
+
+  def need_source_url?
+    build = self.build_type
+    build_check = (build == 'WRAPPER') || (build == 'MEAD_ONLY')
+    has_wrapper_tag = !((self.tags.select { |tag| tag.key == 'wrapper' }).empty?)
+    build_check || has_wrapper_tag
+  end
+
 
   # get_mead_info will go get the mead nvr from the rpm repo directly if it
   # cannot find it via the mead scheduler
@@ -493,6 +619,12 @@ class Package < ActiveRecord::Base
       self.git_url = self.brew_scm_url
     end
     save
+  end
+
+  def duplicate_package_msg
+    "Package #{self.name} already exists. Here's the " \
+    "<a href='/tasks/#{escape_url(self.task.name)}/packages/#{unescape_url(self.name)}'" \
+    " target='_blank'>link</a>."
   end
 
   def delete_all_bzs

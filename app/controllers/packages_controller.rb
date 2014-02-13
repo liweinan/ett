@@ -27,14 +27,6 @@ class PackagesController < ApplicationController
     end
   end
 
-  def get_pacs(params)
-    get_packages(unescape_url(params[:task_id]),
-                 unescape_url(params[:tag]),
-                 unescape_url(params[:status]),
-                 unescape_url(params[:user]))
-  end
-
-
   # GET /packages/1
   # GET /packages/1.xml
   def show
@@ -88,7 +80,7 @@ class PackagesController < ApplicationController
         flash[:notice] = 'Package was successfully created.'
 
         if Rails.env.production?
-          notify_package_created(params, @package)
+          @package.notify_package_created(params)
         end
 
         format.html { show_package(params, @package) }
@@ -97,38 +89,6 @@ class PackagesController < ApplicationController
         format.html { render :action => :new }
       end
     end
-  end
-
-  def show_package(params, package)
-    redirect_to(:controller => :packages,
-                :action => :show,
-                :id => escape_url(package.name),
-                :task_id => escape_url(package.task.name),
-                :user => params[:user])
-  end
-
-  def notify_package_created(params, package)
-    url = get_package_link(params, package, :create)
-
-    if Setting.activated?(package.task, Setting::ACTIONS[:created])
-      Notify::Package.create(current_user,
-                             url,
-                             package,
-                             Setting.all_recipients_of_package(package, nil, :create))
-    end
-
-    unless params[:div_package_create_notification_area].blank?
-      Notify::Package.create(current_user,
-                             url,
-                             package,
-                             params[:div_package_create_notification_area])
-    end
-  end
-
-  # list of 2 elements, first element is bz_user, and second element is
-  # bz_password
-  def bz_user_pass(params, session)
-    [extract_username(params[:bzauth_user]), session[:bz_pass]]
   end
 
   # PUT /packages/1
@@ -194,18 +154,18 @@ class PackagesController < ApplicationController
 
           do_sync(%w(name notes ver assignee brew_link group_id artifact_id project_name project_url license scm))
 
-          sync_actions(params)
+          sync_actions(params, @package)
 
           flash[:notice] = 'Package was successfully updated.'
 
           if Rails.env.production?
-            notify_package_updated(latest_changes_package, params, @package)
+            @package.notify_package_updated(latest_changes_package, params)
           end
 
           @output = true
         else
           unless @package.errors[:name].blank?
-            @error_message = duplicate_package_msg(@package)
+            @error_message = @package.duplicate_package_msg
           end
           @user = params[:user]
           @output = false
@@ -223,32 +183,43 @@ class PackagesController < ApplicationController
     end
   end
 
-  def duplicate_package_msg(package)
-    "Package #{package.name} already exists. Here's the " \
-    "<a href='/tasks/#{escape_url(package.task.name)}/packages/#{unescape_url(package.name)}'" \
-    " target='_blank'>link</a>."
+  def get_pacs(params)
+    get_packages(unescape_url(params[:task_id]),
+                 unescape_url(params[:tag]),
+                 unescape_url(params[:status]),
+                 unescape_url(params[:user]))
   end
 
-  def sync_actions(params)
-    sync_status if params[:sync_status] == 'yes'
-    sync_tags if params[:sync_tags] == 'yes'
+
+  def show_package(params, package)
+    redirect_to(:controller => :packages,
+                :action => :show,
+                :id => escape_url(package.name),
+                :task_id => escape_url(package.task.name),
+                :user => params[:user])
+  end
+
+  # list of 2 elements, first element is bz_user, and second element is
+  # bz_password
+  def bz_user_pass(params, session)
+    [extract_username(params[:bzauth_user]), session[:bz_pass]]
+  end
+
+
+  def sync_actions(params, package)
+    package.sync_status if params[:sync_status] == 'yes'
+    package.sync_tags if params[:sync_tags] == 'yes'
   end
 
   def status_changed_actions(assignee_email, last_status,
       last_status_changed, bz_cred, package, params)
     new_status = get_new_status(params)
     if new_status != last_status
-      last_status_changed = time_track_package(last_status,
-                                               last_status_changed,
-                                               package)
-      ####################################################################
-      ############################ Bugzilla ##############################
-      ####################################################################
+      last_status_changed = package.time_track_package(last_status,
+                                                       last_status_changed)
       update_bz_status_if_status_changed(assignee_email, new_status,
                                          bz_cred, package)
-      ####################################################################
-      ####################################################################
-      @package.update_log_entry(last_status, last_status_changed, current_user)
+      package.update_log_entry(last_status, last_status_changed, current_user)
     end
   end
 
@@ -352,6 +323,14 @@ class PackagesController < ApplicationController
     bz_bug.bz_assignee == package.assignee.bugzilla_email)
   end
 
+  def upgrade_bz2?(assignee_email, bz_bug)
+    bz_bug.summary.match(/Upgrade/) &&
+        !assignee_email.nil? &&
+        (!bz_bug.component.blank? &&
+            bz_bug.component.include?('RPMs')) &&
+        (bz_bug.keywords.include? 'Rebase')
+  end
+
   def update_bz_status(assignee_email, bz_cred, package)
     shared_bz_user, shared_bz_pass = bz_cred
     package.bz_bugs.each do |bz_bug|
@@ -410,13 +389,6 @@ class PackagesController < ApplicationController
     end
   end
 
-  def upgrade_bz2?(assignee_email, bz_bug)
-    bz_bug.summary.match(/Upgrade/) &&
-    !assignee_email.nil? &&
-    (!bz_bug.component.blank? &&
-     bz_bug.component.include?('RPMs')) &&
-    (bz_bug.keywords.include? 'Rebase')
-  end
 
   def update_tags(params, package)
     if params[:process_tags] == 'Yes'
@@ -505,50 +477,6 @@ class PackagesController < ApplicationController
       shared_inline_bzs.compact!
     end
     shared_inline_bzs
-  end
-
-  def time_track_package(last_status, last_status_changed, package)
-    package.status_changed_at = Time.now
-
-    if !last_status.blank? && last_status.is_time_tracked?
-      time_track = TrackTime.all(:conditions => ['package_id=? and status_id=?',
-                                                 package.id,
-                                                 last_status.id])[0]
-      time_track = TrackTime.new if time_track.blank?
-
-      time_track.package_id = package.id
-      time_track.status_id = last_status.id
-      last_status_changed ||= package.status_changed_at
-
-      time_track.time_consumed ||= 0
-      time_track.time_consumed +=
-          (package.status_changed_at.to_i - last_status_changed.to_i)/60
-
-      time_track.save
-    end
-    last_status_changed
-  end
-
-  def notify_package_updated(latest_changes, params, package)
-    url = get_package_link(params, package).gsub('/edit', '')
-
-    if Setting.activated?(package.task, Setting::ACTIONS[:updated])
-      Notify::Package.update(current_user,
-                             url,
-                             package,
-                             Setting.all_recipients_of_package(package,
-                                                               current_user,
-                                                               :edit),
-                             latest_changes)
-    end
-
-    unless params[:div_package_edit_notification_area].blank?
-      Notify::Package.update(current_user,
-                             url,
-                             package,
-                             params[:div_package_edit_notification_area],
-                             latest_changes)
-    end
   end
 
   def destroy
@@ -668,7 +596,6 @@ class PackagesController < ApplicationController
 
       # data rows
       @packages.each do |package|
-
         val = [package.name]
         if package.status.blank?
           val << ''
@@ -748,8 +675,6 @@ class PackagesController < ApplicationController
   end
 
   protected
-
-
   def do_sync(fields)
     fields.each do |field|
       if params["sync_#{field}"] == 'yes'
@@ -761,55 +686,6 @@ class PackagesController < ApplicationController
     end
   end
 
-  def sync_tags
-    @package.all_relationships_of('clone').each do |target_package|
-      if @package.tags.blank?
-        target_package.tags = nil
-        target_package.save
-      else
-        target_tags = []
-        @package.tags.each do |source_tag|
-          target_tag = Tag.find_by_key_and_task_id(source_tag.key,
-                                                   target_package.task_id)
-          if target_tag.blank?
-            target_tag = source_tag.clone
-            target_tag.task_id = target_package.task_id
-            target_tag.save
-            target_tags << target_tag
-          else
-            target_tags << target_tag
-          end
-        end
-        target_package.tags = target_tags
-        target_package.save
-      end
-    end
-  end
-
-  def sync_status
-    @package.all_relationships_of('clone').each do |target_package|
-      # User has unset the status of source package, so we unset all the
-      # statuses assigned to target packages.
-      if @package.status.blank?
-        target_package.status = nil
-        target_package.save
-      else
-        target_status = Status.find_in_global_scope(@package.status.name,
-                                                    target_package.task.name)
-
-        if target_status.blank?
-          target_status = @package.status.clone
-          target_status.task = target_package.task
-          target_status.save
-          target_package.status = target_status
-          target_package.save
-        else
-          target_package.status = target_status
-          target_package.save
-        end
-      end
-    end
-  end
 
   def clone_form_validation
     unless request.post?

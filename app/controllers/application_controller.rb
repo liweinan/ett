@@ -468,19 +468,6 @@ class ApplicationController < ActionController::Base
     res.code
   end
 
-  # mode flag needed since for mode=:create,
-  # the request_path link is wrong
-  def get_package_link(params, package, mode=:edit)
-    hardcoded_string = "#{APP_CONFIG['site_prefix']}tasks/#{escape_url(package.task.name)}/packages/#{escape_url(package.name)}"
-
-    if mode == :create
-      hardcoded_string
-    elsif params[:request_path].blank?
-      hardcoded_string
-    else
-      params[:request_path]
-    end
-  end
 
 
   def password_valid?(user, password)
