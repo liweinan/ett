@@ -3,9 +3,6 @@
   <table>
     <tr>
       <th class='content-list-head'>
-        Operations
-      </th>
-      <th class='content-list-head'>
         Task Name
       </th>
       <th class='content-list-head'>
@@ -14,19 +11,32 @@
       <th class='content-list-head'>
         Time Consumed Per Status
       </th>
+      <th class='content-list-head'>
+        More Reports
+      </th>
     </tr>
     <% TaskWorkloadSummary.all(:order => :id).each do |tws| %>
         <tr>
-          <td>Detail / Weekly Report</td>
           <td><%= tws.task.name %></td>
           <td><%= tws.total_number_of_packages %></td>
           <td>
             <%
                workload_per_status_in_minutes = JSON.parse(tws.workload_per_status_in_minutes)
-               workload_per_status_in_minutes.each do |k,v|
+               workload_per_status_in_minutes.each do |k, v|
             %>
-            <%= render :partial => 'packages/fields/auto_track_time_display', :locals => {:status => Status.find(k), :time_consumed => v, :time_to_add => 0} %><br/>
+                <%= render :partial => 'packages/fields/auto_track_time_display', :locals => {:status => Status.find(k), :time_consumed => v, :time_to_add => 0} %>
+                <br/>
             <% end %>
+          </td>
+          <td>
+            <%= link_to 'Detail Report',
+                          :controller => :packages,
+                          :task_id => escape_url(tws.task.name),
+                          :style => 'time_report' %> /
+            <%= link_to 'Weekly Report',
+                        :controller => :packages,
+                        :task_id => escape_url(tws.task.name),
+                        :style => 'workload' %>
           </td>
         </tr>
     <% end %>
