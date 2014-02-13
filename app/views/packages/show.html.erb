@@ -42,7 +42,7 @@ Tags:
 GitUrl: <%= h @package.git_url %>
 <%= render :partial => 'layouts/sep_tiny' %>
 
-<% if @package.task.use_mead_integration? %>
+<% if @package.task.use_mead_integration? && !@package.task.readonly? %>
     Brew: <%= h @package.nvr_in_errata %>
 
     <%= render :partial => 'layouts/sep_tiny' %>
@@ -51,15 +51,15 @@ GitUrl: <%= h @package.git_url %>
     <%= render :partial => 'layouts/sep_tiny' %>
 <% end %>
 
-<% if @package.status.code == 'inprogress' %>
+<% if @package.status.code == 'inprogress' && !@package.task.readonly? %>
     <%= render :partial => 'packages/fields/build' %>
 <% end %>
 
-<% if @package.task.use_mead_integration? && @package.status.code == 'finished' %>
+<% if @package.task.use_mead_integration? && @package.status.code == 'finished' && !@package.task.readonly? %>
     <%= render :partial => 'packages/fields/errata' %>
 <% end %>
 
-<% if @package.task.use_bz_integration? %>
+<% if @package.task.use_bz_integration? && !@package.task.readonly? %>
     <div id="upgrade_bz_unique">
         <%= render :partial => 'bz_bugs/upgrade_bz_bug', :locals => {:bz_bug => @package.upgrade_bz} %>
     </div>

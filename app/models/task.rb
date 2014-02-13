@@ -72,7 +72,7 @@ class Task < ActiveRecord::Base
     # So we will consider this package as active.
     # For example if the package is in 'Deleted' status, and because 'Deleted' status's 'is_track_time' is set to 'No',
     # so we think the packages marked in 'Delete' status is inactive.
-    Package.all(:conditions => ["task_id = ? and status_id in (select id from statuses where is_track_time != 'No')", id])
+    Package.all(:conditions => ["task_id = ? and status_id in (select id from statuses where is_track_time != 'No') or status_id is null", id])
   end
 
 end

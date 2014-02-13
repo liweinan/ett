@@ -12,14 +12,14 @@ class WorkloadController < ApplicationController
 
     all_tasks = Task.all
     all_tasks.each do |task|
-      active_packages = task.active_packages
+      packages = task.packages
 
       task_workload_summary = TaskWorkloadSummary.new
-      task_workload_summary.total_number_of_packages = active_packages.size
+      task_workload_summary.total_number_of_packages = packages.size
       task_workload_summary.task_id = task.id
 
       package_ids = []
-      active_packages.each do |package|
+      packages.each do |package|
         package_ids << package.id
       end
 
@@ -40,7 +40,7 @@ class WorkloadController < ApplicationController
 
 
   def summary
-    
+
   end
 
   # This method needs to be run by cron in a weekly basis
