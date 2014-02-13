@@ -166,10 +166,10 @@ class Package < ActiveRecord::Base
   #
   # Returns: string
   def to_s
-    str = "Name: #{name}\n"
-    str += "Created By: #{creator.name}(#{creator.email})\n"
-    str += "Created At: #{created_at.to_s}\n"
-    str += "Belongs To: #{task.name}\n"
+    str = "Name: #{name}\n" \
+          "Created By: #{creator.name}(#{creator.email})\n" \
+          "Created At: #{created_at.to_s}\n" \
+          "Belongs To: #{task.name}\n"
     unless assignee.blank?
       str += "Assignee: #{assignee.name}(#{assignee.email})\n"
     end
