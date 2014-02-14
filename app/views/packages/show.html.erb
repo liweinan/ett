@@ -1,6 +1,11 @@
 <h2>
 <span style="<%= deleted_style(@package) %>">
-<%= h @package.name %>
+
+ <% if has_task_and_readonly? @package.task.name %>
+    <h2 style="color: red;">This package is read only</h2>
+<% end %>
+
+  <%= h @package.name %>
   @<%= link_to @package.task.name, :controller => 'packages', :action => 'index', :task_id => escape_url(@package.task.name) %>
 </span>
 </h2>
