@@ -8,17 +8,39 @@ class WorkloadController < ApplicationController
   def generate_task_workload_summary_report
     # Delete older data
     ActiveRecord::Base.connection.execute("delete from task_workload_summaries")
-    ActiveRecord::Base.connection.execute("delete from task_workload_per_package_summaries")
+    #ActiveRecord::Base.connection.execute("delete from task_workload_per_package_summaries")
 
     all_tasks = Task.all
     all_tasks.each do |task|
-      active_packages = task.active_packages
+      packages = task.packages
 
       task_workload_summary = TaskWorkloadSummary.new
-      task_workload_summary.total_number_of_packages = active_packages.size
+      task_workload_summary.total_number_of_packages = packages.size
+      task_workload_summary.task_id = task.id
 
+      package_ids = []
+      packages.each do |package|
+        package_ids << package.id
+      end
 
+      workload_per_status_in_minutes = Hash.new
+
+      track_times = TrackTime.all(:conditions => ["package_id in (?)", package_ids])
+      track_times.each do |track_time|
+        if workload_per_status_in_minutes[track_time.status_id].blank?
+          workload_per_status_in_minutes[track_time.status_id] = 0
+        end
+        workload_per_status_in_minutes[track_time.status_id] += track_time.time_consumed
+      end
+
+      task_workload_summary.workload_per_status_in_minutes = workload_per_status_in_minutes.to_json
+      task_workload_summary.save
     end
+  end
+
+
+  def summary
+
   end
 
   # This method needs to be run by cron in a weekly basis

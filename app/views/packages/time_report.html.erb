@@ -1,5 +1,5 @@
 <% @task = Task.find_by_name(unescape_url(params[:task_id])) %>
-<h2><%= @task.name %></h2>
+<h2>Detail report of <%= @task.name %></h2>
 
 <%= render :partial => 'layouts/sep'%>
 
@@ -10,8 +10,7 @@
     <th class='content-list-head'>Status</th>
     <th class='content-list-head'>Tags</th>
     <th class='content-list-head'>Assignee</th>
-    <th class='content-list-head'>Automatic Time Track</th>
-    <th class='content-list-head'>Manual Time Track</th>
+    <th class='content-list-head'>Time Spent Per Package</th>
 </tr>
 <% @packages.each do |package| %>
     <tr>
@@ -20,7 +19,6 @@
       <%= render :partial => 'packages/index/tag', :locals => {:package => package} %>
       <%= render :partial => 'packages/index/user', :locals => {:package => package} %>
       <%= render :partial => 'packages/index/auto_tt', :locals => {:package => package} %>
-      <%= render :partial => 'packages/index/manual_tt', :locals => {:package => package} %>
     </tr>
 <% end %>
 </table>

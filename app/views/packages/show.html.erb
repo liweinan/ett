@@ -1,10 +1,12 @@
 <h2>
-<span style="<%= @package.deleted_style %>">
-<%= h @package.name %>
-  @<%= link_to @package.task.name,
-               :controller => 'packages',
-               :action => 'index',
-               :task_id => escape_url(@package.task.name) %>
+<span style="<%= deleted_style(@package) %>">
+
+ <% if has_task_and_readonly? @package.task.name %>
+    <h2 style="color: red;">This package is read only</h2>
+<% end %>
+
+  <%= h @package.name %>
+  @<%= link_to @package.task.name, :controller => 'packages', :action => 'index', :task_id => escape_url(@package.task.name) %>
 </span>
 </h2>
 <%= render :partial => 'packages/fields/mead_sync' %>
@@ -45,7 +47,7 @@ Tags:
 GitUrl: <%= h @package.git_url %>
 <%= render :partial => 'layouts/sep_tiny' %>
 
-<% if @package.task.use_mead_integration? %>
+<% if @package.task.use_mead_integration? && !@package.task.readonly? %>
     Brew: <%= h @package.nvr_in_errata %>
 
     <%= render :partial => 'layouts/sep_tiny' %>
@@ -54,18 +56,17 @@ GitUrl: <%= h @package.git_url %>
     <%= render :partial => 'layouts/sep_tiny' %>
 <% end %>
 
-<% if @package.status.code == 'inprogress' %>
+<% if @package.status.code == 'inprogress' && !@package.task.readonly? %>
     <%= render :partial => 'packages/fields/build' %>
 <% end %>
 
-<% if @package.task.use_mead_integration? && @package.status.code == 'finished' %>
+<% if @package.task.use_mead_integration? && @package.status.code == 'finished' && !@package.task.readonly? %>
     <%= render :partial => 'packages/fields/errata' %>
 <% end %>
 
-<% if @package.task.use_bz_integration? %>
+<% if @package.task.use_bz_integration? && !@package.task.readonly? %>
     <div id="upgrade_bz_unique">
-        <%= render :partial => 'bz_bugs/upgrade_bz_bug',
-                   :locals => {:bz_bug => @package.upgrade_bz} %>
+        <%= render :partial => 'bz_bugs/upgrade_bz_bug', :locals => {:bz_bug => @package.upgrade_bz} %>
     </div>
 <% end %>
 
@@ -76,18 +77,12 @@ GitUrl: <%= h @package.git_url %>
 
 <% unless @package.task.readonly? %>
     <% if can_edit_package? @package %>
-        <%= link_to 'Edit', :controller => 'packages',
-                    :action => 'edit',
-                    :id => escape_url(@package.name) %>
+        <%= link_to 'Edit', :controller => 'packages', :action => 'edit', :id => escape_url(@package.name) %>
     <% end %>
 
     <% if can_manage? %>
         <% unless @package.deleted? %>
-            | <%= link_to 'Clone',
-                          :controller => :packages, :action => :clone,
-                          :id => escape_url(@package.name),
-                          :task_id => escape_url(@package.task.name) %>
-
+            | <%= link_to 'Clone', :controller => :packages, :action => :clone, :id => escape_url(@package.name), :task_id => escape_url(@package.task.name) %>
             | <%= link_to 'Delete', @package,
                           :confirm => "Are you sure to delete #{escape_url(@package.name)}?",
                           :method => :delete %>
@@ -106,14 +101,13 @@ GitUrl: <%= h @package.git_url %>
     <%= render :partial => 'layouts/sep' %>
 <% end %>
 <% if @package.task.use_bz_integration? %>
-    <%= render :partial => 'packages/bz_bugs',
-               :locals => {:package => @package} %>
+    <%= render :partial => 'packages/bz_bugs', :locals => {:package => @package} %>
     <%= render :partial => 'layouts/sep' %>
 <% end %>
 <%= render :partial => 'changelog' %>
 <%= render :partial => 'layouts/sep' %>
 
-<%= render :partial => 'comments/index' %>
+<%= render :partial => "comments/index" %>
 <% if logged_in? && !@package.task.readonly? %>
-    <%= render :partial => 'comments/new' %>
+    <%= render :partial => "comments/new" %>
 <% end %>
