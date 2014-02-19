@@ -239,7 +239,7 @@ class PackagesController < ApplicationController
           # TODO: we don't check whether the bz_bug assignee is the same as the old
           # one. Will have to fix this someday
           if Rails.env.production?
-            if old_assignee_email != assignee_email
+            if (old_assignee_email != assignee_email) && !assignee_email.blank?
               @package.bz_bugs.each do |bz_bug|
                 if bz_bug.summary.match(/Upgrade/) &&
                    !assignee_email.nil? &&
