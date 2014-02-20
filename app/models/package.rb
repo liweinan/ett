@@ -458,7 +458,7 @@ class Package < ActiveRecord::Base
   end
 
 
-  def notify_package_created(params)
+  def notify_package_created(params, current_user)
     url = self.get_package_link(params, :create)
 
     if Setting.activated?(self.task, Setting::ACTIONS[:created])
@@ -476,7 +476,7 @@ class Package < ActiveRecord::Base
     end
   end
 
-  def notify_package_updated(latest_changes, params)
+  def notify_package_updated(latest_changes, params, current_user)
     url = self.get_package_link(params).gsub('/edit', '')
 
     if Setting.activated?(self.task, Setting::ACTIONS[:updated])
