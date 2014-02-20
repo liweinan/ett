@@ -368,21 +368,8 @@ class ApplicationController < ActionController::Base
     session[:bz_pass] = pwd if session[:bz_pass].blank? || session[:bz_pass] != pwd
   end
 
-  # TODO: move me to a model
-  # bz_bug_status_update_url: "http:/mead.usersys.redhat.com/mead-bzbridge/bug/status/<id>?oneway=<oneway>&status=<status>&assignee=<assignee>&userid=<userid>&pwd=<pwd>"
-  def generate_bug_status_update_url(id, oneway, params)
-    link = APP_CONFIG['mead_scheduler'] +
-        BzBug.bz_bug_status_update_url.gsub('<id>', id).gsub('<oneway>', oneway)
-
-    params.each do |key, value|
-      link += "&#{key}=#{URI::encode(value)}"
-    end
-
-    link
-  end
-
   # TODO: move me to model
-  def generate_bug_summary_update_url(id, oneway, params)
+  def get_bz_update_link(id, oneway, params)
     link = APP_CONFIG['mead_scheduler'] +
         APP_CONFIG['bz_bug_summary_update_url'].gsub('<id>', id).gsub('<oneway>', oneway)
 
@@ -400,45 +387,10 @@ class ApplicationController < ActionController::Base
     (!params[:ubbs_user].blank? && !params[:ubbs_pwd].blank?)
   end
 
-
-  # TODO: move to a model
-  def update_bug(bz_id, oneway, params)
+  def set_bz_upstream_fields(bz_id, oneway, params)
     uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
-
-    req = Net::HTTP::Post.new(generate_bug_status_update_url(
-                                  bz_id, oneway, params))
-
-    puts generate_bug_status_update_url(bz_id, oneway, params)
-
-    Net::HTTP.start(uri.host, uri.port) do |http|
-      http.request(req)
-    end
-  end
-
-  # TODO: move to a model
-  def update_bug_summary(bz_id, oneway, params)
-    uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
-
-    req = Net::HTTP::Put.new(generate_bug_summary_update_url(
-                                  bz_id, oneway, params))
-
+    req = Net::HTTP::Put.new(get_bz_update_link(bz_id, oneway, params))
     Net::HTTP.start(uri.host, uri.port) { |http| http.request(req) }
-  end
-
-  # TODO: move to a model
-  def add_comment_milestone_status_to_bug(bz_id, params)
-    req_link = "/mead-bzbridge/bug/#{bz_id}?oneway=false"
-
-    params.each do |key, value|
-      req_link += "&#{key}=#{URI::encode(value)}" if value != nil
-    end
-
-    uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
-    req = Net::HTTP::Put.new(req_link)
-
-    res = Net::HTTP.start(uri.host, uri.port) { |http| http.request(req) }
-
-    puts res.response
   end
 
   def current_bzuser(params)

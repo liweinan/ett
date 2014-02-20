@@ -155,18 +155,6 @@ class BzBug < ActiveRecord::Base
     end
   end
 
-  # Get the mead scheduler endpoint for updating current bugzillas. The endpoint
-  # depends on whether we are in production or development.
-  #
-  # Returns: string
-  def self.bz_bug_status_update_url
-    if Rails.env.production?
-      return APP_CONFIG['bz_bug_status_update_url']
-    else
-      return APP_CONFIG['bz_bug_status_update_url_mocked']
-    end
-  end
-
   def self.extract_bz_bug_info(body)
     #  @response.body
     # "999999: Upgrade jboss-aggregator to 7.2.0.Final-redhat-7 (MOCK)"

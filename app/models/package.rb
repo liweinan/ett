@@ -156,10 +156,11 @@ class Package < ActiveRecord::Base
   # Returns: List of BzBugs objects
   def upgrade_bz
     BzBug.all(:conditions =>
-                  ['package_id = ? and summary like ? and component = ?',
+                  ['package_id = ? and summary like ? and component = ? and keywords like ?',
                     self.id,
                     "%Upgrade%#{self.name}%",
-                    'RPMs'])
+                    'RPMs',
+                    '%Rebase%'])
   end
 
   # Return the string representation of the object
@@ -353,9 +354,13 @@ class Package < ActiveRecord::Base
 
   def get_bz_email
     assignee_email = nil
-    unless assignee.bugzilla_email.blank?
+
+    if assignee.bugzilla_email.blank?
+      assignee_email = assignee.email unless assignee.nil?
+    else
       assignee_email = assignee.bugzilla_email
     end
+
     assignee_email
   end
 
