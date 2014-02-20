@@ -56,11 +56,11 @@ GitUrl: <%= h @package.git_url %>
     <%= render :partial => 'layouts/sep_tiny' %>
 <% end %>
 
-<% if @package.status.code == 'inprogress' && !@package.task.readonly? %>
+<% if @package.status && @package.status.code == 'inprogress' && !@package.task.readonly? %>
     <%= render :partial => 'packages/fields/build' %>
 <% end %>
 
-<% if @package.task.use_mead_integration? && @package.status.code == 'finished' && !@package.task.readonly? %>
+<% if @package.task.use_mead_integration? && @package.status && @package.status.code == 'finished' && !@package.task.readonly? %>
     <%= render :partial => 'packages/fields/errata' %>
 <% end %>
 
