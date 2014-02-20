@@ -1,4 +1,4 @@
 <% disabled ||= false %>
 <% Setting::ACTIONS.each do |k, v| %>
-    <%= check_box_tag("actions[]", v, (@setting.actions & v > 0), :disabled => disabled) %> - <%= t "action_#{k}" %><br/>
+    <%= check_box_tag('actions[]', v, (@setting.actions & v > 0), :disabled => disabled) %> - <%= t "action_#{k}" %><br/>
 <% end %>

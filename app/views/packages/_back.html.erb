@@ -1,5 +1,8 @@
 <% if has_task? %>
-    <%= link_to 'Back', :controller => :packages, :action => :index, :task_id => params[:task_id] %>
+    <%= link_to 'Back',
+                :controller => :packages,
+                :action => :index,
+                :task_id => params[:task_id] %>
 <% else %>
     <%= link_to 'Back', packages_path %>
 <% end %>

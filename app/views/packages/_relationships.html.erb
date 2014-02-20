@@ -9,10 +9,17 @@
 <%
    if tos.size > 0
      tos.each do |to|
-%>  <span style="<%= deleted_style(to.to_package) %>">
+%>  <span style="<%= to.to_package.deleted_style %>">
 
-        <%= to.relationship.to_name %> <%= link_to to.to_package.name, :controller => :packages, :action => :show, :id => escape_url(to.to_package.name), :task_id => escape_url(to.to_package.task.name) %>
-  @<%= link_to (to.to_package.task.name), :controller => :packages, :action => :index, :task_id => escape_url(to.to_package.task.name) %>
+        <%= to.relationship.to_name %> <%= link_to to.to_package.name,
+                                                   :controller => :packages,
+                                                   :action => :show,
+                                                   :id => escape_url(to.to_package.name),
+                                                   :task_id => escape_url(to.to_package.task.name) %>
+  @<%= link_to (to.to_package.task.name),
+               :controller => :packages,
+               :action => :index,
+               :task_id => escape_url(to.to_package.task.name) %>
   </span>
         <%= render :partial => 'layouts/sep' %>
     <%
@@ -23,9 +30,16 @@
    if froms.size > 0
      froms.each do |from|
 %>
-        <span style="<%= deleted_style(from.from_package) %>">
-        <%= from.relationship.from_name %> <%= link_to from.from_package.name, :controller => :packages, :action => :show, :id => escape_url(from.from_package.name), :task_id => escape_url(from.from_package.task.name) %>
-          @<%= link_to (from.from_package.task.name), :controller => :packages, :action => :index, :task_id => escape_url(from.from_package.task.name) %>
+        <span style="<%= from.from_package.deleted_style %>">
+        <%= from.relationship.from_name %> <%= link_to from.from_package.name,
+                                                       :controller => :packages,
+                                                       :action => :show,
+                                                       :id => escape_url(from.from_package.name),
+                                                       :task_id => escape_url(from.from_package.task.name) %>
+          @<%= link_to (from.from_package.task.name),
+                       :controller => :packages,
+                       :action => :index,
+                       :task_id => escape_url(from.from_package.task.name) %>
           </span>
         <%= render :partial => 'layouts/sep' %>
     <%

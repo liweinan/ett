@@ -44,11 +44,24 @@ class AllowedStatusesController < ApplicationController
 
     respond_to do |format|
       if @allowed_status.save
-        format.html { redirect_to(@allowed_status, :notice => 'AllowedStatus was successfully created.') }
-        format.xml  { render :xml => @allowed_status, :status => :created, :location => @allowed_status }
+
+        format.html do
+          redirect_to(@allowed_status,
+                      :notice => 'AllowedStatus was successfully created.')
+        end
+
+        format.xml do
+          render :xml => @allowed_status,
+                 :status => :created,
+                 :location => @allowed_status
+        end
+
       else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @allowed_status.errors, :status => :unprocessable_entity }
+        format.html { render :action => 'new' }
+        format.xml do
+          render :xml => @allowed_status.errors,
+                 :status => :unprocessable_entity
+        end
       end
     end
   end
@@ -63,8 +76,11 @@ class AllowedStatusesController < ApplicationController
         format.html { redirect_to(@allowed_status, :notice => 'AllowedStatus was successfully updated.') }
         format.xml  { head :ok }
       else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @allowed_status.errors, :status => :unprocessable_entity }
+        format.html { render :action => 'edit' }
+        format.xml do
+          render :xml => @allowed_status.errors,
+                 :status => :unprocessable_entity
+        end
       end
     end
   end

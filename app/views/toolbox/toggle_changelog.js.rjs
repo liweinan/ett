@@ -1,7 +1,7 @@
 pac_id = params[:id]
-btn = "toggle_changelog_btn"
+btn = 'toggle_changelog_btn'
 btn_val = params[:btn_val]
-div = "toggle_changelog_area"
+div = 'toggle_changelog_area'
 @package = Package.find(pac_id)
 
 if btn_val == '[SHOW]'

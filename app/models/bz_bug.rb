@@ -25,6 +25,9 @@ class BzBug < ActiveRecord::Base
 
   # Creates a new bz_bug entry in the database based on the information provided
   #
+  # Parameter is generally obtained from querying the bugzilla using the
+  # appropriate method
+  #
   # Params:
   # +bz_info+:: hash of key and value strings. The following keys are required:
   #             id, summary, status, assignee, component, keywords (array of
@@ -149,18 +152,6 @@ class BzBug < ActiveRecord::Base
       return URI.parse(APP_CONFIG['bz_bug_creation_url'])
     else
       return URI.parse(APP_CONFIG['bz_bug_creation_url_mocked'])
-    end
-  end
-
-  # Get the mead scheduler endpoint for updating current bugzillas. The endpoint
-  # depends on whether we are in production or development.
-  #
-  # Returns: string
-  def self.bz_bug_status_update_url
-    if Rails.env.production?
-      return APP_CONFIG['bz_bug_status_update_url']
-    else
-      return APP_CONFIG['bz_bug_status_update_url_mocked']
     end
   end
 

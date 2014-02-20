@@ -13,10 +13,10 @@
 
 <% @task.tags.each do |tag| %>
     <% if package.blank? %>
-        <label><%= tag.key %> - <%= check_box_tag("tags[]", tag.key, false) %></label> <%= sep %>
+        <label><%= tag.key %> - <%= check_box_tag('tags[]', tag.key, false) %></label> <%= sep %>
     <% else %>
         <% assignment = Assignment.find_by_package_id_and_tag_id(package.id, tag.id) %>
-        <label><%= tag.key %> - <%= check_box_tag("tags[]", tag.key, assignment != nil) %></label> <%= sep %>
+        <label><%= tag.key %> - <%= check_box_tag('tags[]', tag.key, assignment != nil) %></label> <%= sep %>
     <% end %>
 <% end %>
 

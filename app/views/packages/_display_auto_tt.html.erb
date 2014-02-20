@@ -1,4 +1,5 @@
-<% auto_track_times=TrackTime.all(:conditions => "package_id = #{package.id}", :order => "status_id") %>
+<% auto_track_times=TrackTime.all(:conditions => "package_id = #{package.id}",
+                                  :order => 'status_id') %>
 <% auto_track_times.each do |tt| %>
     <% if tt.status.is_track_time? %>
         <%
@@ -8,7 +9,10 @@
            end
         %>
 
-        <%= render :partial => 'packages/fields/auto_track_time_display', :locals => {:status => tt.status, :time_consumed => tt.time_consumed, :time_to_add => time_to_add} %>
+        <%= render :partial => 'packages/fields/auto_track_time_display',
+                   :locals => {:status => tt.status,
+                               :time_consumed => tt.time_consumed,
+                               :time_to_add => time_to_add} %>
     <% end %>
 <% end %>
 
@@ -29,6 +33,9 @@
         <% else %>
             <% time_to_add = (Time.now.to_i - package.status_changed_at.to_i)/60 %>
         <% end %>
-        <%= render :partial => 'packages/fields/auto_track_time_display', :locals => {:status => package.status, :time_consumed => 0, :time_to_add => time_to_add} %>
+        <%= render :partial => 'packages/fields/auto_track_time_display',
+                   :locals => {:status => package.status,
+                               :time_consumed => 0,
+                               :time_to_add => time_to_add} %>
     <% end %>
 <% end %>

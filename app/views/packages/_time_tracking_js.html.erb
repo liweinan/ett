@@ -8,28 +8,28 @@
                 indicator = document.getElementById('manual_time_track_component_' + pac_id + '_indicator');
             }
             new Ajax.Request("/packages/start_progress/" + pac_id,
-                    {
-                        asynchronous: true,
-                        evalScripts: true,
-                        onLoading: function (request) {
-                            if (indicator) {
-                                Element.show(indicator);
-                            }
-                        },
-                        onSuccess: function (response) {
-                            var div1 = document.getElementById('manual_time_track_component');
-                            if (div1) {
-                                new Effect.Highlight(div1);
-                            }
-                            if (indicator) {
-                                Element.hide(indicator);
-                            }
-                        },
-                        parameters: {
-                            'style': style,
-                            'div': div,
-                            'authenticity_token': '<%=form_authenticity_token%>'}
-                    });
+                {
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function (request) {
+                        if (indicator) {
+                            Element.show(indicator);
+                        }
+                    },
+                    onSuccess: function (response) {
+                        var div1 = document.getElementById('manual_time_track_component');
+                        if (div1) {
+                            new Effect.Highlight(div1);
+                        }
+                        if (indicator) {
+                            Element.hide(indicator);
+                        }
+                    },
+                    parameters: {
+                        'style': style,
+                        'div': div,
+                        'authenticity_token': '<%=form_authenticity_token%>'}
+                });
         }
 
         function stopProgress(pac_id, style, div) {
@@ -41,34 +41,34 @@
             }
 
             new Ajax.Request("/packages/stop_progress/" + pac_id,
-                    {
-                        asynchronous: true,
-                        evalScripts: true,
-                        onLoading: function (request) {
-                            if (indicator) {
-                                Element.show(indicator);
-                            }
-                        },
-                        onSuccess: function (response) {
-                            var div1 = document.getElementById('manual_time_track_component');
-                            var div2 = document.getElementById('manual_tracked_time');
-                            if (div1) {
-                                new Effect.Highlight(div1);
-                            }
+                {
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function (request) {
+                        if (indicator) {
+                            Element.show(indicator);
+                        }
+                    },
+                    onSuccess: function (response) {
+                        var div1 = document.getElementById('manual_time_track_component');
+                        var div2 = document.getElementById('manual_tracked_time');
+                        if (div1) {
+                            new Effect.Highlight(div1);
+                        }
 
-                            if (div2) {
-                                new Effect.Highlight(div2);
-                            }
+                        if (div2) {
+                            new Effect.Highlight(div2);
+                        }
 
-                            if (indicator) {
-                                Element.hide(indicator);
-                            }
-                        },
-                        parameters: {
-                            'style': style,
-                            'div': div,
-                            'authenticity_token': '<%=form_authenticity_token%>'}
-                    });
+                        if (indicator) {
+                            Element.hide(indicator);
+                        }
+                    },
+                    parameters: {
+                        'style': style,
+                        'div': div,
+                        'authenticity_token': '<%=form_authenticity_token%>'}
+                });
         }
 
 

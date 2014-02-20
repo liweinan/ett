@@ -1,2 +1,4 @@
 package = Package.find(params[:id])
-page.replace_html "comment_area_#{params[:id]}", :partial => 'comments/new_mini', :locals => {:package => package}
+page.replace_html "comment_area_#{params[:id]}",
+                  :partial => 'comments/new_mini',
+                  :locals => {:package => package}

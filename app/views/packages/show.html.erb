@@ -1,5 +1,5 @@
 <h2>
-<span style="<%= deleted_style(@package) %>">
+<span style="<%= @package.deleted_style %>">
 
  <% if has_task_and_readonly? @package.task.name %>
     <h2 style="color: red;">This package is read only</h2>

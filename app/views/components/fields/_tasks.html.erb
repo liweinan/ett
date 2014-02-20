@@ -1,8 +1,8 @@
 <% Task.all(:order => 'lower(name)').each do |task| %>
 <% if @task_names.blank? %>
-        <label><%= check_box_tag("task_names[]", task.name, false) %> <%= task.name %></label>
+        <label><%= check_box_tag('task_names[]', task.name, false) %> <%= task.name %></label>
 <% else %>
-        <label><%= check_box_tag("task_names[]", task.name, @task_names.include?(task.name)) %> <%= task.name %></label>
+        <label><%= check_box_tag('task_names[]', task.name, @task_names.include?(task.name)) %> <%= task.name %></label>
 <% end %>
         <%= render :partial => 'layouts/sep_tiny' %>
 <% end %>

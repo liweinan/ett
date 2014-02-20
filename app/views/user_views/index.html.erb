@@ -15,10 +15,18 @@
     <% @packages.each do |package| %>
         <tr>
           <td style='font-size:10px'>
-            <%= link_to "#{package.name}", :controller => 'packages', :action => 'show', :id => "#{escape_url(package.name)}", :task_id => escape_url(package.task.name), :user => params[:user] %>
+            <%= link_to "#{package.name}",
+                        :controller => 'packages',
+                        :action => 'show',
+                        :id => "#{escape_url(package.name)}",
+                        :task_id => escape_url(package.task.name),
+                        :user => params[:user] %>
           </td>
           <td style='font-size:10px'>
-            <%= link_to package.task.name, :controller => 'packages', :action => 'index', :task_id => package.task.name %>
+            <%= link_to package.task.name,
+                        :controller => 'packages',
+                        :action => 'index',
+                        :task_id => package.task.name %>
           </td>
           <td style='font-size:10px'>
             <% if package.status %>

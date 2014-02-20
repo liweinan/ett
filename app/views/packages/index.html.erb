@@ -196,19 +196,19 @@ Statuses:
                 });
 
             new Ajax.Request('/toolbox/get_pac_btns',
-                    {
-                        asynchronous: true,
-                        evalScripts: true,
-                        onSuccess: function (response) {
-                            Element.hide('inline_editor_indicator');
-                            document.getElementById('inline_editor_switch').innerHTML = '<span style="color:#228b22;">[INLINE EDITOR ENABLED]</span>';
-                            new Effect.Highlight('inline_editor_switch', { duration: 1 });
+                {
+                    asynchronous: true,
+                    evalScripts: true,
+                    onSuccess: function (response) {
+                        Element.hide('inline_editor_indicator');
+                        document.getElementById('inline_editor_switch').innerHTML = '<span style="color:#228b22;">[INLINE EDITOR ENABLED]</span>';
+                        new Effect.Highlight('inline_editor_switch', { duration: 1 });
 
-                        },
-                        parameters: {
-                            'ids': pacBtns.toString(),
-                            'authenticity_token': '<%=form_authenticity_token%>'}
-                    });
+                    },
+                    parameters: {
+                        'ids': pacBtns.toString(),
+                        'authenticity_token': '<%=form_authenticity_token%>'}
+                });
         }
 
         Event.observe(window, 'load', function () {

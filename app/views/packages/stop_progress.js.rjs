@@ -1,9 +1,20 @@
 if params[:style] == 'list'
-  page.replace_html params[:div], :partial => 'packages/fields/bar_start_progress', :locals => {:package => @package, :div => params[:div]}
+  page.replace_html params[:div],
+                    :partial => 'packages/fields/bar_start_progress',
+                    :locals => {:package => @package, :div => params[:div]}
+
   page.visual_effect :highlight, params[:div]
 else
-  page.replace_html 'manual_time_track_component', :partial => '/packages/fields/start_progress', :locals => {:package => @package}
-  page.replace_html 'manual_tracked_time', display_track_time(@package.time_consumed)
-  page.replace_html 'manual_time_track_current_status', :partial => '/packages/fields/progress_stopped', :locals => {:package => @package}
+  page.replace_html 'manual_time_track_component',
+                    :partial => '/packages/fields/start_progress',
+                    :locals => {:package => @package}
+
+  page.replace_html 'manual_tracked_time',
+                    display_track_time(@package.time_consumed)
+
+  page.replace_html 'manual_time_track_current_status',
+                    :partial => '/packages/fields/progress_stopped',
+                    :locals => {:package => @package}
+
   page.visual_effect :highlight, 'manual_time_track_current_status'
 end

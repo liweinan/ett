@@ -6,6 +6,7 @@ end %>
     Status
   </td>
   <td style="text-align:left;">
-    <%= render :partial => "statuses/selection_for_tag", :locals => { :package => @package, :form => f }%>
+    <%= render :partial => 'statuses/selection_for_tag',
+               :locals => { :package => @package, :form => f }%>
   </td>
 </tr>

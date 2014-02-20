@@ -6,7 +6,7 @@
         Tag
       </td>
       <td colspan style="text-align:left;">
-        <%= f.collection_select :task_id, Task.all(:order => "name"), :id, :name %>
+        <%= f.collection_select :task_id, Task.all(:order => 'name'), :id, :name %>
       </td>
     </tr>
 <% end %>

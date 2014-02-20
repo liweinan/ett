@@ -2,26 +2,29 @@
     <% if @error.nil? %>
         <div style="text-align: left;">
         <% form_remote_tag(
-                   :url => {:controller => "toolbox", :action => "package_ajax_req"},
+                   :url => {:controller => 'toolbox', :action => 'package_ajax_req'},
                    :loading => "Element.show('spinner_build_#{@package_id}');",
                    :success => "Element.hide('spinner_build_#{@package_id}');
                ") do %>
               <%= hidden_field_tag :package_id, @package_id %>
-              <p> * <%= raw(Time.new.strftime("%a %b %d %Y ") + @pac.assignee.name + " &lt" + @pac.assignee.email + "&gt") %></p>
-              <%= text_area(:clentry, :text, :cols => 80, :rows => 10, :placeholder => "Changelog Entry") %>
+              <p> * <%= raw(Time.new.strftime('%a %b %d %Y ') + @pac.assignee.name + ' &lt' + @pac.assignee.email + '&gt') %></p>
+              <%= text_area(:clentry, :text,
+                            :cols => 80, :rows => 10,
+                            :placeholder => 'Changelog Entry') %>
               <br />
-              <%= label_tag("Wrapper Build Only") %>
-              <%= check_box_tag(:wrapper_build, "1") %>
+              <%= label_tag('Wrapper Build Only') %>
+              <%= check_box_tag(:wrapper_build, '1') %>
               <br />
               <br />
               <%= submit_tag 'Build This Package Using Mead-Scheduler' %>
-              <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "spinner_build_#{@package_id}"} %>
+              <%= render :partial => 'layouts/progress_indicator',
+                         :locals => {:progress_indicator_id => "spinner_build_#{@package_id}"} %>
         <% end %>
         </div>
 
     <% else %>
         <p><%= @error %></p>
         <center>
-            <%= button_to_function "Close", "TINY.box.hide()" %>
+            <%= button_to_function 'Close', 'TINY.box.hide()' %>
         </center>
     <% end %>

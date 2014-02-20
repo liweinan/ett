@@ -1,5 +1,6 @@
 <script type="text/javascript">
-    // After page loaded, do some initial scannings and process package's bz bugs according to https://docspace.corp.redhat.com/docs/DOC-148169.
+    // After page loaded, do some initial scannings and process package's bz
+    // bugs according to https://docspace.corp.redhat.com/docs/DOC-148169.
     <% if has_bz_auth_info? && @package.task.use_bz_integration? %>
     document.observe("dom:loaded", function () {
 //        processMeadInfo(); this is a sync operation now
@@ -10,20 +11,20 @@
     function processMeadInfo() {
         if (document.getElementById('mead_sync').value == '<%=Package::MEAD_ACTIONS[:needsync]%>') {
             new Ajax.Request('/packages/process_mead_info/<%=@package.id%>',
-                    {
-                        method: 'GET',
-                        asynchronous: true,
-                        evalScripts: true,
-                        onLoading: function () {
-                            Element.show('update_mead_info_indicator');
-                        },
-                        onFailure: function () {
-                            Element.hide('update_mead_info_indicator');
-                        },
-                        onSuccess: function () {
-                            Element.hide('update_mead_info_indicator');
-                        }
+                {
+                    method: 'GET',
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function () {
+                        Element.show('update_mead_info_indicator');
+                    },
+                    onFailure: function () {
+                        Element.hide('update_mead_info_indicator');
+                    },
+                    onSuccess: function () {
+                        Element.hide('update_mead_info_indicator');
                     }
+                }
             );
         }
     }
@@ -46,27 +47,27 @@
     }
     function moveBzBugStatusToDone(bz_bug_id) {
         new Ajax.Request('/bz_bugs/' + bz_bug_id,
-                {
-                    method: 'POST',
-                    asynchronous: true,
-                    evalScripts: true,
-                    onLoading: function () {
-                        Element.show('update_bz_bugs_indicator');
-                    },
-                    onFailure: function () {
-                        Element.hide('update_bz_bugs_indicator');
-                    },
-                    onSuccess: function () {
-                        Element.hide('update_bz_bugs_indicator');
-                    },
-                    onComplete: function () {
-                    },
-                    parameters: {
-                        'bz_action': '<%=BzBug::BZ_ACTIONS[:done]%>',
-                        'authenticity_token': '<%=form_authenticity_token%>',
-                        '_method': 'put'
-                    }
+            {
+                method: 'POST',
+                asynchronous: true,
+                evalScripts: true,
+                onLoading: function () {
+                    Element.show('update_bz_bugs_indicator');
+                },
+                onFailure: function () {
+                    Element.hide('update_bz_bugs_indicator');
+                },
+                onSuccess: function () {
+                    Element.hide('update_bz_bugs_indicator');
+                },
+                onComplete: function () {
+                },
+                parameters: {
+                    'bz_action': '<%=BzBug::BZ_ACTIONS[:done]%>',
+                    'authenticity_token': '<%=form_authenticity_token%>',
+                    '_method': 'put'
                 }
+            }
         );
     }
 
@@ -96,26 +97,26 @@
 
         var bz_id = bz_bug.match(/\d+/)[0];
         new Ajax.Request('/bz_bugs/sync/' + bz_id,
-                {
-                    method: 'GET',
-                    asynchronous: true,
-                    evalScripts: true,
-                    onLoading: function () {
-                        Element.show("sync_bz_bug_button_indicator");
-                    },
-                    onFailure: function () {
-                        Element.hide('sync_bz_bug_button_indicator');
-                        syncBugInfoWithBz(bz_bugs);
-                    },
-                    onSuccess: function (response) {
-                        syncBugInfoWithBz(bz_bugs);
-                    },
-                    parameters: {
-                        'user': sbb_user,
-                        'pwd': sbb_pwd,
-                        'authenticity_token': '<%=form_authenticity_token%>'
-                    }
+            {
+                method: 'GET',
+                asynchronous: true,
+                evalScripts: true,
+                onLoading: function () {
+                    Element.show("sync_bz_bug_button_indicator");
+                },
+                onFailure: function () {
+                    Element.hide('sync_bz_bug_button_indicator');
+                    syncBugInfoWithBz(bz_bugs);
+                },
+                onSuccess: function (response) {
+                    syncBugInfoWithBz(bz_bugs);
+                },
+                parameters: {
+                    'user': sbb_user,
+                    'pwd': sbb_pwd,
+                    'authenticity_token': '<%=form_authenticity_token%>'
                 }
+            }
         );
     }
 
@@ -130,31 +131,31 @@
         var nbb_pwd = document.getElementById('nbb_pwd').value;
         var nbb_see_also = document.getElementById('nbb_wsum_see_also').value;
         new Ajax.Request('/bz_bugs',
-                {
-                    method: 'POST',
-                    asynchronous: true,
-                    evalScripts: true,
-                    onLoading: function () {
-                        Element.show('create_bz_bug_indicator');
-                    },
-                    onSuccess: function () {
-                        var div = document.getElementById('new_bz_bug_sum_form_div');
-                        Element.hide(div);
-                        div.innerHTML = "";
-                    },
-                    onFailure: function () {
-                        Element.hide('create_bz_bug_indicator');
-                    },
-                    parameters: {
-                        'package_id': '<%=package.id%>',
-                        'type': 'create_bz',
-                        'ver': nbb_ver,
-                        'user': nbb_user,
-                        'pwd': nbb_pwd,
-                        'see_also': nbb_see_also,
-                        'authenticity_token': '<%=form_authenticity_token%>'
-                    }
-                });
+            {
+                method: 'POST',
+                asynchronous: true,
+                evalScripts: true,
+                onLoading: function () {
+                    Element.show('create_bz_bug_indicator');
+                },
+                onSuccess: function () {
+                    var div = document.getElementById('new_bz_bug_sum_form_div');
+                    Element.hide(div);
+                    div.innerHTML = "";
+                },
+                onFailure: function () {
+                    Element.hide('create_bz_bug_indicator');
+                },
+                parameters: {
+                    'package_id': '<%=package.id%>',
+                    'type': 'create_bz',
+                    'ver': nbb_ver,
+                    'user': nbb_user,
+                    'pwd': nbb_pwd,
+                    'see_also': nbb_see_also,
+                    'authenticity_token': '<%=form_authenticity_token%>'
+                }
+            });
     }
 
     function createBzBug() {
@@ -169,32 +170,32 @@
         }
 
         new Ajax.Request('/bz_bugs',
-                {
-                    method: 'POST',
-                    asynchronous: true,
-                    evalScripts: true,
-                    onLoading: function () {
-                        Element.show('create_bz_bug_indicator');
-                    },
-                    onSuccess: function () {
-                        var div = document.getElementById('new_bz_bug_form_div');
-                        Element.hide(div);
-                        div.innerHTML = "";
-                    },
-                    onFailure: function () {
-                        Element.hide('create_bz_bug_indicator');
-                    },
-                    parameters: {
-                        'package_id': '<%=package.id%>',
-                        'type': 'create_bz',
-                        'ver': 0,
-                        'user': nbb_user,
-                        'pwd': nbb_pwd,
-                        'summary': nbb_summary,
-                        'see_also': nbb_see_also,
-                        'authenticity_token': '<%=form_authenticity_token%>'
-                    }
-                });
+            {
+                method: 'POST',
+                asynchronous: true,
+                evalScripts: true,
+                onLoading: function () {
+                    Element.show('create_bz_bug_indicator');
+                },
+                onSuccess: function () {
+                    var div = document.getElementById('new_bz_bug_form_div');
+                    Element.hide(div);
+                    div.innerHTML = "";
+                },
+                onFailure: function () {
+                    Element.hide('create_bz_bug_indicator');
+                },
+                parameters: {
+                    'package_id': '<%=package.id%>',
+                    'type': 'create_bz',
+                    'ver': 0,
+                    'user': nbb_user,
+                    'pwd': nbb_pwd,
+                    'summary': nbb_summary,
+                    'see_also': nbb_see_also,
+                    'authenticity_token': '<%=form_authenticity_token%>'
+                }
+            });
     }
 
     function createBzBugLink() {
@@ -204,30 +205,30 @@
 
         bz_id = bz_id.replace(/^\s+|\s+$/g, '');
         new Ajax.Request('/bz_bugs',
-                {
-                    method: 'POST',
-                    asynchronous: true,
-                    evalScripts: true,
-                    onLoading: function () {
-                        Element.show('link_bz_bug_indicator');
-                    },
-                    onSuccess: function () {
-                        var div = document.getElementById('link_bz_bug_form_div');
-                        Element.hide(div);
-                        div.innerHTML = '';
-                    },
-                    onFailure: function () {
-                        Element.hide('link_bz_bug_indicator');
-                    },
+            {
+                method: 'POST',
+                asynchronous: true,
+                evalScripts: true,
+                onLoading: function () {
+                    Element.show('link_bz_bug_indicator');
+                },
+                onSuccess: function () {
+                    var div = document.getElementById('link_bz_bug_form_div');
+                    Element.hide(div);
+                    div.innerHTML = '';
+                },
+                onFailure: function () {
+                    Element.hide('link_bz_bug_indicator');
+                },
 
-                    parameters: {
-                        'bz_id': bz_id,
-                        'type': 'create_bz_link',
-                        'user': user,
-                        'pwd': pwd,
-                        'package_id': '<%=package.id%>',
-                        'authenticity_token': '<%=form_authenticity_token%>'}
-                });
+                parameters: {
+                    'bz_id': bz_id,
+                    'type': 'create_bz_link',
+                    'user': user,
+                    'pwd': pwd,
+                    'package_id': '<%=package.id%>',
+                    'authenticity_token': '<%=form_authenticity_token%>'}
+            });
     }
 
     function renderBzBugLinkEditor(id) {
@@ -275,25 +276,25 @@
 
     function updateBzBugLink(id, bz_id) {
         new Ajax.Request('/bz_bugs/' + id,
-                {
-                    method: 'POST',
-                    asynchronous: true,
-                    evalScripts: true,
-                    onLoading: function () {
-                        Element.show("bz_id_" + id + "_indicator");
-                    },
-                    onSuccess: function () {
-                        Element.hide("bz_id_" + id + "_indicator");
-                        var div = 'col_bz_id_' + id;
-                        renderBzBugId(id, document.getElementById(div));
-                        Element.highlight(div);
-                    },
-                    parameters: {
-                        '_method': 'put',
-                        'bz_id': bz_id,
-                        'authenticity_token': '<%=form_authenticity_token%>'
-                    }
-                });
+            {
+                method: 'POST',
+                asynchronous: true,
+                evalScripts: true,
+                onLoading: function () {
+                    Element.show("bz_id_" + id + "_indicator");
+                },
+                onSuccess: function () {
+                    Element.hide("bz_id_" + id + "_indicator");
+                    var div = 'col_bz_id_' + id;
+                    renderBzBugId(id, document.getElementById(div));
+                    Element.highlight(div);
+                },
+                parameters: {
+                    '_method': 'put',
+                    'bz_id': bz_id,
+                    'authenticity_token': '<%=form_authenticity_token%>'
+                }
+            });
     }
 
     function updateBzBugRow(id) {
@@ -420,19 +421,19 @@
         var confirm = window.confirm("Are you sure to remove link to bz" + bz_bug_id + "?");
         if (confirm == true) {
             new Ajax.Request('/bz_bugs/' + id,
-                    {
-                        method: 'POST',
-                        asynchronous: true,
-                        evalScripts: true,
-                        onLoading: function () {
-                        },
-                        onSuccess: function () {
-                            deleteBzBugRow(id);
-                        },
-                        parameters: {
-                            '_method': 'delete',
-                            'authenticity_token': '<%=form_authenticity_token%>'}
-                    });
+                {
+                    method: 'POST',
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function () {
+                    },
+                    onSuccess: function () {
+                        deleteBzBugRow(id);
+                    },
+                    parameters: {
+                        '_method': 'delete',
+                        'authenticity_token': '<%=form_authenticity_token%>'}
+                });
         }
     }
 </script>
