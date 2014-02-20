@@ -80,7 +80,7 @@ class PackagesController < ApplicationController
         flash[:notice] = 'Package was successfully created.'
 
         if Rails.env.production?
-          @package.notify_package_created(params)
+          @package.notify_package_created(params, current_user)
         end
 
         format.html { show_package(params, @package) }
@@ -143,7 +143,7 @@ class PackagesController < ApplicationController
           flash[:notice] = 'Package was successfully updated.'
 
           if Rails.env.production?
-            @package.notify_package_updated(latest_changes_package, params)
+            @package.notify_package_updated(latest_changes_package, params, current_user)
           end
 
           @output = true
