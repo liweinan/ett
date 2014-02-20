@@ -59,6 +59,19 @@ class Package < ActiveRecord::Base
   default_value_for :in_errata, ''
   default_value_for :rpmdiff_status, ''
 
+  ######### This is duplicated from application_controller.rb since some methods
+  # are using that method right now. It's here temporarily and will have to be
+  # moved to a better place eventually.
+  # FIXME ?
+  def escape_url(url)
+    url.blank? ? nil : url.gsub(/\./, '-dot-').gsub(/\//, '-slash-')
+  end
+
+  def unescape_url(url)
+    url.blank? ? nil : url.gsub(/-dot-/, '.').gsub(/-slash-/, '/')
+  end
+  #####################################################################
+
   # Return a boolean to indicate whether this package's version column field can
   # be updated
   #
