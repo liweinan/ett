@@ -68,12 +68,16 @@
     <script type="text/javascript">
         function validateFormAndPostForm() {
             var ver = document.getElementById('package_ver').value;
+            var status = document.getElementById('package_status_id').value;
 
             if (ver != "") {
                 if (!checkPackageVersionFormat(ver)) {
                     alert('<%=t"version_fmt_incorrect"%>');
                     return false;
                 }
+            } else if (status == '36') { // finished state
+                alert('You have to specify a version');
+                return false;
             }
 
             var myForm = document.getElementById('edit_package_<%=@package.id%>');
