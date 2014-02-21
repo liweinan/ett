@@ -10,7 +10,9 @@ else
   if @do_nothing
     page.alert("Bug already added")
   elsif @response.class == Net::HTTPCreated || @response.class == Net::HTTPOK
-    if @created
+    if @created && @summary_provided
+      page << "addBzBugRow('#{@bz_bug.id}')"
+    elsif @created && !@summary_provided
       page << "renderByUpgradeBz()"
     else
       page << "addBzBugRow('#{@bz_bug.id}')"

@@ -28,6 +28,8 @@ class BzBugsController < ApplicationController
 
         # marker for the view
         @created = true
+        @summary_provided = false
+        @bz_bug = nil
 
         parameters = {'pkg' => package.name,
                       'version' => params[:ver],
@@ -45,27 +47,28 @@ class BzBugsController < ApplicationController
 
         if params.has_key?(:summary)
           parameters['summary'] = params[:summary]
-          @response = BzBug.create_bzs_from_params(parameters,
-                                                   'el6',
-                                                   package_id,
-                                                   current_user)
+          @response, @bz_bug = BzBug.create_bzs_from_params(parameters,
+                                                           'el6',
+                                                           package_id,
+                                                           current_user)
+          @summary_provided = true
         else
           if package.task.os_advisory_tags.empty?
             summary = "RHEL6 RPMs: Upgrade #{package.name} to #{params[:ver]}"
             parameters['summary'] = summary
-            @response = BzBug.create_bzs_from_params(parameters,
-                                                     'el6',
-                                                     package_id,
-                                                     current_user)
+            @response, _ = BzBug.create_bzs_from_params(parameters,
+                                                        'el6',
+                                                        package_id,
+                                                        current_user)
           else
             # create bzs for each rhels
             package.task.os_advisory_tags.each do |os_adv_tag|
               summary = "RHEL#{os_adv_tag.os_arch[-1, 1]} RPMs: Upgrade #{package.name} to #{params[:ver]}"
               parameters['summary'] = summary
-              @response = BzBug.create_bzs_from_params(parameters,
-                                                       os_adv_tag.os_arch,
-                                                       package_id,
-                                                       current_user)
+              @response, _ = BzBug.create_bzs_from_params(parameters,
+                                                          os_adv_tag.os_arch,
+                                                          package_id,
+                                                          current_user)
             end
           end
         end
