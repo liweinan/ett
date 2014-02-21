@@ -105,6 +105,7 @@ class BzBug < ActiveRecord::Base
   #  assignee:    The email of the assignee of this bugzilla
   def self.create_bzs_from_params(parameters, os, package_id, current_user)
     puts parameters
+    bz_bug = nil
     puts BzBug.bz_bug_creation_uri
     response = Net::HTTP.post_form(BzBug.bz_bug_creation_uri, parameters)
 
@@ -117,10 +118,10 @@ class BzBug < ActiveRecord::Base
 
       if response.class == Net::HTTPOK
         bz_info = JSON.parse(response.body)
-        BzBug.create_from_bz_info(bz_info, package_id, current_user, os)
+        bz_bug = BzBug.create_from_bz_info(bz_info, package_id, current_user, os)
       end
     end
-    response
+    [response, bz_bug]
   end
 
   # From assignee (User) object, determine the best email address of the
