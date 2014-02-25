@@ -14,7 +14,7 @@
   <<%= col %> class='content-list-head'>GitUrl</<%= col %>>
   <% if @task.use_mead_integration? %>
       <<%= col %> class='content-list-head'>Mead</<%= col %>>
-      <<%= col %> class='content-list-head'>Brew</<%= col %>>
+      <<%= col %> class='content-list-head'>Brew <%= params.include?(:brew) ? "(#{params[:brew]})": ''%></<%= col %>>
       <<%= col %> class='content-list-head'>Rpm Diff</<%= col %>>
   <% end %>
 </tr>
