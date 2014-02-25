@@ -1,5 +1,5 @@
 pac = Package.find(params[:id])
-res = submit_build(pac, params[:clentry], 'eap6', params[:type_build])
+res = submit_build(pac, params[:clentry], pac.task.prod, params[:type_build])
 page.alert(res)
 if res.start_with?('Success:')
   page << 'TINY.box.hide()'
