@@ -7,6 +7,7 @@
       <th>Can Show</th>
       <th>Candidate Tag</th>
       <th>Target Release</th>
+      <th>Prod</th>
       <th>Milestone</th>
       <th>Version</th>
       <th>Advisory</th>
@@ -31,6 +32,13 @@
                 -
             <% else %>
                 <%= task.target_release %>
+            <% end %>
+          </td>
+          <td>
+            <% if task.prod.blank? %>
+                -
+            <% else %>
+                <%= task.prod %>
             <% end %>
           </td>
           <td>
