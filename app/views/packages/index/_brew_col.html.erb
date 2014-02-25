@@ -1,4 +1,5 @@
-<%# TODO: this is very slowly, greatly slow down the page loading speed. Please make it async %>
-<% if Rails.env.production? %>
-    <%= package.brew_in_errata %>
+<% if params.include?(:brew) %>
+    <%= package.nvr_in_brew(params[:brew]) %>
+<% else %>
+    <%= package.nvr_in_brew('el6') %>
 <% end %>

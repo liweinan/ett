@@ -90,6 +90,15 @@ Statuses:
                :locals => {:progress_indicator_id => 'inline_editor_indicator'} %>
 <% end %>
 <p> ✔ : nvr added to errata. ✘ : nvr not in shipped-list </p>
+<form name="distroselect">
+    Choose the brew distro to show:
+    <select name="menu" onChange="window.document.location.href=this.options[this.selectedIndex].value;" value="GO">
+        <option selected="selected">Select One</option>
+        <% task_erb.os_advisory_tags.each do |tag| %>
+            <option value="<%= request.url.gsub(/\?.*/, '') + "?brew=#{tag.os_arch}" %>"><%= tag.os_arch %></option>
+        <% end %>
+    </select>
+</form>
 
 <div class='manage-tbl'>
   <%= render :partial => 'layouts/sep' %>

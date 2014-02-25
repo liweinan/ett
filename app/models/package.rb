@@ -34,6 +34,8 @@ class Package < ActiveRecord::Base
   has_many :bz_bugs, :class_name => 'BzBug',
            :foreign_key => 'package_id', :order => 'created_at'
 
+  has_many :brew_nvrs, :dependent => :destroy
+
   #has_and_belongs_to_many :components
 
   has_many :to_relationships, :class_name => 'PackageRelationship',
@@ -84,6 +86,14 @@ class Package < ActiveRecord::Base
       status.code != Status::CODES[:finished]
     else
       true
+    end
+  end
+
+  def status_in_finished?
+    if status.respond_to?(:code)
+      status.code == Status::CODES[:finished]
+    else
+      false
     end
   end
 
@@ -387,6 +397,17 @@ class Package < ActiveRecord::Base
     if task.use_mead_integration?
       update_mead_brew_info
       update_source_url_info
+
+      self.task.os_advisory_tags.each do |tag|
+        next if tag.os_arch == 'el6'
+        brew_nvr =  self.brew_nvrs.select { |obj| obj.distro == tag.os_arch }
+        if brew_nvr.blank?
+          create_brew_nvr(tag.os_arch)
+        else
+          brew_nvr[0].nvr = self.get_brew_name(tag.candidate_tag + '-build')
+          brew_nvr[0].save
+        end
+      end
     end
   end
 
@@ -673,6 +694,37 @@ class Package < ActiveRecord::Base
   def update_user_id(id)
     self.user_id = id
     save
+  end
+
+  def create_brew_nvr(distro)
+    adv_tag = self.task.os_advisory_tags.select { |tag| tag.os_arch == distro }
+    if !adv_tag.nil? && adv_tag.size > 0
+      brew_nvr = BrewNvr.new
+      brew_nvr.package_id = self.id
+      brew_nvr.distro = distro
+      brew_nvr.nvr = self.get_brew_name(adv_tag[0].candidate_tag + '-build')
+      brew_nvr.save
+      brew_nvr.nvr
+    else
+      '-'
+    end
+  end
+
+  def nvr_in_brew(distro)
+    case distro
+    when 'el6'
+      self.brew_in_errata
+    else
+      if self.brew_nvrs.select{ |obj| obj.distro == distro }.blank?
+        if self.status_in_finished?
+          create_brew_nvr(distro)
+        else
+          '-'
+        end
+      else
+        self.brew_nvrs.select { |obj| obj.distro == distro }[0].nvr
+      end
+    end
   end
 
   protected

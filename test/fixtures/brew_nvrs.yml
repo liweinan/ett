@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  package_id: 1
+  nvr: MyString
+  distro: MyString
+
+two:
+  package_id: 1
+  nvr: MyString
+  distro: MyString
