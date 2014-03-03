@@ -60,7 +60,10 @@ class PackagesController < ApplicationController
   def edit
     @package = Package.find_by_name_and_task_id(unescape_url(params[:id]),
                                                 find_task(params[:task_id]).id)
-    redirect_to('/') unless can_edit_package? @package
+    if params.include?(:assignee)
+      @package.assignee = User.find(params[:assignee])
+    end
+    redirect_to('/') unless logged_in?
   end
 
   # POST /packages
