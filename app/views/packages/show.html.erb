@@ -88,6 +88,11 @@ GitUrl: <%= h @package.git_url %>
                           :method => :delete %>
         <% end %>
     <% end %>
+
+    <% if logged_in? && !@package.status_in_finished? && current_user != @package.assignee %>
+        <%= link_to 'Assign To Me', :controller => 'packages', :action => 'edit', :id => escape_url(@package.name), :assignee => current_user %>
+    <% end %>
+
 <% end %>
 
 <%= render :partial => 'packages/notes' %>
