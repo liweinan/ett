@@ -8,6 +8,11 @@ warning_string = "This will also build the source '#{source_pkg}' package. " \
 warning_chain = "This will build both the MEAD and WRAPPER part of the package. " \
                 "If you only want to build the WRAPPER part, please select CANCEL " \
                 "and make sure you check the Wrapper only option before requesting again"
+
+warning_not_assignee = "You are not the assignee of this package. You are recommended, " \
+                       "but not required to assign this package to you by pressing 'Cancel' and using the " \
+                       "'Assign To Me' button. If you'd like to continue nonetheless, " \
+                       "press the 'OK' button."
 begin
   type_build = 'chain'
   type_build = 'wrapper' if params.include?(:wrapper_build)
@@ -21,6 +26,9 @@ begin
   page << "  move_fwd = confirm(\"#{warning_string}\");"
   page << "} else if (x == 'chain') {"
   page << "  move_fwd = confirm(\"#{warning_chain}\");"
+  page << "}"
+  page << "if (move_fwd && #{current_user != pac.assignee}) {"
+  page << "  move_fwd = confirm(\"#{warning_not_assignee}\");"
   page << "}"
   page << "if (move_fwd) {"
   page << "  new Ajax.Request('/toolbox/submit_build/' + #{params[:package_id]}, {"
