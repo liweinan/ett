@@ -111,7 +111,7 @@ class ImportController < ApplicationController
             end
             json_obj.delete(:notes.to_s)
 
-            #deal with xattrs
+            #deal with other attributes
             json_obj.keys.each do |k|
               unless json_obj[k] == nil
                 orig_package[k] = json_obj[k]

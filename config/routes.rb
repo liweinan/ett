@@ -1,4 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :task_groups
+
   map.resources :readonly_tasks
 
   map.resources :allowed_statuses
