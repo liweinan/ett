@@ -1,20 +1,26 @@
 <h1>Listing task_groups</h1>
 
-<table>
+<table border=1>
   <tr>
-    <th>Name</th>
+    <th>Task Group Name</th>
+    <th>Included Tasks</th>
+    <th>Operation</th>
   </tr>
 
-<% @task_groups.each do |task_group| %>
-  <tr>
-    <td><%=h task_group.name %></td>
-    <td><%= link_to 'Show', task_group %></td>
-    <td><%= link_to 'Edit', edit_task_group_path(task_group) %></td>
-    <td><%= link_to 'Destroy', task_group, :confirm => 'Are you sure?', :method => :delete %></td>
-  </tr>
-<% end %>
+  <% @task_groups.each do |task_group| %>
+      <tr>
+        <td><%= h task_group.name %></td>
+        <td>
+          <% task_group.tasks.each do |task| %>
+              <%= task.name %> /
+          <% end %>
+        </td>
+        <td><%= link_to 'Edit', edit_task_group_path(task_group) %>
+          / <%= link_to 'Destroy', task_group, :confirm => 'Are you sure?', :method => :delete %></td>
+      </tr>
+  <% end %>
 </table>
 
-<br />
+<br/>
 
 <%= link_to 'New task_group', new_task_group_path %>

@@ -35,6 +35,15 @@ class Task < ActiveRecord::Base
     task_ids
   end
 
+  def self.from_task_ids(task_ids)
+    tasks = []
+    task_ids.each do |task_id|
+      task = Task.find(task_id.to_i)
+      tasks << task
+    end
+    tasks
+  end
+
   def self.all_that_have_package_with_name(name)
     Task.all(:conditions => ['id in (select task_id from packages where name = ?)', name])
   end

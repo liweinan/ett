@@ -44,6 +44,8 @@ class TaskGroupsController < ApplicationController
 
     respond_to do |format|
       if @task_group.save
+        @task_group.tasks = Task.from_task_ids(params[:task_ids])
+        @task_group.save
         format.html { redirect_to(@task_group, :notice => 'TaskGroup was successfully created.') }
         format.xml  { render :xml => @task_group, :status => :created, :location => @task_group }
       else
@@ -57,9 +59,12 @@ class TaskGroupsController < ApplicationController
   # PUT /task_groups/1.xml
   def update
     @task_group = TaskGroup.find(params[:id])
-
+    params[:task_ids] ||= []
     respond_to do |format|
       if @task_group.update_attributes(params[:task_group])
+        ActiveRecord::Base.connection.execute("delete from task_group_to_tasks where task_group_id = #{@task_group.id}")
+        @task_group.tasks = Task.from_task_ids(params[:task_ids])
+        @task_group.save
         format.html { redirect_to(@task_group, :notice => 'TaskGroup was successfully updated.') }
         format.xml  { head :ok }
       else

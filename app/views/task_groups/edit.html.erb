@@ -1,33 +1,11 @@
 <h1>Editing Task Group</h1>
 <% f = ActionView::Helpers::FormBuilder.new('task_group', @task_group, self, nil, nil) %>
-<form action="/readonly_tasks/0" class="edit_task" method="post">
+<form action="/task_groups/<%= @task_group.id %>" class="edit_task_group" method="post">
   <%= f.error_messages %>
   <input name="_method" type="hidden" value="put"/>
   <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>"/>
 
-  <p>
-    <%= f.label :name %><br/>
-    <%= f.text_field :name %>
-  </p>
-  <% task_ids = @task_group.task_ids %>
-  <p>
-    Included Tasks:
-  </p>
-  <% Task.all(:order => :name).each do |task| %>
-      <table>
-      <tr>
-        <td style="text-align: right;">
-          <input id="task_<%= task.id %>" type="checkbox" name="task_ids[]" value="<%= task.id %>"
-                 <% if task_ids.include?(task.id) %>
-                 checked
-                 <% end %>
-                 /></td>
-        <td>
-          <label for="task_<%= task.id %>"><%= task.name %></label>
-        </td>
-      </tr>
-      </table>
-  <% end %>
+  <%= render :partial => 'task_groups/form', :locals => {:f => f} %>
   <p>
     <%= f.submit 'Update' %>
   </p>

@@ -1,0 +1,23 @@
+<p>
+  <%= f.label :name %><br/>
+  <%= f.text_field :name %>
+</p>
+<% task_ids = @task_group.task_ids %>
+<p>
+  Included Tasks:
+</p>
+<% Task.all(:order => :name).each do |task| %>
+    <table>
+      <tr>
+        <td style="text-align: right;">
+          <input id="task_<%= task.id %>" type="checkbox" name="task_ids[]" value="<%= task.id %>"
+                 <% if task_ids.include?(task.id) %>
+                 checked
+                 <% end %>
+                 /></td>
+        <td>
+          <label for="task_<%= task.id %>"><%= task.name %></label>
+        </td>
+      </tr>
+    </table>
+<% end %>
