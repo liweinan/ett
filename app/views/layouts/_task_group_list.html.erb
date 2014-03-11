@@ -1,0 +1,6 @@
+<select id="id_task_group_selection" name="task_group_selection" onchange="selectTaskGroup(this.options[this.selectedIndex].value);">
+  <option value="-" <% if params[:task_group_id].blank? %>selected<% end %>>-</option>
+  <% TaskGroup.all.each do |tg| %>
+      <option value="<%= tg.id %>" <% if tg.id == params[:task_group_id].to_i %>selected<% end %>><%= tg.name %></option>
+  <% end %>
+</select>

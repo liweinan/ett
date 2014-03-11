@@ -1,10 +1,17 @@
+Task Group: <%= render :partial => 'layouts/task_group_list' %>
+<br/>
 <div style="width:100%;text-align:left;">
 	<span style="padding-right:20px;"> 
 		Tasks:
-      <% Task.all(:order => 'name', :conditions => "can_show='Yes'").each do |task| %>
-		<%= link_to "#{task.name}", :controller => :packages, :action => :index, :task_id => escape_url(task.name), :user => params[:user] %>
-          /
-		<% end %>
+      <% if params[:task_group_id].blank? %>
+          <% Task.all(:order => 'name', :conditions => "can_show='Yes'").each do |task| %>
+              <%= render :partial => 'layouts/task_links', :locals => { :task => task, :user => params[:user] } %>
+          <% end %>
+      <% else %>
+        <% TaskGroup.find(params[:task_group_id]).tasks.each do |task| %>
+              <%= render :partial => 'layouts/task_links', :locals => { :task => task, :user => params[:user] } %>
+        <% end %>
+      <% end %>
 	</span>
 </div>
 <%= render :partial => 'layouts/line' %>
