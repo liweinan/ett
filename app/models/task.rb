@@ -15,6 +15,10 @@ class Task < ActiveRecord::Base
   has_many :component_views
   has_many :components, :through => :component_views
 
+  has_many :task_group_to_tasks
+  has_many :task_groups, :through => :task_group_to_tasks
+
+
   has_one :setting, :class_name => 'Setting', :foreign_key => 'task_id'
 
   belongs_to :workflow
