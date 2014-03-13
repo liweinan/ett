@@ -1,7 +1,7 @@
 require 'net/http'
 
 class Package < ActiveRecord::Base
-  #versioned # versioned plugin sucks, try to withdrawal the usage of it.
+  versioned # versioned plugin sucks, try to withdrawal the usage of it.
             #  STATUS = [ 'Open', 'Assigned', 'Finished', 'Uploaded', 'Deleted' ]
             #  STATUS_FOR_CHOICE = [ 'Assigned', 'Finished', 'Uploaded', 'Deleted' ]
             #  SORTED_STATUS = ['Open', 'Assigned', 'Finished', 'Uploaded', 'Deleted']
