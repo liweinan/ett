@@ -120,7 +120,10 @@ class PackagesController < ApplicationController
 
     respond_to do |format|
       Package.transaction do
-        if !@package.task.use_bz_integration? || shared_inline_bzs.blank?
+        # if update_inline_bz is true, then it’s a pure update bzs request in inline editor.
+        # So package edit page won’t bypass all the actions in below because update_inline_bz
+        # will always be blank then.
+        if shared_inline_bzs.blank?
           # this is when everything is saved
           @package.update_attributes(params[:package])
           @package.reload
@@ -144,7 +147,6 @@ class PackagesController < ApplicationController
           end
 
           @package.save
-
 
           if Rails.env.production?
             update_changelog(orig_package, @package)
