@@ -99,19 +99,20 @@ class PackagesController < ApplicationController
   # params[:flatten_bzs] seems to be only used for inline bugzilla
   # params[:process_tags] ??
   def update
-
-    update_bz_pass(params[:bzauth_pwd])
-    bz_cred = bz_user_pass(params, session)
-
-    shared_inline_bzs = nil
-    unless params[:flatten_bzs].blank?
-      shared_inline_bzs = get_shared_inline_bz(params[:flatten_bzs])
-      update_inline_bz(bz_cred, shared_inline_bzs, @package)
-    end
-
     # for Changelog.package_updated
     orig_package = Package.find(params[:id])
     @package = Package.find(params[:id])
+
+    shared_inline_bzs = nil
+    if @package.task.use_bz_integration?
+      update_bz_pass(params[:bzauth_pwd])
+      bz_cred = bz_user_pass(params, session)
+
+      unless params[:flatten_bzs].blank?
+        shared_inline_bzs = get_shared_inline_bz(params[:flatten_bzs])
+        update_inline_bz(bz_cred, shared_inline_bzs, @package)
+      end
+    end
 
     update_params_hash!(params, @package)
 
@@ -119,6 +120,9 @@ class PackagesController < ApplicationController
 
     respond_to do |format|
       Package.transaction do
+        # if update_inline_bz is true, then it’s a pure update bzs request in inline editor.
+        # So package edit page won’t bypass all the actions in below because update_inline_bz
+        # will always be blank then.
         if shared_inline_bzs.blank?
           # this is when everything is saved
           @package.update_attributes(params[:package])
@@ -130,18 +134,25 @@ class PackagesController < ApplicationController
           latest_changes_package = @package.latest_changes
           update_tags(params, @package)
 
-          if @package.status && @package.status.status_in_finished
+          if @package.task.use_mead_integration? && @package.status && @package.status.status_in_finished
             @package.update_mead_information
           end
 
-          update_bzs(old_values, bz_cred, @package)
-          update_time_track_and_log_entry(old_values, @package)
+          if @package.task.use_bz_integration?
+            update_bzs(old_values, bz_cred, @package)
+          end
+
+          if Rails.env.production?
+            update_time_track_and_log_entry(old_values, @package)
+          end
 
           @package.save
 
-          update_changelog(orig_package, @package)
-          do_sync(%w(name notes ver assignee brew_link group_id artifact_id project_name project_url license scm))
-          sync_actions(params, @package)
+          if Rails.env.production?
+            update_changelog(orig_package, @package)
+            do_sync(%w(name notes ver assignee brew_link group_id artifact_id project_name project_url license scm))
+            sync_actions(params, @package)
+          end
 
           flash[:notice] = 'Package was successfully updated.'
 
@@ -160,7 +171,6 @@ class PackagesController < ApplicationController
       end
 
       if @output
-        expire_all_fragments
         format.html { show_package(params, @package) }
         format.js
       else
@@ -291,8 +301,8 @@ class PackagesController < ApplicationController
 
   def version_changed(current_ver, old_version)
     !current_ver.nil? &&
-    !old_version.nil? &&
-    current_ver != old_version
+        !old_version.nil? &&
+        current_ver != old_version
   end
 
   def get_current_version(params)

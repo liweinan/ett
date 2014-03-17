@@ -15,7 +15,7 @@
              :locals => {:package => Package.find(pac_id),
                          :field_name => field_name} %>
 
-  <% needBzAuth = ['StatusId', 'Bz'].include?(field_name) %>
+  <% needBzAuth = ['StatusId', 'Bz'].include?(field_name) && package.task.use_bz_integration? %>
 
   <% if needBzAuth %>
       <input type='submit'

@@ -79,7 +79,7 @@ Statuses:
                     :task_id => params[:task_id], :tag => tag.key %> /
     <% end %>
 <% end %>
-<% if logged_in? && (!has_task? || !Task.readonly?(task_erb)) %>
+<% if logged_in? && !Task.readonly?(task_erb) %>
     <%= render :partial => 'layouts/sep' %>
     <span id="inline_editor_switch" style="display:none;">
       <a href="javascript:void(0);" onclick="getPacBtns();">
