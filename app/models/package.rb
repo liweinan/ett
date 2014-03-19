@@ -241,11 +241,15 @@ class Package < ActiveRecord::Base
   # Returns: boolean
   def in_shipped_list?
     ans = ''
-    Net::HTTP.start('mead.usersys.redhat.com') do |http|
-      resp = http.get("/mead-scheduler/rest/package/eap6/#{name}/shipped")
-      ans = resp.body
+    begin
+      Net::HTTP.start('mead.usersys.redhat.com') do |http|
+        resp = http.get("/mead-scheduler/rest/package/eap6/#{name}/shipped")
+        ans = resp.body
+      end
+      ans == 'YES'
+    rescue
+      true
     end
-    ans == 'YES'
   end
 
   # Determines whether this package is already included inside an errata or not.
