@@ -1,5 +1,5 @@
 <% if params.include?(:brew) %>
-    <%= package.nvr_in_brew(params[:brew]) %>
+    <%= package.brew_in_errata(params[:brew]) %>
 <% else %>
-    <%= package.nvr_in_brew('el6') %>
+    <%= package.brew_in_errata('el6') %>
 <% end %>

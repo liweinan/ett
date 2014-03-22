@@ -8,7 +8,10 @@ class ErrataCheckController < ApplicationController
 
     render :text => 'OK', :status => 202
 
-    task = Task.first(:conditions => ['advisory = ?', params[:advisory]])
+    os_adv_tag = OsAdvisoryTag.first(:conditions => ['advisory = ?',
+                                                     params[:advisory]])
+    task = os_adv_tag.task
+    distro = os_adv_tag.os_arch
 
     nvrs.each do |nvr|
 
@@ -23,8 +26,13 @@ class ErrataCheckController < ApplicationController
                                               task.id,
                                               pac_name])
       if package
-        package.in_errata = nvr
-        package.save
+        package.update_nvr_in_errata(distro, nvr)
+        if package.nvr_in_brew(distro) == nvr
+          in_errata = 'YES'
+        else
+          in_errata = 'NO'
+        end
+        package.update_in_errata(distro, in_errata)
       end
     end
   end
@@ -46,7 +54,10 @@ class ErrataCheckController < ApplicationController
 
     rpmdiffs = JSON.parse(params['rpmdiffs'])
 
-    task = Task.first(:conditions => ['advisory = ?', params[:advisory]])
+    os_adv_tag = OsAdvisoryTag.first(:conditions => ['advisory = ?',
+                                                     params[:advisory]])
+    task = os_adv_tag.task
+    distro = os_adv_tag.os_arch
 
     rpmdiffs.each do |rpmdiff|
         nvr = rpmdiff['nvr']
@@ -61,11 +72,8 @@ class ErrataCheckController < ApplicationController
                                                 pac_name])
 
         if package
-          package.rpmdiff_status = rpmdiff['status']
-          package.rpmdiff_id = rpmdiff['id']
-          package.save
+          package.update_rpmdiff_status_and_id(distro, rpmdiff['status'], rpmdiff['id'])
         end
-
     end
     render :text => 'OK', :status => 202
   end

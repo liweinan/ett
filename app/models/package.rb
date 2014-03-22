@@ -29,6 +29,7 @@ class Package < ActiveRecord::Base
   belongs_to :task
   belongs_to :status
 
+  has_many :rpm_diffs, :dependent => :destroy
   has_many :assignments, :dependent => :destroy
   has_many :tags, :through => :assignments
   has_many :bz_bugs, :class_name => 'BzBug',
@@ -230,8 +231,9 @@ class Package < ActiveRecord::Base
   # be shipped; just the brew nvr if the above 2 conditions cannot be satisfied
   #
   # Returns: string
-  def brew_in_errata
-    return '✔  ' + brew if in_errata?
+  def brew_in_errata(distro)
+    brew = self.nvr_in_brew(distro)
+    return '✔  ' + brew if in_errata?(distro)
     return '✘  ' + brew if brew && (!can_be_shipped? || !in_shipped_list?)
     return  brew # else
   end
@@ -255,8 +257,13 @@ class Package < ActiveRecord::Base
   # Determines whether this package is already included inside an errata or not.
   #
   # Returns: boolean
-  def in_errata?
-    !in_errata.blank? && !brew.blank? && (in_errata.strip == brew.strip)
+  def in_errata?(distro='el6')
+      rpmdiff = self.select_rpmdiff(distro)
+      if rpmdiff.blank?
+        false
+      else
+        rpmdiff[0].in_errata == 'YES'
+      end
   end
 
   # Return a string representation of the rpmdiff status associated with it.
@@ -264,11 +271,12 @@ class Package < ActiveRecord::Base
   # If the rpmdiff_status column is empty, return an empty string instead
   #
   # Returns: string
-  def rpmdiff_info
-    if rpmdiff_status.blank?
+  def rpmdiff_info(distro)
+    rpmdiff = self.select_rpmdiff(distro)
+    if rpmdiff.blank?
       ''
     else
-      RPMDIFF_INFO[rpmdiff_status.to_i][:status]
+      RPMDIFF_INFO[rpmdiff[0].rpmdiff_status.to_i][:status]
     end
   end
 
@@ -277,22 +285,24 @@ class Package < ActiveRecord::Base
   # If the rpmdiff_id column is empty, return an empty string instead
   #
   # Returns: string
-  def rpmdiff_link
-    if rpmdiff_id.blank?
+  def rpmdiff_link(distro)
+    rpmdiff = self.select_rpmdiff(distro)
+    if rpmdiff.blank?
       ''
     else
-      'https://errata.devel.redhat.com/rpmdiff/show/' + rpmdiff_id
+      'https://errata.devel.redhat.com/rpmdiff/show/' + rpmdiff[0].rpmdiff_id
     end
   end
 
   # Return a css color style depending on the current rpmdiff status
   #
   # Returns: string
-  def rpmdiff_style
-    if rpmdiff_status.blank?
+  def rpmdiff_style(distro)
+    rpmdiff = self.select_rpmdiff(distro)
+    if rpmdiff.blank?
       ''
     else
-      RPMDIFF_INFO[rpmdiff_status.to_i][:style]
+      RPMDIFF_INFO[rpmdiff[0].rpmdiff_status.to_i][:style]
     end
   end
 
@@ -395,6 +405,41 @@ class Package < ActiveRecord::Base
     "Source URL: #{git_url}\n" +
     "Mead-Build: #{mead}\n" +
     "Brew-Build: #{brew}\n"
+  end
+
+  def select_rpmdiff(distro)
+    self.rpm_diffs.select {|rpmdiff| rpmdiff.distro == distro}
+  end
+
+  def get_rpmdiff(distro)
+    rpmdiffs = self.select_rpmdiff(distro)
+    if rpmdiffs.blank?
+      rpmdiff = RpmDiff.create
+      rpmdiff.package_id = self.id
+      rpmdiff.distro = distro
+    else
+      rpmdiff = rpmdiffs[0]
+    end
+    rpmdiff
+  end
+
+  def update_rpmdiff_status_and_id(distro, status, id)
+    rpmdiff = self.get_rpmdiff(distro)
+    rpmdiff.rpmdiff_status = status
+    rpmdiff.rpmdiff_id = id
+    rpmdiff.save
+  end
+
+  def update_nvr_in_errata(distro, value)
+    rpmdiff = self.get_rpmdiff(distro)
+    rpmdiff.nvr_in_errata = value
+    rpmdiff.save
+  end
+
+  def update_in_errata(distro, value)
+    rpmdiff = self.get_rpmdiff(distro)
+    rpmdiff.in_errata = value
+    rpmdiff.save
   end
 
   def update_mead_information
@@ -717,7 +762,7 @@ class Package < ActiveRecord::Base
   def nvr_in_brew(distro)
     case distro
     when 'el6'
-      self.brew_in_errata
+      self.brew
     else
       if self.brew_nvrs.select{ |obj| obj.distro == distro }.blank?
         if self.status_in_finished?
