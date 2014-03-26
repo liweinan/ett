@@ -15,6 +15,7 @@ class BzBugsController < ApplicationController
   def create
     package_id = params[:package_id].strip
     package = Package.find(package_id)
+    expire_fragment(package)
     bz_id = ''
 
     if params[:type] == 'create_bz'
