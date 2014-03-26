@@ -60,9 +60,7 @@ class ApplicationController < ActionController::Base
   end
 
   def can_edit_package?(package)
-    # FIXME: why create another package???
-    _package = Package.find(package.id)
-    logged_in_and_owner_package(_package) || can_manage?
+    logged_in_and_owner_package(package) || can_manage?
   end
 
   def logged_in_and_owner_package(_package)

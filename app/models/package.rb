@@ -179,12 +179,11 @@ class Package < ActiveRecord::Base
   #
   # Returns: List of BzBugs objects
   def upgrade_bz
-    BzBug.all(:conditions =>
-                  ['package_id = ? and summary like ? and component = ? and keywords like ?',
-                    self.id,
-                    "%Upgrade%#{self.name}%",
-                    'RPMs',
-                    '%Rebase%'])
+    self.bz_bugs.select do |bz_bug|
+      bz_bug.summary.grep(/Upgrade #{self.name}/) &&
+      bz_bug.component == 'RPMs' &&
+      bz_bug.keywords.grep(/Rebase/)
+    end
   end
 
   # Return the string representation of the object
@@ -234,7 +233,7 @@ class Package < ActiveRecord::Base
   def brew_in_errata(distro)
     brew = self.nvr_in_brew(distro)
     return '✔  ' + brew if in_errata?(distro)
-    return '✘  ' + brew if brew && (!can_be_shipped? || !in_shipped_list?)
+    return '✘  ' + brew if brew && !can_be_shipped?
     return  brew # else
   end
 
