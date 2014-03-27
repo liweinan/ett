@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  in_errata: MyString
+  rpmdiff_status: MyString
+  rpmdiff_id: MyString
+
+two:
+  in_errata: MyString
+  rpmdiff_status: MyString
+  rpmdiff_id: MyString

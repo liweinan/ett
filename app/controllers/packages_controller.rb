@@ -102,7 +102,7 @@ class PackagesController < ApplicationController
     # for Changelog.package_updated
     orig_package = Package.find(params[:id])
     @package = Package.find(params[:id])
-
+    expire_fragment(@package)
     shared_inline_bzs = nil
     if @package.task.use_bz_integration?
       update_bz_pass(params[:bzauth_pwd])
@@ -131,7 +131,8 @@ class PackagesController < ApplicationController
           # the code. (@package.status_changed_at = Time.now). This messes up
           # with the latest_changes command since the latest_change will be that
           # instead of what the user changed in the website.
-          latest_changes_package = @package.latest_changes
+          latest_changes_package = @package.changes_with_old(orig_package)
+
           update_tags(params, @package)
 
           if @package.task.use_mead_integration? && @package.status && @package.status.status_in_finished
@@ -655,39 +656,56 @@ class PackagesController < ApplicationController
     end
   end
 
-  def get_packages(__task_name, __tag_key, __status_name, __user_email)
+  def get_packages(task_name, tag_key, status_name, user_email)
+
+    task = Task.find_by_name(task_name)
+    statuses_string = Status.ids_can_show_by_task_name_in_global_scope(task_name)
+    statuses_int = statuses_string.split(',').map {|str| str.to_i}
+    statuses_can_show_sql = {:status_id => statuses_int + [nil]}
+
+    condition = {:task_id => task.id}.merge(statuses_can_show_sql)
+
+    @all_packages_count = Package.count(:conditions => condition)
+    @my_packages_count = Package.count(:conditions => condition.merge({:user_id => session[:current_user].id})) if logged_in?
+
+    opts = {:user_id => User.find_by_email(user_email).id} unless user_email.blank?
+    opts ||= {}
+    opts.merge(statuses_can_show_sql)
+
     order = 'status_id, name'
+    includes = [:rpm_diffs, :brew_nvrs, :bz_bugs, :status, :tags, :task]
+    if !status_name.blank? && !tag_key.blank?
+      tag = Tag.find_by_key_and_task_id(tag_key, task.id)
+      status = Status.find_in_global_scope(status_name, task_name)
 
-    hierarchy = "select id from tasks where name = '#{__task_name}'"
+      conditions = {'assignments.tag_id' => tag.id,
+                    'packages.status_id' => status.id,
+                    'packages.task_id' => task.id}.merge(opts)
 
-    __statuses_can_show_sql = " AND (p.status_id IN (#{Status.ids_can_show_by_task_name_in_global_scope(__task_name)}) OR p.status_id IS NULL)"
+      packages = Package.find(:all, :joins => [:assignments],
+                              :conditions => conditions,
+                              :order => order,
+                              :include => includes)
+    elsif !status_name.blank?
 
-    @all_packages_count = Package.count_by_sql("select count(*) from packages p where p.task_id IN (#{hierarchy}) #{__statuses_can_show_sql}")
-
-    if logged_in?
-      @my_packages_count = Package.count_by_sql("select count(*) from packages p where p.task_id IN (#{hierarchy}) AND p.user_id = #{session[:current_user].id} #{__statuses_can_show_sql}")
-    end
-
-    opts = ''
-    unless __user_email.blank?
-      opts = "AND p.user_id = #{User.find_by_email(__user_email).id} "
-    end
-
-    opts << __statuses_can_show_sql
-
-    if !__status_name.blank? && !__tag_key.blank?
-      tag = Tag.find_by_key_and_task_id(__tag_key, Task.find_by_name(__task_name).id)
-      _status = Status.find_in_global_scope(__status_name, __task_name)
-      _packages = Package.find_by_sql("select p.* from packages p join assignments a on p.id = a.package_id and a.tag_id = #{tag.id} and status_id = #{_status.id} and p.task_id IN (#{hierarchy}) #{opts} order by #{order}")
-    elsif !__status_name.blank?
-      _packages = Package.find_by_sql("select p.* from packages p where p.status_id = #{Status.find_in_global_scope(__status_name, __task_name).id} AND p.task_id IN (#{hierarchy}) #{opts} order by #{order}")
-    elsif !__tag_key.blank?
-      tag = Tag.find_by_key_and_task_id(__tag_key, Task.find_by_name(__task_name))
-      _packages = Package.find_by_sql("select p.* from packages p join assignments a on p.id = a.package_id and a.tag_id = #{tag.id} and p.task_id IN (#{hierarchy}) #{opts} order by #{order}")
+      status = Status.find_in_global_scope(status_name, task_name)
+      conditions = {'packages.status_id' => status.id,
+                    'packages.task_id' => task.id}.merge(opts)
+      packages = Package.find(:all, :conditions => conditions,
+                              :order => order, :include => includes)
+    elsif !tag_key.blank?
+      tag = Tag.find_by_key_and_task_id(tag_key, task.id)
+      conditions = {'assignments.tag_id' => tag.id,
+                    'packages.task_id' => task.id}.merge(opts)
+      packages = Package.find(:all, :joins => [:assignments],
+                              :conditions => conditions,
+                              :order => order, :include => includes)
     else
-      _packages = Package.find_by_sql("select p.* from packages p where p.task_id IN (#{hierarchy}) #{opts} order by #{order}")
+      conditions = {'packages.task_id' => task.id}.merge(opts)
+      packages = Package.find(:all, :conditions => conditions, :order => order,
+                              :include => includes)
     end
-    _packages
+    packages
   end
 
   def deal_with_deprecated_brew_tag_id

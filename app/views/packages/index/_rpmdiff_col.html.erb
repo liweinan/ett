@@ -1,3 +1,4 @@
 <% unless package.blank? %>
-<%= link_to package.rpmdiff_info, package.rpmdiff_link %>
+    <% distro = params.include?(:brew) ? params[:brew] : 'el6' %>
+    <%= link_to package.rpmdiff_info(distro), package.rpmdiff_link(distro) %>
 <% end %>
