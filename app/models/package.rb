@@ -416,29 +416,11 @@ class Package < ActiveRecord::Base
       rpmdiff = RpmDiff.create
       rpmdiff.package_id = self.id
       rpmdiff.distro = distro
+      rpmdiff.save
     else
       rpmdiff = rpmdiffs[0]
     end
     rpmdiff
-  end
-
-  def update_rpmdiff_status_and_id(distro, status, id)
-    rpmdiff = self.get_rpmdiff(distro)
-    rpmdiff.rpmdiff_status = status
-    rpmdiff.rpmdiff_id = id
-    rpmdiff.save
-  end
-
-  def update_nvr_in_errata(distro, value)
-    rpmdiff = self.get_rpmdiff(distro)
-    rpmdiff.nvr_in_errata = value
-    rpmdiff.save
-  end
-
-  def update_in_errata(distro, value)
-    rpmdiff = self.get_rpmdiff(distro)
-    rpmdiff.in_errata = value
-    rpmdiff.save
   end
 
   def update_mead_information
