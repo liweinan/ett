@@ -34,7 +34,7 @@ Rails::Initializer.run do |config|
     :address => "smtp.corp.redhat.com",
     :port => 25,
     :domain => 'redhat.com',
-    :authentication => :plain,    
+    :authentication => :plain,
     :tls => true
   }
 
@@ -63,3 +63,20 @@ ActionController::Base.cache_store = :file_store, "#{RAILS_ROOT}/cache"
 require "xmlrpc/client"
 require "open-uri"
 XMLRPC::Config::ENABLE_NIL_PARSER = true
+
+class Hash
+  # this diff for hash will show the old one, and the newer one, as differences
+  # e.g {"name"=>["old", "new"]}
+  def diff_custom(other)
+    (self.keys + other.keys).uniq.inject({}) do |memo, key|
+      unless self[key] == other[key]
+        if self[key].kind_of?(Hash) &&  other[key].kind_of?(Hash)
+          memo[key] = self[key].diff(other[key])
+        else
+          memo[key] = [self[key], other[key]]
+        end
+      end
+      memo
+    end
+  end
+end

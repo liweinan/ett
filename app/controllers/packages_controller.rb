@@ -131,7 +131,8 @@ class PackagesController < ApplicationController
           # the code. (@package.status_changed_at = Time.now). This messes up
           # with the latest_changes command since the latest_change will be that
           # instead of what the user changed in the website.
-          latest_changes_package = @package.latest_changes
+          latest_changes_package = @package.changes_with_old(orig_package)
+
           update_tags(params, @package)
 
           if @package.task.use_mead_integration? && @package.status && @package.status.status_in_finished

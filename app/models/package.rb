@@ -1,10 +1,9 @@
 require 'net/http'
 
 class Package < ActiveRecord::Base
-  versioned # versioned plugin sucks, try to withdrawal the usage of it.
-            #  STATUS = [ 'Open', 'Assigned', 'Finished', 'Uploaded', 'Deleted' ]
-            #  STATUS_FOR_CHOICE = [ 'Assigned', 'Finished', 'Uploaded', 'Deleted' ]
-            #  SORTED_STATUS = ['Open', 'Assigned', 'Finished', 'Uploaded', 'Deleted']
+  #  STATUS = [ 'Open', 'Assigned', 'Finished', 'Uploaded', 'Deleted' ]
+  #  STATUS_FOR_CHOICE = [ 'Assigned', 'Finished', 'Uploaded', 'Deleted' ]
+  #  SORTED_STATUS = ['Open', 'Assigned', 'Finished', 'Uploaded', 'Deleted']
   SKIP_FIELDS = %w(id updated_at updated_by created_by created_at)
   MEAD_ACTIONS = {:open => 'open', :needsync => 'needsync', :done => 'done'}
 
@@ -88,6 +87,12 @@ class Package < ActiveRecord::Base
     else
       true
     end
+  end
+
+  def changes_with_old(orig_package)
+    diff = orig_package.attributes.diff_custom(self.attributes)
+    diff.delete("updated_at") if diff.key?("updated_at")
+    diff
   end
 
   def status_in_finished?
