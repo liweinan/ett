@@ -20,7 +20,7 @@ begin
   page << "var submit = true;"
   page << "var x = '#{type_build}';"
   page << "var is_eap6_pac = #{is_eap6_pac};"
-  page << "var clentry = '#{params['clentry']['text']}';"
+  page << "var clentry = '#{params['clentry']['text'].inspect}';"
   page << "var move_fwd = true;"
   page << "if (x == 'chain' && is_eap6_pac) {"
   page << "  move_fwd = confirm(\"#{warning_string}\");"
