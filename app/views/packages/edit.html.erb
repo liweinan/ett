@@ -70,7 +70,19 @@
             var ver = document.getElementById('package_ver').value;
             var status = document.getElementById('package_status_id').value;
 
-            if (ver != "") {
+            // default is always the second option
+            var defaultSelected = document.getElementById('package_status_id').options[1].selected;
+
+            var notes = document.getElementById('package_notes');
+
+            if (status == '85' && !defaultSelected) {
+                var changelog_res = prompt('Please enter reason why this package is blocked');
+                if (changelog_res != null) {
+                    var changelog = '* Blocked @ ' + new Date().toDateString();
+                    changelog += '\n- Reason: ' + changelog_res;
+                    notes.value = changelog + '\n\n' + notes.value;
+                }
+            } else if (ver != "") {
                 if (!checkPackageVersionFormat(ver)) {
                     alert('<%=t"version_fmt_incorrect"%>');
                     return false;
