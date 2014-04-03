@@ -2,7 +2,7 @@
       id="pac_<%= pac_id %>_<%= field_name %>_form"
       method="post"
       onsubmit="postInlineEditorForm('<%=pac_id%>', '<%=field_name%>', this);return false;">
-
+  <% package = Package.find(pac_id) %>
   <%= hidden_field_tag '_method', 'put' %>
   <%= hidden_field_tag '_type', 'inline' %>
   <%= hidden_field_tag :id, pac_id %>
