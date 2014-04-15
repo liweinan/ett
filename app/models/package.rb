@@ -688,10 +688,7 @@ class Package < ActiveRecord::Base
 
   def update_source_url_info
     self.brew_scm_url = get_scm_url_brew
-
-    if self.git_url.nil? || self.git_url.empty?
-      self.git_url = self.brew_scm_url
-    end
+    self.git_url = self.brew_scm_url
     save
   end
 
