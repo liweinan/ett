@@ -1,11 +1,7 @@
 <div class='manage-tbl'>
   <table id='bz_list_tbl'>
-    <tr>
-      <th class='content-list-head'>OS</th>
-      <th class='content-list-head'>Advisory</th>
-      <th class='content-list-head'>Candidate Tag</th>
+    <%=render :partial => 'tasks/os_arch/header'%>
 
-    </tr>
     <tr id='bz_list_row_haha'>
       <% task_os_adv_tags = @task.os_advisory_tags %>
       <% if task_os_adv_tags.size > 0 %>
@@ -99,8 +95,8 @@
     function delete_last_row() {
         var tbl = document.getElementById('bz_list_tbl');
         var rowCnt = tbl.rows.length;
-        if (rowCnt != 2) {
-            tbl.deleteRow(rowCnt - 1);
+        if (rowCnt > 2) {
+            tbl.deleteRow(rowCnt - 2);
         }
     }
 </script>
