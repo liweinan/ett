@@ -36,7 +36,7 @@
     </tr>
     <tr>
       <td>
-          Milestone:
+        Milestone:
       </td>
       <td>
         <%= h @task.milestone %>
@@ -66,31 +66,31 @@
         <%= @task.advisory %>
       </td>
     </tr>
-	<tr>
+    <tr>
       <td>Can Show</td>
       <td><%= @task.can_show %></td>
     </tr>
   </table>
 </div>
 
-<br/>
-
+<p/>
+<div class='manage-tbl'>
   <table id='bz_list_tbl'>
     <tr>
-        <th class='content-list-head'>OS</th>
-        <th class='content-list-head'>Advisory</th>
-        <th class='content-list-head'>Candidate Tag</th>
+      <th class='content-list-head'>OS</th>
+      <th class='content-list-head'>Advisory</th>
+      <th class='content-list-head'>Candidate Tag</th>
     </tr>
-    <% (@task.os_advisory_tags.each.sort_by {|tag| tag.priority}).each do |tag| %>
+    <% (@task.os_advisory_tags.each.sort_by { |tag| tag.priority }).each do |tag| %>
         <tr>
-            <td><%=tag.os_arch%></td>
-            <td><%=tag.advisory%></td>
-            <td><%=tag.candidate_tag%></td>
+          <td><%= tag.os_arch %></td>
+          <td><%= tag.advisory %></td>
+          <td><%= tag.candidate_tag %></td>
         </tr>
     <% end %>
-    </table>
-
-
+  </table>
+</div>
+<p/>
 <% if can_manage? %>
     <%= link_to 'Edit', :controller => :tasks, :action => :edit, :id => escape_url(@task.name) %> |
 <% end %>

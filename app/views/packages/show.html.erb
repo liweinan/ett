@@ -74,6 +74,9 @@ GitUrl: <%= h @package.git_url %>
 
 <%= render :partial => 'packages/fields/track_time' %>
 
+<% if logged_in? && !@package.status_in_finished? && current_user != @package.assignee %>
+    <%= link_to 'Assign To Me', :controller => 'packages', :action => 'edit', :id => escape_url(@package.name), :assignee => current_user %> |
+<% end %>
 
 <% unless @package.task.readonly? %>
     <% if can_edit_package? @package %>
@@ -89,9 +92,6 @@ GitUrl: <%= h @package.git_url %>
         <% end %>
     <% end %>
 
-    <% if logged_in? && !@package.status_in_finished? && current_user != @package.assignee %>
-        <%= link_to 'Assign To Me', :controller => 'packages', :action => 'edit', :id => escape_url(@package.name), :assignee => current_user %>
-    <% end %>
 
 <% end %>
 

@@ -1,0 +1,106 @@
+<div class='manage-tbl'>
+  <table id='bz_list_tbl'>
+    <tr>
+      <th class='content-list-head'>OS</th>
+      <th class='content-list-head'>Advisory</th>
+      <th class='content-list-head'>Candidate Tag</th>
+
+    </tr>
+    <tr id='bz_list_row_haha'>
+      <% task_os_adv_tags = @task.os_advisory_tags %>
+      <% if task_os_adv_tags.size > 0 %>
+          <% first_os_adv_tag = task_os_adv_tags[0] %>
+          <% os_arch = first_os_adv_tag.os_arch %>
+          <% advisory = first_os_adv_tag.advisory %>
+          <% tag = first_os_adv_tag.candidate_tag %>
+      <% else %>
+          <% os_arch = advisory = tag = "" %>
+      <% end %>
+
+      <%= render :partial => 'tasks/os_box', :locals => {:count => 1, :default_val => os_arch} %>
+      <%= render :partial => 'tasks/advisory_box', :locals => {:count => 1, :default_val => advisory} %>
+      <%= render :partial => 'tasks/tag_box', :locals => {:count => 1, :default_val => tag} %>
+    </tr>
+    <% if task_os_adv_tags.size > 1 %>
+        <% count = 2 %>
+        <% task_os_adv_tags[1..task_os_adv_tags.size].each do |os_adv_tag| %>
+            <tr>
+              <%= render :partial => 'tasks/os_box', :locals => {:count => count, :default_val => os_adv_tag.os_arch} %>
+              <%= render :partial => 'tasks/advisory_box', :locals => {:count => count, :default_val => os_adv_tag.advisory} %>
+              <%= render :partial => 'tasks/tag_box', :locals => {:count => count, :default_val => os_adv_tag.candidate_tag} %>
+              <% count = count + 1 %>
+            </tr>
+        <% end %>
+    <% end %>
+    <tr>
+      <td id="col_add_new" class="small_font" colspan="3" style="text-align: right">
+        <a onclick="add_new_row()">Add New Row</a> /
+        <a onclick="delete_last_row()">Delete Last Row</a>
+      </td>
+    </tr>
+
+  </table>
+</div>
+
+<script>
+    function add_new_row() {
+        var tbl = document.getElementById('bz_list_tbl');
+        var rowCnt = tbl.rows.length;
+        var row = tbl.insertRow(rowCnt - 1);
+        row.id = 'bz_list_row_' + 123;
+
+        var colOs = row.insertCell(0);
+        colOs.id = "col_os" + rowCnt;
+        renderOs(rowCnt, colOs);
+
+        var colAdvisory = row.insertCell(1);
+        colAdvisory.id = "col_advisory" + rowCnt;
+        renderAdvisory(rowCnt, colAdvisory);
+
+        var colTag = row.insertCell(2);
+        colTag.id = "col_tag" + rowCnt;
+        renderTag(rowCnt, colTag);
+
+
+        Element.show(row);
+        Element.highlight(row);
+    }
+
+    function renderOs(rowCnt, colOs) {
+        renderPartial(rowCnt, colOs.id, 'tasks/os_box');
+    }
+
+    function renderAdvisory(rowCnt, colAdvisory) {
+        renderPartial(rowCnt, colAdvisory.id, 'tasks/advisory_box');
+    }
+
+    function renderTag(rowCnt, colTag) {
+        renderPartial(rowCnt, colTag.id, 'tasks/tag_box');
+    }
+
+    function renderPartial(count, div_id, partial) {
+        new Ajax.Request('/tasks/render_partial/' + count, {
+            method: 'GET',
+            asynchronous: true,
+            evalScripts: true,
+            onSuccess: function (response) {
+                var content = response.responseText;
+                var div = document.getElementById(div_id);
+                div.innerHTML = content;
+                Element.show(div);
+                Element.highlight(div);
+            },
+            parameters: {
+                "count": count,
+                "partial": partial,
+            }
+        });
+    }
+    function delete_last_row() {
+        var tbl = document.getElementById('bz_list_tbl');
+        var rowCnt = tbl.rows.length;
+        if (rowCnt != 2) {
+            tbl.deleteRow(rowCnt - 1);
+        }
+    }
+</script>
