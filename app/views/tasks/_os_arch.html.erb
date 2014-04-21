@@ -2,7 +2,6 @@
   <table id='bz_list_tbl'>
     <%= render :partial => 'tasks/os_arch/header' %>
     <% task_os_adv_tags = @task.sorted_os_advisory_tags %>
-    <% first_os_adv_tag = task_os_adv_tags[0] %>
     <% if task_os_adv_tags.size > 0 %>
         <% task_os_adv_tags.each_with_index do |os_adv_tag, count| %>
             <tr>
@@ -50,7 +49,6 @@
         colCandidateTag.id = "col_candidate_tag" + rowCnt;
         renderCandidateTag(rowCnt, colCandidateTag);
 
-
         Element.show(row);
         Element.highlight(row);
     }
@@ -89,7 +87,7 @@
             },
             parameters: {
                 "count": count,
-                "partial": partial,
+                "partial": partial
             }
         });
     }

@@ -5,12 +5,10 @@
     <tr>
       <th>Name</th>
       <th>Can Show</th>
-      <th>Candidate Tag</th>
       <th>Target Release</th>
       <th>Prod</th>
       <th>Milestone</th>
       <th>Version</th>
-      <th>Advisory</th>
       <% if can_manage? %>
           <th>Operation</th>
       <% end %>
@@ -20,13 +18,6 @@
         <tr>
           <td style="text-align:left;"><%= link_to task.name, :controller => :tasks, :action => :show, :id => escape_url(task.name) %></td>
           <td><%= task.can_show %></td>
-          <td>
-            <% if task.candidate_tag.blank? %>
-                -
-            <% else %>
-                <%= task.candidate_tag %>
-            <% end %>
-          </td>
           <td>
             <% if task.target_release.blank? %>
                 -
@@ -53,13 +44,6 @@
                 -
             <% else %>
                 <%= task.tag_version %>
-            <% end %>
-          </td>
-          <td>
-            <% if task.advisory.blank? %>
-                -
-            <% else %>
-                <%= task.advisory %>
             <% end %>
           </td>
           <% if can_manage? %>

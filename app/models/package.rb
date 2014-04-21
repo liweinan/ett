@@ -622,13 +622,13 @@ class Package < ActiveRecord::Base
     brew_pkg = self.get_brew_name
     self.brew = brew_pkg
     if brew_pkg.blank?
-      uri = URI.parse("http://pkgs.devel.redhat.com/cgit/rpms/#{self.name}/plain/last-mead-build?h=#{self.task.candidate_tag}")
+      uri = URI.parse("http://pkgs.devel.redhat.com/cgit/rpms/#{self.name}/plain/last-mead-build?h=#{self.task.primary_os_advisory_tag.candidate_tag}")
       res = Net::HTTP.get_response(uri)
       # TODO: error handling
       package_old_mead = res.body if res.code == '200'
       package_name = self.parse_nvr(package_old_mead)[:name]
 
-      uri = URI.parse("http://mead.usersys.redhat.com/mead-brewbridge/pkg/latest/#{self.task.candidate_tag}-build/#{package_name}")
+      uri = URI.parse("http://mead.usersys.redhat.com/mead-brewbridge/pkg/latest/#{self.task.primary_os_advisory_tag.candidate_tag}-build/#{package_name}")
       res = Net::HTTP.get_response(uri)
       self.mead = res.body if res.code == '200'
     else
@@ -662,7 +662,7 @@ class Package < ActiveRecord::Base
 
   def get_brew_name(candidate_tag=nil)
     # TODO: make the tag more robust
-    tag = candidate_tag.nil? ? "#{task.candidate_tag}-build" : candidate_tag
+    tag = candidate_tag.nil? ? "#{task.primary_os_advisory_tag.candidate_tag}-build" : candidate_tag
 
     uri = URI.parse(URI.encode("#{APP_CONFIG['mead_scheduler']}/mead-brewbridge/pkg/latest/#{tag}/#{name}"))
 

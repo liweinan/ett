@@ -92,5 +92,12 @@ class Task < ActiveRecord::Base
     OsAdvisoryTag.all(:conditions => ['task_id = ?', self.id], :order => :priority)
   end
 
-
+  def primary_os_advisory_tag
+    primary = sorted_os_advisory_tags[0]
+    if primary.blank?
+      OsAdvisoryTag.new
+    else
+      primary
+    end
+  end
 end
