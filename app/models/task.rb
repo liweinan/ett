@@ -88,4 +88,9 @@ class Task < ActiveRecord::Base
     Package.all(:conditions => ["task_id = ? and status_id in (select id from statuses where is_track_time != 'No') or status_id is null", id])
   end
 
+  def sorted_os_advisory_tags
+    OsAdvisoryTag.all(:conditions => ['task_id = ?', self.id], :order => :priority)
+  end
+
+
 end

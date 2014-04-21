@@ -76,17 +76,9 @@
 <p/>
 <div class='manage-tbl'>
   <table id='bz_list_tbl'>
-    <tr>
-      <th class='content-list-head'>OS</th>
-      <th class='content-list-head'>Advisory</th>
-      <th class='content-list-head'>Candidate Tag</th>
-    </tr>
-    <% (@task.os_advisory_tags.each.sort_by { |tag| tag.priority }).each do |tag| %>
-        <tr>
-          <td><%= tag.os_arch %></td>
-          <td><%= tag.advisory %></td>
-          <td><%= tag.candidate_tag %></td>
-        </tr>
+    <%= render :partial => 'tasks/os_arch/header' %>
+    <% @task.sorted_os_advisory_tags.each do |os_advisory_tag| %>
+        <%= render :partial => 'tasks/os_arch/fields', :locals => {:os_advisory_tag => os_advisory_tag} %>
     <% end %>
   </table>
 </div>

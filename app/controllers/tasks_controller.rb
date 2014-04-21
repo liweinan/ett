@@ -86,21 +86,18 @@ class TasksController < ApplicationController
     @task = Task.find(params[:id])
     params[:task][:name].strip!
     params[:task][:name].downcase!
-
-    os_adv_tags = params.keys.select {|key| key.to_s.start_with? 'task_os' }
-    os_adv_tags = os_adv_tags.sort_by &:to_s
-
     # verify if all the fields are filled
 
+    # TODO: We will check it by JavaScript
     os_adv_tag_error = false
-    modify_any_os_adv_tag = verify_os_options_valid(os_adv_tags, params)
+    # modify_any_os_adv_tag = verify_os_options_valid(os_adv_tags, params)
 
     # if only the first field is filled and they are left blank, ignore
-    os_adv_tag_error = true if (os_adv_tags.size != 1 && !modify_any_os_adv_tag)
+    # os_adv_tag_error = true if (os_adv_tags.size != 1 && !modify_any_os_adv_tag)
 
-    if !os_adv_tag_error && modify_any_os_adv_tag
-      update_and_add_new_os_adv_tag(os_adv_tags, params, @task)
-    end
+    # if !os_adv_tag_error && modify_any_os_adv_tag
+    update_and_add_new_os_adv_tag(params, @task)
+    # end
 
     respond_to do |format|
       if @task.update_attributes(params[:task]) && !os_adv_tag_error
@@ -195,11 +192,11 @@ class TasksController < ApplicationController
 
     if params[:target_task_name].blank?
       @error_message << 'Target task name not specified.'
-    #else
-    #  @task = Task.find_by_name(unescape_url(params[:target_task_name].downcase.strip))
-    #  if @task
-    #    @error_message << "Target task name already used."
-    #  end
+      #else
+      #  @task = Task.find_by_name(unescape_url(params[:target_task_name].downcase.strip))
+      #  if @task
+      #    @error_message << "Target task name already used."
+      #  end
     end
 
     if params[:source_task_name].strip == params[:target_task_name].strip
@@ -229,7 +226,7 @@ class TasksController < ApplicationController
 
     unless @error_message.blank?
       @task = Task.find_by_name(unescape_url(params[:source_task_name]))
-      render :controller =>'tasks', :action => 'clone', :id => escape_url(params[:source_task_name])
+      render :controller => 'tasks', :action => 'clone', :id => escape_url(params[:source_task_name])
     end
   end
 
@@ -242,8 +239,8 @@ class TasksController < ApplicationController
     num_os_adv_tags = os_adv_tags.size
     (1..num_os_adv_tags).each do |i|
       if params[params_os + i.to_s].blank? ||
-         params[params_adv + i.to_s].blank? ||
-         params[params_tag + i.to_s].blank?
+          params[params_adv + i.to_s].blank? ||
+          params[params_tag + i.to_s].blank?
         return false
       end
     end
@@ -251,26 +248,24 @@ class TasksController < ApplicationController
     true
   end
 
-  # TODO: optimize this. right now I'm just dumbly deleting and recreating new
-  # ones
-  def update_and_add_new_os_adv_tag(os_adv_tags, params, task)
+  def update_and_add_new_os_adv_tag(params, task)
+    # Delete existing ones
+    task.os_advisory_tags.each { |to_delete| to_delete.delete }
 
-    params_os = 'task_os_'
-    params_adv = 'task_advisory_'
-    params_tag = 'task_tag_'
-
-    # delete existing ones
-    task.os_advisory_tags.each {|to_delete| to_delete.delete}
-
-    os_adv_tags.each_with_index do |_, x|
-      i = x + 1
-      to_save = OsAdvisoryTag.new
-      to_save.os_arch = params[params_os + i.to_s]
-      to_save.advisory = params[params_adv + i.to_s]
-      to_save.candidate_tag = params[params_tag + i.to_s]
-      to_save.task_id = task.id
-      to_save.priority = i.to_s
-      to_save.save
+    # Create new set of data.
+    # We assume JavaScript in task/edit.html.erb has validated all the data is sane.
+    unless params[:advisories].blank?
+      params[:advisories].each_with_index do |_, idx|
+        to_save = OsAdvisoryTag.new
+        to_save.os_arch = params[:oses][idx]
+        to_save.advisory = params[:advisories][idx]
+        to_save.candidate_tag = params[:candidate_tags][idx]
+        to_save.build_tag = params[:build_tags][idx]
+        to_save.target_tag = params[:target_tags][idx]
+        to_save.task_id = task.id
+        to_save.priority = idx.to_s
+        to_save.save
+      end
     end
   end
 end
