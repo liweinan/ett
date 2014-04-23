@@ -185,9 +185,9 @@ class Package < ActiveRecord::Base
   # Returns: List of BzBugs objects
   def upgrade_bz
     self.bz_bugs.select do |bz_bug|
-      bz_bug.summary.grep(/Upgrade #{self.name}/) &&
+      bz_bug.summary.include?("Upgrade #{self.name}") &&
       bz_bug.component == 'RPMs' &&
-      bz_bug.keywords.grep(/Rebase/)
+      bz_bug.keywords.include?('Rebase')
     end
   end
 
