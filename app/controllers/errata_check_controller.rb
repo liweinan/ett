@@ -15,12 +15,7 @@ class ErrataCheckController < ApplicationController
 
     nvrs.each do |nvr|
 
-      if nvr.start_with? 'sun-ws-metadata-2.0-api'
-        # TODO: temporary hack to get the correct package name for sunws
-        pac_name = 'sun-ws-metadata-2.0-api'
-      else
-        pac_name = nvr.gsub(/-[0-9].*/, '')
-      end
+      pac_name = parse_nvr(nvr)[:name]
 
       package = Package.first(:conditions => ['task_id = ? and name = ?',
                                               task.id,
@@ -62,12 +57,7 @@ class ErrataCheckController < ApplicationController
 
     rpmdiffs.each do |rpmdiff|
         nvr = rpmdiff['nvr']
-        if nvr.start_with? 'sun-ws-metadata-2.0-api'
-          # TODO: temporary hack to get the correct package name for sunws
-          pac_name = 'sun-ws-metadata-2.0-api'
-        else
-          pac_name = nvr.gsub(/-[0-9].*/, '')
-        end
+        pac_name = parse_nvr(nvr)[:name]
         package = Package.first(:conditions => ['task_id = ? and name = ?',
                                                 task.id,
                                                 pac_name])
@@ -80,5 +70,19 @@ class ErrataCheckController < ApplicationController
         end
     end
     render :text => 'OK', :status => 202
+  end
+
+  private
+  def parse_nvr(nvr)
+    ret = {}
+    p2 = nvr.rindex('-')
+    p1 = nvr.rindex('-', p2 - 1)
+    puts p1
+    puts p2
+    ret[:release] = nvr[(p2 + 1)..-1]
+    ret[:version] = nvr[(p1 + 1)...p2]
+    ret[:name] = nvr[0...p1]
+
+    ret
   end
 end
