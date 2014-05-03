@@ -101,4 +101,14 @@
         return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
     }
 
+    function findParentNodeByClass(self, clazz) {
+        if (self == undefined || self instanceof clazz) {
+            return self;
+        } else {
+            return findParentNodeByClass(self.parentNode, clazz);
+        }
+    }
+
+
+
 </script>

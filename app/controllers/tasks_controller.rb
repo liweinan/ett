@@ -231,7 +231,6 @@ class TasksController < ApplicationController
   end
 
   def verify_os_options_valid(os_adv_tags, params)
-
     params_os = 'task_os_'
     params_adv = 'task_advisory_'
     params_tag = 'task_tag_'

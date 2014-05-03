@@ -1,5 +1,5 @@
 <div class='manage-tbl'>
-  <table id='bz_list_tbl'>
+  <table id='os_adv_tbl'>
     <%= render :partial => 'tasks/os_arch/header' %>
     <% task_os_adv_tags = @task.sorted_os_advisory_tags %>
     <% if task_os_adv_tags.size == 0 %>
@@ -20,90 +20,119 @@
 </div>
 
 <% content_for :js do %>
-<script>
-    function add_new_row() {
-        var tbl = document.getElementById('bz_list_tbl');
-        var rowCnt = tbl.rows.length;
-        var row = tbl.insertRow(rowCnt - 1);
-        row.id = 'bz_list_row_' + rowCnt;
+    <script>
+        function add_new_row() {
+            var tbl = document.getElementById('os_adv_tbl');
+            var rowCnt = tbl.rows.length;
+            var row = tbl.insertRow(rowCnt - 1);
+            row.id = 'os_adv_row_' + rowCnt;
 
-        var colOs = row.insertCell(0);
-        colOs.id = "col_os" + rowCnt;
-        renderOs(rowCnt, colOs);
+            var colOs = row.insertCell(0);
+            colOs.id = "col_os" + rowCnt;
+            renderOs(rowCnt, colOs);
 
-        var colAdvisory = row.insertCell(1);
-        colAdvisory.id = "col_advisory" + rowCnt;
-        renderAdvisory(rowCnt, colAdvisory);
+            var colAdvisory = row.insertCell(1);
+            colAdvisory.id = "col_advisory" + rowCnt;
+            renderAdvisory(rowCnt, colAdvisory);
 
-        var colTargetTag = row.insertCell(2);
-        colTargetTag.id = "col_target_tag" + rowCnt;
-        renderTargetTag(rowCnt, colTargetTag);
+            var colTargetTag = row.insertCell(2);
+            colTargetTag.id = "col_target_tag" + rowCnt;
+            renderTargetTag(rowCnt, colTargetTag);
 
-        var colBuildTag = row.insertCell(3);
-        colBuildTag.id = "col_build_tag" + rowCnt;
-        renderBuildTag(rowCnt, colBuildTag);
+            var colBuildTag = row.insertCell(3);
+            colBuildTag.id = "col_build_tag" + rowCnt;
+            renderBuildTag(rowCnt, colBuildTag);
 
-        var colCandidateTag = row.insertCell(4);
-        colCandidateTag.id = "col_candidate_tag" + rowCnt;
-        renderCandidateTag(rowCnt, colCandidateTag);
+            var colCandidateTag = row.insertCell(4);
+            colCandidateTag.id = "col_candidate_tag" + rowCnt;
+            renderCandidateTag(rowCnt, colCandidateTag);
 
-        Element.show(row);
-        Element.highlight(row);
-    }
+            Element.show(row);
+            Element.highlight(row);
+        }
 
-    function renderOs(rowCnt, colOs) {
-        renderPartial(rowCnt, colOs.id, 'tasks/os_arch/os_box');
-    }
+        function renderOs(rowCnt, colOs) {
+            renderPartial(rowCnt, colOs.id, 'tasks/os_arch/os_box');
+        }
 
-    function renderAdvisory(rowCnt, col) {
-        renderPartial(rowCnt, col.id, 'tasks/os_arch/advisory_box');
-    }
+        function renderAdvisory(rowCnt, col) {
+            renderPartial(rowCnt, col.id, 'tasks/os_arch/advisory_box');
+        }
 
-    function renderBuildTag(rowCnt, col) {
-        renderPartial(rowCnt, col.id, 'tasks/os_arch/build_tag');
-    }
+        function renderBuildTag(rowCnt, col) {
+            renderPartial(rowCnt, col.id, 'tasks/os_arch/build_tag');
+        }
 
-    function renderTargetTag(rowCnt, col) {
-        renderPartial(rowCnt, col.id, 'tasks/os_arch/target_tag');
-    }
+        function renderTargetTag(rowCnt, col) {
+            renderPartial(rowCnt, col.id, 'tasks/os_arch/target_tag');
+        }
 
-    function renderCandidateTag(rowCnt, col) {
-        renderPartial(rowCnt, col.id, 'tasks/os_arch/candidate_tag');
-    }
+        function renderCandidateTag(rowCnt, col) {
+            renderPartial(rowCnt, col.id, 'tasks/os_arch/candidate_tag');
+        }
 
-    function renderPartial(count, div_id, partial) {
-        new Ajax.Request('/tasks/render_partial/' + count, {
-            method: 'GET',
-            asynchronous: true,
-            evalScripts: true,
-            onSuccess: function (response) {
-                var content = response.responseText;
-                var div = document.getElementById(div_id);
-                div.innerHTML = content;
-                Element.show(div);
-                Element.highlight(div);
-            },
-            parameters: {
-                "count": count,
-                "partial": partial
-            }
-        });
-    }
+        function renderPartial(count, div_id, partial) {
+            new Ajax.Request('/tasks/render_partial/' + count, {
+                method: 'GET',
+                asynchronous: true,
+                evalScripts: true,
+                onSuccess: function (response) {
+                    var content = response.responseText;
+                    var div = document.getElementById(div_id);
+                    div.innerHTML = content;
+                    Element.show(div);
+                    Element.highlight(div);
+                },
+                parameters: {
+                    "count": count,
+                    "partial": partial
+                }
+            });
+        }
 
-    function delete_last_row() {
-        var tbl = document.getElementById('bz_list_tbl');
-        var rowCnt = tbl.rows.length;
-        if (rowCnt > 3) {
-            tbl.deleteRow(rowCnt - 2);
-        } else if (rowCnt == 3) {
-            // We just clear the last row, but don't delete it from UI.
-            // The function is not affected.
-            lastRow = tbl.rows[1];
-            boxes = document.getObjectsByClass(HTMLInputElement, lastRow);
-            for (i = 0; i < boxes.length; i++) {
-                boxes[i].value = "";
+        function delete_last_row() {
+            var tbl = document.getElementById('os_adv_tbl');
+            var rowCnt = tbl.rows.length;
+            if (rowCnt > 3) {
+                tbl.deleteRow(rowCnt - 2);
+            } else if (rowCnt == 3) {
+                // We just clear the last row, but don't delete it from UI.
+                // The function is not affected.
+                lastRow = tbl.rows[1];
+                boxes = document.getObjectsByClass(HTMLInputElement, lastRow);
+                for (i = 0; i < boxes.length; i++) {
+                    boxes[i].value = "";
+                }
             }
         }
-    }
-</script>
+
+        function validate_os_advisory_table() {
+            // 1. all blanks are allowed
+            // 2. if a row is filled, then all the fields of the row should be filled
+            all_blank = true;
+            var tbl = document.getElementById('os_adv_tbl');
+            boxes = document.getObjectsByClass(HTMLInputElement, tbl);
+            rowSize = tbl.rows.length - 1;
+            alert("row size: " + rowSize);
+            for (i = 0; i < boxes.length; i++) {
+                // bypass header at first row and buttons at last row
+                rowIdx = (findParentNodeByClass(boxes[i], HTMLTableRowElement)).rowIndex;
+                if (rowIdx == 0 || rowIdx == rowSize)
+                    continue;
+                if (trim_str(boxes[i].value) != '')
+                    all_blank = false;
+                // now we validate the data integrity
+                // if a row is not blank, then all fields of the row need to be filled
+                // TODO
+            }
+
+            return false;
+        }
+
+        function trim_str(str) {
+            if (str == undefined)
+                return str;
+            return str.replace(/^\s+|\s+$/g, '');
+        }
+    </script>
 <% end %>
