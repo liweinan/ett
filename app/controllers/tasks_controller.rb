@@ -254,7 +254,7 @@ class TasksController < ApplicationController
 
     # Create new set of data.
     # We assume JavaScript in task/edit.html.erb has validated all the data is sane.
-    unless params[:advisories].blank?
+    unless empty_row?(params[:advisories])
       params[:advisories].each_with_index do |_, idx|
         to_save = OsAdvisoryTag.new
         to_save.os_arch = params[:oses][idx]
@@ -266,6 +266,19 @@ class TasksController < ApplicationController
         to_save.priority = idx.to_s
         to_save.save
       end
+    end
+  end
+
+  # blank rows from UI are accepted.
+  def empty_row?(row)
+    if row.blank?
+      true
+    else
+      empty = true
+      row.each do |col|
+        (empty = false) unless col.blank?
+      end
+      empty
     end
   end
 end

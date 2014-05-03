@@ -1,0 +1,7 @@
+<tr>
+  <%= render :partial => 'tasks/os_arch/os_box', :locals => {:count => count, :default_val => default_val.os_arch} %>
+  <%= render :partial => 'tasks/os_arch/advisory_box', :locals => {:count => count, :default_val => default_val.advisory} %>
+  <%= render :partial => 'tasks/os_arch/target_tag', :locals => {:count => count, :default_val => default_val.target_tag} %>
+  <%= render :partial => 'tasks/os_arch/build_tag', :locals => {:count => count, :default_val => default_val.build_tag} %>
+  <%= render :partial => 'tasks/os_arch/candidate_tag', :locals => {:count => count, :default_val => default_val.candidate_tag} %>
+</tr>
