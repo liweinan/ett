@@ -107,7 +107,7 @@ Statuses:
 
 <div class='manage-tbl'>
   <%= render :partial => 'layouts/sep' %>
-  <table>
+  <table data-mode="columntoggle">
     <%= render :partial => 'packages/index/header', :locals => {:col => 'th'} %>
     <% @packages.each_with_index do |package, i| %>
         <% if i % 25 == 0 && i > 0 %>
