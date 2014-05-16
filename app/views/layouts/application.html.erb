@@ -10,9 +10,15 @@
   <%= yield :css %>
 
   <%= stylesheet_link_tag 'style.css' %>
+  <%= stylesheet_link_tag 'tablesaw.css' %>
+  <%= stylesheet_link_tag '/javascripts/filament-dialog/dialog.css' %>
   <%= stylesheet_link_tag '/javascripts/syntaxHighlighter/styles/shCore.css' %>
   <%= stylesheet_link_tag '/javascripts/syntaxHighlighter/styles/shThemeDefault.css' %>
+  <%= stylesheet_link_tag 'icons.fallback.css' %>
   <%= javascript_include_tag 'tinybox.js' %>
+  <%= javascript_include_tag 'jquery/dist/jquery.js' %>
+  <%= javascript_include_tag 'filament-dialog/dialog.js' %>
+  <%= javascript_include_tag 'tablesaw.js' %>
 </head>
 <body>
 <%# image_tag 'confidential.jpg' %>
