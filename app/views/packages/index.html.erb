@@ -115,15 +115,7 @@ Statuses:
         <% end %>
         <tr>
           <% @show_progress = true %>
-		  <% if logged_in? %>
-          <%= link_to 'Clone',
-                      :controller => :packages,
-                      :action => :clone,
-                      :id => escape_url(package.name),
-                      :task_id => escape_url(package.task.name) %>
-          /
-		  <% end %>
-          <% if logged_in? && (!has_task? || !Task.readonly?(task_erb)) %>
+          <% if logged_in? %>
               <%= render :partial => 'packages/index/ops', :locals => {:package => package} %>
           <% end %>
           <%= render :partial => 'packages/index/name', :locals => {:package => package} %>

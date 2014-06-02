@@ -1,43 +1,67 @@
 <td style='font-size:10px;'>
+
   <% unless package.blank? %>
       <% if logged_in? %>
           <% unless package.deleted? %>
               <% if can_manage? %>
-                  <%= link_to 'Delete',
-                              package,
-                              :confirm => "Are you sure to delete #{escape_url(package.name)}?",
-                              :method => :delete %>
-                  /
-              <% elsif package.user_id == nil %>
-                  <%= link_to 'Take',
-                              :controller => 'actions',
-                              :action => 'take',
+                  <%= link_to 'Clone',
+                              :controller => :packages,
+                              :action => :clone,
                               :id => escape_url(package.name),
                               :task_id => escape_url(package.task.name) %>
                   /
               <% end %>
           <% end %>
-
-          <% if can_edit_package?(package) %>
-              <a href="javascript:void(0);"
-                 onclick="showCommentDialog('<%=package.id%>')">Comment</a>
-              <%= render :partial => 'layouts/progress_indicator',
-                         :locals => {:progress_indicator_id => "comment_area_indicator_#{package.id}"} %>
-              /
-              <a href="javascript:void(0);"
-                 onclick="showLog('<%=package.id%>')">Log</a>
-              <%= render :partial => 'layouts/progress_indicator',
-                         :locals => {:progress_indicator_id => "log_area_indicator_#{package.id}"} %>
-              /
-              <%= link_to 'Edit',
-                          :controller => 'packages',
-                          :action => 'edit',
-                          :id => escape_url(package.name),
-                          :task_id => escape_url(package.task.name) %>
-          <% end %>
       <% end %>
-      <div id="log_area_<%= package.id %>" style="display:none;"></div>
-      <div id="comment_area_<%= package.id %>" style="display:none;"></div>
+  <% end %>
+
+  <% if (!has_task? || !Task.readonly?(task_erb)) %>
+      <% unless package.blank? %>
+          <% if logged_in? %>
+              <% unless package.deleted? %>
+                  <% if can_manage? %>
+                      <%= link_to 'Clone',
+                                  :controller => :packages,
+                                  :action => :clone,
+                                  :id => escape_url(package.name),
+                                  :task_id => escape_url(package.task.name) %>
+                      /
+                      <%= link_to 'Delete',
+                                  package,
+                                  :confirm => "Are you sure to delete #{escape_url(package.name)}?",
+                                  :method => :delete %>
+                      /
+                  <% elsif package.user_id == nil %>
+                      <%= link_to 'Take',
+                                  :controller => 'actions',
+                                  :action => 'take',
+                                  :id => escape_url(package.name),
+                                  :task_id => escape_url(package.task.name) %>
+                      /
+                  <% end %>
+              <% end %>
+
+              <% if can_edit_package?(package) %>
+                  <a href="javascript:void(0);"
+                     onclick="showCommentDialog('<%=package.id%>')">Comment</a>
+                  <%= render :partial => 'layouts/progress_indicator',
+                             :locals => {:progress_indicator_id => "comment_area_indicator_#{package.id}"} %>
+                  /
+                  <a href="javascript:void(0);"
+                     onclick="showLog('<%=package.id%>')">Log</a>
+                  <%= render :partial => 'layouts/progress_indicator',
+                             :locals => {:progress_indicator_id => "log_area_indicator_#{package.id}"} %>
+                  /
+                  <%= link_to 'Edit',
+                              :controller => 'packages',
+                              :action => 'edit',
+                              :id => escape_url(package.name),
+                              :task_id => escape_url(package.task.name) %>
+              <% end %>
+          <% end %>
+          <div id="log_area_<%= package.id %>" style="display:none;"></div>
+          <div id="comment_area_<%= package.id %>" style="display:none;"></div>
+      <% end %>
   <% end %>
 </td>
 
