@@ -55,6 +55,8 @@ GitUrl: <%= h @package.git_url %>
     Mead: <%= h @package.mead %>
     <%= render :partial => 'layouts/sep_tiny' %>
 <% end %>
+Milestone: <%= h @package.milestone || '-' %>
+<%= render :partial => 'layouts/sep_tiny' %>
 
 <% if @package.status && @package.status.code == 'inprogress' && !@package.task.readonly? %>
     <%= render :partial => 'packages/fields/build' %>

@@ -8,15 +8,16 @@
   <<%= col %> data-priority="3" class='content-list-head'>Tags</<%= col %>>
   <<%= col %> data-priority="4" class='content-list-head'>Assignee</<%= col %>>
   <<%= col %> data-priority="5" class='content-list-head'>Version</<%= col %>>
+  <<%= col %> data-priority="6" class='content-list-head'>Milestone</<%= col %>>
   <% if @task.use_bz_integration? %>
-      <<%= col %> data-priority="6" class='content-list-head'>Errata BZ</<%= col %>>
-      <<%= col %> data-priority="7" class='content-list-head'>BZ</<%= col %>>
+      <<%= col %> data-priority="7" class='content-list-head'>Errata BZ</<%= col %>>
+      <<%= col %> data-priority="8" class='content-list-head'>BZ</<%= col %>>
   <% end %>
-  <<%= col %> data-priority="8" class='content-list-head'>GitUrl</<%= col %>>
+  <<%= col %> data-priority="9" class='content-list-head'>GitUrl</<%= col %>>
   <% if @task.use_mead_integration? %>
-      <<%= col %> data-priority="9" class='content-list-head'>Mead</<%= col %>>
-      <<%= col %> data-priority="10" class='content-list-head'>Brew <%= params.include?(:brew) ? "(#{params[:brew]})": ''%></<%= col %>>
-      <<%= col %> data-priority="11" class='content-list-head'>Rpm Diff</<%= col %>>
+      <<%= col %> data-priority="10" class='content-list-head'>Mead</<%= col %>>
+      <<%= col %> data-priority="11" class='content-list-head'>Brew <%= params.include?(:brew) ? "(#{params[:brew]})": ''%></<%= col %>>
+      <<%= col %> data-priority="12" class='content-list-head'>Rpm Diff</<%= col %>>
   <% end %>
 </tr>
 </thead>

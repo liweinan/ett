@@ -147,6 +147,10 @@ class PackagesController < ApplicationController
             update_time_track_and_log_entry(old_values, @package)
           end
 
+          if @package.status && @package.status.status_in_finished
+            @package.milestone = @package.task.milestone
+          end
+
           @package.save
 
           if Rails.env.production?

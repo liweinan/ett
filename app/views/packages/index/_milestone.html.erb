@@ -1,0 +1,7 @@
+<% unless package.blank? %>
+<%= render :partial => 'packages/index/field_template',
+           :locals => {:package => package,
+                       :field_name => 'milestone',
+                       :field_type => 'packages/index/milestone',
+                       :partial => 'packages/index/milestone_col'} %>
+<% end %>
