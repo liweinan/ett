@@ -15,7 +15,7 @@
       <% end %>
   <% end %>
 
-  <% if (!has_task? || !Task.readonly?(task_erb)) %>
+  <% if (!has_task? || !Task.readonly?(package.task.id)) %>
       <% unless package.blank? %>
           <% if logged_in? %>
               <% unless package.deleted? %>
