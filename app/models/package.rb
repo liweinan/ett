@@ -277,7 +277,7 @@ class Package < ActiveRecord::Base
   # Returns: string
   def rpmdiff_info(distro)
     rpmdiff = self.select_rpmdiff(distro)
-    if rpmdiff.blank?
+    if rpmdiff.blank? || rpmdiff[0].rpmdiff_status.blank?
       ''
     else
       RPMDIFF_INFO[rpmdiff[0].rpmdiff_status.to_i][:status]
@@ -291,7 +291,7 @@ class Package < ActiveRecord::Base
   # Returns: string
   def rpmdiff_link(distro)
     rpmdiff = self.select_rpmdiff(distro)
-    if rpmdiff.blank?
+    if rpmdiff.blank? || rpmdiff[0].rpmdiff_id.blank?
       ''
     else
       'https://errata.devel.redhat.com/rpmdiff/show/' + rpmdiff[0].rpmdiff_id
@@ -303,7 +303,7 @@ class Package < ActiveRecord::Base
   # Returns: string
   def rpmdiff_style(distro)
     rpmdiff = self.select_rpmdiff(distro)
-    if rpmdiff.blank?
+    if rpmdiff.blank? || rpmdiff[0].rpmdiff_status.blank?
       ''
     else
       RPMDIFF_INFO[rpmdiff[0].rpmdiff_status.to_i][:style]
