@@ -86,7 +86,7 @@ class ErrataCheckController < ApplicationController
             # there are sometimes a few rpmdiffs running for the same nvr. We
             # just take the decision to pick the rpmdiff with the largest
             # number, which means its the rpmdiff who ran the latest.
-            if rpmdiff_pac.rpmdiff_status.empty? ||
+            if rpmdiff_pac.rpmdiff_status.nil? ||
                rpmdiff['status'].to_i > rpmdiff_pac.rpmdiff_status.to_i
 
               rpmdiff_pac.rpmdiff_status = rpmdiff['status']
