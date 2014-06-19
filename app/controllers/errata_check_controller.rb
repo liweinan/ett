@@ -43,7 +43,7 @@ class ErrataCheckController < ApplicationController
       all_packages.each do |pkg|
         rpm_diff = pkg.get_rpmdiff(distro)
         rpm_diff.in_errata = 'NO'
-        # rpm_diff.save
+        rpm_diff.save
       end
     end
   end
@@ -83,16 +83,9 @@ class ErrataCheckController < ApplicationController
           package = package[0]
           rpmdiff_pac = package.get_rpmdiff(distro)
           if package.nvr_in_brew(distro) == rpmdiff['nvr']
-            # there are sometimes a few rpmdiffs running for the same nvr. We
-            # just take the decision to pick the rpmdiff with the largest
-            # number, which means its the rpmdiff who ran the latest.
-            if rpmdiff_pac.rpmdiff_status.nil? ||
-               rpmdiff['status'].to_i > rpmdiff_pac.rpmdiff_status.to_i
-
-              rpmdiff_pac.rpmdiff_status = rpmdiff['status']
-              rpmdiff_pac.rpmdiff_id = rpmdiff['id']
-              rpmdiff_pac.save
-            end
+            rpmdiff_pac.rpmdiff_status = rpmdiff['status']
+            rpmdiff_pac.rpmdiff_id = rpmdiff['id']
+            rpmdiff_pac.save
           end
         end
       end
