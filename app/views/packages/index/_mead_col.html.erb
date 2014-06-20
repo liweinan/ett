@@ -1,3 +1,7 @@
 <% unless package.blank? %>
-<%= package.mead %>
+    <% if package.mead_link %>
+        <%= link_to package.mead, package.mead_link %>
+    <% else %>
+        <%= package.mead %>
+    <% end %>
 <% end %>

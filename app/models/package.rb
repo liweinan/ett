@@ -408,7 +408,7 @@ class Package < ActiveRecord::Base
   def generate_bz_comment
     "Source URL: #{git_url}\n" +
     "Mead-Build: #{mead}\n" +
-    "Brew-Build: #{brew}\n"
+    "Brew-Build: #{self.nvr_in_brew('el6')}\n"
   end
 
   def select_rpmdiff(distro)
@@ -428,19 +428,40 @@ class Package < ActiveRecord::Base
     rpmdiff
   end
 
+  def get_brew_rpm_link(nvr)
+    server = XMLRPC::Client.new("brewhub.devel.redhat.com", "/brewhub", 80)
+    begin
+      call = server.call("getBuild", nvr)
+      'https://brewweb.devel.redhat.com/taskinfo?taskID=' + call['task_id'].to_s
+    rescue Exception => e
+      nil
+    end
+  end
+
+  def get_brew_maven_link(nvr)
+    server = XMLRPC::Client.new("brewhub.devel.redhat.com", "/brewhub", 80)
+    begin
+      call = server.call("getMavenBuild", nvr)
+      'https://brewweb.devel.redhat.com/buildinfo?buildID=' + call['build_id'].to_s
+    rescue Exception => e
+      get_brew_rpm_link(nvr)
+    end
+  end
+
   def update_mead_information
     if task.use_mead_integration?
       update_mead_brew_info
       update_source_url_info
 
       self.task.os_advisory_tags.each do |tag|
-        next if tag.os_arch == 'el6'
         brew_nvr =  self.brew_nvrs.select { |obj| obj.distro == tag.os_arch }
         if brew_nvr.blank?
           create_brew_nvr(tag.os_arch)
         else
-          brew_nvr[0].nvr = self.get_brew_name(tag.candidate_tag + '-build')
-          brew_nvr[0].save
+          brew_nvr = brew_nvr[0]
+          brew_nvr.nvr = self.get_brew_name(tag.candidate_tag + '-build')
+          brew_nvr.link = self.get_brew_rpm_link(brew_nvr.nvr)
+          brew_nvr.save
         end
       end
     end
@@ -620,7 +641,6 @@ class Package < ActiveRecord::Base
   # cannot find it via the mead scheduler
   def update_mead_brew_info
     brew_pkg = self.get_brew_name
-    self.brew = brew_pkg
     if brew_pkg.blank?
       uri = URI.parse("http://pkgs.devel.redhat.com/cgit/rpms/#{self.name}/plain/last-mead-build?h=#{self.task.primary_os_advisory_tag.candidate_tag}")
       res = Net::HTTP.get_response(uri)
@@ -634,6 +654,8 @@ class Package < ActiveRecord::Base
     else
       self.mead = get_mead_name(brew_pkg) unless brew_pkg.blank?
     end
+
+    self.mead_link = self.get_brew_maven_link(self.mead) if self.mead
 
     self.mead_action = Package::MEAD_ACTIONS[:done]
     self.save
@@ -742,20 +764,26 @@ class Package < ActiveRecord::Base
     end
   end
 
-  def nvr_in_brew(distro)
-    case distro
-    when 'el6'
-      self.brew
+  def pkg_brew_rpm_link(distro)
+    brew_nvr = self.brew_nvrs.select {|obj| obj.distro == distro}
+
+    if brew_nvr.blank?
+      nil
     else
-      if self.brew_nvrs.select{ |obj| obj.distro == distro }.blank?
-        if self.status_in_finished?
-          create_brew_nvr(distro)
-        else
-          '-'
-        end
+      brew_nvr[0].link
+    end
+  end
+
+  def nvr_in_brew(distro)
+    brew_nvr = self.brew_nvrs.select {|obj| obj.distro == distro}
+    if brew_nvr.blank?
+      if self.status_in_finished?
+        create_brew_nvr(distro)
       else
-        self.brew_nvrs.select { |obj| obj.distro == distro }[0].nvr
+        '-'
       end
+    else
+      brew_nvr[0].nvr
     end
   end
 

@@ -1,2 +1,6 @@
 <% distro = params.include?(:brew) ? params[:brew] : 'el6' %>
-<%= package.brew_in_errata(distro) %>
+<% if package.pkg_brew_rpm_link(distro) %>
+    <%= link_to package.brew_in_errata(distro), package.pkg_brew_rpm_link(distro) %>
+<% else %>
+    <%= package.brew_in_errata(distro) %>
+<% end %>

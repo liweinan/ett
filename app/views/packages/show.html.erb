@@ -48,11 +48,20 @@ GitUrl: <%= h @package.git_url %>
 <%= render :partial => 'layouts/sep_tiny' %>
 
 <% if @package.task.use_mead_integration? && !@package.task.readonly? %>
-    Brew: <%= h @package.nvr_in_errata %>
+
+    <% if @package.pkg_brew_rpm_link('el6') %>
+        Brew: <%= link_to @package.brew_in_errata('el6'), @package.pkg_brew_rpm_link('el6') %>
+    <% else %>
+        Brew: <%= h @package.brew_in_errata('el6') %>
+    <% end %>
 
     <%= render :partial => 'layouts/sep_tiny' %>
 
-    Mead: <%= h @package.mead %>
+    <% if @package.mead_link %>
+        Mead: <%= link_to @package.mead, @package.mead_link %>
+    <% else %>
+        Mead: <%= h @package.mead %>
+    <% end %>
     <%= render :partial => 'layouts/sep_tiny' %>
 <% end %>
 Milestone: <%= h @package.milestone || '-' %>
