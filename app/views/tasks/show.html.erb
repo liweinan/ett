@@ -12,6 +12,22 @@
     </tr>
     <tr>
       <td>
+        Repository:
+      </td>
+      <td>
+        <%= h @task.repository %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Active?:
+      </td>
+      <td>
+        <%= h @task.active == "1" ? "✓": "No" %>
+      </td>
+    </tr>
+    <tr>
+      <td>
         Target Release:
       </td>
       <td>

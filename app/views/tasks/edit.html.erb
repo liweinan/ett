@@ -5,6 +5,8 @@
       <%= f.error_messages %>
       <table>
         <%= render :partial => 'tasks/fields/name', :locals => {:f => f} %>
+        <%= render :partial => 'tasks/fields/active', :locals => {:f => f} %>
+        <%= render :partial => 'tasks/fields/repository', :locals => {:f => f} %>
         <%= render :partial => 'tasks/fields/target_release', :locals => {:f => f} %>
         <%= render :partial => 'tasks/fields/prod', :locals => {:f => f} %>
         <%= render :partial => 'tasks/fields/milestone', :locals => {:f => f} %>

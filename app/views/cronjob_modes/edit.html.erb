@@ -1,0 +1,22 @@
+<h2>Editing cronjob_mode</h2>
+<div style="height:20px;border:none;"></div>
+<div class='manage-tbl'>
+<% form_for(@cronjob_mode) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :mode %><br />
+    <%= f.text_field :mode %>
+  </p>
+  <p>
+    <%= f.label :description %><br />
+    <%= f.text_field :description %>
+  </p>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+</div>
+
+<%= link_to 'Show', @cronjob_mode %> |
+<%= link_to 'Back', cronjob_modes_path %>

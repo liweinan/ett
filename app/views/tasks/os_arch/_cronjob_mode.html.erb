@@ -1,0 +1,8 @@
+<td class="small_font">
+    <% default_val ||= nil %>
+
+    <% CronjobMode.all.each do |cron| %>
+        <% is_checked = !default_val.nil? && default_val.cron_mode_activated?(cron.mode) %>
+        <input type="checkbox" id="cronjob_<%=count%>" name="cronjob_<%=count%>[]" <%= is_checked ? "checked" : "" %> value="<%=cron.mode%>"><%= cron.mode %></input>
+    <% end %>
+</td>

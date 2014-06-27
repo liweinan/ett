@@ -1,0 +1,25 @@
+<h1>Listing cronjob_modes</h1>
+
+<div class='manage-tbl'>
+<table>
+  <tr>
+    <th>Mode</th>
+    <th>Description</th>
+  </tr>
+
+<% @cronjob_modes.each do |cronjob_mode| %>
+  <tr>
+    <td><%=h cronjob_mode.mode %></td>
+    <td><%=h cronjob_mode.description %></td>
+    <% if can_manage? %>
+        <td><%= link_to 'Show', cronjob_mode %></td>
+        <td><%= link_to 'Edit', edit_cronjob_mode_path(cronjob_mode) %></td>
+        <td><%= link_to 'Destroy', cronjob_mode, :confirm => 'Are you sure?', :method => :delete %></td>
+    <% end %>
+  </tr>
+<% end %>
+</table>
+</div>
+<br />
+
+<%= link_to 'New cronjob_mode', new_cronjob_mode_path %>

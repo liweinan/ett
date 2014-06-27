@@ -131,7 +131,8 @@ module ApplicationHelper
           latest_brew_nvr = pac.nvr_in_brew(os_tag.os_arch)
           link = "/mead-scheduler/rest/errata/#{prod}/files?dist=#{os_tag.os_arch}&nvr=#{latest_brew_nvr}&pkg=#{pac.name}&version=#{pac.task.tag_version}"
           link += '&bugs=' + bz_struct[os_tag.os_arch] if bz_struct.has_key? os_tag.os_arch
-          link +='&erratum=' + os_tag.advisory
+          link +='&erratum=' + os_tag.advisory unless os_tag.advisory.blank?
+          link += '&tag=' + os_tag.target_tag unless os_tag.target_tag.blank?
           puts link
           req = Net::HTTP::Post.new(link)
 

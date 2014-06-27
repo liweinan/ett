@@ -1,4 +1,6 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :cronjob_modes
+
   map.resources :task_groups
 
   map.resources :readonly_tasks
@@ -17,7 +19,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :relationships
   map.resources :settings
   map.resources :p_attachments
-  map.resources :tasks, :has_many => [:packages, :statuses, :tags, :settings]  
+  map.resources :tasks, :has_many => [:packages, :statuses, :tags, :settings]
   map.resources :brew_tags, :has_many => [:packages]
   map.resources :tags
   map.resources :statuses, :has_many => :packages
@@ -34,7 +36,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # Sample of regular route:
   #   map.connect 'tasks/:id', :controller => 'catalog', :action => 'view'
-  # Keep in mind you can assign values other than :controller and :action  
+  # Keep in mind you can assign values other than :controller and :action
 
   # Sample of named route:
   #   map.purchase 'tasks/:id/purchase', :controller => 'catalog', :action => 'purchase'
@@ -48,7 +50,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # Sample resourc  e route with sub-resources:
   #   map.resources :tasks, :has_many => [ :comments, :sales ], :has_one => :seller
-  
+
   # Sample resource route with more complex sub-resources
   #   map.resources :tasks do |tasks|
   #     tasks.resources :comments
@@ -72,6 +74,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'errata_check/sync', :controller => 'errata_check', :action => 'sync'
   map.connect 'errata_check/sync_bz', :controller => 'errata_check', :action => 'sync_bz'
   map.connect 'errata_check/sync_rpmdiffs', :controller => 'errata_check', :action => 'sync_rpmdiffs'
+  map.connect 'cronjob/products_to_build', :controller => 'cronjob_modes', :action => 'products_to_build'
   map.connect ':controller/:action/:id'
   map.connect ':controller/:action/:id.:format'
 end

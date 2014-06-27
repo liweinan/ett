@@ -4,4 +4,11 @@
   <td><%= os_advisory_tag.target_tag %></td>
   <td><%= os_advisory_tag.build_tag %></td>
   <td><%= os_advisory_tag.candidate_tag %></td>
+  <td><%= os_advisory_tag.errata_prod_release %></td>
+  <td>
+      <%= "| " %>
+      <% os_advisory_tag.modes_to_build.each do |mode| %>
+          <%= mode + " | "%>
+      <% end %>
+  </td>
 </tr>
