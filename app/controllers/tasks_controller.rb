@@ -253,7 +253,11 @@ class TasksController < ApplicationController
 
     # Create new set of data.
     # We assume JavaScript in task/edit.html.erb has validated all the data is sane.
+    #
+
     unless empty_row?(params[:advisories])
+
+
       params[:advisories].each_with_index do |_, idx|
         to_save = OsAdvisoryTag.new
         to_save.os_arch = params[:oses][idx]
@@ -261,6 +265,13 @@ class TasksController < ApplicationController
         to_save.candidate_tag = params[:candidate_tags][idx]
         to_save.build_tag = params[:build_tags][idx]
         to_save.target_tag = params[:target_tags][idx]
+        to_save.errata_prod_release = params[:errata_prod_release][idx]
+
+        unless params['cronjob_' + params[:indexes][idx]].blank?
+          params['cronjob_' + params[:indexes][idx]].each do |mode|
+            to_save.cronjob_modes << CronjobMode.first(:conditions => ["mode = ?", mode])
+          end
+        end
         to_save.task_id = task.id
         to_save.priority = idx.to_s
         to_save.save

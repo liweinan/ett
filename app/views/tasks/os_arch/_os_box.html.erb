@@ -1,4 +1,5 @@
 <td class="small_font">
     <% default_val ||= "" %>
     <input type="text" id="task_os_<%=count%>" name="oses[]" size="10" value="<%=default_val %>"/>
+    <input type="hidden" name="indexes[]" value="<%=count%>"/>
 </td>

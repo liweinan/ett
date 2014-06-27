@@ -47,6 +47,14 @@
             colCandidateTag.id = "col_candidate_tag" + rowCnt;
             renderCandidateTag(rowCnt, colCandidateTag);
 
+            var colErrataRelease = row.insertCell(5);
+            colErrataRelease.id = "col_errata_release" + rowCnt;
+            renderErrataRelease(rowCnt, colErrataRelease);
+
+            var colCronJob = row.insertCell(6);
+            colCronJob.id = "col_cronjob_mode" + rowCnt;
+            renderCronjob(rowCnt, colCronJob);
+
             Element.show(row);
             Element.highlight(row);
         }
@@ -69,6 +77,14 @@
 
         function renderCandidateTag(rowCnt, col) {
             renderPartial(rowCnt, col.id, 'tasks/os_arch/candidate_tag');
+        }
+
+        function renderErrataRelease(rowCnt, col) {
+            renderPartial(rowCnt, col.id, 'tasks/os_arch/errata_prod_release');
+        }
+
+        function renderCronjob(rowCnt, col) {
+            renderPartial(rowCnt, col.id, 'tasks/os_arch/cronjob_mode');
         }
 
         function renderPartial(count, div_id, partial) {
@@ -133,23 +149,6 @@
                 return true;
             }
 
-            // now we check condition two.
-            var keys = Object.keys(rows);
-
-            for (i = 0; i < keys.length; i++) {
-                cols = rows[keys[i]];
-                filled = 0;
-                for (j = 0; j < cols.length; j++) {
-                    if (cols[j])
-                        filled++;
-                }
-                if (filled != 0 && filled != cols.length) {
-                    alert("All the fields in \"OS	Advisory / Target Tag / Build Tag / Candidate Tag\" " +
-                            "table needs to be filled!");
-                    return false;
-
-                }
-            }
             return true;
         }
 

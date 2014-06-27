@@ -1,0 +1,13 @@
+<p>
+  <b>Mode:</b>
+  <%=h @cronjob_mode.mode %>
+</p>
+
+<p>
+  <b>Description:</b>
+  <%=h @cronjob_mode.description %>
+</p>
+
+
+<%= link_to 'Edit', edit_cronjob_mode_path(@cronjob_mode) %> |
+<%= link_to 'Back', cronjob_modes_path %>
