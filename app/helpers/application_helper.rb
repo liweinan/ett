@@ -125,6 +125,7 @@ module ApplicationHelper
         uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
         # the errata request is sent to mead-scheduler's rest api:
 
+        res = nil
         # TODO: remove those copy-pasted code!
         pac.task.os_advisory_tags.each do |os_tag|
 
