@@ -89,7 +89,8 @@ module ApplicationHelper
 
     # stupid URI.encode cannot encode the '+' sign
     params_build = "mode=#{mode}&userid=#{pac.user.email.gsub('@redhat.com', '')}" + "&sources=#{url_encode(pac.git_url)}&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}&bugs=#{url_encode(bz_bug_structure.to_json)}&distros=#{distros_to_build.join(',')}"
-    puts params_build
+    params_build += "&erratum=" + pac.errata unless pac.errata.blank?
+
     req = Net::HTTP::Post.new("/mead-scheduler/rest/build/sched/#{prod}/#{pac.name}?" + params_build)
 
     res = Net::HTTP.start(uri.host, uri.port) do |http|
@@ -132,7 +133,13 @@ module ApplicationHelper
           latest_brew_nvr = pac.nvr_in_brew(os_tag.os_arch)
           link = "/mead-scheduler/rest/errata/#{prod}/files?dist=#{os_tag.os_arch}&nvr=#{latest_brew_nvr}&pkg=#{pac.name}&version=#{pac.task.tag_version}"
           link += '&bugs=' + bz_struct[os_tag.os_arch] if bz_struct.has_key? os_tag.os_arch
-          link +='&erratum=' + os_tag.advisory unless os_tag.advisory.blank?
+
+          if pac.errata.blank?
+            link +='&erratum=' + os_tag.advisory unless os_tag.advisory.blank?
+          else
+            link += '&erratum=' + pac.errata
+          end
+
           link += '&tag=' + os_tag.target_tag unless os_tag.target_tag.blank?
           puts link
           req = Net::HTTP::Post.new(link)
