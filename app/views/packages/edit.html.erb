@@ -32,6 +32,7 @@
             <%= render :partial => 'packages/fields/brew', :locals => {:f => f} %>
             <%= render :partial => 'packages/fields/mead', :locals => {:f => f} %>
         <% end %>
+        <%= render :partial => 'packages/fields/erratum', :locals => {:f => f} %>
 
         <%= render :partial => 'packages/fields/assignee', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/notes', :locals => {:f => f} %>

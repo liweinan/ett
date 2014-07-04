@@ -47,6 +47,11 @@ Tags:
 GitUrl: <%= h @package.git_url %>
 <%= render :partial => 'layouts/sep_tiny' %>
 
+<% unless @package.errata.blank? %>
+    Custom Errata: <%= h @package.errata %>
+    <%= render :partial => 'layouts/sep_tiny' %>
+<% end %>
+
 <% if @package.task.use_mead_integration? && !@package.task.readonly? %>
 
     <% if @package.pkg_brew_rpm_link('el6') %>

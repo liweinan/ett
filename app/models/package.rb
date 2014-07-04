@@ -375,7 +375,7 @@ class Package < ActiveRecord::Base
     # Use alt part only if ver does not contain any dots
     alt_first_part_ver = ver.gsub(/(.)redhat.*/, '').gsub('-', '_')
     alt_second_part_ver = ver.gsub(/#{alt_first_part_ver}(.)/, '').gsub('-', '_')
-    [mead, brew].each do |item|
+    [mead, nvr_in_brew('el6')].each do |item|
       if !item.nil? && !item.empty?
         if ver.include?('.')
           unless item.include?(first_part_ver) && item.include?(second_part_ver)
