@@ -318,9 +318,11 @@ class Package < ActiveRecord::Base
   #
   # Returns: string
   def brew_style
-    if brew.nil? || brew.empty? || latest_brew_nvr.nil? || latest_brew_nvr.empty?
+    brew_nvr = self.nvr_in_brew('el6')
+
+    if brew_nvr.nil? || brew_nvr.empty? || latest_brew_nvr.nil? || latest_brew_nvr.empty?
       ''
-    elsif brew == latest_brew_nvr
+    elsif brew_nvr == latest_brew_nvr
       ''
     else
       'background-color: yellow;'
