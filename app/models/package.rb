@@ -263,6 +263,10 @@ class Package < ActiveRecord::Base
                                :conditions => ['key = ? and task_id = ?',
                                                'Not Shipped', self.task_id])
 
+    if !not_shipped_tag.nil? and self.tags.include? not_shipped_tag
+      return
+    end
+
     unless in_shipped_list?
       unless not_shipped_tag.nil? and self.tags.include? not_shipped_tag
         self.tags << not_shipped_tag
