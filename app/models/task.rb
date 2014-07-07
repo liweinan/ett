@@ -100,4 +100,9 @@ class Task < ActiveRecord::Base
       primary
     end
   end
+
+  def has_pkg_with_optional_errata?
+    Package.find(:all,
+                 :conditions => ['task_id = ? and errata > ?', self.id, '']).count != 0
+  end
 end

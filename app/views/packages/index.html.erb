@@ -128,6 +128,9 @@ Statuses:
               <%= render :partial => 'packages/index/errata_bz', :locals => {:package => package} %>
               <%= render :partial => 'packages/index/bz', :locals => {:package => package} %>
           <% end %>
+          <% if @task.has_pkg_with_optional_errata? %>
+              <%= render :partial => 'packages/index/async_erratum', :locals => {:package => package} %>
+          <% end %>
           <%= render :partial => 'packages/index/git_url', :locals => {:package => package} %>
           <% if @task.use_mead_integration? %>
               <%= render :partial => 'packages/index/mead', :locals => {:package => package} %>
