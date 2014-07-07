@@ -48,7 +48,7 @@ GitUrl: <%= h @package.git_url %>
 <%= render :partial => 'layouts/sep_tiny' %>
 
 <% unless @package.errata.blank? %>
-    Custom Errata: <%= h @package.errata %>
+    Async Erratum: <%= h @package.errata %>
     <%= render :partial => 'layouts/sep_tiny' %>
 <% end %>
 
