@@ -151,6 +151,8 @@ class PackagesController < ApplicationController
             @package.milestone = @package.task.milestone
           end
 
+          @package.update_tag_if_not_shipped
+
           @package.save
 
           if Rails.env.production?
