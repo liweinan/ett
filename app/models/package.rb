@@ -263,17 +263,16 @@ class Package < ActiveRecord::Base
                                :conditions => ['key = ? and task_id = ?',
                                                'Not Shipped', self.task_id])
 
-    if !not_shipped_tag.nil? and self.tags.include? not_shipped_tag
+    if !not_shipped_tag.nil? && self.tags.include?(not_shipped_tag)
       return
     end
 
-    unless in_shipped_list?
-      unless not_shipped_tag.nil? and self.tags.include? not_shipped_tag
-        self.tags << not_shipped_tag
-        self.save
-      end
+    if !in_shipped_list? && !not_shipped_tag.nil? && !self.tags.include?(not_shipped_tag)
+      self.tags << not_shipped_tag
+      self.save
     end
   end
+
   # Determines whether this package is already included inside an errata or not.
   #
   # Returns: boolean
