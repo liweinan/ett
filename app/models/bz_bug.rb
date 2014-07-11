@@ -177,4 +177,17 @@ class BzBug < ActiveRecord::Base
     end
   end
 
+  # return a list of bzs belonging to that task and in the distro
+  def self.find_bzs(task_id, distro)
+    bzs = []
+    task = Task.find(task_id)
+    packages = task.packages.all
+
+    packages.each do |package|
+      package.upgrade_bz.each do |bz|
+        bzs << bz if bz.os_arch == distro
+      end
+    end
+    bzs
+  end
 end

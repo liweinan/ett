@@ -50,14 +50,29 @@ class ErrataCheckController < ApplicationController
 
   def sync_bz
     bz_bugs = JSON.parse(params['bz_bugs'])
+    os_adv_tag = OsAdvisoryTag.find(:first,
+                                    :conditions => ['advisory = ?', params['advisory']])
+    return if os_adv_tag.nil?
+    bzs = BzBug.find_bzs(os_adv_tag.task_id, os_adv_tag.os_arch)
+
     render :text => 'OK', :status => 202
     BzBug.transaction do
       bz_bugs.each do |bug|
         bz_bug = BzBug.first(:conditions => ['bz_id = ?', bug.to_s])
-        if bz_bug
-          bz_bug.is_in_errata = 'YES'
-          bz_bug.save
+
+        # find out if bz_bug in our database
+        bz_bug_in_errata = bzs.delete(bz_bug)
+
+        unless bz_bug_in_errata.nil?
+          bz_bug_in_errata.is_in_errata = 'YES'
+          bz_bug_in_errata.save
         end
+      end
+
+      # the remaining bzs are not in errata
+      bzs.each do |bz|
+        bz.is_in_errata = 'NO'
+        bz.save
       end
     end
   end
