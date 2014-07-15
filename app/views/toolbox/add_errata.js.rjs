@@ -1,7 +1,11 @@
 pac = Package.find(params[:package_id])
 begin
-  res = add_errata(pac, pac.task.prod)
-  page.alert(res);
+  unless pac.task.frozen_state.blank?
+    page.alert("Task is in frozen state! You cannot add to errata right now")
+  else
+    res = add_errata(pac, pac.task.prod)
+    page.alert(res);
+  end
 rescue TypeError => e
   page.alert(e.message)
 end
