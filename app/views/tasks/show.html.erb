@@ -20,10 +20,18 @@
     </tr>
     <tr>
       <td>
-        Active?:
+        Cronjob Activated?:
       </td>
       <td>
         <%= h @task.active == "1" ? "✓": "No" %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        Frozen Task?:
+      </td>
+      <td>
+        <%= h @task.frozen_state == "1" ? "✓": "No" %>
       </td>
     </tr>
     <tr>
