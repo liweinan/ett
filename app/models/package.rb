@@ -806,7 +806,8 @@ class Package < ActiveRecord::Base
 
   def remove_nvr_and_bugs_from_errata
     result = ''
-    self.generate_mead_sched_link.each do |link|
+    self.generate_mead_sched_link.each do |link, nvr, advisory|
+      uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
       req = Net::HTTP::Delete.new(link)
 
       res = Net::HTTP.start(uri.host, uri.port) do |http|
@@ -817,7 +818,7 @@ class Package < ActiveRecord::Base
       # TODO: huh make it apply for all of them!
       result += case res.code
       when "202"
-          "202: Successfully removed package #{pac.name} from Errata"
+        "202: Successfully removed nvr #{nvr} from Errata #{advisory} in task #{self.task.name}"
       when "400"
           "400: Bad Request: One of the mandatory paramenters is missing or has an invalid value.\n
           Link used:  #{link} \n
@@ -844,7 +845,8 @@ class Package < ActiveRecord::Base
     elsif !self.in_shipped_list?
         "Package not in shipped list. Aborting"
     else
-      self.generate_mead_sched_link.each do |link|
+      uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
+      self.generate_mead_sched_link.each do |link, nvr, advisory|
 
         req = Net::HTTP::Post.new(link)
 
@@ -856,7 +858,7 @@ class Package < ActiveRecord::Base
         # TODO: huh make it apply for all of them!
         status_sched += case res.code
         when "202"
-            "202: Successfully added package #{pac.name} to Errata"
+            "202: Successfully added nvr #{nvr} to Errata #{advisory}"
         when "400"
             "400: Bad Request: One of the mandatory paramenters is missing or has an invalid value.\n
             Link used:  #{link} \n
@@ -892,14 +894,17 @@ class Package < ActiveRecord::Base
       link = "/mead-scheduler/rest/errata/#{self.task.prod}/files?dist=#{os_tag.os_arch}&nvr=#{latest_brew_nvr}&pkg=#{self.name}&version=#{self.task.tag_version}"
       link += '&bugs=' + bz_struct[os_tag.os_arch] if bz_struct.has_key? os_tag.os_arch
 
+      advisory_used = ''
       if self.errata.blank?
+        advisory_used = os_tag.advisory
         link +='&erratum=' + os_tag.advisory unless os_tag.advisory.blank?
       else
+        advisory_used = self.errata
         link += '&erratum=' + self.errata
       end
 
       link += '&tag=' + os_tag.target_tag unless os_tag.target_tag.blank?
-      links << link
+      links << [link, latest_brew_nvr, advisory_used]
     end
     links
   end

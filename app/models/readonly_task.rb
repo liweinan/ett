@@ -16,8 +16,8 @@ class ReadonlyTask < ActiveRecord::Base
       unless similar_pkgs.blank?
         similar_pkgs.each do |pkg|
           unless pkg.task.active.nil?
-            # status = Status.find(:first, :conditions => ['name = ?', 'Already Released'])
-            # pkg.status_id = status.id
+            status = Status.find(:first, :conditions => ['name = ?', 'Already Released'])
+            pkg.status_id = status.id
             str += pkg.remove_nvr_and_bugs_from_errata.to_s
             str += "\n"
             pkg.save

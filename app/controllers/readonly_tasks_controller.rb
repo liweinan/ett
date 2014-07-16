@@ -42,10 +42,15 @@ class ReadonlyTasksController < ApplicationController
         params[:task_ids].each do |task_id|
 
           unless task_id_in_readonly_task(all_tasks, task_id)
-            result += "-------------------\n"
-            result += ReadonlyTask.move_other_packages_to_already_released(task_id.to_i)
-            result += "\nTask: #{Task.find(task_id.to_i).name}\n"
-            result += "-------------------\n"
+            task = Task.find(task_id.to_i)
+            if task.active?
+              result += "-------------------\n"
+              result += "Packages moved to state 'Already Released':\n"
+              result += ReadonlyTask.move_other_packages_to_already_released(task_id.to_i)
+              result += "-------------------\n"
+              task.active = nil
+              task.save
+            end
           end
 
           rt = ReadonlyTask.new

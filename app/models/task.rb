@@ -35,6 +35,10 @@ class Task < ActiveRecord::Base
     task_ids
   end
 
+  def frozen_state?
+    self.frozen_state == "1"
+  end
+
   def self.from_task_ids(task_ids)
     tasks = []
     task_ids.each do |task_id|
@@ -86,6 +90,10 @@ class Task < ActiveRecord::Base
     # For example if the package is in 'Deleted' status, and because 'Deleted' status's 'is_track_time' is set to 'No',
     # so we think the packages marked in 'Delete' status is inactive.
     Package.all(:conditions => ["task_id = ? and status_id in (select id from statuses where is_track_time != 'No') or status_id is null", id])
+  end
+
+  def active?
+    self.active == "1"
   end
 
   def sorted_os_advisory_tags

@@ -23,7 +23,7 @@
         Cronjob Activated?:
       </td>
       <td>
-        <%= h @task.active == "1" ? "✓": "No" %>
+        <%= h @task.active? ? "✓": "No" %>
       </td>
     </tr>
     <tr>
@@ -31,7 +31,7 @@
         Frozen Task?:
       </td>
       <td>
-        <%= h @task.frozen_state == "1" ? "✓": "No" %>
+        <%= h @task.frozen_state? ? "✓": "No" %>
       </td>
     </tr>
     <tr>
