@@ -30,13 +30,29 @@ class ReadonlyTasksController < ApplicationController
   # PUT /readonly_tasks/1.xml
   def update
     #@readonly_task = ReadonlyTask.find(params[:id])
+    result = ''
+
     ReadonlyTask.transaction do
+      all_tasks = ReadonlyTask.all
       ReadonlyTask.all.each do |rt|
         rt.destroy
       end
 
       unless params[:task_ids].blank?
         params[:task_ids].each do |task_id|
+
+          unless task_id_in_readonly_task(all_tasks, task_id)
+            task = Task.find(task_id.to_i)
+            if task.active?
+              result += "-------------------\n"
+              result += "Packages moved to state 'Already Released':\n"
+              result += ReadonlyTask.move_other_packages_to_already_released(task_id.to_i)
+              result += "-------------------\n"
+              task.active = nil
+              task.save
+            end
+          end
+
           rt = ReadonlyTask.new
           rt.task_id = task_id.to_i
           rt.save
@@ -47,8 +63,12 @@ class ReadonlyTasksController < ApplicationController
     respond_to do |format|
       #if @readonly_task.update_attributes(params[:readonly_task])
       format.html do
+        notice ='ReadonlyTask was successfully updated.'
+        unless result.blank?
+          notice += "\n" + result
+        end
         redirect_to(readonly_tasks_path,
-                    :notice => 'ReadonlyTask was successfully updated.')
+                    :notice => notice.gsub("\n", "<br/>"))
       end
     end
   end
@@ -63,5 +83,13 @@ class ReadonlyTasksController < ApplicationController
       format.html { redirect_to(readonly_tasks_url) }
       format.xml { head :ok }
     end
+  end
+
+  private
+  def task_id_in_readonly_task(array_task, task_id)
+    array_task.each do |task|
+      return true if task.task_id == task_id.to_i
+    end
+    false # reach here if no task_id found
   end
 end

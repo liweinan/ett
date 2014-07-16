@@ -804,6 +804,111 @@ class Package < ActiveRecord::Base
     end
   end
 
+  def remove_nvr_and_bugs_from_errata
+    result = ''
+    self.generate_mead_sched_link.each do |link, nvr, advisory|
+      uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
+      req = Net::HTTP::Delete.new(link)
+
+      res = Net::HTTP.start(uri.host, uri.port) do |http|
+        http.request(req)
+      end
+
+      # Need to update the error codes when we get word on their values:
+      # TODO: huh make it apply for all of them!
+      result += case res.code
+      when "202"
+        "202: Successfully removed nvr #{nvr} from Errata #{advisory} in task #{self.task.name}"
+      when "400"
+          "400: Bad Request: One of the mandatory paramenters is missing or has an invalid value.\n
+          Link used:  #{link} \n
+          #{res.body}"
+      when "409"
+          "409: Rejected, Errata already submitted for this package \n #{res.body}"
+      else
+          "#{res.code} error! \n
+          Link used: #{link} \n
+          #{res.body}"
+      end
+      result += "\n"
+    end
+    result
+  end
+
+
+  def add_nvr_and_bugs_to_errata
+
+    status_sched = ''
+
+    if self.status.blank? || self.status.name != 'Finished'
+      "You can only add to Errata when the build is Finished."
+    elsif !self.in_shipped_list?
+        "Package not in shipped list. Aborting"
+    else
+      uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
+      self.generate_mead_sched_link.each do |link, nvr, advisory|
+
+        req = Net::HTTP::Post.new(link)
+
+        res = Net::HTTP.start(uri.host, uri.port) do |http|
+          http.request(req)
+        end
+
+        # Need to update the error codes when we get word on their values:
+        # TODO: huh make it apply for all of them!
+        status_sched += case res.code
+        when "202"
+            "202: Successfully added nvr #{nvr} to Errata #{advisory}"
+        when "400"
+            "400: Bad Request: One of the mandatory paramenters is missing or has an invalid value.\n
+            Link used:  #{link} \n
+            #{res.body}"
+        when "409"
+            "409: Rejected, Errata already submitted for this package \n #{res.body}"
+        else
+            "#{res.code} error! \n
+            Link used: #{link} \n
+            #{res.body}"
+        end
+        status_sched += "\n"
+      end
+    end
+    status_sched
+  end
+
+  def generate_mead_sched_link
+    bz_struct = {}
+    self.upgrade_bz.each do |bz|
+      bz_struct[bz.os_arch] = bz.bz_id
+    end
+
+    uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
+    # the errata request is sent to mead-scheduler's rest api:
+
+    res = nil
+    links = []
+    # TODO: remove those copy-pasted code!
+    self.task.os_advisory_tags.each do |os_tag|
+
+      latest_brew_nvr = self.nvr_in_brew(os_tag.os_arch)
+      link = "/mead-scheduler/rest/errata/#{self.task.prod}/files?dist=#{os_tag.os_arch}&nvr=#{latest_brew_nvr}&pkg=#{self.name}&version=#{self.task.tag_version}"
+      link += '&bugs=' + bz_struct[os_tag.os_arch] if bz_struct.has_key? os_tag.os_arch
+
+      advisory_used = ''
+      if self.errata.blank?
+        advisory_used = os_tag.advisory
+        link +='&erratum=' + os_tag.advisory unless os_tag.advisory.blank?
+      else
+        advisory_used = self.errata
+        link += '&erratum=' + self.errata
+      end
+
+      link += '&tag=' + os_tag.target_tag unless os_tag.target_tag.blank?
+      links << [link, latest_brew_nvr, advisory_used]
+    end
+    links
+  end
+
   protected
 
   def all_from_packages_of(from_relationships, relationship_name)
@@ -865,4 +970,5 @@ class Package < ActiveRecord::Base
       Changelog.package_deleted(self)
     end
   end
+
 end
