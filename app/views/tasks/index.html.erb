@@ -9,6 +9,8 @@
       <th>Prod</th>
       <th>Milestone</th>
       <th>Version</th>
+      <th>Frozen State?</th>
+      <th>Cronjob activated?</th>
       <% if can_manage? %>
           <th>Operation</th>
       <% end %>
@@ -46,6 +48,8 @@
                 <%= task.tag_version %>
             <% end %>
           </td>
+          <td><%= task.frozen_state? ? "✓": "No" %></td>
+          <td><%= task.active? ? "✓": "No" %></td>
           <% if can_manage? %>
               <td><%= link_to 'Edit', :controller => :tasks, :action => :edit, :id => escape_url(task.name) %></td>
           <% end %>
