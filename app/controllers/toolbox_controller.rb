@@ -83,10 +83,8 @@ class ToolboxController < ApplicationController
     @clentry.class.module_eval { attr_accessor :text }
     @clentry.text = "- "
     @error = nil
-    if @pac.status.blank? || @pac.status.code != 'inprogress' ||
-      @pac.user.nil? || (@pac.git_url.blank? && @pac.need_source_url?)
-      @error = "You can only use the Build Button when the Git-Url is provided," \
-               " the status is 'InProgress' and there is an assignee to this package"
+    if @pac.status.blank? || @pac.status.code != 'inprogress' || @pac.user.nil?
+      @error = "You can only use the Build Button when the status is 'InProgress' and there is an assignee to this package"
     end
 
     render :layout => false

@@ -1,5 +1,11 @@
 pac = Package.find(params[:package_id])
 
+git_url_check = true
+
+if !params.include?(:wrapper_build) && pac.git_url.blank?
+  git_url_check = false
+end
+
 source_pkg = pac.name.sub('-eap6', '')
 warning_string = "This will also build the source '#{source_pkg}' package. " \
                  "If you only want to build the '#{pac.name}' wrapper of it " \
@@ -13,6 +19,10 @@ warning_not_assignee = "You are not the assignee of this package. You are recomm
                        "but not required to assign this package to you by pressing 'Cancel' and using the " \
                        "'Assign To Me' button. If you'd like to continue nonetheless, " \
                        "press the 'OK' button."
+
+git_url_not_provided = "You do not have the source-url specified in ETT. You need " \
+  "to specify it for this type of build."
+
 begin
   type_build = 'chain'
   type_build = 'wrapper' if params.include?(:wrapper_build)
@@ -22,9 +32,14 @@ begin
   page << "var is_eap6_pac = #{is_eap6_pac};"
   page << "var clentry = '#{params['clentry']['text'].inspect[1..-2].gsub(/'/, "\\\\'")}';"
   page << "var move_fwd = true;"
-  page << "if (x == 'chain' && is_eap6_pac) {"
+  page << "if (move_fwd && \"#{git_url_check.to_s}\" == \"false\") {"
+  page << "    alert(\"#{git_url_not_provided}\");"
+  page << "     move_fwd = false;"
+  page << "     TINY.box.hide()"
+  page << "}"
+  page << "if ( move_fwd && x == 'chain' && is_eap6_pac) {"
   page << "  move_fwd = confirm(\"#{warning_string}\");"
-  page << "} else if (x == 'chain') {"
+  page << "} else if (move_fwd && x == 'chain') {"
   page << "  move_fwd = confirm(\"#{warning_chain}\");"
   page << "}"
   page << "if (move_fwd && #{current_user != pac.assignee}) {"

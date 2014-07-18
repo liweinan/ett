@@ -646,14 +646,6 @@ class Package < ActiveRecord::Base
                   "/mead-scheduler/rest/package/eap6/#{self.name}/type")
   end
 
-  def need_source_url?
-    build = self.build_type
-    build_check = (build == 'WRAPPER') || (build == 'MEAD_ONLY')
-    has_wrapper_tag = !((self.tags.select { |tag| tag.key == 'wrapper' }).empty?)
-    build_check || has_wrapper_tag
-  end
-
-
   # get_mead_info will go get the mead nvr from the rpm repo directly if it
   # cannot find it via the mead scheduler
   def update_mead_brew_info
