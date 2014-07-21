@@ -476,7 +476,7 @@ class Package < ActiveRecord::Base
           create_brew_nvr(tag.os_arch)
         else
           brew_nvr = brew_nvr[0]
-          brew_nvr.nvr = self.get_brew_name(tag.candidate_tag + '-build')
+          brew_nvr.nvr = self.get_brew_name(tag.candidate_tag + '-build', tag.os_arch)
           brew_nvr.link = self.get_brew_rpm_link(brew_nvr.nvr)
           brew_nvr.save
         end
@@ -691,11 +691,29 @@ class Package < ActiveRecord::Base
     end
   end
 
-  def get_brew_name(candidate_tag=nil)
+  def is_scl_package?
+    ans = ''
+    begin
+      Net::HTTP.start('mead.usersys.redhat.com') do |http|
+        resp = http.get("/mead-scheduler/rest/package/eap6/#{name}/scl")
+        ans = resp.body
+      end
+      ans == 'YES'
+    rescue
+      true
+    end
+  end
+
+  def get_brew_name(candidate_tag=nil, distro=nil)
     # TODO: make the tag more robust
     tag = candidate_tag.nil? ? "#{task.primary_os_advisory_tag.candidate_tag}-build" : candidate_tag
 
-    uri = URI.parse(URI.encode("#{APP_CONFIG['mead_scheduler']}/mead-brewbridge/pkg/latest/#{tag}/#{name}"))
+    # FIXME: stop that hardcoding... one day!
+    pkg_name = self.name
+    if distro == 'el7' && self.is_scl_package?
+      pkg_name = 'eap6-' + pkg_name.sub(/-eap6$/, '')
+    end
+    uri = URI.parse(URI.encode("#{APP_CONFIG['mead_scheduler']}/mead-brewbridge/pkg/latest/#{tag}/#{pkg_name}"))
 
     res = Net::HTTP.get_response(uri)
 
@@ -765,7 +783,7 @@ class Package < ActiveRecord::Base
       brew_nvr = BrewNvr.new
       brew_nvr.package_id = self.id
       brew_nvr.distro = distro
-      brew_nvr.nvr = self.get_brew_name(adv_tag[0].candidate_tag + '-build')
+      brew_nvr.nvr = self.get_brew_name(adv_tag[0].candidate_tag + '-build', distro)
       brew_nvr.save
       brew_nvr.nvr
     else
