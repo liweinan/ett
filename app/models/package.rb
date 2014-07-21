@@ -783,7 +783,7 @@ class Package < ActiveRecord::Base
       brew_nvr = BrewNvr.new
       brew_nvr.package_id = self.id
       brew_nvr.distro = distro
-      brew_nvr.nvr = self.get_brew_name(adv_tag[0].candidate_tag + '-build')
+      brew_nvr.nvr = self.get_brew_name(adv_tag[0].candidate_tag + '-build', distro)
       brew_nvr.save
       brew_nvr.nvr
     else
