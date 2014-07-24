@@ -13,14 +13,18 @@ class ReadonlyTask < ActiveRecord::Base
                                  :conditions => ['name = ? and ver = ? and task_id != ? and status_id = ?',
                                                  pkg.name, pkg.ver, pkg.task_id, pkg.status_id])
 
+      status = Status.find(:first, :conditions => ['name = ?', 'Already Released'])
       unless similar_pkgs.blank?
-        similar_pkgs.each do |pkg|
-          unless pkg.task.active.nil?
-            status = Status.find(:first, :conditions => ['name = ?', 'Already Released'])
-            pkg.status_id = status.id
-            str += pkg.remove_nvr_and_bugs_from_errata.to_s
+        similar_pkgs.each do |pkg_to_change|
+          unless pkg_to_change.task.active.nil?
+            main_distro = pkg_to_change.task.primary_os_advisory_tag.os_arch
+            if pkg.nvr_in_brew(main_distro) != pkg_to_change.nvr_in_brew(main_distro)
+              next
+            end
+            pkg_to_change.status_id = status.id
+            str += pkg_to_change.remove_nvr_and_bugs_from_errata.to_s
             str += "\n"
-            pkg.save
+            pkg_to_change.save
           end
         end
       end
