@@ -1,0 +1,8 @@
+<tr>
+    <td>Distros</td>
+    <td style="text-align:left;">
+        <% @task.distros.each do |distro| %>
+            <input type="checkbox" name="distros[]" checked value="<%=distro%>"><%= distro %></input>
+        <% end %>
+    </td>
+</tr>

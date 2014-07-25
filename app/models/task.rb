@@ -100,6 +100,15 @@ class Task < ActiveRecord::Base
     OsAdvisoryTag.all(:conditions => ['task_id = ?', self.id], :order => :priority)
   end
 
+  def distros
+    tags = self.sorted_os_advisory_tags
+    distros = []
+    tags.each do |tag|
+      distros << tag.os_arch
+    end
+    distros
+  end
+
   def primary_os_advisory_tag
     primary = sorted_os_advisory_tags[0]
     if primary.blank?

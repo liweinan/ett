@@ -44,6 +44,9 @@
                   :controller => :settings, :action => :show,
                   :id => setting_id,
                   :task_id => escape_url(params[:task_id]) %>
+    / <%= link_to 'Mass-Rebuild',
+                  :controller => :mass_rebuild, :action => :first_step,
+                  :task_id => escape_url(params[:task_id]) %>
 <% end %>
 
 
