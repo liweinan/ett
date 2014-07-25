@@ -75,6 +75,8 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'errata_check/sync_bz', :controller => 'errata_check', :action => 'sync_bz'
   map.connect 'errata_check/sync_rpmdiffs', :controller => 'errata_check', :action => 'sync_rpmdiffs'
   map.connect 'cronjob/products_to_build', :controller => 'cronjob_modes', :action => 'products_to_build'
+  map.connect 'mass-rebuild/first-step', :controller => 'mass_rebuild', :action => 'first_step'
+  map.connect 'mass-rebuild/second-step', :controller => 'mass_rebuild', :action => 'second_step'
   map.connect ':controller/:action/:id'
   map.connect ':controller/:action/:id.:format'
 end
