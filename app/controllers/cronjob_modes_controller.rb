@@ -102,6 +102,7 @@ class CronjobModesController < ApplicationController
       end
 
       product_info = {:version => task.tag_version,
+                      :prod => task.prod,
                       :branch => branch,
                       :repository => task.repository,
                       :distros => distros}
