@@ -8,13 +8,16 @@ class SessionsController < ApplicationController
   end
 
   def update
+    redirect = '/'
+    redirect = params[:session][:redirect]  if params[:session][:redirect]
+
     u = User.find_by_email(params[:session][:email].strip.downcase)
     if u
       if password_valid?(u, params[:session][:password])
       session[:current_user] = u
       flash[:notice] = 'Login succeed.'
       #redirect_back_or_default('/')
-      redirect_to('/')
+      redirect_to(redirect)
       else
         flash[:notice] = 'Login failed: password not correct'
         redirect_to(new_session_path)
