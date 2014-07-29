@@ -1,0 +1,13 @@
+<tr>
+  <td>
+    <%= f.label 'Task Group' %>
+    <br/>
+  </td>
+  <td>
+      <% TaskGroup.all.each do |group| %>
+          <input name="task_groups[]" type="checkbox" value="<%= group.id %>"
+          <% if @task.task_groups.include?(group) %> checked <% end %>
+          ><%= group.name %></input><br>
+      <% end %>
+  </td>
+</tr>

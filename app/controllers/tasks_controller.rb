@@ -99,6 +99,9 @@ class TasksController < ApplicationController
     update_and_add_new_os_adv_tag(params, @task)
     # end
 
+    @task.task_groups = params[:task_groups].map {|gp| TaskGroup.find(gp)}
+    @task.save
+
     respond_to do |format|
       if @task.update_attributes(params[:task]) && !os_adv_tag_error
         expire_all_fragments
