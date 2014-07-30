@@ -52,9 +52,14 @@ class TasksController < ApplicationController
 
   # POST /tasks
   # POST /tasks.xml
+  def save_task_groups(task, params)
+      @task.task_groups = params[:task_groups].map {|gp| TaskGroup.find(gp)} if params[:task_groups]
+      @task.save
+  end
   def create
     if can_manage?
       @task = Task.new(params[:task])
+      save_task_groups(@task, params)
       params[:task][:name].strip!
       params[:task][:name].downcase!
     end
@@ -99,8 +104,7 @@ class TasksController < ApplicationController
     update_and_add_new_os_adv_tag(params, @task)
     # end
 
-    @task.task_groups = params[:task_groups].map {|gp| TaskGroup.find(gp)}
-    @task.save
+    save_task_groups(@task, params)
 
     respond_to do |format|
       if @task.update_attributes(params[:task]) && !os_adv_tag_error
@@ -156,6 +160,7 @@ class TasksController < ApplicationController
       session[:clone_review][:status_selection_value] = params[:status_selection_value]
       session[:clone_review][:status_selection_value_global] = params[:status_selection_value_global]
       session[:clone_review][:task] = params[:task]
+      session[:clone_review][:task_groups] = params[:task_groups]
 
       redirect_to :action => :clone_review, :id => escape_url(params[:source_task_name])
     else

@@ -1,6 +1,7 @@
 <h2>Clone Task</h2>
 <%= render :partial => 'layouts/error_messages' %>
 
+<div class='manage-tbl'>
 
 <form action="/tasks/clone/<%= escape_url(params[:id]) %>" method="post" onsubmit="return validateForm();">
   <input type='hidden' value='<%= escape_url(params[:id]) %>' name='source_task_name'/>
@@ -12,11 +13,9 @@
 
   <% f = ActionView::Helpers::FormBuilder.new('task', @task, self, nil, nil) %>
   <table>
-    <%= render :partial => 'tasks/fields/candidate_tag', :locals => {:f => f} %>
-    <%= render :partial => 'tasks/fields/target_release', :locals => {:f => f} %>
-    <%= render :partial => 'tasks/fields/milestone', :locals => {:f => f} %>
-    <%= render :partial => 'tasks/fields/tag_version', :locals => {:f => f} %>
-    <%= render :partial => 'tasks/fields/description', :locals => {:f => f} %>
+    <!-- using that partial to coordinate fields between new, edit, and clone -->
+    <%= render :partial => 'tasks/options', :locals => {:f => f} %>
+    <%= render :partial => 'tasks/fields/task_group', :locals => {:f => f} %>
   </table>
 
   <%= render :partial => 'layouts/sep' %>
@@ -154,4 +153,5 @@
         Event.observe(window, "load", refresh_form());
     </script>
 <% end %>
+</div>
 
