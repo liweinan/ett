@@ -12,14 +12,6 @@ Target task information:
   <table>
     <tr>
       <td>
-        Candidate Tag:
-      </td>
-      <td>
-        <%= h session[:clone_review][:task][:candidate_tag] %>
-      </td>
-    </tr>
-    <tr>
-      <td>
         Target Release:
       </td>
       <td>
@@ -118,6 +110,6 @@ Target task information:
 <% end %>
 <%= render :partial => 'layouts/line' %>
 <%= render :partial => 'layouts/sep_tiny' %>
-<%= link_to "Confirm the setting and start the clone process", :controller => :tasks, :action => :process_clone, :id => escape_url(session[:clone_review][:target_task_name]) %>
+<%= link_to "<button>Confirm the setting and start the clone process</button>", :controller => :tasks, :action => :process_clone, :id => escape_url(session[:clone_review][:target_task_name]) %>
 <%= render :partial => 'layouts/sep_tiny' %>
 <a href = "javascript:history.back()">Go back and review the setting</a>

@@ -1,9 +1,5 @@
 <div style="width:100%;text-align:right;">
 	<span style="padding-right:20px;">
-      <% if can_manage? %>
-		<%= link_to 'Settings', '/settings/1' %>
-          /
-      <% end %>
       <%= link_to 'Workload Summary', '/workload/summary' %>
       /
       <%= link_to 'Components', '/components' %>
@@ -25,7 +21,7 @@
       <%= link_to 'User List', users_path %>
       /
       <% unless logged_in? %>
-			<%= link_to 'Login', '/login' %> /
+			<%= link_to 'Login', '/login?redirect=' + request.url %> /
           <%= link_to 'Register', new_user_path %>
 		<% else %>
 			Welcome, <%= link_to current_user.name, :controller => :users, :action => :show, :id => current_user.id %>

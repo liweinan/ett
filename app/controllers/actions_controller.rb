@@ -48,10 +48,8 @@ class ActionsController < ApplicationController
           @target_task = Task.new
           @target_task.name = target_task_name
 
-          @target_task.target_release = session[:clone_review][:task][:target_release]
-          @target_task.milestone = session[:clone_review][:task][:milestone]
-          @target_task.tag_version = session[:clone_review][:task][:tag_version]
-          @target_task.description = session[:clone_review][:task][:description]
+          @target_task.update_attributes(session[:clone_review][:task])
+          @target_task.task_groups = session[:clone_review][:task_groups].map {|gp| TaskGroup.find(gp)} if session[:clone_review][:task_groups]
 
           @target_task.save
         end

@@ -18,7 +18,8 @@
           <td>
             <%= f.password_field :password %>
           </td>
-        </tr>
+      </tr>
+      <%= f.hidden_field :redirect, :value => params[:redirect] ? params[:redirect] : '/' %>
         <tr>
           <td colspan=2 style="text-align:right;">
             Default password is your Email address. <%= f.submit 'Login' %>
