@@ -1,0 +1,10 @@
+<tr>
+    <td>Created By</td>
+    <td style="text-align:left;">
+        <% unless @package.created_by.blank? %>
+            <%= h @package.creator.name %>
+        <% else %>
+            -
+        <% end %>
+    </td>
+</tr>

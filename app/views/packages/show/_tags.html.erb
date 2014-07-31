@@ -1,0 +1,10 @@
+<tr>
+    <td>Tags</td>
+    <td>
+        <% unless @package.tags.blank? %>
+            <% @package.tags.each do |tag| %>
+                <%= tag.key %> /
+            <% end %>
+        <% end %>
+    </td>
+</tr>

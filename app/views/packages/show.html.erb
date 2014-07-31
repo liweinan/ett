@@ -10,85 +10,25 @@
 </span>
 </h2>
 <%= render :partial => 'packages/fields/mead_sync' %>
-Created By:
-<% unless @package.created_by.blank? %>
-    <%= h @package.creator.name %>
-<% else %>
-    -
-<% end %>
-/
-Assignee:
-<% if !@package.user_id.blank? %>
-    <%= h @package.user.name %>
-<% end %>
-<%= render :partial => 'layouts/sep_tiny' %>
-Created At:
-<%= at_zone(@package.created_at) %>
-/
-Last Modified At:
-<%= at_zone(@package.updated_at) %>
-<%= render :partial => 'layouts/sep_tiny' %>
+<div class='manage-tbl'>
+    <table>
+        <%= render :partial => 'packages/show/created_by' %>
+        <%= render :partial => 'packages/show/assignee' %>
+        <%= render :partial => 'packages/show/created_at' %>
+        <%= render :partial => 'packages/show/last_modified_at' %>
+        <%= render :partial => 'packages/show/status' %>
+        <%= render :partial => 'packages/show/tags' %>
+        <%= render :partial => 'packages/show/git_url' %>
+        <%= render :partial => 'packages/show/async_erratum' %>
+        <%= render :partial => 'packages/show/mead_and_brew' %>
+        <%= render :partial => 'packages/show/milestone' %>
+        <%= render :partial => 'packages/show/submit_build' %>
+        <%= render :partial => 'packages/show/add_to_errata' %>
+        <%= render :partial => 'packages/show/errata_bz' %>
+        <%= render :partial => 'packages/fields/track_time' %>
+    </table>
+</div>
 
-Status:
-<% unless @package.status.blank? %>
-    <span style="<%= default_style(@package.status.style) %>">&nbsp;</span>
-    <%= h @package.status.name %>
-<% end %>
-<%= render :partial => 'layouts/sep_tiny' %>
-
-Tags:
-<% unless @package.tags.blank? %>
-    <% @package.tags.each do |tag| %>
-        <%= tag.key %> /
-    <% end %>
-<% end %>
-<%= render :partial => 'layouts/sep_tiny' %>
-
-GitUrl: <%= h @package.git_url %>
-<%= render :partial => 'layouts/sep_tiny' %>
-
-<% unless @package.errata.blank? %>
-    Async Erratum: <%= h @package.errata %>
-    <%= render :partial => 'layouts/sep_tiny' %>
-<% end %>
-
-<% if @package.task.use_mead_integration? && !@package.task.readonly? %>
-
-    <% if @package.pkg_brew_rpm_link('el6') %>
-        Brew: <%= link_to @package.brew_in_errata('el6'), @package.pkg_brew_rpm_link('el6') %>
-    <% else %>
-        Brew: <%= h @package.brew_in_errata('el6') %>
-    <% end %>
-
-    <%= render :partial => 'layouts/sep_tiny' %>
-
-    <% if @package.mead_link %>
-        Mead: <%= link_to @package.mead, @package.mead_link %>
-    <% else %>
-        Mead: <%= h @package.mead %>
-    <% end %>
-    <%= render :partial => 'layouts/sep_tiny' %>
-<% end %>
-Milestone: <%= h @package.milestone || '-' %>
-<%= render :partial => 'layouts/sep_tiny' %>
-
-<% if @package.status && @package.status.code == 'inprogress' && !@package.task.readonly? %>
-    <%= render :partial => 'packages/fields/build' %>
-<% end %>
-
-<% if @package.task.use_mead_integration? && @package.status && @package.status.code == 'finished' && !@package.task.readonly? %>
-    <%= render :partial => 'packages/fields/errata' %>
-<% end %>
-
-<% if @package.task.use_bz_integration? && !@package.task.readonly? %>
-    <div id="upgrade_bz_unique">
-        <%= render :partial => 'bz_bugs/upgrade_bz_bug', :locals => {:bz_bug => @package.upgrade_bz} %>
-    </div>
-<% end %>
-
-
-
-<%= render :partial => 'packages/fields/track_time' %>
 
 <% if logged_in? && !@package.status_in_finished? && current_user != @package.assignee %>
     <%= link_to 'Assign To Me', :controller => 'packages', :action => 'edit', :id => escape_url(@package.name), :assignee => current_user %> |

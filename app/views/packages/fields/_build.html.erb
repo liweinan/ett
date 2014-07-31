@@ -1,5 +1,3 @@
-<%= render :partial => 'layouts/sep_tiny' %>
-
 <span style="text-align: left;">
   <% if logged_in? && !@package.task.readonly? %>
       <button onclick="TINY.box.show({url:'/toolbox/press_build_button?id=<%=@package.id%>'})">Submit Build</button>

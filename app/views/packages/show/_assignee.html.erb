@@ -1,0 +1,8 @@
+<tr>
+    <td>Assignee</td>
+    <td style="text-align:left;">
+        <% if !@package.user_id.blank? %>
+            <%= h @package.user.name %>
+        <% end %>
+    </td>
+</tr>
