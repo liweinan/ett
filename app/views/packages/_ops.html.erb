@@ -30,7 +30,8 @@
 
 <% if has_task? && can_manage? %>
     <%
-       task_id = Task.find_by_name(unescape_url(params[:task_id])).id
+       task = Task.find_by_name(unescape_url(params[:task_id]))
+       task_id = task.id
        setting = Setting.find_by_task_id(task_id)
        setting_id = -1
        unless setting.blank?
@@ -44,9 +45,11 @@
                   :controller => :settings, :action => :show,
                   :id => setting_id,
                   :task_id => escape_url(params[:task_id]) %>
+    <% if !task.frozen_state? && task.active? %>
     / <%= link_to 'Mass-Rebuild',
                   :controller => :mass_rebuild, :action => :first_step,
                   :task_id => escape_url(params[:task_id]) %>
+    <% end %>
 <% end %>
 
 
