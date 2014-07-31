@@ -1,6 +1,6 @@
 <tr>
     <td>Changelog Entry</td>
     <td style="text-align:left;">
-        <%= text_field_tag(:clentry, '- ') %>
+        <%= text_field_tag(:clentry, "- #{@task.target_release} #{@task.milestone} Rebuild") %>
     </td>
 </tr>
