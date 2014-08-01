@@ -1,3 +1,7 @@
 <% unless package.blank? %>
-<%= package.git_url %>
+    <% unless package.git_url_http_link.blank? %>
+        <%= link_to package.git_url, package.git_url_http_link %>
+    <% else %>
+        <%= package.git_url %>
+    <% end %>
 <% end %>

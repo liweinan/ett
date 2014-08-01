@@ -129,6 +129,19 @@ class Package < ActiveRecord::Base
     !time_point.blank? && time_point > 0
   end
 
+  def git_url_http_link
+    if !self.git_url || !self.git_url.include?("git://git.app.eng.bos.redhat.com")
+      ''
+    else
+      url_link = self.git_url
+      repo_link = url_link.split("#")[0]
+      commit_id = url_link.split("#")[1]
+      repo_name = repo_link.gsub("git://git.app.eng.bos.redhat.com/", '')
+      "http://git.app.eng.bos.redhat.com/git/#{repo_name}/commit?id=#{commit_id}"
+    end
+  end
+
+
   def set_deleted
     self.status = Status.deleted_status
     self.save

@@ -1,29 +1,38 @@
 <%= render :partial => 'layouts/sep_tiny' %>
-Automatic Time Track:
-<%= render :partial => 'packages/display_auto_tt', :locals => {:package => @package} %>
+<tr>
+    <td>Automatic Time Track</td>
+    <td><%= render :partial => 'packages/display_auto_tt', :locals => {:package => @package} %></td>
+</tr>
 <%= render :partial => 'layouts/sep_tiny' %>
-Manual Time Track:
-<span id="manual_tracked_time">
-  <%= display_manual_track_time_in_real_time(@package) %>
-</span>
-
+<tr>
+    <td>Manual Time Track</td>
+    <td>
+        <span id="manual_tracked_time">
+          <%= display_manual_track_time_in_real_time(@package) %>
+        </span>
+    </td>
+</tr>
 <span id="manual_time_track_component">&nbsp;</span> <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'manual_time_track_component_indicator'} %>
 <% if logged_in? && !@package.task.readonly? %>
+    <tr>
+        <td>Log work time</td>
     <%= render :partial => 'layouts/sep_tiny' %>
+    <td>
     <% form_remote_tag(
                :url => {:controller => 'toolbox', :action => 'log_work_done'},
                :loading => "Element.show('spinner_log_#{@package.id}');",
                :success => "Element.hide('spinner_log_#{@package.id}');
            document.getElementById('work_time_col').value='';
            ") do %>
-        <%= hidden_field_tag :package_id, @package.id %>
-        <%= hidden_field_tag :refresh_page, 'manual_tracked_time' %>
         <div style="text-align: left;">
-          Log work time: <input id="work_time_col" name="work_time">
+            <%= hidden_field_tag :package_id, @package.id %>
+            <%= hidden_field_tag :refresh_page, 'manual_tracked_time' %>
+            <input id="work_time_col" name="work_time">
           (Example: 1w,2d,3h,4m)
           <%= submit_tag 'Log' %>
           <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "spinner_log_#{@package.id}"} %>
         </div>
     <% end %>
+</td>
 <% end %>
 <%= render :partial => 'layouts/sep_tiny' %>

@@ -1,0 +1,8 @@
+<% if @package.task.use_bz_integration? && !@package.task.readonly? %>
+    <div id="upgrade_bz_unique">
+        <tr>
+            <td>Errata Bz</td>
+            <td><%= render :partial => 'bz_bugs/upgrade_bz_bug', :locals => {:bz_bug => @package.upgrade_bz} %></td>
+        </tr>
+    </div>
+<% end %>

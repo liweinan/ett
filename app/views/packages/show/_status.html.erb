@@ -1,0 +1,9 @@
+<tr>
+    <td>Status</td>
+    <td>
+        <% unless @package.status.blank? %>
+            <span style="<%= default_style(@package.status.style) %>">&nbsp;</span>
+            <%= h @package.status.name %>
+        <% end %>
+    </td>
+</tr>
