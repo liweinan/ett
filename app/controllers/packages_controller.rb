@@ -149,6 +149,7 @@ class PackagesController < ApplicationController
 
           if @package.status && @package.status.status_in_finished
             @package.milestone = @package.task.milestone
+            @package.spec_file = @package.maven_build_arguments = nil
           end
 
           @package.update_tag_if_not_shipped

@@ -6,6 +6,9 @@ if !params.include?(:wrapper_build) && pac.git_url.blank?
   git_url_check = false
 end
 
+spec_file_included = params.include?(:edit_spec_file) ? 1 : 0
+maven_build_arguments_file_included = params.include?(:edit_maven_build_arguments) ? 1 : 0
+
 source_pkg = pac.name.sub('-eap6', '')
 warning_string = "This will also build the source '#{source_pkg}' package. " \
                  "If you only want to build the '#{pac.name}' wrapper of it " \
@@ -54,6 +57,8 @@ begin
   page << "      'type_build': x,"
   page << "      'authenticity_token': '#{form_authenticity_token}',"
   page << "      'clentry': clentry,"
+  page << "      'edit_spec_file': #{spec_file_included},"
+  page << "      'edit_maven_build_arguments': #{maven_build_arguments_file_included},"
   page << "    }"
   page << "  })"
   page << "}"
