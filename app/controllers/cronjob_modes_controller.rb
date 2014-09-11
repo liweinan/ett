@@ -105,6 +105,7 @@ class CronjobModesController < ApplicationController
                       :prod => task.prod,
                       :branch => branch,
                       :repository => task.repository,
+                      :name => task.name,
                       :distros => distros}
 
       product_info.merge!(to_add)

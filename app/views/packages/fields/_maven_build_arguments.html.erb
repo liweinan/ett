@@ -1,0 +1,5 @@
+<span style="text-align: left;">
+  <% if logged_in? && !@package.task.readonly? %>
+      <button onclick="TINY.box.show({url:'/toolbox/edit_maven_build_arguments_file?id=<%=@package.id%>'})">Edit maven-build-arguments</button>
+  <% end %>
+</span>

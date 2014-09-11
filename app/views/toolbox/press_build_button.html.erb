@@ -15,6 +15,19 @@
               <%= label_tag('Wrapper Build Only') %>
               <%= check_box_tag(:wrapper_build, '1') %>
               <br />
+
+              <% unless @pac.spec_file.blank? %>
+                  <%= label_tag('Submit edited spec file') %>
+                  <%= check_box_tag(:edit_spec_file, '1', true) %>
+                  <br />
+              <% end %>
+
+              <% unless @pac.maven_build_arguments.blank? %>
+                  <%= label_tag('Submit edited maven-build-arguments file') %>
+                  <%= check_box_tag(:edit_maven_build_arguments, '1', true) %>
+                  <br />
+              <% end %>
+
               <br />
               <%= submit_tag 'Build This Package Using Mead-Scheduler' %>
               <%= render :partial => 'layouts/progress_indicator',

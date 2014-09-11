@@ -72,8 +72,10 @@ module ApplicationHelper
     end
   end
 
-  def submit_build(pac, clentry, prod, mode)
-    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+  def submit_build(pac, clentry, prod, mode,
+                   include_spec_file,
+                   include_maven_build_arguments_file)
+
     bz_bug_structure = {}
 
     pac.upgrade_bz.each do |bz_bug|
@@ -93,6 +95,14 @@ module ApplicationHelper
 
     req = Net::HTTP::Post.new("/mead-scheduler/rest/build/sched/#{prod}/#{pac.name}?" + params_build)
 
+    req_data = {}
+    req_data[:spec_file] = pac.spec_file if include_spec_file == "1"
+    req_data[:maven_build_arguments] = pac.maven_build_arguments if include_maven_build_arguments_file == "1"
+
+    req.body = req_data.to_json unless req_data.blank?
+    req.content_type = 'text/plain' unless req_data.blank?
+
+    uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
     res = Net::HTTP.start(uri.host, uri.port) do |http|
       http.request(req)
     end
@@ -165,5 +175,5 @@ module ApplicationHelper
       end
     end
   end
-  
+
 end

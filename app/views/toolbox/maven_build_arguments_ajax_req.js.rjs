@@ -1,0 +1,5 @@
+pac = Package.find(params[:package_id])
+pac.maven_build_arguments = params['m_b_a']['text']
+pac.save
+page.alert("SUCCESS! The edited maven-build-arguments will be commited to the rpm repository when you press 'Submit Build'")
+page << "TINY.box.hide()"

@@ -1,0 +1,5 @@
+pac = Package.find(params[:package_id])
+pac.spec_file = params['spec_file']['text']
+pac.save
+page.alert("SUCCESS! The edited spec file will be commited to the rpm repository when you press 'Submit Build'")
+page << "TINY.box.hide()"

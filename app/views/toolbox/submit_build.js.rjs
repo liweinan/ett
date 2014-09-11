@@ -1,5 +1,6 @@
 pac = Package.find(params[:id])
-res = submit_build(pac, params[:clentry], pac.task.prod, params[:type_build])
+res = submit_build(pac, params[:clentry], pac.task.prod, params[:type_build],
+                   params[:edit_spec_file], params[:edit_maven_build_arguments])
 page.alert(res)
 if res.start_with?('Success:')
   page << 'TINY.box.hide()'
