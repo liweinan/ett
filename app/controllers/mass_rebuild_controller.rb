@@ -43,7 +43,7 @@ class MassRebuildController < ApplicationController
   def sched_build(pkg, version, repository, type_build, distros, clentry)
     uri = URI("http://mead.usersys.redhat.com/mead-scheduler/rest/build/sched/eap6/#{pkg}")
     res = Net::HTTP.post_form(uri, :clentry => clentry,
-                                   :user_id => current_user.email.gsub('@redhat.com', ''),
+                                   :userid => current_user.email.gsub('@redhat.com', ''),
                                    :sources => '',
                                    :version => version,
                                    :mode => type_build,
