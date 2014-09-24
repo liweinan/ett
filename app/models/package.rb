@@ -932,6 +932,13 @@ class Package < ActiveRecord::Base
     links
   end
 
+  def native?
+    self.tags.each do |tag|
+      return true if tag.key == 'Native'
+    end
+    false
+  end
+
   protected
 
   def all_from_packages_of(from_relationships, relationship_name)
