@@ -36,6 +36,22 @@
     </tr>
     <tr>
       <td>
+          Allow non-existent packages to be added by regular users?:
+      </td>
+      <td>
+        <%= h @task.allow_non_existent_pkgs ? "✓": "No" %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+          Allow non-shipped packages to be added by regular users?
+      </td>
+      <td>
+        <%= h @task.allow_non_shipped_pkgs ? "✓": "No" %>
+      </td>
+    </tr>
+    <tr>
+      <td>
         Target Release:
       </td>
       <td>
