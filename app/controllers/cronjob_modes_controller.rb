@@ -90,7 +90,7 @@ class CronjobModesController < ApplicationController
       to_add = {}
       to_add[:errata] = {}
       branch = ''
-      os_adv_tags.each do |tag|
+      os_adv_tags.each_with_index do |tag, count|
         distros << tag.os_arch
         to_add[tag.os_arch] = tag.modes_to_build
 
@@ -98,7 +98,7 @@ class CronjobModesController < ApplicationController
           to_add[:errata][tag.target_tag] = tag.errata_prod_release
         end
 
-        branch = tag.candidate_tag if tag.os_arch == 'el6'
+        branch = tag.candidate_tag if count == 0
       end
 
       product_info = {:version => task.tag_version,

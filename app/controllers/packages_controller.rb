@@ -69,6 +69,7 @@ class PackagesController < ApplicationController
   # POST /packages
   # POST /packages.xml
   def create
+
     @package = Package.new(params[:package])
     cleanup_pac_name!(@package.name)
 
@@ -77,8 +78,27 @@ class PackagesController < ApplicationController
 
     @package.tags = process_tags(params[:tags], params[:package][:task_id])
 
+    failed_admin_con = false
+    # conditions if user is not admin
+    unless can_manage?
+      unless @package.task.allow_non_existent_pkgs
+        if Package.package_unique?(@package.name)
+          failed_admin_con = true
+          flash[:notice] = 'Package is new to ETT. You do not have permission to add new packages already in ETT for this task.'
+        end
+      end
+
+      unless @package.task.allow_non_shipped_pkgs
+        unless @package.can_be_shipped?
+          failed_admin_con = true
+          flash[:notice] = 'You do not have permission to add non-shipped packages for this task.'
+        end
+      end
+    end
+
+
     respond_to do |format|
-      if @package.save
+      if !failed_admin_con && @package.save
         expire_all_fragments
         flash[:notice] = 'Package was successfully created.'
 

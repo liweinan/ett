@@ -73,6 +73,8 @@ class Package < ActiveRecord::Base
     url.blank? ? nil : url.gsub(/-dot-/, '.').gsub(/-slash-/, '/')
   end
   #####################################################################
+  #
+  @package_sets = nil
 
   # Return a boolean to indicate whether this package's version column field can
   # be updated
@@ -930,6 +932,11 @@ class Package < ActiveRecord::Base
       links << [link, latest_brew_nvr, advisory_used]
     end
     links
+  end
+
+  def self.package_unique?(package)
+    @package_sets ||= Set.new(Package.all(:select => "name").map {|pkg| pkg.name})
+    !@package_sets.include?(package)
   end
 
   def native?
