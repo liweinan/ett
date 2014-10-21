@@ -21,9 +21,26 @@ class MassRebuildController < ApplicationController
     distros = params[:distros]
     clentry = params[:clentry]
 
-    packages = get_filename_content(repository, branch, filename)
+    @packages = get_filename_content(repository, branch, filename)
 
+    respond_to do |format|
+      format.html
+    end
+  end
+
+
+  def third_step
+    return unless admin?
+    version = params[:version]
+    repository = params[:repository]
+    type_build = params[:type_build]
+    branch = params[:branch]
+    filename = params[:filename]
+    distros = params[:distros].split(',')
+    clentry = params[:clentry]
+    packages = params[:packages]
     @msg = []
+
     packages.each do |pkg|
       @msg << sched_build(pkg, version, repository, type_build, distros, clentry)
     end
