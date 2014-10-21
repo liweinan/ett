@@ -2,10 +2,8 @@
 <div style="height:20px;border:none;"></div>
 <div class='manage-tbl'>
     <% form_tag("/mass-rebuild/third-step", :method => "post") do %>
-        <table>
             <% @packages.each do |package| %>
-                <input type="checkbox" name="packages[]" value="<%= package %>" checked><%= package %>
-                </input>
+                <input type="checkbox" name="packages[]" value="<%= package %>" checked><%= package %></input>
                 <br>
             <% end %>
 
@@ -20,6 +18,5 @@
             <div style="height:20px;border:none;"></div>
             <input name="schedule" type="submit" value="Schedule!" />
 
-        </table>
     <% end %>
 </div>
