@@ -1,10 +1,25 @@
-<h2>Build scheduled</h2>
+<h2>Packages to Mass Rebuild</h2>
 <div style="height:20px;border:none;"></div>
 <div class='manage-tbl'>
-    <table>
-        <% @msg.each do |message| %>
-            <tr><td><%= message %></td></tr>
-        <% end %>
-    </table>
+    <% form_tag("/mass-rebuild/third-step", :method => "post") do %>
+        <table>
+            <% @packages.each do |package| %>
+                <input type="checkbox" name="packages[]" value="<%= package %>" checked><%= package %>
+                </input>
+                <br>
+            <% end %>
+
+            <!-- hidden fields -->
+            <input type="hidden" name="version" value=<%= params[:version] %> />
+            <input type="hidden" name="repository" value=<%= params[:repository] %> />
+            <input type="hidden" name="type_build" value=<%= params[:type][:option] %> />
+            <input type="hidden" name="distros" value=<%= params[:distros].join(',') %> />
+            <input type="hidden" name="clentry" value=<%= params[:clentry] %> />
+
+
+            <div style="height:20px;border:none;"></div>
+            <input name="schedule" type="submit" value="Schedule!" />
+
+        </table>
+    <% end %>
 </div>
-<br/>
