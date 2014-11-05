@@ -62,6 +62,8 @@ ActionController::Base.cache_store = :file_store, "#{RAILS_ROOT}/cache"
 
 require "xmlrpc/client"
 require "open-uri"
+require 'iniparse'
+require 'xmlsimple'
 XMLRPC::Config::ENABLE_NIL_PARSER = true
 
 class Hash

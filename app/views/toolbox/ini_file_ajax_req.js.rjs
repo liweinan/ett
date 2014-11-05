@@ -1,0 +1,28 @@
+pac = Package.find(params[:package_id])
+pac.ini_file = IniParse.gen do |doc|
+  doc.section(params['maven_group_artifact']) do |vehicle|
+    vehicle.option("scmurl", pac.git_url)
+    vehicle.option("buildrequires", params["buildrequires"])
+    vehicle.option("profiles", params["profiles"])
+    vehicle.option("properties", params["properties"])
+
+    goals = params["goals"] || ""
+
+    #FIXME: huge source of bugs later...
+    if !params["javadocs"].blank?
+      goals += " javadoc:jar"
+    end
+
+    if !params["suffix"].blank?
+      goals += " version.incremental.suffix=redhat"
+    end
+
+    vehicle.option("goals", goals)
+    vehicle.option("maven_options", params["maven_options"])
+    vehicle.option("envs", params["envs"])
+    vehicle.option("jvm_options", params["jvm_options"])
+  end
+end.to_ini
+pac.save
+page.alert("SUCCESS! The edited ini file will be commited to the rpm repository when you press 'Submit Build'")
+page << "TINY.box.hide()"

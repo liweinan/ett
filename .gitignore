@@ -7,3 +7,5 @@ log
 cache
 .gitkeep
 db/schema.rb
+Gemfile.lock
+.bundle

@@ -1,0 +1,5 @@
+<span style="text-align: left;">
+  <% if logged_in? && !@package.task.readonly? %>
+      <button onclick="TINY.box.show({url:'/toolbox/edit_ini_file?id=<%=@package.id%>'})">Edit ini file</button>
+  <% end %>
+</span>
