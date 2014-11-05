@@ -44,6 +44,13 @@ class MassRebuildController < ApplicationController
     packages.each do |pkg|
       @msg << sched_build(pkg, version, repository, type_build, distros, clentry)
     end
+       redirect_to(:controller => :mass_rebuild,
+                :action => :fourth_step,
+                :msg => @msg)
+  end
+
+  def fourth_step
+    return unless admin?
     respond_to do |format|
       format.html
     end
