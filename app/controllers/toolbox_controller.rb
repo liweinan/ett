@@ -135,8 +135,8 @@ class ToolboxController < ApplicationController
         @envs = ''
         @jvm_options = ''
       else
-        unless pac.ini_file.blank?
-          parsed = IniParse.parse(pac.ini_file)
+        unless @package.ini_file.blank?
+          parsed = IniParse.parse(@package.ini_file)
         else
           parsed = IniParse.parse(ini_file)
         end
