@@ -78,6 +78,9 @@ class PackagesController < ApplicationController
 
     @package.tags = process_tags(params[:tags], params[:package][:task_id])
 
+    @package.update_tag_if_native
+    @package.update_tag_if_not_shipped
+
     failed_admin_con = false
     # conditions if user is not admin
     unless can_manage?
@@ -173,6 +176,7 @@ class PackagesController < ApplicationController
           end
 
           @package.update_tag_if_not_shipped
+          @package.update_tag_if_native
 
           @package.save
 

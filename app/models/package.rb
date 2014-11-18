@@ -278,12 +278,19 @@ class Package < ActiveRecord::Base
                                :conditions => ['key = ? and task_id = ?',
                                                'Not Shipped', self.task_id])
 
-    if !not_shipped_tag.nil? && self.tags.include?(not_shipped_tag)
-      return
-    end
-
     if !in_shipped_list? && !not_shipped_tag.nil? && !self.tags.include?(not_shipped_tag)
       self.tags << not_shipped_tag
+      self.save
+    end
+  end
+
+  def update_tag_if_native
+    native_tag = Tag.find(:first,
+                          :conditions => ['key = ? and task_id = ?',
+                          'Native', self.task_id])
+
+    if !native_tag.nil? && !self.tags.include?(native_tag) && self.name.include?('native')
+      self.tags << native_tag
       self.save
     end
   end
