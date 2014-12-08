@@ -1,3 +1,4 @@
+require 'shellwords'
 class ToolboxController < ApplicationController
 
   def get_pac_btns
@@ -117,6 +118,53 @@ class ToolboxController < ApplicationController
     render :layout => false
   end
 
+  def replace_newline_to_whitespace(string_info)
+    if string_info.nil?
+      string_info
+    else
+      # leaving 2 whitespace chars so that it's more visible on the webview
+      string_info.gsub("\n", "  ")
+    end
+  end
+
+  def edit_ini_file
+    @package_id = params[:id]
+    @package = Package.find(@package_id)
+
+    branch = @package.task.primary_os_advisory_tag.candidate_tag
+    ini_file = get_file_content_from_rpm_repo(@package.name, branch,
+                                              "#{@package.name}.ini")
+
+    if ini_file.blank?
+      @maven_group_artifact = ''
+      @build_requires = ''
+      @goals = ''
+      @profiles = ''
+      @properties = ''
+      @maven_options = ''
+      @envs = ''
+      @jvm_options = ''
+    else
+      unless @package.ini_file.blank?
+        data = parse_ini_file(@package.ini_file)
+      else
+        data = parse_ini_file(ini_file)
+      end
+
+      section = data.keys[0]
+      config = data[section]
+      @maven_group_artifact = section
+      @build_requires = replace_newline_to_whitespace(config['buildrequires'])
+      @goals = replace_newline_to_whitespace(config['goals'])
+      @profiles = replace_newline_to_whitespace(config['profiles'])
+      @properties = replace_newline_to_whitespace(config['properties'])
+      @maven_options = replace_newline_to_whitespace(config['maven_options'])
+      @envs = replace_newline_to_whitespace(config['envs'])
+      @jvm_options = replace_newline_to_whitespace(config['jvm_options'])
+    end
+    render :layout => false
+  end
+
   def get_maven_build_arguments_content(package, branch)
     get_file_content_from_rpm_repo(package, branch, 'maven-build-arguments')
   end
@@ -126,7 +174,12 @@ class ToolboxController < ApplicationController
   end
 
   def get_file_content_from_rpm_repo(package, branch, file)
-    uri = URI("http://pkgs.devel.redhat.com/cgit/rpms/#{package}/plain/#{file}?h=#{branch}")
+    link = "http://pkgs.devel.redhat.com/cgit/rpms/#{package}/plain/#{file}?h=#{branch}"
+    download_item_from_link(link)
+  end
+
+  def download_item_from_link(link)
+    uri = URI(link)
     response = Net::HTTP.get_response(uri)
     response.code == "200" ? response.body : ''
   end
@@ -143,6 +196,17 @@ class ToolboxController < ApplicationController
       @error = "You can only use the Build Button when the status is 'InProgress' and there is an assignee to this package"
     end
     render :layout => false
+  end
+
+  # this is super hacky, but it works?
+  # Call Python ini parser from Ruby.
+  # Reason: The Python ini parser is way more complete than the ini parsers
+  # existing in rubyland. And the Python ini parser is pretty much guaranteed to
+  # work with Koji/Brew
+  def parse_ini_file(ini_file_content)
+    data_json = `python #{File.dirname(__FILE__)}/ini_parser.py #{ini_file_content.shellescape}`
+    data = JSON.parse(data_json)
+    return data
   end
 
   def tiny_box_helper(content)

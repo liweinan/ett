@@ -1,0 +1,36 @@
+def add_if_not_nil(vehicle, key, item)
+  if !item.nil? || item.strip() != ''
+    puts "#{key}:: =#{item}= =#{item.strip() != ''}="
+  end
+  vehicle.option(key, item) if !item.nil? && item.strip() != ''
+end
+
+pac = Package.find(params[:package_id])
+pac.ini_file = IniParse.gen do |doc|
+  doc.section(params['maven_group_artifact']) do |vehicle|
+    add_if_not_nil(vehicle, "scmurl", pac.git_url)
+    add_if_not_nil(vehicle, "buildrequires", params["buildrequires"])
+    add_if_not_nil(vehicle, "profiles", params["profiles"])
+
+    goals = params["goals"] || ""
+    properties = params["properties"] || ""
+
+    if !params["javadocs"].blank? && !goals.include?("javadoc:")
+      goals += " javadoc:jar"
+    end
+
+    if !params["suffix"].blank? && !properties.include?("suffix")
+      properties += " version.incremental.suffix=redhat"
+    end
+
+    add_if_not_nil(vehicle, "goals", goals)
+    add_if_not_nil(vehicle, "properties", properties)
+    add_if_not_nil(vehicle, "maven_options", params["maven_options"])
+    add_if_not_nil(vehicle, "envs", params["envs"])
+    add_if_not_nil(vehicle, "jvm_options", params["jvm_options"])
+  end
+end.to_ini
+pac.save
+page.alert("SUCCESS! The edited ini file will be commited to the rpm repository when you press 'Submit Build'")
+page << "TINY.box.hide()"
+
