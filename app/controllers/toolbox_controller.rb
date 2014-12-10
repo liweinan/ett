@@ -204,7 +204,11 @@ class ToolboxController < ApplicationController
   # existing in rubyland. And the Python ini parser is pretty much guaranteed to
   # work with Koji/Brew
   def parse_ini_file(ini_file_content)
-    data_json = `python #{File.dirname(__FILE__)}/ini_parser.py #{ini_file_content.shellescape}`
+    if Rails.env.production?
+      data_json = `python26 #{File.dirname(__FILE__)}/ini_parser.py #{ini_file_content.shellescape}`
+    else
+      data_json = `python #{File.dirname(__FILE__)}/ini_parser.py #{ini_file_content.shellescape}`
+    end
     data = JSON.parse(data_json)
     return data
   end
