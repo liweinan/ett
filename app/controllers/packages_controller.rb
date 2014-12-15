@@ -170,6 +170,10 @@ class PackagesController < ApplicationController
             update_time_track_and_log_entry(old_values, @package)
           end
 
+          if old_values[:github_pr] != @package.github_pr
+            @package.github_pr_closed = false
+          end
+
           if @package.status && @package.status.status_in_finished
             @package.milestone = @package.task.milestone
             @package.spec_file = @package.maven_build_arguments = @package.ini_file = nil
@@ -217,11 +221,13 @@ class PackagesController < ApplicationController
     old_status = package.status
     old_assignee = package.assignee
     old_version = package.ver
+    old_github_pr = package.github_pr
 
     {:old_ver => old_version,
      :old_status_changed_at => old_status_changed_at,
      :old_status => old_status,
-     :old_assignee => old_assignee}
+     :old_assignee => old_assignee,
+     :old_github_pr => old_github_pr}
   end
 
   def update_changelog(orig_package, package)
