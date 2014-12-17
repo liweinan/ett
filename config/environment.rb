@@ -64,6 +64,7 @@ require "xmlrpc/client"
 require "open-uri"
 require 'iniparse'
 require 'xmlsimple'
+require 'octokit'
 XMLRPC::Config::ENABLE_NIL_PARSER = true
 
 class Hash

@@ -220,4 +220,14 @@ class ToolboxController < ApplicationController
     entry.text = content || "- "
     entry
   end
+
+  def update_pull_request_information
+    client = Octokit::Client.new(:access_token => ENV['GITHUB_ETT_TOKEN'])
+
+    active_tasks = Task.all(:conditions => ['active = ?', '1'])
+    active_tasks.each do |task|
+      task.unclosed_pr_pkgs.each { |pkg| pkg.close_github_pr_closed(client) }
+    end
+    render :nothing => true
+  end
 end

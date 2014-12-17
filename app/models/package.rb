@@ -91,6 +91,23 @@ class Package < ActiveRecord::Base
     end
   end
 
+  def close_github_pr_closed(github_client)
+
+    git_repo = ENV['GITHUB_REPO_LINK']
+
+    begin
+      pull_request = github_client.pull_request git_repo, self.github_pr
+
+      if pull_request.state == 'closed'
+        # TODO: yeah maybe one day rename that to something more appropriate
+        self.github_pr_closed = true
+        self.save
+      end
+    rescue
+      "Error in fetching PR #{self.github_pr}"
+    end
+  end
+
   def changes_with_old(orig_package)
     diff = orig_package.attributes.diff_custom(self.attributes)
     diff.delete("updated_at") if diff.key?("updated_at")
@@ -129,6 +146,22 @@ class Package < ActiveRecord::Base
 
   def in_progress?
     !time_point.blank? && time_point > 0
+  end
+
+  def github_pr_show
+    if github_pr_closed == true
+      "✔ #{self.github_pr}"
+    elsif !self.github_pr.blank?
+      "✘ #{self.github_pr}"
+    end
+  end
+
+  def github_pr_link
+    if self.github_pr.blank?
+      ""
+    else
+      "https://github.com/#{ENV["GITHUB_REPO_LINK"]}/pull/#{self.github_pr}"
+    end
   end
 
   def git_url_http_link

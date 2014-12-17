@@ -48,6 +48,13 @@ class Task < ActiveRecord::Base
     tasks
   end
 
+  def unclosed_pr_pkgs
+    self.packages.select do |package|
+      !package.github_pr.blank? &&
+      (package.github_pr_closed.nil? || package.github_pr_closed == false)
+    end
+  end
+
   def self.all_that_have_package_with_name(name)
     Task.all(:conditions => ['id in (select task_id from packages where name = ?)', name])
   end
