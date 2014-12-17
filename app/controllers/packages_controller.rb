@@ -530,18 +530,24 @@ class PackagesController < ApplicationController
     unless params[:secret_key] == 'birdistheword'
       render :status => :unauthorized, :text => 'Wrong secret key' and return
     end
-    update_package_brew_nvr(params)
+    update_package_brew_nvr
     render :text => params[:task_id]
 
   end
 
-  def update_package_brew_nvr(params)
-    packages = get_packages(unescape_url(params[:task_id]), nil, nil, nil)
-    packages.each do |package|
-      brew_nvr = package.brew
-      if !brew_nvr.nil? && !brew_nvr.empty?
-        package.latest_brew_nvr = package.get_brew_name
-        package.save
+  def update_package_brew_nvr
+    active_tasks = Task.all(:conditions => ['active = ?', '1'])
+    active_tasks.each do |task|
+      task.packages.each do |package|
+        brew_nvr = package.brew
+        if !brew_nvr.blank? && package.status.name == "Finished"
+          begin # can throw an error in mead-scheduler is down
+            package.latest_brew_nvr = package.get_brew_name
+            package.save
+          rescue
+            puts "ERROR: mead-scheduler might be down"
+          end
+        end
       end
     end
   end
