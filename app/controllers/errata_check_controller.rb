@@ -82,6 +82,9 @@ class ErrataCheckController < ApplicationController
 
     os_adv_tag = OsAdvisoryTag.first(:conditions => ['advisory = ?',
                                                      params[:advisory]])
+
+    return if os_adv_tag.nil?
+
     task = os_adv_tag.task
     distro = os_adv_tag.os_arch
 
