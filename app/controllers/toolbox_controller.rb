@@ -223,6 +223,12 @@ class ToolboxController < ApplicationController
 
   def update_pull_request_information
     client = Octokit::Client.new(:access_token => ENV['GITHUB_ETT_TOKEN'])
+    begin
+      client.user
+    rescue
+      puts 'ERROR: Github token not setup properly, or Github is down'
+      return
+    end
 
     active_tasks = Task.all(:conditions => ['active = ?', '1'])
     active_tasks.each do |task|
