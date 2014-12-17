@@ -540,7 +540,9 @@ class PackagesController < ApplicationController
     active_tasks.each do |task|
       task.packages.each do |package|
         brew_nvr = package.brew
-        if !brew_nvr.blank? && package.status.name == "Finished"
+        if !brew_nvr.blank? &&
+           !package.status.nil? &&
+           package.status.name == "Finished"
           begin # can throw an error in mead-scheduler is down
             package.latest_brew_nvr = package.get_brew_name
             package.save
