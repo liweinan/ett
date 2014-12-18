@@ -227,6 +227,7 @@ class ToolboxController < ApplicationController
       client.user
     rescue
       puts 'ERROR: Github token not setup properly, or Github is down'
+      render(:nothing => true) and return
       return
     end
 
