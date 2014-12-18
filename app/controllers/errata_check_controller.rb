@@ -12,8 +12,7 @@ class ErrataCheckController < ApplicationController
                                                      params[:advisory]])
 
     if os_adv_tag.nil?
-      render :text => 'OK', :status => 202
-      return
+      render(:text => 'OK', :status => 202) and return
     end
 
     task = os_adv_tag.task
@@ -60,8 +59,7 @@ class ErrataCheckController < ApplicationController
                                     :conditions => ['advisory = ?', params['advisory']])
 
     if os_adv_tag.nil?
-      render :text => 'OK', :status => 202
-      return
+      render(:text => 'OK', :status => 202) and return
     end
 
     bzs = BzBug.find_bzs(os_adv_tag.task_id, os_adv_tag.os_arch)
@@ -95,8 +93,7 @@ class ErrataCheckController < ApplicationController
                                                      params[:advisory]])
 
     if os_adv_tag.nil?
-      render :text => 'OK', :status => 202
-      return
+      render(:text => 'OK', :status => 202) and return
     end
 
     task = os_adv_tag.task
