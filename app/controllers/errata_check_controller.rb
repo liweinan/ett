@@ -4,16 +4,14 @@ class ErrataCheckController < ApplicationController
   def sync
     nvrs = JSON.parse(params['nvrs'])
 
-    # advisory = params['advisory']
-
-    render :text => 'OK', :status => 202
-
     os_adv_tag = OsAdvisoryTag.first(:conditions => ['advisory = ?',
                                                      params[:advisory]])
 
     if os_adv_tag.nil?
-      render(:text => 'OK', :status => 202) and return
+      render(:text => 'No tag', :status => 200) and return
     end
+
+    render :text => 'OK', :status => 202
 
     task = os_adv_tag.task
     distro = os_adv_tag.os_arch

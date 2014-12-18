@@ -148,6 +148,14 @@ class Package < ActiveRecord::Base
     !time_point.blank? && time_point > 0
   end
 
+  def github_pr_style
+    if self.github_pr.nil? || self.github_pr_closed
+      ''
+    else
+      'background-color: #ff5757;'
+    end
+  end
+
   def github_pr_show
     if github_pr_closed == true
       "✔ #{self.github_pr}"
