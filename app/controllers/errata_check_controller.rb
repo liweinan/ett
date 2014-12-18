@@ -10,6 +10,12 @@ class ErrataCheckController < ApplicationController
 
     os_adv_tag = OsAdvisoryTag.first(:conditions => ['advisory = ?',
                                                      params[:advisory]])
+
+    if os_adv_tag.nil?
+      render :text => 'OK', :status => 202
+      return
+    end
+
     task = os_adv_tag.task
     distro = os_adv_tag.os_arch
 
@@ -52,7 +58,12 @@ class ErrataCheckController < ApplicationController
     bz_bugs = JSON.parse(params['bz_bugs'])
     os_adv_tag = OsAdvisoryTag.find(:first,
                                     :conditions => ['advisory = ?', params['advisory']])
-    return if os_adv_tag.nil?
+
+    if os_adv_tag.nil?
+      render :text => 'OK', :status => 202
+      return
+    end
+
     bzs = BzBug.find_bzs(os_adv_tag.task_id, os_adv_tag.os_arch)
 
     render :text => 'OK', :status => 202
@@ -83,7 +94,10 @@ class ErrataCheckController < ApplicationController
     os_adv_tag = OsAdvisoryTag.first(:conditions => ['advisory = ?',
                                                      params[:advisory]])
 
-    return if os_adv_tag.nil?
+    if os_adv_tag.nil?
+      render :text => 'OK', :status => 202
+      return
+    end
 
     task = os_adv_tag.task
     distro = os_adv_tag.os_arch
