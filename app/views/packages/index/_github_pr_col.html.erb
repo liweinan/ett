@@ -1,8 +1,3 @@
 <% unless package.blank? %>
-    <% ub = package.upgrade_bz %>
-    <% package.bz_bugs.each do |bz| %>
-        <% unless ub.include? bz %>
-            <%= link_to package.github_pr_show, package.github_pr_link, :target => '_blank' %>
-        <% end %>
-    <% end %>
+    <%= link_to package.github_pr_show, package.github_pr_link, :target => '_blank' %>
 <% end %>
