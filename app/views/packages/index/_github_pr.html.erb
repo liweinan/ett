@@ -1,7 +1,7 @@
 <% unless package.blank? %>
 <%= render :partial => 'packages/index/field_template',
            :locals => {:package => package,
-                       :field_name => 'bz',
+                       :field_name => 'github_pr',
                        :field_type => 'packages/index/field_input',
                        :partial => 'packages/index/github_pr_col',
                        :style => package.github_pr_style} %>
