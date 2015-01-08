@@ -71,12 +71,12 @@
         function validateFormAndPostForm() {
             var ver = document.getElementById('package_ver').value;
             var status = document.getElementById('package_status_id').value;
+            var github_pr = document.getElementById('package_github_pr').value;
 
             // default is always the second option
             var defaultSelected = document.getElementById('package_status_id').options[1].selected;
 
             var notes = document.getElementById('package_notes');
-
             if (status == '85' && !defaultSelected) {
                 var changelog_res = prompt('Please enter reason why this package is blocked');
                 if (changelog_res != null) {
@@ -89,9 +89,31 @@
                     alert('<%=t"version_fmt_incorrect"%>');
                     return false;
                 }
-            } else if (status == '36') { // finished state
+            } else if (status == '36') { // finished state and ver is empty
                 alert('You have to specify a version');
                 return false;
+            }
+
+            // check that github_pr is filled
+            if (status == '36' && github_pr == "") {
+
+                var tags= document.getElementsByClassName("tags_in_package");
+                var is_not_shipped = false;
+
+                for (var i = 0; i < tags.length; i++) {
+                    var tag = tags[i];
+                    if (tag.value == 'Not Shipped' && tag.checked == true) {
+                        is_not_shipped = true;
+                        break;
+                    }
+                }
+
+                if (!is_not_shipped) {
+                    var continue_process = confirm("The Github PR field is empty. It is recommended that you fill in the Github PR # before you continue.\n\nPress 'OK' to go back to the form, or press 'Cancel' if you don't want to fill in the Github PR field.");
+                    if (continue_process == true) {
+                        return false;
+                    }
+                }
             }
 
             var myForm = document.getElementById('edit_package_<%=@package.id%>');
