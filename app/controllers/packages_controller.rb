@@ -24,6 +24,9 @@ class PackagesController < ApplicationController
           render 'layouts/welcome'
         end
       end
+
+      format.json { render :json => @packages }
+
     end
   end
 
