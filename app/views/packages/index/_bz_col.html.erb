@@ -1,6 +1,11 @@
 <% unless package.blank? %>
     <% ub = package.upgrade_bz %>
-    <% package.bz_bugs.each do |bz| %>
+
+    <!--
+        Need to do package.bz_bugs(true) to force active record to not use the
+        cache
+    -->
+    <% package.bz_bugs(true).each do |bz| %>
         <% unless ub.include? bz %>
             <%= link_to bz.bz_id, "#{APP_CONFIG['bugzilla_prefix']}#{bz.bz_id}", :target => '_blank' %>
         <% end %>
