@@ -109,8 +109,8 @@
                 }
 
                 if (!is_not_shipped) {
-                    var continue_process = confirm("The Github PR field is empty. It is recommended that you fill in the Github PR # before you continue.\n\nPress 'OK' to go back to the form, or press 'Cancel' if you don't want to fill in the Github PR field.");
-                    if (continue_process == true) {
+                    var continue_process = confirm("Proceed without specifying a PR?");
+                    if (continue_process == false) {
                         return false;
                     }
                 }
