@@ -237,4 +237,41 @@ class ToolboxController < ApplicationController
     end
     render :nothing => true
   end
+
+  def update_previous_version
+    active_tasks = Task.all(:conditions => ["active = ? and previous_version_tag > ''", '1'])
+
+    active_tasks.each do |task|
+      update_previous_version_of_task(task)
+    end
+    render :nothing => true
+  end
+
+  def update_previous_version_of_task
+    task = find_task(params[:task_id])
+    update_previous_version_of_packages(task) unless task.previous_version_tag.blank?
+    render :nothing => true
+  end
+
+  def update_previous_version_of_packages(task)
+    server = XMLRPC::Client.new("brewhub.devel.redhat.com", "/brewhub", 80)
+    task.packages.each do |package|
+      next if !package.can_be_shipped?
+
+      param = server.call("getLatestRPMS", task.previous_version_tag, package.name)
+      nvr_info = param[1][0]
+      unless nvr_info.nil?
+        version = nvr_info['version']
+        release = nvr_info['release']
+        release = release.split('.')[1].gsub('_', '-')
+        if release.include?("redhat")
+          abbreviated_version = version + '.' + release
+        else
+          abbreviated_version = version
+        end
+        package.previous_version = abbreviated_version
+        package.save
+      end
+    end
+  end
 end
