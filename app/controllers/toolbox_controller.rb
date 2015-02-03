@@ -242,7 +242,7 @@ class ToolboxController < ApplicationController
     active_tasks = Task.all(:conditions => ["active = ? and previous_version_tag > ''", '1'])
 
     active_tasks.each do |task|
-      update_previous_version_of_task(task)
+      update_previous_version_of_packages(task)
     end
     render :nothing => true
   end
