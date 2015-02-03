@@ -123,6 +123,7 @@ Statuses:
           <%= render :partial => 'packages/index/tag', :locals => {:package => package} %>
           <%= render :partial => 'packages/index/user', :locals => {:package => package} %>
           <%= render :partial => 'packages/index/ver', :locals => {:package => package} %>
+          <%= render :partial => 'packages/index/previous_version', :locals => {:package => package} %>
           <%= render :partial => 'packages/index/milestone', :locals => {:package => package} %>
           <% if @task.use_bz_integration? %>
               <%= render :partial => 'packages/index/errata_bz', :locals => {:package => package} %>

@@ -9,6 +9,7 @@
       <th>Prod</th>
       <th>Milestone</th>
       <th>Version</th>
+      <th>Previous Version Tag</th>
       <th>Frozen State?</th>
       <th>Cronjob activated?</th>
       <% if can_manage? %>
@@ -48,6 +49,14 @@
                 <%= task.tag_version %>
             <% end %>
           </td>
+          <td>
+            <% if task.previous_version_tag.blank? %>
+                -
+            <% else %>
+                <%= task.previous_version_tag %>
+            <% end %>
+          </td>
+
           <td><%= task.frozen_state? ? "✓": "No" %></td>
           <td><%= task.active? ? "✓": "No" %></td>
           <% if can_manage? %>
