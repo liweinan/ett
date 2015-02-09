@@ -92,7 +92,7 @@ module ApplicationHelper
     distros_to_build.delete("el7") if pac.name == 'httpd'
 
     # stupid URI.encode cannot encode the '+' sign
-    params_build = "mode=#{mode}&userid=#{pac.user.email.gsub('@redhat.com', '')}" + "&sources=#{url_encode(pac.git_url)}&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}&bugs=#{url_encode(bz_bug_structure.to_json)}&distros=#{distros_to_build.join(',')}"
+    params_build = "mode=#{mode}&userid=#{current_user.email.gsub('@redhat.com', '')}" + "&sources=#{url_encode(pac.git_url)}&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}&bugs=#{url_encode(bz_bug_structure.to_json)}&distros=#{distros_to_build.join(',')}"
     params_build += "&erratum=" + pac.errata unless pac.errata.blank?
 
     req = Net::HTTP::Post.new("/mead-scheduler/rest/build/sched/#{prod}/#{pac.name}?" + params_build)
@@ -112,7 +112,7 @@ module ApplicationHelper
     end
 
     if pac.name == 'httpd'
-      params_build_httpd = "mode=#{mode}&userid=#{pac.user.email.gsub('@redhat.com', '')}&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}&distros=el7"
+      params_build_httpd = "mode=#{mode}&userid=#{current_user.email.gsub('@redhat.com', '')}&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}&distros=el7"
       params_build_httpd += "&erratum=" + pac.errata unless pac.errata.blank?
       req_httpd = Net::HTTP::Post.new("/mead-scheduler/rest/build/sched/#{prod}/httpd22?#{params_build_httpd}")
       res_httpd = Net::HTTP.start(uri.host, uri.port) do |http|
