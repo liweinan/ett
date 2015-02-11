@@ -417,18 +417,4 @@ class ApplicationController < ActionController::Base
     res = Net::HTTP.get_response(URI("#{APP_CONFIG['bz_bug_check']}#{bzauth_user}?pwd=#{bzauth_pwd}"))
     res.code
   end
-
-
-
-  def password_valid?(user, password)
-
-    return false if user.blank?
-
-    #backward compatibility
-    if user.password.blank?
-      user.email == password # default password is user email address
-    else
-      user.password == User.encrypt_password(password)
-    end
-  end
 end
