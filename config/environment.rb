@@ -38,6 +38,7 @@ Rails::Initializer.run do |config|
     :tls => true
   }
 
+  # this tells rails to store all the data in the session into the database
   config.action_controller.session_store = :active_record_store
 
   config.gem "will_paginate", :source => "http://gemcutter.org", :version => '2.3.15'
