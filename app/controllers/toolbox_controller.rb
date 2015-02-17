@@ -274,4 +274,9 @@ class ToolboxController < ApplicationController
       end
     end
   end
+
+  def delete_sessions_older_than_two_weeks
+    ActiveRecord::SessionStore::Session.delete_all(["updated_at < ?", 2.weeks.ago])
+    render :nothing => true
+  end
 end
