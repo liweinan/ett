@@ -2,8 +2,6 @@ class TagsController < ApplicationController
   before_filter :check_task, :only => [:index, :new]
   before_filter :check_can_manage, :only => [:new, :edit]
 
-  # GET /attributes
-  # GET /attributes.xml
   def index
     @tags = Tag.all(:conditions => ['task_id = ?', get_task(params[:task_id]).id])
 
@@ -13,8 +11,6 @@ class TagsController < ApplicationController
     end
   end
 
-  # GET /attributes/1
-  # GET /attributes/1.xml
   def show
     @tag = Tag.find(params[:id])
 
@@ -24,8 +20,6 @@ class TagsController < ApplicationController
     end
   end
 
-  # GET /attributes/new
-  # GET /attributes/new.xml
   def new
     @tag = Tag.new
 
@@ -40,8 +34,6 @@ class TagsController < ApplicationController
     @tag = Tag.find(params[:id])
   end
 
-  # POST /attributes
-  # POST /attributes.xml
   def create
     expire_all_fragments
     @tag = Tag.new(params[:tag])
@@ -62,8 +54,6 @@ class TagsController < ApplicationController
     end
   end
 
-  # PUT /attributes/1
-  # PUT /attributes/1.xml
   def update
     expire_all_fragments
     @tag = Tag.find(params[:id])
@@ -83,8 +73,6 @@ class TagsController < ApplicationController
     end
   end
 
-  # DELETE /attributes/1
-  # DELETE /attributes/1.xml
   def destroy
     @tag = Tag.find(params[:id])
     @tag.destroy
