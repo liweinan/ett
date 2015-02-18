@@ -92,11 +92,10 @@ module ApplicationHelper
     distros_to_build.delete("el7") if pac.name == 'httpd'
 
     # stupid URI.encode cannot encode the '+' sign
-    params_build = "mode=#{mode}&userid=#{current_user.email.gsub('@redhat.com', '')}" + "&sources=#{url_encode(pac.git_url)}&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}&bugs=#{url_encode(bz_bug_structure.to_json)}&distros=#{distros_to_build.join(',')}"
+    params_build = "mode=#{mode}&userid=#{current_user.email.gsub('@redhat.com', '')}" + "&sources=#{url_encode(pac.git_url)}&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}&bugs=#{url_encode(bz_bug_structure.to_json)}&distros=#{distros_to_build.join(',')}&etttask=#{escape_url(pac.task.name)}"
     params_build += "&erratum=" + pac.errata unless pac.errata.blank?
 
     req = Net::HTTP::Post.new("/mead-scheduler/rest/build/sched/#{prod}/#{pac.name}?" + params_build)
-
     req_data = {}
     req_data[:spec_file] = pac.spec_file if include_spec_file == "1"
     req_data[:maven_build_arguments] = pac.maven_build_arguments if include_maven_build_arguments_file == "1"
