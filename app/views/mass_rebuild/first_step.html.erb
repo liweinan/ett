@@ -11,6 +11,7 @@
           <%= render :partial => 'mass_rebuild/fields/distros' %>
           <div class='manage-tbl'>
           <%= render :partial => 'mass_rebuild/fields/clentry' %>
+          <input type="hidden" name="task_id" value="<%= params[:task_id] %>" />
       </table>
       <p/>
       <td colspan="2" style="text-align: right"><input name="next" type="submit" value="Next!" /></td>

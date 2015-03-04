@@ -39,10 +39,12 @@ class MassRebuildController < ApplicationController
     distros = params[:distros].split(',')
     clentry = params[:clentry]
     packages = params[:packages]
+    task_id = params[:task_id]
     @msg = []
 
+    task = find_task(task_id)
     packages.each do |pkg|
-      @msg << sched_build(pkg, version, repository, type_build, distros, clentry)
+      @msg << sched_build(pkg, version, repository, type_build, distros, clentry, task)
     end
        redirect_to(:controller => :mass_rebuild,
                 :action => :fourth_step,
@@ -64,8 +66,8 @@ class MassRebuildController < ApplicationController
     res.body.split("\n")
   end
 
-  def sched_build(pkg, version, repository, type_build, distros, clentry)
-    uri = URI("http://mead.usersys.redhat.com/mead-scheduler/rest/build/sched/eap6/#{pkg}")
+  def sched_build(pkg, version, repository, type_build, distros, clentry, task)
+    uri = URI("http://mead.usersys.redhat.com/mead-scheduler/rest/build/sched/#{task.prod}/#{pkg}")
     res = Net::HTTP.post_form(uri, :clentry => clentry,
                                    :userid => current_user.email.gsub('@redhat.com', ''),
                                    :sources => '',

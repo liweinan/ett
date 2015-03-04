@@ -305,7 +305,7 @@ class Package < ActiveRecord::Base
     ans = ''
     begin
       Net::HTTP.start('mead.usersys.redhat.com') do |http|
-        resp = http.get("/mead-scheduler/rest/package/eap6/#{name}/shipped")
+        resp = http.get("/mead-scheduler/rest/package/#{self.task.prod}/#{name}/shipped")
         ans = resp.body
       end
       ans == 'YES'
@@ -706,7 +706,7 @@ class Package < ActiveRecord::Base
 
   def build_type
     Net::HTTP.get('mead.usersys.redhat.com',
-                  "/mead-scheduler/rest/package/eap6/#{self.name}/type")
+                  "/mead-scheduler/rest/package/#{self.task.prod}/#{self.name}/type")
   end
 
   # get_mead_info will go get the mead nvr from the rpm repo directly if it
@@ -758,7 +758,7 @@ class Package < ActiveRecord::Base
     ans = ''
     begin
       Net::HTTP.start('mead.usersys.redhat.com') do |http|
-        resp = http.get("/mead-scheduler/rest/package/eap6/#{name}/scl")
+        resp = http.get("/mead-scheduler/rest/package/#{self.task.prod}/#{name}/scl")
         ans = resp.body
       end
       ans == 'YES'
