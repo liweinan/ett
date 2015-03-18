@@ -42,6 +42,9 @@
 <% if has_task_and_readonly? params[:task_id] %>
     <h2 style="color: red;">This task is read only</h2>
 <% end %>
+<% if @task.frozen_state? %>
+    <h2 style="color: red;">This task is frozen</h2>
+<% end %>
 
 <%= render :partial => 'ops' %>
 
