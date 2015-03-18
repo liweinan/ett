@@ -508,13 +508,18 @@ class Package < ActiveRecord::Base
     rpmdiff
   end
 
-  def get_brew_rpm_link(nvr)
+  def get_brew_rpm_link(nvr, retries = 3)
     server = XMLRPC::Client.new("brewhub.devel.redhat.com", "/brewhub", 80)
     begin
       call = server.call("getBuild", nvr)
       'https://brewweb.devel.redhat.com/taskinfo?taskID=' + call['task_id'].to_s
     rescue Exception => e
-      nil
+      if retries == 0
+        nil
+      else
+        puts "Retrying for nvr '#{nvr}'... attempt #{4 - retries}"
+        get_brew_rpm_link(nvr, retries - 1)
+      end
     end
   end
 
