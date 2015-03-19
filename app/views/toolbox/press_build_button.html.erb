@@ -1,5 +1,5 @@
 <%= javascript_include_tag :defaults %>
-    <% if @error.nil? && !@pac.task.frozen_state? %>
+    <% if @error.nil? && @pac.task.active? %>
         <div style="text-align: left;">
         <% form_remote_tag(
                    :url => {:controller => 'toolbox', :action => 'package_ajax_req'},
@@ -36,7 +36,7 @@
         </div>
 
     <% else %>
-        <% if @pac.task.frozen_state? %>
+        <% unless @pac.task.active? %>
             <p><%= 'Task is in frozen state. You cannot build at the moment!' %></p>
         <% end %>
         <p><%= @error %></p>

@@ -1,4 +1,4 @@
-<% if @package.task.use_mead_integration? && @package.status && @package.status.code == 'finished' && !@package.task.readonly? %>
+<% if @package.task.use_mead_integration? && @package.status && @package.status.code == 'finished' && !@package.task.read_only_task? %>
     <tr>
         <td>Add builds to Errata</td>
         <td><%= render :partial => 'packages/fields/errata' %></td>

@@ -1,4 +1,3 @@
-<% is_frozen = task.frozen_state? ? " [FROZEN]": "" %>
-<% is_active = task.active? ? " [CRONJOB_ACTIVE]": "" %>
-<%= link_to "#{task.name + is_frozen + is_active}", :controller => :packages, :action => :index, :task_id => escape_url(task.name), :user => user %>
+<% is_active = task.active? ? " [CRONJOB_ACTIVE]": " [FROZEN]" %>
+<%= link_to "#{task.name + is_active}", :controller => :packages, :action => :index, :task_id => escape_url(task.name), :user => user %>
 /

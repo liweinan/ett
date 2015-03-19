@@ -5,7 +5,7 @@
     <%= link_to("bz#{bz_bug.bz_id} [#{bz_bug.bz_status}] #{bz_bug.summary}", "#{APP_CONFIG['bugzilla_prefix']}#{bz_bug.bz_id}", :target => '_blank') %>
     <br>
 <% end %>
-<% elsif logged_in? && !@package.task.readonly? %>
+<% elsif logged_in? && !@package.task.read_only_task? %>
     <form onsubmit="return false;" style='display:inline;'>
         <button onclick="renderBzBugForm('new_bz_bug_wsum');">Create a new Errata bug</button>
     </form>

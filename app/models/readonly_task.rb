@@ -1,6 +1,5 @@
 class ReadonlyTask < ActiveRecord::Base
   belongs_to :task
-
   # move packages found in tasks other than 'task_id' to 'Already Released' if
   # there is a package in 'task_id' that is marked as 'Finished', and have the
   # same versions.
@@ -16,7 +15,7 @@ class ReadonlyTask < ActiveRecord::Base
       status = Status.find(:first, :conditions => ['name = ?', 'Already Released'])
       unless similar_pkgs.blank?
         similar_pkgs.each do |pkg_to_change|
-          unless pkg_to_change.task.active.nil?
+          if pkg_to_change.task.active && pkg_to_change.task.prod == task.prod
             main_distro = pkg_to_change.task.primary_os_advisory_tag.os_arch
             if pkg.nvr_in_brew(main_distro) != pkg_to_change.nvr_in_brew(main_distro)
               next

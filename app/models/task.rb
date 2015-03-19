@@ -35,10 +35,6 @@ class Task < ActiveRecord::Base
     task_ids
   end
 
-  def frozen_state?
-    self.frozen_state == "1"
-  end
-
   def self.from_task_ids(task_ids)
     tasks = []
     task_ids.each do |task_id|
@@ -83,12 +79,8 @@ class Task < ActiveRecord::Base
     end
   end
 
-  def readonly?
-    !ReadonlyTask.find_by_task_id(id).blank?
-  end
-
-  def self.readonly?(task)
-    !ReadonlyTask.find_by_task_id(task.id).blank?
+  def read_only_task?
+    self.read_only_task
   end
 
   def active_packages # find the packages of the task which the workload time need to be tracked.

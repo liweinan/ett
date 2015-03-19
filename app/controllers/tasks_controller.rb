@@ -106,10 +106,18 @@ class TasksController < ApplicationController
 
     save_task_groups(@task, params)
 
+    old_read_only_task = @task.read_only_task
     respond_to do |format|
       if @task.update_attributes(params[:task]) && !os_adv_tag_error
         expire_all_fragments
-        flash[:notice] = 'Task was successfully updated.'
+        flash_text = ''
+        if !old_read_only_task && @task.read_only_task
+          @task.active = nil
+          @task.save
+          flash_text = ReadonlyTask.move_other_packages_to_already_released(@task.id)
+        end
+        flash[:notice] = "Task was successfully updated.\n#{flash_text}"
+        flash[:notice] = flash[:notice].gsub("\n", "<br>")
         format.html do
           redirect_to(:controller => :tasks,
                       :action => :show,

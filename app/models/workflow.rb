@@ -57,7 +57,7 @@ class Workflow < ActiveRecord::Base
     Task.transaction do
       # reset current workflow assignment
       Task.find_all_by_workflow_id(id).each do |task|
-        unless task.readonly?
+        unless task.read_only_task?
           task.workflow_id = nil
           task.save
         end
@@ -66,7 +66,7 @@ class Workflow < ActiveRecord::Base
       unless tasks.blank?
         tasks.each do |task|
           task = Task.find(task.to_i)
-          unless task.readonly?
+          unless task.read_only_task?
             task.workflow_id = id
             task.save
           end

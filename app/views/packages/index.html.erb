@@ -42,7 +42,7 @@
 <% if has_task_and_readonly? params[:task_id] %>
     <h2 style="color: red;">This task is read only</h2>
 <% end %>
-<% if @task.frozen_state? %>
+<% unless @task.active? %>
     <h2 style="color: red;">This task is frozen</h2>
 <% end %>
 
@@ -82,7 +82,7 @@ Statuses:
                     :task_id => params[:task_id], :tag => tag.key %> /
     <% end %>
 <% end %>
-<% if logged_in? && !Task.readonly?(task_erb) %>
+<% if logged_in? && !task_erb.read_only_task? %>
     <%= render :partial => 'layouts/sep' %>
     <span id="inline_editor_switch" style="display:none;">
       <a href="javascript:void(0);" onclick="getPacBtns();">

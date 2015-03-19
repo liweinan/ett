@@ -36,7 +36,7 @@
     <%= link_to 'Assign To Me', :controller => 'packages', :action => 'edit', :id => escape_url(@package.name), :assignee => current_user %> |
 <% end %>
 
-<% unless @package.task.readonly? %>
+<% unless @package.task.read_only_task? %>
     <% if can_edit_package? @package %>
         <%= link_to 'Edit', :controller => 'packages', :action => 'edit', :id => escape_url(@package.name) %>
     <% end %>
@@ -59,7 +59,7 @@
 <%= render :partial => 'packages/relationships' %>
 <%= render :partial => 'layouts/sep' %>
 
-<% unless @package.task.readonly? %>
+<% unless @package.task.read_only_task? %>
     <%= render :partial => 'packages/attachment' %>
     <%= render :partial => 'layouts/sep' %>
 <% end %>
@@ -71,6 +71,6 @@
 <%= render :partial => 'layouts/sep' %>
 
 <%= render :partial => "comments/index" %>
-<% if logged_in? && !@package.task.readonly? %>
+<% if logged_in? && !@package.task.read_only_task? %>
     <%= render :partial => "comments/new" %>
 <% end %>

@@ -13,7 +13,7 @@
     </td>
 </tr>
 <span id="manual_time_track_component">&nbsp;</span> <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'manual_time_track_component_indicator'} %>
-<% if logged_in? && !@package.task.readonly? %>
+<% if logged_in? && !@package.task.read_only_task? %>
     <tr>
         <td>Log work time</td>
     <%= render :partial => 'layouts/sep_tiny' %>
