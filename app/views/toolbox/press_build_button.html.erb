@@ -37,7 +37,7 @@
 
     <% else %>
         <% unless @pac.task.active? %>
-            <p><%= 'Task is in frozen state. You cannot build at the moment!' %></p>
+            <p><%= 'Task is currently not active. You cannot build at the moment!' %></p>
         <% end %>
         <p><%= @error %></p>
         <center>

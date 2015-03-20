@@ -1,3 +1,7 @@
+# ==============================================================================
+# Seems to be good for Rails4!
+# Just need to find an alternative to act_as_textiled
+# ==============================================================================
 require 'net/http'
 
 class Package < ActiveRecord::Base
@@ -19,7 +23,10 @@ class Package < ActiveRecord::Base
       500 => {:status => 'QUEUED FOR TEST', :style => 'background-color: #b2f4ff;'},
       -1 => {:status => 'DUPLICATE', :style => 'background-color: #b2ffa1;'}
   }
-  acts_as_textiled :notes
+  if Rails::VERSION::STRING < "4"
+    # TODO: fix me in Rails4
+    acts_as_textiled :notes
+  end
   acts_as_commentable
 
   belongs_to :user #assignee
@@ -31,12 +38,8 @@ class Package < ActiveRecord::Base
   has_many :rpm_diffs, :dependent => :destroy
   has_many :assignments, :dependent => :destroy
   has_many :tags, :through => :assignments
-  has_many :bz_bugs, :class_name => 'BzBug',
-           :foreign_key => 'package_id', :order => 'created_at'
-
+  has_many :bz_bugs, :dependent => :destroy
   has_many :brew_nvrs, :dependent => :destroy
-
-  #has_and_belongs_to_many :components
 
   has_many :to_relationships, :class_name => 'PackageRelationship',
            :foreign_key => 'from_package_id', :dependent => :destroy
@@ -54,6 +57,7 @@ class Package < ActiveRecord::Base
   validates_presence_of :created_by
   validates_presence_of :updated_by
 
+  # provided by default_value_for gem
   default_value_for :time_consumed, 0
   default_value_for :time_point, 0
   default_value_for :status_changed_at, Time.now

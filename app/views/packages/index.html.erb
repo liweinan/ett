@@ -43,7 +43,7 @@
     <h2 style="color: red;">This task is read only</h2>
 <% end %>
 <% unless @task.active? %>
-    <h2 style="color: red;">This task is frozen</h2>
+    <h2 style="color: red;">This task is not active</h2>
 <% end %>
 
 <%= render :partial => 'ops' %>
