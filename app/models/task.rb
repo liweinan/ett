@@ -1,5 +1,4 @@
 class Task < ActiveRecord::Base
-#  acts_as_tree
   validates_presence_of :name
   validates_uniqueness_of :name
 
@@ -23,7 +22,9 @@ class Task < ActiveRecord::Base
 
   belongs_to :workflow
 
-  acts_as_textiled :description
+  if Rails::VERSION::STRING < "4"
+    acts_as_textiled :description
+  end
 
   LINK = {:tag => 0, :package => 1}
 
