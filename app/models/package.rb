@@ -200,8 +200,14 @@ class Package < ActiveRecord::Base
     else
       relationship = Relationship.find_by_name(relationship_name)
       unless relationship.blank?
-        unless PackageRelationship.all(:conditions =>  ['(from_package_id = ? or to_package_id = ?) and relationship_id = ?', self.id, self.id, relationship.id]).blank?
-          return true
+        if Rails::VERSION::STRING < "4"
+          unless PackageRelationship.all(:conditions =>  ['(from_package_id = ? or to_package_id = ?) and relationship_id = ?', self.id, self.id, relationship.id]).blank?
+            return true
+          end
+        else
+          unless PackageRelationship.where('(from_package_id = ? or to_package_id = ?) and relationship_id = ?', self.id, self.id, relationship.id).blank?
+            return true
+          end
         end
       end
       false
@@ -267,7 +273,11 @@ class Package < ActiveRecord::Base
 
   # FIXME: not used anywhere, candidate for removal
   def pending_bz_bugs
-    BzBug.all(:conditions => ['package_id = ? and bz_action is not null', self.id])
+    if Rails::VERSION::STRING < "4"
+      BzBug.all(:conditions => ['package_id = ? and bz_action is not null', self.id])
+    else
+      BzBug.where('package_id = ? and bz_action is not null', self.id)
+    end
   end
 
   # FIXME: not used anywhere, candidate for removal
@@ -682,9 +692,15 @@ class Package < ActiveRecord::Base
     self.status_changed_at = Time.now
 
     if !last_status.blank? && last_status.is_time_tracked?
-      time_track = TrackTime.all(:conditions => ['package_id=? and status_id=?',
-                                                 self.id,
-                                                 last_status.id])[0]
+      if Rails::VERSION::STRING < "4"
+        time_track = TrackTime.all(:conditions => ['package_id=? and status_id=?',
+                                                   self.id,
+                                                   last_status.id])[0]
+      else
+        time_track = TrackTime.where('package_id=? and status_id=?',
+                                     self.id,
+                                     last_status.id).take
+      end
       time_track = TrackTime.new if time_track.blank?
 
       time_track.package_id = self.id
@@ -991,8 +1007,13 @@ class Package < ActiveRecord::Base
     links
   end
 
+  # TODO: candidate for removal, no one uses it
   def self.package_unique?(package)
-    @package_sets ||= Set.new(Package.all(:select => "name").map {|pkg| pkg.name})
+    if Rails::VERSION::STRING < "4"
+      @package_sets ||= Set.new(Package.all(:select => "name").map {|pkg| pkg.name})
+    else
+      @package_sets ||= Set.new(Package.select("name").distinct.map {|pkg| pkg.name})
+    end
     !@package_sets.include?(package)
   end
 
@@ -1028,10 +1049,15 @@ class Package < ActiveRecord::Base
     packages.flatten.uniq
   end
 
+  # TODO: candidate for removal
   def self.distinct_in_tasks(tasks)
-    Package.all(:select => 'distinct name',
-                :conditions => ['task_id in (?)', Task.tasks_to_ids(tasks)],
-                :order => 'name')
+    if Rails::VERSION::STRING < "4"
+      Package.all(:select => 'distinct name',
+                  :conditions => ['task_id in (?)', Task.tasks_to_ids(tasks)],
+                  :order => 'name')
+    else
+      Package.where("task_id in (?)", Task.tasks_to_ids(tasks)).select('name').distinct.order('name')
+    end
   end
 
   def self.distinct_in_tasks_can_show(tasks)
@@ -1042,10 +1068,13 @@ class Package < ActiveRecord::Base
         can_show_status_ids << status.id
       end
     end
-
-    Package.all(:select => 'distinct name',
-                :conditions => ['task_id in (?) and (status_id in (?) or status_id is NULL)', task_ids, can_show_status_ids.uniq],
-                :order => 'name')
+    if Rails::VERSION::STRING < "4"
+      Package.all(:select => 'distinct name',
+                  :conditions => ['task_id in (?) and (status_id in (?) or status_id is NULL)', task_ids, can_show_status_ids.uniq],
+                  :order => 'name')
+    else
+      Package.where('task_id in (?) and (status_id in (?) or status_id is NULL)', task_ids, can_show_status_ids.uniq).select('name').distinct.order('name')
+    end
   end
 
   def validate

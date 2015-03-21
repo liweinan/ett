@@ -53,7 +53,11 @@ class Task < ActiveRecord::Base
   end
 
   def self.all_that_have_package_with_name(name)
-    Task.all(:conditions => ['id in (select task_id from packages where name = ?)', name])
+    if Rails::VERSION::STRING < "4"
+      Task.all(:conditions => ['id in (select task_id from packages where name = ?)', name])
+    else
+      Task.where("id in (select task_id from packages where name = ?)", name)
+    end
   end
 
   def use_bz_integration?
@@ -89,7 +93,11 @@ class Task < ActiveRecord::Base
     # So we will consider this package as active.
     # For example if the package is in 'Deleted' status, and because 'Deleted' status's 'is_track_time' is set to 'No',
     # so we think the packages marked in 'Delete' status is inactive.
-    Package.all(:conditions => ["task_id = ? and status_id in (select id from statuses where is_track_time != 'No') or status_id is null", id])
+    if Rails::VERSION::STRING < "4"
+      Package.all(:conditions => ["task_id = ? and status_id in (select id from statuses where is_track_time != 'No') or status_id is null", id])
+    else
+      Package.where("task_id = ? and status_id in (select id from statuses where is_track_time != 'No') or status_id is null", id)
+    end
   end
 
   def active?
@@ -97,7 +105,11 @@ class Task < ActiveRecord::Base
   end
 
   def sorted_os_advisory_tags
-    OsAdvisoryTag.all(:conditions => ['task_id = ?', self.id], :order => :priority)
+    if Rails::VERSION::STRING < "4"
+      OsAdvisoryTag.all(:conditions => ['task_id = ?', self.id], :order => :priority)
+    else
+      OsAdvisoryTag.where('task_id = ?', self.id).order(:priority)
+    end
   end
 
   def distros
@@ -119,7 +131,11 @@ class Task < ActiveRecord::Base
   end
 
   def has_pkg_with_optional_errata?
-    Package.find(:all,
-                 :conditions => ['task_id = ? and errata > ?', self.id, '']).count != 0
+    if Rails::VERSION::STRING < "4"
+      Package.find(:all,
+                   :conditions => ['task_id = ? and errata > ?', self.id, '']).count != 0
+    else
+      Package.where("task_id = ? and errata > ?", self.id, '').count != 0
+    end
   end
 end
