@@ -15,7 +15,11 @@ class Setting < ActiveRecord::Base
   belongs_to :task
 
   def self.system_settings
-    Setting.find(:first, :conditions => 'task_id IS NULL')
+    if Rails::VERSION::STRING < "4"
+      Setting.find(:first, :conditions => 'task_id IS NULL')
+    else
+      Setting.where('task_id IS NULL').first
+    end
   end
 
   def is_system_setting?
@@ -59,7 +63,6 @@ class Setting < ActiveRecord::Base
       end
 
       if props & Setting::PROPS[:commenter] > 0
-        debugger
         package.commenters.each do |commenter|
           unless same_person?(commenter, editor)
             recipients += ", #{commenter.email}"
@@ -83,7 +86,6 @@ class Setting < ActiveRecord::Base
       end
 
       if props & Setting::PROPS[:commenter] > 0
-        debugger
         package.commenters.each do |commenter|
           unless same_person?(commenter, editor)
             recipients += ", #{commenter.email}"

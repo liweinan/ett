@@ -1,3 +1,7 @@
+if Rails::VERSION::STRING < "4" # Rails2 routing starts here
+# ==============================================================================
+# RAILS 2 routing starts here
+# ==============================================================================
 ActionController::Routing::Routes.draw do |map|
   map.resources :cronjob_modes
 
@@ -81,4 +85,124 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'mass-rebuild/fourth-step', :controller => 'mass_rebuild', :action => 'fourth_step'
   map.connect ':controller/:action/:id'
   map.connect ':controller/:action/:id.:format'
+end
+else # Rails 4 routing starts here
+# ==============================================================================
+# RAILS 4 routing starts here
+# ==============================================================================
+Rails.application.routes.draw do
+  # The priority is based upon order of creation: first created -> highest priority.
+  # See how all your routes lay out with "rake routes".
+
+  # You can have the root of your site routed with "root"
+  # root 'welcome#index'
+
+  # Example of regular route:
+  #   get 'products/:id' => 'catalog#view'
+
+  # Example of named route that can be invoked with purchase_url(id: product.id)
+  #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
+
+  # Example resource route (maps HTTP verbs to controller actions automatically):
+  #   resources :products
+
+  # Example resource route with options:
+  #   resources :products do
+  #     member do
+  #       get 'short'
+  #       post 'toggle'
+  #     end
+  #
+  #     collection do
+  #       get 'sold'
+  #     end
+  #   end
+
+  # Example resource route with sub-resources:
+  #   resources :products do
+  #     resources :comments, :sales
+  #     resource :seller
+  #   end
+
+  # Example resource route with more complex sub-resources:
+  #   resources :products do
+  #     resources :comments
+  #     resources :sales do
+  #       get 'recent', on: :collection
+  #     end
+  #   end
+
+  # Example resource route with concerns:
+  #   concern :toggleable do
+  #     post 'toggle'
+  #   end
+  #   resources :posts, concerns: :toggleable
+  #   resources :photos, concerns: :toggleable
+
+  # Example resource route within a namespace:
+  #   namespace :admin do
+  #     # Directs /admin/products/* to Admin::ProductsController
+  #     # (app/controllers/admin/products_controller.rb)
+  #     resources :products
+  #   end
+
+  resources :cronjob_modes
+  resources :task_groups
+  resources :readonly_tasks
+  resources :allowed_statuses
+  resources :workflows
+  resources :manual_log_entries
+  resources :sandboxes
+  resources :jira_bugs
+  resources :changelogs
+  resources :components
+  resources :package_relationships
+  resources :relationships
+  resources :settings
+  resources :p_attachments
+
+  resources :tasks do
+    resources :packages, :statuses, :tags, :settings
+  end
+
+  resources :brew_tags do
+    resources :packages
+  end
+  resources :tags
+
+  resources :statuses do
+    resources :packages
+  end
+
+  resources :sessions
+
+  resources :users do
+   resources :packages, :user_views
+  end
+  
+  resources :user_views
+  resources :import
+  resources :comments
+  resources :bz_bugs
+  
+  # ============================================================================
+  # TODO: verify that those changes are valid
+  # ============================================================================
+  get 'logout' => 'sessions#destroy', as: 'logout'
+  get 'login' => 'sessions#new', as: 'login'
+
+  get 'errata_check/sync' => 'errata_check#sync'
+  get 'errata_check/sync_bz' => 'errata_check#sync_bz'
+  get 'errata_check/sync_rpmdiffs' => 'errata_check#sync_rpmdiffs'
+  get 'cronjob/products_to_build' => 'cronjob_modes#products_to_build'
+  get 'mass-rebuild/first-step' => 'mass_rebuild#first_step'
+  get 'mass-rebuild/second-step' => 'mass_rebuild#second_step'
+  get 'mass-rebuild/third-step' => 'mass_rebuild#third_step'
+  get 'mass-rebuild/fourth-step' => 'mass_rebuild#fourth_step'
+  # ============================================================================
+  # TODO: FIX ME!!!
+  # ============================================================================
+  # get '/:action/:id'
+  # get '/:action/:id.:format'
+end
 end

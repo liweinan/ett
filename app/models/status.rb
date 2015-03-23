@@ -38,15 +38,23 @@ class Status < ActiveRecord::Base
   end
 
   def self.find_all_can_select_only_in_global_scope
-    Status.find(:all,
-                :conditions => ["(global='Y') AND can_select='Yes'"],
-                :order => 'lower(name)')
+    if Rails::VERSION::STRING < "4"
+      Status.find(:all,
+                  :conditions => ["(global='Y') AND can_select='Yes'"],
+                  :order => 'lower(name)')
+    else
+      Status.where("(global='Y') AND can_select='Yes'").order('lower(name)')
+    end
   end
 
   def self.find_all_can_show_by_task_id_in_global_scope(task_id)
-    Status.find(:all,
-                :conditions => ["(task_id = ? OR global='Y') AND can_show='Yes'", task_id],
-                :order => 'lower(name)')
+    if Rails::VERSION::STRING < "4"
+      Status.find(:all,
+                  :conditions => ["(task_id = ? OR global='Y') AND can_show='Yes'", task_id],
+                  :order => 'lower(name)')
+    else
+      Status.where("(task_id = ? OR global='Y') AND can_show='Yes'", task_id).order('lower(name)')
+    end
   end
 
   def self.ids_can_show_by_task_name_in_global_scope(task_name)
@@ -59,20 +67,32 @@ class Status < ActiveRecord::Base
   end
 
   def self.find_all_can_select_by_task_id_in_global_scope(task_id)
-    Status.find(:all,
-                :conditions => ["(task_id = ? or global='Y') AND can_select='Yes'", task_id],
-                :order => 'lower(name)')
+    if Rails::VERSION::STRING < "4"
+      Status.find(:all,
+                  :conditions => ["(task_id = ? or global='Y') AND can_select='Yes'", task_id],
+                  :order => 'lower(name)')
+    else
+      Status.where("(task_id = ? or global='Y') AND can_select='Yes'", task_id).order('lower(name)')
+    end
   end
 
   def self.find_all_can_select_by_task_id(task_id)
-    Status.find(:all,
-                :conditions => ["(task_id = ?) AND can_select='Yes'", task_id],
-                :order => 'lower(name)')
+    if Rails::VERSION::STRING < "4"
+      Status.find(:all,
+                  :conditions => ["(task_id = ?) AND can_select='Yes'", task_id],
+                  :order => 'lower(name)')
+    else
+      Status.where("(task_id = ?) AND can_select='Yes'", task_id).order('lower(name)')
+    end
   end
 
   def self.find_in_global_scope(status_name, task_name)
-    global_status = Status.find(:first,
-                                :conditions => ["name = ? and global='Y'", status_name])
+    if Rails::VERSION::STRING < "4"
+      global_status = Status.find(:first,
+                                  :conditions => ["name = ? and global='Y'", status_name])
+    else
+      global_status = Status.where("name = ? and global='Y'", status_name).first
+    end
     if global_status.nil?
       return Status.find_by_name_and_task_id(status_name,
                                              Task.find_by_name(task_name).id)
@@ -127,8 +147,12 @@ class Status < ActiveRecord::Base
   def validate
     status = Status.find_by_name_and_task_id(self.name.strip, self.task_id)
     if status == nil
-      status = Status.find(:first,
-                           :conditions => ["global='Y' and name = ?", self.name.strip])
+      if Rails::VERSION::STRING < "4"
+        status = Status.find(:first,
+                             :conditions => ["global='Y' and name = ?", self.name.strip])
+      else
+        status = Status.where("global='Y' and name = ?", self.name.strip).first
+      end
     end
 
     if status && status.id != self.id

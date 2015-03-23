@@ -8,11 +8,18 @@ class ReadonlyTask < ActiveRecord::Base
     packages = task.packages.all.select {|pkg| pkg.status.name == 'Finished'}
     str = ''
     packages.each do |pkg|
-      similar_pkgs = Package.find(:all,
-                                 :conditions => ['name = ? and ver = ? and task_id != ? and status_id = ?',
-                                                 pkg.name, pkg.ver, pkg.task_id, pkg.status_id])
+      if Rails::VERSION::STRING < "4"
+        similar_pkgs = Package.find(:all,
+                                   :conditions => ['name = ? and ver = ? and task_id != ? and status_id = ?',
+                                                   pkg.name, pkg.ver, pkg.task_id, pkg.status_id])
 
-      status = Status.find(:first, :conditions => ['name = ?', 'Already Released'])
+        status = Status.find(:first, :conditions => ['name = ?', 'Already Released'])
+      else
+        similar_pkgs = Package.where('name = ? and ver = ? and task_id != ? and status_id = ?',
+                                                   pkg.name, pkg.ver, pkg.task_id, pkg.status_id)
+
+        status = Status.where('name = ?', 'Already Released').first
+      end
       unless similar_pkgs.blank?
         similar_pkgs.each do |pkg_to_change|
           if pkg_to_change.task.active && pkg_to_change.task.prod == task.prod

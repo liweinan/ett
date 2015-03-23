@@ -263,7 +263,7 @@ class Package < ActiveRecord::Base
   def to_s
     str = "Name: #{name}\n" \
           "Created By: #{creator.name}(#{creator.email})\n" \
-          "Created At: #{created_at.to_s}\n" \
+          "Created At: #{created_at}\n" \
           "Belongs To: #{task.name}\n"
     unless assignee.blank?
       str += "Assignee: #{assignee.name}(#{assignee.email})\n"
@@ -329,9 +329,14 @@ class Package < ActiveRecord::Base
   end
 
   def update_tag_if_not_shipped
-    not_shipped_tag = Tag.find(:first,
-                               :conditions => ['key = ? and task_id = ?',
-                                               'Not Shipped', self.task_id])
+    if Rails::VERSION::STRING < "4"
+      not_shipped_tag = Tag.find(:first,
+                                 :conditions => ['key = ? and task_id = ?',
+                                                 'Not Shipped', self.task_id])
+    else
+      not_shipped_tag = Tag.where('key = ? and task_id = ?',
+                                  'Not Shipped', self.task_id).first
+    end
 
     if !in_shipped_list? && !not_shipped_tag.nil? && !self.tags.include?(not_shipped_tag)
       self.tags << not_shipped_tag
@@ -340,9 +345,14 @@ class Package < ActiveRecord::Base
   end
 
   def update_tag_if_native
-    native_tag = Tag.find(:first,
-                          :conditions => ['key = ? and task_id = ?',
-                          'Native', self.task_id])
+    if Rails::VERSION::STRING < "4"
+      native_tag = Tag.find(:first,
+                            :conditions => ['key = ? and task_id = ?',
+                            'Native', self.task_id])
+    else
+      native_tag = Tag.where('key = ? and task_id = ?',
+                            'Native', self.task_id).first
+    end
 
     if !native_tag.nil? && !self.tags.include?(native_tag) && self.name.include?('native')
       self.tags << native_tag
@@ -980,10 +990,8 @@ class Package < ActiveRecord::Base
       bz_struct[bz.os_arch] = bz.bz_id
     end
 
-    uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
     # the errata request is sent to mead-scheduler's rest api:
 
-    res = nil
     links = []
     # TODO: remove those copy-pasted code!
     self.task.os_advisory_tags.each do |os_tag|

@@ -155,8 +155,6 @@ class Changelog < ActiveRecord::Base
 
   end
 
-  protected
-
   def self.diff_fields(orig_ar_obj, ar_obj)
 
     ar_obj.attributes.keys.each do |attr|
