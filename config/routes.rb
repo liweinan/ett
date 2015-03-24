@@ -188,8 +188,11 @@ Rails.application.routes.draw do
   # ============================================================================
   # TODO: verify that those changes are valid
   # ============================================================================
-  get 'logout' => 'sessions#destroy', as: 'logout'
-  get 'login' => 'sessions#new', as: 'login'
+  # Use Ruby 1.8.7 notations for compatibility reasons
+  # Safe to change it after migration
+  get 'logout' => 'sessions#destroy', :as => 'logout'
+  get 'login' => 'sessions#new', :as => 'login'
+  post 'login' => 'sessions#create'
 
   get 'errata_check/sync' => 'errata_check#sync'
   get 'errata_check/sync_bz' => 'errata_check#sync_bz'
@@ -199,10 +202,6 @@ Rails.application.routes.draw do
   get 'mass-rebuild/second-step' => 'mass_rebuild#second_step'
   get 'mass-rebuild/third-step' => 'mass_rebuild#third_step'
   get 'mass-rebuild/fourth-step' => 'mass_rebuild#fourth_step'
-  # ============================================================================
-  # TODO: FIX ME!!!
-  # ============================================================================
-  # get '/:action/:id'
-  # get '/:action/:id.:format'
+  match ':controller(/:action(/:id))(.:format)', :via => [:get, :post, :put, :destroy]
 end
 end
