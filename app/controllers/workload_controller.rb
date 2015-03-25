@@ -25,7 +25,11 @@ class WorkloadController < ApplicationController
 
       workload_per_status_in_minutes = Hash.new
 
-      track_times = TrackTime.all(:conditions => ["package_id in (?)", package_ids])
+      if Rails::VERSION::STRING < "4"
+        track_times = TrackTime.all(:conditions => ["package_id in (?)", package_ids])
+      else
+        track_times = TrackTime.where("package_id in (?)", package_ids)
+      end
       track_times.each do |track_time|
         if workload_per_status_in_minutes[track_time.status_id].blank?
           workload_per_status_in_minutes[track_time.status_id] = 0
@@ -76,11 +80,18 @@ class WorkloadController < ApplicationController
 
         # If a cron job is run multiple times during a week, we need to destroy
         # the older result and replace it with the newer result.
-        wl = WeeklyWorkload.find(:first,
-                                 :conditions => ['start_of_week=? and end_of_week=? and task_id=?',
-                                                 begin_of_current_week,
-                                                 end_of_current_week,
-                                                 task.id])
+        if Rails::VERSION::STRING < "4"
+          wl = WeeklyWorkload.find(:first,
+                                   :conditions => ['start_of_week=? and end_of_week=? and task_id=?',
+                                                   begin_of_current_week,
+                                                   end_of_current_week,
+                                                   task.id])
+        else
+          wl = WeeklyWorkload.where('start_of_week=? and end_of_week=? and task_id=?',
+                                    begin_of_current_week,
+                                    end_of_current_week,
+                                    task.id).first
+        end
         unless wl.blank?
           wl.destroy
         end
@@ -101,16 +112,28 @@ class WorkloadController < ApplicationController
           ps.save
 
           # Collect data of auto log entires
-          entries = AutoLogEntry.all(:conditions => ['package_id = ? and start_time >= ? and end_time <= ?',
-                                                     package.id,
-                                                     begin_of_current_week,
-                                                     end_of_current_week])
+          if Rails::VERSION::STRING < "4"
+            entries = AutoLogEntry.all(:conditions => ['package_id = ? and start_time >= ? and end_time <= ?',
+                                                       package.id,
+                                                       begin_of_current_week,
+                                                       end_of_current_week])
+          else
+            entries = AutoLogEntry.where('package_id = ? and start_time >= ? and end_time <= ?',
+                                         package.id,
+                                         begin_of_current_week,
+                                         end_of_current_week)
+          end
           entries.each do |entry|
             #sum up the time spent on each status during this week
-            ls = StatusStat.find(:first,
-                                 :conditions => ['package_stat_id=? and status_id=?',
-                                                 ps.id,
-                                                 entry.status_id])
+            if Rails::VERSION::STRING < "4"
+              ls = StatusStat.find(:first,
+                                   :conditions => ['package_stat_id=? and status_id=?',
+                                                   ps.id,
+                                                   entry.status_id])
+            else
+              ls = StatusStat.where('package_stat_id=? and status_id=?',
+                                    ps.id, entry.status_id).first
+            end
 
             if ls.blank?
               ls = StatusStat.new
@@ -123,10 +146,15 @@ class WorkloadController < ApplicationController
             end
             ls.save
 
-            asd = AutoSumDetail.find(:first,
-                                     :conditions => ['weekly_workload_id=? and status_id=?',
-                                                     wl.id,
-                                                     ls.status_id])
+            if Rails::VERSION::STRING < "4"
+              asd = AutoSumDetail.find(:first,
+                                       :conditions => ['weekly_workload_id=? and status_id=?',
+                                                       wl.id,
+                                                       ls.status_id])
+            else
+              asd = AutoSumDetail.where('weekly_workload_id=? and status_id=?',
+                                        wl.id, ls.status_id).first
+            end
             if asd.blank?
               asd = AutoSumDetail.new
               asd.weekly_workload_id = wl.id
@@ -142,15 +170,27 @@ class WorkloadController < ApplicationController
 
           # Deprecated
           # Collect data of manual log entries
-          entries = ManualLogEntry.all(:conditions => ['package_id = ? and start_time >= ? and end_time <= ?',
-                                                       package.id,
-                                                       begin_of_current_week,
-                                                       end_of_current_week])
+          if Rails::VERSION::STRING < "4"
+            entries = ManualLogEntry.all(:conditions => ['package_id = ? and start_time >= ? and end_time <= ?',
+                                                         package.id,
+                                                         begin_of_current_week,
+                                                         end_of_current_week])
+          else
+            entries = ManualLogEntry.where('package_id = ? and start_time >= ? and end_time <= ?',
+                                           package.id,
+                                           begin_of_current_week,
+                                           end_of_current_week)
+          end
           entries.each do |entry|
-            ws = WorktimeStat.find(:first,
-                                   :conditions => ['package_stat_id=? and user_id=?',
-                                                   ps.id,
-                                                   entry.who_id])
+            if Rails::VERSION::STRING < "4"
+              ws = WorktimeStat.find(:first,
+                                     :conditions => ['package_stat_id=? and user_id=?',
+                                                     ps.id,
+                                                     entry.who_id])
+            else
+              ws = WorktimeStat.where('package_stat_id=? and user_id=?',
+                                      ps.id, entry.who_id).first
+            end
             if ws.blank?
               ws = WorktimeStat.new
               ws.package_stat_id = ps.id

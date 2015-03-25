@@ -6,11 +6,20 @@ class StatusesController < ApplicationController
   # GET /statuses.xml
   def index
     if params[:task_id].blank?
-      @statuses = Status.all(:conditions => "global = 'Y'", :order => 'name')
+      if Rails::VERSION::STRING < "4"
+        @statuses = Status.all(:conditions => "global = 'Y'", :order => 'name')
+      else
+        @statuses = Status.where("global = 'Y'").order('name')
+      end
     else
-      @statuses = Status.all(:conditions => ['task_id = ?',
-                                             Task.find_by_name(unescape_url(params[:task_id])).id],
-                             :order => 'name')
+      if Rails::VERSION::STRING < "4"
+        @statuses = Status.all(:conditions => ['task_id = ?',
+                                               Task.find_by_name(unescape_url(params[:task_id])).id],
+                               :order => 'name')
+      else
+        @statuses = Status.where('task_id = ?',
+                                 Task.find_by_name(unescape_url(params[:task_id])).id).order('name')
+      end
     end
 
     respond_to do |format|
@@ -23,9 +32,14 @@ class StatusesController < ApplicationController
   # GET /statuses/1.xml
   def show
     if params[:task_id].blank?
-      @status = Status.find(:first,
-                            :conditions => ["global = 'Y' and name = ?",
-                                            unescape_url(params[:id])])
+      if Rails::VERSION::STRING < "4"
+        @status = Status.find(:first,
+                              :conditions => ["global = 'Y' and name = ?",
+                                              unescape_url(params[:id])])
+      else
+        @status = Status.where("global = 'Y' and name = ?",
+                               unescape_url(params[:id])).first
+      end
     else
       @status = Status.find_by_name_and_task_id(unescape_url(params[:id]),
                                                 Task.find_by_name(unescape_url(params[:task_id])).id)
@@ -51,9 +65,14 @@ class StatusesController < ApplicationController
   # GET /statuses/1/edit
   def edit
     if params[:task_id].blank?
-      @status = Status.find(:first,
-                            :conditions => ["name = ? AND global='Y'",
-                                            unescape_url(params[:id])])
+      if Rails::VERSION::STRING < "4"
+        @status = Status.find(:first,
+                              :conditions => ["name = ? AND global='Y'",
+                                              unescape_url(params[:id])])
+      else
+        @status = Status.where("name = ? AND global='Y'",
+                               unescape_url(params[:id])).first
+      end
     else
       @status = Status.find_by_name_and_task_id(unescape_url(params[:id]),
                                                 Task.find_by_name(unescape_url(params[:task_id])).id)

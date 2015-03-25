@@ -5,7 +5,11 @@ class TasksController < ApplicationController
   # GET /tasks
   # GET /tasks.xml
   def index
-    @tasks = Task.find(:all, :order => "name asc")
+    if Rails::VERSION::STRING < "4"
+      @tasks = Task.find(:all, :order => "name asc")
+    else
+      @tasks = Task.all.order("name asc")
+    end
 
     respond_to do |format|
       format.html # index.html.erb
@@ -285,7 +289,11 @@ class TasksController < ApplicationController
 
         unless params['cronjob_' + params[:indexes][idx]].blank?
           params['cronjob_' + params[:indexes][idx]].each do |mode|
-            to_save.cronjob_modes << CronjobMode.first(:conditions => ["mode = ?", mode])
+            if Rails::VERSION::STRING < "4"
+              to_save.cronjob_modes << CronjobMode.first(:conditions => ["mode = ?", mode])
+            else
+              to_save.cronjob_modes << CronjobMode.where("mode = ?", mode).first
+            end
           end
         end
         to_save.task_id = task.id
