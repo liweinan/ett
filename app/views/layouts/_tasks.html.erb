@@ -4,7 +4,12 @@ Task Group: <%= render :partial => 'layouts/task_group_list' %>
 	<span style="padding-right:20px;"> 
 		Tasks:
       <% if params[:task_group_id].blank? %>
-          <% Task.all(:order => 'name', :conditions => "can_show='Yes'").each do |task| %>
+          <% if Rails::VERSION::STRING < "4" %>
+              <% all_tasks = Task.all(:order => 'name', :conditions => "can_show='Yes'") %>
+          <% else %>
+              <% all_tasks = Task.where("can_show='Yes'").order('name') %>
+          <% end %>
+          <% all_tasks.each do |task| %>
               <%= render :partial => 'layouts/task_links', :locals => { :task => task, :user => params[:user] } %>
           <% end %>
       <% else %>

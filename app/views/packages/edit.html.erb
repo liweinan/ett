@@ -7,61 +7,120 @@
 <h2><%= h @package.name %></h2>
 
 <%= render :partial => 'layouts/error_messages' %>
-<% form_for(@package, :html => {:onsubmit => 'return false;'}) do |f| %>
-    <%= f.error_messages %>
-    <% if params[:user] %>
-        <input type="hidden" id="user" name="user" value="<%= params[:user] %>"/>
+<% if Rails::VERSION::STRING < "4" %>
+    <% form_for(@package, :html => {:onsubmit => 'return false;'}) do |f| %>
+        <%= f.error_messages %>
+        <% if params[:user] %>
+            <input type="hidden" id="user" name="user" value="<%= params[:user] %>"/>
+        <% end %>
+
+        <div class='manage-tbl'>
+          <table>
+            <%= render :partial => 'packages/fields/name', :locals => {:f => f} %>
+            <%= render :partial => 'packages/fields/task', :locals => {:f => f} %>
+            <%= render :partial => 'packages/fields/status', :locals => {:f => f} %>
+
+            <% if @package.task.use_bz_integration? %>
+                <%= render :partial => 'bz_bugs/fields/bz_user' %>
+                <%= render :partial => 'bz_bugs/fields/bz_pass' %>
+            <% end %>
+
+            <%= render :partial => 'packages/fields/tags', :locals => {:f => f} %>
+            <%= render :partial => 'packages/fields/ver', :locals => {:f => f} %>
+            <%= render :partial => 'packages/fields/git_url', :locals => {:f => f} %>
+
+            <% if @package.task.use_mead_integration? %>
+                <%= render :partial => 'packages/fields/brew', :locals => {:f => f} %>
+                <%= render :partial => 'packages/fields/mead', :locals => {:f => f} %>
+            <% end %>
+            <%= render :partial => 'packages/fields/github_pr', :locals => {:f => f} %>
+            <%= render :partial => 'packages/fields/erratum', :locals => {:f => f} %>
+
+            <%= render :partial => 'packages/fields/assignee', :locals => {:f => f} %>
+            <%= render :partial => 'packages/fields/notes', :locals => {:f => f} %>
+
+            <tr>
+              <td colspan=2 style="text-align:left;">
+                <%= render :partial => 'layouts/notification',
+                           :locals => {:title => 'Notify the changes to:',
+                                       :div_id => 'package_edit'} %>
+
+            <input type='submit'
+                   value='Update'
+                   <% if @package.task.use_bz_integration? %>
+                      onclick="validateFormAndPostForm();return false;"
+                   <% else %>
+                      onclick="submit(); return false;"
+                    <% end %>/>
+
+                <%= render :partial => 'layouts/progress_indicator',
+                           :locals => {:progress_indicator_id => 'validate_bz_auth_indicator',
+                                       :msg => t('validating_bzauth_info')} %>
+
+                <%= render :partial => 'layouts/notification_link',
+                           :locals => {:div_id => 'package_edit'} %>
+              </td>
+            </tr>
+          </table>
+        </div>
     <% end %>
-
-    <div class='manage-tbl'>
-      <table>
-        <%= render :partial => 'packages/fields/name', :locals => {:f => f} %>
-        <%= render :partial => 'packages/fields/task', :locals => {:f => f} %>
-        <%= render :partial => 'packages/fields/status', :locals => {:f => f} %>
-
-        <% if @package.task.use_bz_integration? %>
-            <%= render :partial => 'bz_bugs/fields/bz_user' %>
-            <%= render :partial => 'bz_bugs/fields/bz_pass' %>
+<% else %>
+    <%= form_for(@package, :html => {:onsubmit => 'return false;'}) do |f| %>
+        <%= f.error_messages %>
+        <% if params[:user] %>
+            <input type="hidden" id="user" name="user" value="<%= params[:user] %>"/>
         <% end %>
 
-        <%= render :partial => 'packages/fields/tags', :locals => {:f => f} %>
-        <%= render :partial => 'packages/fields/ver', :locals => {:f => f} %>
-        <%= render :partial => 'packages/fields/git_url', :locals => {:f => f} %>
+        <div class='manage-tbl'>
+          <table>
+            <%= render :partial => 'packages/fields/name', :locals => {:f => f} %>
+            <%= render :partial => 'packages/fields/task', :locals => {:f => f} %>
+            <%= render :partial => 'packages/fields/status', :locals => {:f => f} %>
 
-        <% if @package.task.use_mead_integration? %>
-            <%= render :partial => 'packages/fields/brew', :locals => {:f => f} %>
-            <%= render :partial => 'packages/fields/mead', :locals => {:f => f} %>
-        <% end %>
-        <%= render :partial => 'packages/fields/github_pr', :locals => {:f => f} %>
-        <%= render :partial => 'packages/fields/erratum', :locals => {:f => f} %>
+            <% if @package.task.use_bz_integration? %>
+                <%= render :partial => 'bz_bugs/fields/bz_user' %>
+                <%= render :partial => 'bz_bugs/fields/bz_pass' %>
+            <% end %>
 
-        <%= render :partial => 'packages/fields/assignee', :locals => {:f => f} %>
-        <%= render :partial => 'packages/fields/notes', :locals => {:f => f} %>
+            <%= render :partial => 'packages/fields/tags', :locals => {:f => f} %>
+            <%= render :partial => 'packages/fields/ver', :locals => {:f => f} %>
+            <%= render :partial => 'packages/fields/git_url', :locals => {:f => f} %>
 
-        <tr>
-          <td colspan=2 style="text-align:left;">
-            <%= render :partial => 'layouts/notification',
-                       :locals => {:title => 'Notify the changes to:',
-                                   :div_id => 'package_edit'} %>
+            <% if @package.task.use_mead_integration? %>
+                <%= render :partial => 'packages/fields/brew', :locals => {:f => f} %>
+                <%= render :partial => 'packages/fields/mead', :locals => {:f => f} %>
+            <% end %>
+            <%= render :partial => 'packages/fields/github_pr', :locals => {:f => f} %>
+            <%= render :partial => 'packages/fields/erratum', :locals => {:f => f} %>
 
-        <input type='submit'
-               value='Update'
-               <% if @package.task.use_bz_integration? %>
-                  onclick="validateFormAndPostForm();return false;"
-               <% else %>
-                  onclick="submit(); return false;"
-                <% end %>/>
+            <%= render :partial => 'packages/fields/assignee', :locals => {:f => f} %>
+            <%= render :partial => 'packages/fields/notes', :locals => {:f => f} %>
 
-            <%= render :partial => 'layouts/progress_indicator',
-                       :locals => {:progress_indicator_id => 'validate_bz_auth_indicator',
-                                   :msg => t('validating_bzauth_info')} %>
+            <tr>
+              <td colspan=2 style="text-align:left;">
+                <%= render :partial => 'layouts/notification',
+                           :locals => {:title => 'Notify the changes to:',
+                                       :div_id => 'package_edit'} %>
 
-            <%= render :partial => 'layouts/notification_link',
-                       :locals => {:div_id => 'package_edit'} %>
-          </td>
-        </tr>
-      </table>
-    </div>
+            <input type='submit'
+                   value='Update'
+                   <% if @package.task.use_bz_integration? %>
+                      onclick="validateFormAndPostForm();return false;"
+                   <% else %>
+                      onclick="submit(); return false;"
+                    <% end %>/>
+
+                <%= render :partial => 'layouts/progress_indicator',
+                           :locals => {:progress_indicator_id => 'validate_bz_auth_indicator',
+                                       :msg => t('validating_bzauth_info')} %>
+
+                <%= render :partial => 'layouts/notification_link',
+                           :locals => {:div_id => 'package_edit'} %>
+              </td>
+            </tr>
+          </table>
+        </div>
+    <% end %>
 <% end %>
 
 <%= render :partial => 'packages/time_tracking_js' %>

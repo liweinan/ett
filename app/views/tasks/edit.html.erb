@@ -1,20 +1,39 @@
 <h2>Editing Task</h2>
 <div style="height:20px;border:none;"></div>
-<div class='manage-tbl'>
-  <% form_for(@task) do |f| %>
-      <%= f.error_messages %>
-      <table>
-        <%= render :partial => 'tasks/fields/name', :locals => {:f => f} %>
-        <%= render :partial => 'tasks/fields/previous_version_tag', :locals => {:f => f} %>
-        <!-- add any new fields in the options partial so that it can be shared -->
-        <%= render :partial => 'tasks/options', :locals => {:f => f} %>
-        <%= render :partial => 'tasks/fields/task_group', :locals => {:f => f} %>
-      </table>
-      <p/>
-      <%= render :partial => 'tasks/os_arch', :locals => {:f => f} %>
-      <p/>
-      <td colspan="2" style="text-align: right"> <input type="submit" value='Update' onclick="return validate_os_advisory_table();" /></td>
-  <% end %>
-</div>
+<% if Rails::VERSION::STRING < "4" %>
+  <div class='manage-tbl'>
+    <% form_for(@task) do |f| %>
+        <%= f.error_messages %>
+        <table>
+          <%= render :partial => 'tasks/fields/name', :locals => {:f => f} %>
+          <%= render :partial => 'tasks/fields/previous_version_tag', :locals => {:f => f} %>
+          <!-- add any new fields in the options partial so that it can be shared -->
+          <%= render :partial => 'tasks/options', :locals => {:f => f} %>
+          <%= render :partial => 'tasks/fields/task_group', :locals => {:f => f} %>
+        </table>
+        <p/>
+        <%= render :partial => 'tasks/os_arch', :locals => {:f => f} %>
+        <p/>
+        <td colspan="2" style="text-align: right"> <input type="submit" value='Update' onclick="return validate_os_advisory_table();" /></td>
+    <% end %>
+  </div>
+<% else %>
+  <div class='manage-tbl'>
+    <%= form_for(@task) do |f| %>
+        <%= f.error_messages %>
+        <table>
+          <%= render :partial => 'tasks/fields/name', :locals => {:f => f} %>
+          <%= render :partial => 'tasks/fields/previous_version_tag', :locals => {:f => f} %>
+          <!-- add any new fields in the options partial so that it can be shared -->
+          <%= render :partial => 'tasks/options', :locals => {:f => f} %>
+          <%= render :partial => 'tasks/fields/task_group', :locals => {:f => f} %>
+        </table>
+        <p/>
+        <%= render :partial => 'tasks/os_arch', :locals => {:f => f} %>
+        <p/>
+        <td colspan="2" style="text-align: right"> <input type="submit" value='Update' onclick="return validate_os_advisory_table();" /></td>
+    <% end %>
+  </div>
+<% end %>
 <br/>
 <%= link_to 'Back', tasks_path %>

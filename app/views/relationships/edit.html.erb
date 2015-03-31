@@ -1,23 +1,44 @@
 <h1>Editing relationship</h1>
+<% if Rails::VERSION::STRING < "4" %>
+  <% form_for(@relationship) do |f| %>
+      <%= f.error_messages %>
 
-<% form_for(@relationship) do |f| %>
-    <%= f.error_messages %>
+      <p>
+        <%= f.label :name %><br/>
+        <%= f.text_field :name %>
+      </p>
+      <p>
+        <%= f.label :is_global %><br/>
+        <%= f.text_field :is_global %>
+      </p>
+      <p>
+        <%= f.label :task_id %><br/>
+        <%= f.text_field :task_id %>
+      </p>
+      <p>
+        <%= f.submit 'Update' %>
+      </p>
+  <% end %>
+<% else %>
+  <%= form_for(@relationship) do |f| %>
+      <%= f.error_messages %>
 
-    <p>
-      <%= f.label :name %><br/>
-      <%= f.text_field :name %>
-    </p>
-    <p>
-      <%= f.label :is_global %><br/>
-      <%= f.text_field :is_global %>
-    </p>
-    <p>
-      <%= f.label :task_id %><br/>
-      <%= f.text_field :task_id %>
-    </p>
-    <p>
-      <%= f.submit 'Update' %>
-    </p>
+      <p>
+        <%= f.label :name %><br/>
+        <%= f.text_field :name %>
+      </p>
+      <p>
+        <%= f.label :is_global %><br/>
+        <%= f.text_field :is_global %>
+      </p>
+      <p>
+        <%= f.label :task_id %><br/>
+        <%= f.text_field :task_id %>
+      </p>
+      <p>
+        <%= f.submit 'Update' %>
+      </p>
+  <% end %>
 <% end %>
 
 <%= link_to 'Show', @relationship %> |

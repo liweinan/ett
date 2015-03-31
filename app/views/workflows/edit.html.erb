@@ -1,24 +1,47 @@
 <h1>Editing workflow</h1>
 
-<% form_for(@workflow) do |f| %>
-    <%= f.error_messages %>
+<% if Rails::VERSION::STRING < "4" %>
+  <% form_for(@workflow) do |f| %>
+      <%= f.error_messages %>
 
-    <p>
-      <%= f.label :name %><br/>
-      <%= f.text_field :name %>
-    </p>
-    <p>
-      <%= render :partial => 'workflows/start_status' %>
-    </p>
-    <p>
-      <%= render :partial => 'workflows/workflow_definitions' %>
-    </p>
-    <p>
-      <%= render :partial => 'workflows/assigned_tasks' %>
-    </p>
-    <p>
-      <%= f.submit 'Update' %>
-    </p>
+      <p>
+        <%= f.label :name %><br/>
+        <%= f.text_field :name %>
+      </p>
+      <p>
+        <%= render :partial => 'workflows/start_status' %>
+      </p>
+      <p>
+        <%= render :partial => 'workflows/workflow_definitions' %>
+      </p>
+      <p>
+        <%= render :partial => 'workflows/assigned_tasks' %>
+      </p>
+      <p>
+        <%= f.submit 'Update' %>
+      </p>
+  <% end %>
+<% else %>
+  <%= form_for(@workflow) do |f| %>
+      <%= f.error_messages %>
+
+      <p>
+        <%= f.label :name %><br/>
+        <%= f.text_field :name %>
+      </p>
+      <p>
+        <%= render :partial => 'workflows/start_status' %>
+      </p>
+      <p>
+        <%= render :partial => 'workflows/workflow_definitions' %>
+      </p>
+      <p>
+        <%= render :partial => 'workflows/assigned_tasks' %>
+      </p>
+      <p>
+        <%= f.submit 'Update' %>
+      </p>
+  <% end %>
 <% end %>
 
 <%= link_to 'Show', @workflow %> |

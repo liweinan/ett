@@ -6,32 +6,62 @@
 
 <h2>New package of <%= params[:task_id] %></h2>
 
-<div class='manage-tbl'>
-  <% form_for(@package) do |f| %>
-      <%= f.error_messages %>
+<% if Rails::VERSION::STRING < "4" %>
+  <div class='manage-tbl'>
+    <% form_for(@package) do |f| %>
+        <%= f.error_messages %>
 
-      <table>
-        <%= render :partial => 'packages/fields/name', :locals => {:f => f} %>
-        <%= render :partial => 'packages/fields/task', :locals => {:f => f} %>
-        <%= render :partial => 'packages/fields/status', :locals => {:f => f} %>
-        <%= render :partial => 'packages/fields/tags', :locals => {:f => f} %>
-        <%= render :partial => 'packages/fields/git_url', :locals => {:f => f} %>
-        <%= render :partial => 'packages/fields/ver', :locals => {:f => f} %>
-        <%= render :partial => 'packages/fields/erratum', :locals => {:f => f} %>
-        <%= render :partial => 'packages/fields/assignee', :locals => {:f => f} %>
-        <%= render :partial => 'packages/fields/notes', :locals => {:f => f} %>
-        <tr>
-          <td colspan=2 style="text-align:left;">
-            <%= render :partial => 'layouts/notification',
-                       :locals => {:title => 'Notify the package creation to:',
-                                   :div_id => 'package_create'} %>
-            <%= f.submit 'Create' %>
-            <%= render :partial => 'layouts/notification_link',
-                       :locals => {:div_id => 'package_create'} %>
-          </td>
-        </tr>
-      </table>
+        <table>
+          <%= render :partial => 'packages/fields/name', :locals => {:f => f} %>
+          <%= render :partial => 'packages/fields/task', :locals => {:f => f} %>
+          <%= render :partial => 'packages/fields/status', :locals => {:f => f} %>
+          <%= render :partial => 'packages/fields/tags', :locals => {:f => f} %>
+          <%= render :partial => 'packages/fields/git_url', :locals => {:f => f} %>
+          <%= render :partial => 'packages/fields/ver', :locals => {:f => f} %>
+          <%= render :partial => 'packages/fields/erratum', :locals => {:f => f} %>
+          <%= render :partial => 'packages/fields/assignee', :locals => {:f => f} %>
+          <%= render :partial => 'packages/fields/notes', :locals => {:f => f} %>
+          <tr>
+            <td colspan=2 style="text-align:left;">
+              <%= render :partial => 'layouts/notification',
+                         :locals => {:title => 'Notify the package creation to:',
+                                     :div_id => 'package_create'} %>
+              <%= f.submit 'Create' %>
+              <%= render :partial => 'layouts/notification_link',
+                         :locals => {:div_id => 'package_create'} %>
+            </td>
+          </tr>
+        </table>
 
-  <% end %>
-</div>
+    <% end %>
+  </div>
+<% else %>
+  <div class='manage-tbl'>
+    <%= form_for(@package) do |f| %>
+        <%= f.error_messages %>
 
+        <table>
+          <%= render :partial => 'packages/fields/name', :locals => {:f => f} %>
+          <%= render :partial => 'packages/fields/task', :locals => {:f => f} %>
+          <%= render :partial => 'packages/fields/status', :locals => {:f => f} %>
+          <%= render :partial => 'packages/fields/tags', :locals => {:f => f} %>
+          <%= render :partial => 'packages/fields/git_url', :locals => {:f => f} %>
+          <%= render :partial => 'packages/fields/ver', :locals => {:f => f} %>
+          <%= render :partial => 'packages/fields/erratum', :locals => {:f => f} %>
+          <%= render :partial => 'packages/fields/assignee', :locals => {:f => f} %>
+          <%= render :partial => 'packages/fields/notes', :locals => {:f => f} %>
+          <tr>
+            <td colspan=2 style="text-align:left;">
+              <%= render :partial => 'layouts/notification',
+                         :locals => {:title => 'Notify the package creation to:',
+                                     :div_id => 'package_create'} %>
+              <%= f.submit 'Create' %>
+              <%= render :partial => 'layouts/notification_link',
+                         :locals => {:div_id => 'package_create'} %>
+            </td>
+          </tr>
+        </table>
+
+    <% end %>
+  </div>
+<% end %>

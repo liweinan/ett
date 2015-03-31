@@ -1,23 +1,44 @@
 <h1>Editing package_relationship</h1>
+<% if Rails::VERSION::STRING < "4" %>
+  <% form_for(@package_relationship) do |f| %>
+      <%= f.error_messages %>
 
-<% form_for(@package_relationship) do |f| %>
-    <%= f.error_messages %>
+      <p>
+        <%= f.label :from_package_id %><br/>
+        <%= f.text_field :from_package_id %>
+      </p>
+      <p>
+        <%= f.label :to_package_id %><br/>
+        <%= f.text_field :to_package_id %>
+      </p>
+      <p>
+        <%= f.label :relationship_id %><br/>
+        <%= f.text_field :relationship_id %>
+      </p>
+      <p>
+        <%= f.submit 'Update' %>
+      </p>
+  <% end %>
+<% else %>
+  <%= form_for(@package_relationship) do |f| %>
+      <%= f.error_messages %>
 
-    <p>
-      <%= f.label :from_package_id %><br/>
-      <%= f.text_field :from_package_id %>
-    </p>
-    <p>
-      <%= f.label :to_package_id %><br/>
-      <%= f.text_field :to_package_id %>
-    </p>
-    <p>
-      <%= f.label :relationship_id %><br/>
-      <%= f.text_field :relationship_id %>
-    </p>
-    <p>
-      <%= f.submit 'Update' %>
-    </p>
+      <p>
+        <%= f.label :from_package_id %><br/>
+        <%= f.text_field :from_package_id %>
+      </p>
+      <p>
+        <%= f.label :to_package_id %><br/>
+        <%= f.text_field :to_package_id %>
+      </p>
+      <p>
+        <%= f.label :relationship_id %><br/>
+        <%= f.text_field :relationship_id %>
+      </p>
+      <p>
+        <%= f.submit 'Update' %>
+      </p>
+  <% end %>
 <% end %>
 
 <%= link_to 'Show', @package_relationship %> |

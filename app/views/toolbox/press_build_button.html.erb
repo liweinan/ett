@@ -1,37 +1,73 @@
 <%= javascript_include_tag :defaults %>
     <% if @error.nil? && @pac.task.active? %>
         <div style="text-align: left;">
-        <% form_remote_tag(
-                   :url => {:controller => 'toolbox', :action => 'package_ajax_req'},
-                   :loading => "Element.show('spinner_build_#{@package_id}');",
-                   :success => "Element.hide('spinner_build_#{@package_id}');
-               ") do %>
-              <%= hidden_field_tag :package_id, @package_id %>
-              <p> * <%= raw(Time.new.strftime('%a %b %d %Y ') + @pac.assignee.name + ' &lt' + @pac.assignee.email + '&gt') %></p>
-              <%= text_area(:clentry, :text,
-                            :cols => 80, :rows => 10,
-                            :placeholder => 'Changelog Entry') %>
-              <br />
-              <%= label_tag('Wrapper Build Only') %>
-              <%= check_box_tag(:wrapper_build, '1') %>
-              <br />
+        <% if Rails::VERSION::STRING < "4" %>
+          <% form_remote_tag(
+                     :url => {:controller => 'toolbox', :action => 'package_ajax_req'},
+                     :loading => "Element.show('spinner_build_#{@package_id}');",
+                     :success => "Element.hide('spinner_build_#{@package_id}');
+                 ") do %>
+                <%= hidden_field_tag :package_id, @package_id %>
+                <p> * <%= raw(Time.new.strftime('%a %b %d %Y ') + @pac.assignee.name + ' &lt' + @pac.assignee.email + '&gt') %></p>
+                <%= text_area(:clentry, :text,
+                              :cols => 80, :rows => 10,
+                              :placeholder => 'Changelog Entry') %>
+                <br />
+                <%= label_tag('Wrapper Build Only') %>
+                <%= check_box_tag(:wrapper_build, '1') %>
+                <br />
 
-              <% unless @pac.spec_file.blank? %>
-                  <%= label_tag('Submit edited spec file') %>
-                  <%= check_box_tag(:edit_spec_file, '1', true) %>
-                  <br />
-              <% end %>
+                <% unless @pac.spec_file.blank? %>
+                    <%= label_tag('Submit edited spec file') %>
+                    <%= check_box_tag(:edit_spec_file, '1', true) %>
+                    <br />
+                <% end %>
 
-              <% unless @pac.maven_build_arguments.blank? %>
-                  <%= label_tag('Submit edited maven-build-arguments file') %>
-                  <%= check_box_tag(:edit_maven_build_arguments, '1', true) %>
-                  <br />
-              <% end %>
+                <% unless @pac.maven_build_arguments.blank? %>
+                    <%= label_tag('Submit edited maven-build-arguments file') %>
+                    <%= check_box_tag(:edit_maven_build_arguments, '1', true) %>
+                    <br />
+                <% end %>
 
-              <br />
-              <%= submit_tag 'Build This Package Using Mead-Scheduler' %>
-              <%= render :partial => 'layouts/progress_indicator',
-                         :locals => {:progress_indicator_id => "spinner_build_#{@package_id}"} %>
+                <br />
+                <%= submit_tag 'Build This Package Using Mead-Scheduler' %>
+                <%= render :partial => 'layouts/progress_indicator',
+                           :locals => {:progress_indicator_id => "spinner_build_#{@package_id}"} %>
+          <% end %>
+        <% else %>
+          <%= form_tag(
+                     {:controller => 'toolbox', :action => 'package_ajax_req'},
+                     :remote => true,
+                     :loading => "Element.show('spinner_build_#{@package_id}');",
+                     :success => "Element.hide('spinner_build_#{@package_id}');
+                 ") do %>
+                <%= hidden_field_tag :package_id, @package_id %>
+                <p> * <%= raw(Time.new.strftime('%a %b %d %Y ') + @pac.assignee.name + ' &lt' + @pac.assignee.email + '&gt') %></p>
+                <%= text_area(:clentry, :text,
+                              :cols => 80, :rows => 10,
+                              :placeholder => 'Changelog Entry') %>
+                <br />
+                <%= label_tag('Wrapper Build Only') %>
+                <%= check_box_tag(:wrapper_build, '1') %>
+                <br />
+
+                <% unless @pac.spec_file.blank? %>
+                    <%= label_tag('Submit edited spec file') %>
+                    <%= check_box_tag(:edit_spec_file, '1', true) %>
+                    <br />
+                <% end %>
+
+                <% unless @pac.maven_build_arguments.blank? %>
+                    <%= label_tag('Submit edited maven-build-arguments file') %>
+                    <%= check_box_tag(:edit_maven_build_arguments, '1', true) %>
+                    <br />
+                <% end %>
+
+                <br />
+                <%= submit_tag 'Build This Package Using Mead-Scheduler' %>
+                <%= render :partial => 'layouts/progress_indicator',
+                           :locals => {:progress_indicator_id => "spinner_build_#{@package_id}"} %>
+          <% end %>
         <% end %>
         </div>
 

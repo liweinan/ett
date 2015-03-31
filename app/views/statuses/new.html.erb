@@ -4,26 +4,52 @@
     <h2>New status of <%= params[:task_id] %></h2>
 <% end %>
 
-<div class='manage-tbl'>
-  <% form_for(@status) do |f| %>
-      <%= f.error_messages %>
-      <table>
-        <% if params[:task_id].blank? %>
-            <%= render :partial => 'statuses/fields/global', :locals => {:f => f} %>
-        <% end %>
-        <%= render :partial => 'statuses/fields/name', :locals => {:f => f} %>
-        <%= render :partial => 'statuses/fields/code', :locals => {:f => f} %>
-        <%= render :partial => 'statuses/fields/style', :locals => {:f => f} %>
-        <% unless params[:task_id].blank? %>
-            <%= render :partial => 'statuses/fields/task', :locals => {:f => f} %>
-        <% end %>
-        <%= render :partial => 'statuses/fields/can_show', :locals => {:f => f} %>
-        <%= render :partial => 'statuses/fields/can_select', :locals => {:f => f} %>
-        <%= render :partial => 'statuses/fields/can_change_code', :locals => {:f => f} %>
+<% if Rails::VERSION::STRING < "4" %>
+  <div class='manage-tbl'>
+    <% form_for(@status) do |f| %>
+        <%= f.error_messages %>
+        <table>
+          <% if params[:task_id].blank? %>
+              <%= render :partial => 'statuses/fields/global', :locals => {:f => f} %>
+          <% end %>
+          <%= render :partial => 'statuses/fields/name', :locals => {:f => f} %>
+          <%= render :partial => 'statuses/fields/code', :locals => {:f => f} %>
+          <%= render :partial => 'statuses/fields/style', :locals => {:f => f} %>
+          <% unless params[:task_id].blank? %>
+              <%= render :partial => 'statuses/fields/task', :locals => {:f => f} %>
+          <% end %>
+          <%= render :partial => 'statuses/fields/can_show', :locals => {:f => f} %>
+          <%= render :partial => 'statuses/fields/can_select', :locals => {:f => f} %>
+          <%= render :partial => 'statuses/fields/can_change_code', :locals => {:f => f} %>
 
-        <tr>
-          <td colspan=2 style='text-align:right;'><%= f.submit 'Create' %></td>
-        </tr>
-      </table>
-  <% end %>
-</div>
+          <tr>
+            <td colspan=2 style='text-align:right;'><%= f.submit 'Create' %></td>
+          </tr>
+        </table>
+    <% end %>
+  </div>
+<% else %>
+  <div class='manage-tbl'>
+    <%= form_for(@status) do |f| %>
+        <%= f.error_messages %>
+        <table>
+          <% if params[:task_id].blank? %>
+              <%= render :partial => 'statuses/fields/global', :locals => {:f => f} %>
+          <% end %>
+          <%= render :partial => 'statuses/fields/name', :locals => {:f => f} %>
+          <%= render :partial => 'statuses/fields/code', :locals => {:f => f} %>
+          <%= render :partial => 'statuses/fields/style', :locals => {:f => f} %>
+          <% unless params[:task_id].blank? %>
+              <%= render :partial => 'statuses/fields/task', :locals => {:f => f} %>
+          <% end %>
+          <%= render :partial => 'statuses/fields/can_show', :locals => {:f => f} %>
+          <%= render :partial => 'statuses/fields/can_select', :locals => {:f => f} %>
+          <%= render :partial => 'statuses/fields/can_change_code', :locals => {:f => f} %>
+
+          <tr>
+            <td colspan=2 style='text-align:right;'><%= f.submit 'Create' %></td>
+          </tr>
+        </table>
+    <% end %>
+  </div>
+<% end %>

@@ -4,16 +4,30 @@
 <h2>New tag of <%= params[:task_id] %></h2>
 <% end %>
 
-<% form_for(@tag) do |f| %>
-    <%= f.error_messages %>
+<% if Rails::VERSION::STRING < "4" %>
+	<% form_for(@tag) do |f| %>
+	    <%= f.error_messages %>
 
-    <%= render :partial => 'key', :locals => {:f => f} %>
-    <%= render :partial => 'value', :locals => {:f => f} %>
-    <%= render :partial => 'task_id', :locals => {:f => f} %>
+	    <%= render :partial => 'key', :locals => {:f => f} %>
+	    <%= render :partial => 'value', :locals => {:f => f} %>
+	    <%= render :partial => 'task_id', :locals => {:f => f} %>
 
-    <p>
-      <%= f.submit 'Create' %>
-    </p>
+	    <p>
+	      <%= f.submit 'Create' %>
+	    </p>
+	<% end %>
+<% else %>
+	<%= form_for(@tag) do |f| %>
+	    <%= f.error_messages %>
+
+	    <%= render :partial => 'key', :locals => {:f => f} %>
+	    <%= render :partial => 'value', :locals => {:f => f} %>
+	    <%= render :partial => 'task_id', :locals => {:f => f} %>
+
+	    <p>
+	      <%= f.submit 'Create' %>
+	    </p>
+	<% end %>
 <% end %>
 
 <%= link_to 'Back', tags_path %>

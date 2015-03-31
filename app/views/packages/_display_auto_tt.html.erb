@@ -1,5 +1,9 @@
-<% auto_track_times=TrackTime.all(:conditions => "package_id = #{package.id}",
-                                  :order => 'status_id') %>
+<% if Rails::VERSION::STRING < "4" %>
+    <% auto_track_times=TrackTime.all(:conditions => "package_id = #{package.id}",
+                                      :order => 'status_id') %>
+<% else %>
+    <% auto_track_times=TrackTime.where("package_id = #{package.id}").order('status_id') %>
+<% end %>
 <% auto_track_times.each do |tt| %>
     <% if tt.status.is_track_time? %>
         <%

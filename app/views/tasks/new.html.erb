@@ -1,20 +1,39 @@
 <h1>New Task</h1>
 
-<div class='manage-tbl'>
-  <% form_for(@task) do |f| %>
-      <%= f.error_messages %>
-      <table>
-        <%= render :partial => 'tasks/fields/name', :locals => {:f => f} %>
-        <!-- add any new fields in the options partial so that it can be shared -->
-        <%= render :partial => 'tasks/options', :locals => {:f => f} %>
-        <%= render :partial => 'tasks/fields/task_group', :locals => {:f => f} %>
-        <tr>
-          <td colspan='2'>
-            <%= f.submit 'Create' %>
-          </td>
-        </tr>
-      </table>
-  <% end %>
-</div>
+<%if Rails.VERSION::STRING < "4" %>
+  <div class='manage-tbl'>
+    <% form_for(@task) do |f| %>
+        <%= f.error_messages %>
+        <table>
+          <%= render :partial => 'tasks/fields/name', :locals => {:f => f} %>
+          <!-- add any new fields in the options partial so that it can be shared -->
+          <%= render :partial => 'tasks/options', :locals => {:f => f} %>
+          <%= render :partial => 'tasks/fields/task_group', :locals => {:f => f} %>
+          <tr>
+            <td colspan='2'>
+              <%= f.submit 'Create' %>
+            </td>
+          </tr>
+        </table>
+    <% end %>
+  </div>
+<% else %>
+  <div class='manage-tbl'>
+    <%= form_for(@task) do |f| %>
+        <%= f.error_messages %>
+        <table>
+          <%= render :partial => 'tasks/fields/name', :locals => {:f => f} %>
+          <!-- add any new fields in the options partial so that it can be shared -->
+          <%= render :partial => 'tasks/options', :locals => {:f => f} %>
+          <%= render :partial => 'tasks/fields/task_group', :locals => {:f => f} %>
+          <tr>
+            <td colspan='2'>
+              <%= f.submit 'Create' %>
+            </td>
+          </tr>
+        </table>
+    <% end %>
+  </div>
+<% end %>
 <br/>
 <%= link_to 'Back', tasks_path %>

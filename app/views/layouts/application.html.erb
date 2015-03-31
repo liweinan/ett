@@ -19,6 +19,7 @@
   <%= javascript_include_tag 'jquery/dist/jquery.js' %>
   <%= javascript_include_tag 'filament-dialog/dialog.js' %>
   <%= javascript_include_tag 'tablesaw.js' %>
+  <%= csrf_meta_tag %>
 </head>
 <body>
 <%# image_tag 'confidential.jpg' %>
@@ -46,7 +47,7 @@
 </div>
 <%= render :partial => 'layouts/sep' %>
 
-<%= javascript_include_tag :defaults %>
+<%= javascript_include_tag 'application' %>
 <%= render :partial => 'layouts/regexp' %>
 <%= render :partial => 'layouts/application_js' %>
 <%= yield :js %>
