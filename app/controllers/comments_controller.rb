@@ -3,18 +3,18 @@ class CommentsController < ApplicationController
 
   def create
 
-    @comment = Comment.new
+    @package = Package.find(params[:package_id])
+    @comment = @package.comments.create
     @comment.comment = params[:comment].strip
     @comment.created_at = Time.now
-    @package = Package.find(params[:package_id])
 
-    dup_comment = Comment.find_by_comment_and_source(@comment.comment(:source),
+    dup_comment = Comment.find_by_comment_and_source(@comment.comment,
                                                      request.remote_ip)
 
     if no_duplicate_comment(dup_comment)
       @comment.user_id = current_user.id if current_user
       @comment.source = request.remote_ip
-      @package.add_comment(@comment)
+      @comment.save
 
       if Rails.env.production?
         notify_users_of_comment(@package, @comment, params)
