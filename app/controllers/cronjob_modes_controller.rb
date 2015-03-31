@@ -83,7 +83,11 @@ class CronjobModesController < ApplicationController
 
   def products_to_build
     response = {:products => []}
-    active_tasks = Task.all(:conditions => ['active = ?', "1"])
+    if Rails::VERSION::STRING < "4"
+      active_tasks = Task.all(:conditions => ['active = ?', "1"])
+    else
+      active_tasks = Task.where('active = ?', "1")
+    end
     active_tasks.each do |task|
       os_adv_tags = task.os_advisory_tags
       distros = []

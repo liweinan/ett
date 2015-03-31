@@ -1,23 +1,44 @@
 <h1>Editing manual_log_entry</h1>
+<% if Rails::VERSION::STRING < "4" %>
+  <% form_for(@manual_log_entry) do |f| %>
+    <%= f.error_messages %>
 
-<% form_for(@manual_log_entry) do |f| %>
-  <%= f.error_messages %>
+    <p>
+      <%= f.label :who %><br />
+      <%= f.text_field :who %>
+    </p>
+    <p>
+      <%= f.label :start_time %><br />
+      <%= f.datetime_select :start_time %>
+    </p>
+    <p>
+    <%= f.label :end_time %><br />
+    <%= f.datetime_select :end_time %>
+    </p>
+    <p>
+      <%= f.submit 'Update' %>
+    </p>
+  <% end %>
+<% else %>
+  <%= form_for(@manual_log_entry) do |f| %>
+    <%= f.error_messages %>
 
-  <p>
-    <%= f.label :who %><br />
-    <%= f.text_field :who %>
-  </p>
-  <p>
-    <%= f.label :start_time %><br />
-    <%= f.datetime_select :start_time %>
-  </p>
-  <p>
-  <%= f.label :end_time %><br />
-  <%= f.datetime_select :end_time %>
-  </p>
-  <p>
-    <%= f.submit 'Update' %>
-  </p>
+    <p>
+      <%= f.label :who %><br />
+      <%= f.text_field :who %>
+    </p>
+    <p>
+      <%= f.label :start_time %><br />
+      <%= f.datetime_select :start_time %>
+    </p>
+    <p>
+    <%= f.label :end_time %><br />
+    <%= f.datetime_select :end_time %>
+    </p>
+    <p>
+      <%= f.submit 'Update' %>
+    </p>
+  <% end %>
 <% end %>
 
 <%= link_to 'Show', @manual_log_entry %> |

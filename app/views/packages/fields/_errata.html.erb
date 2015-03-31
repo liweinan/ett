@@ -1,13 +1,26 @@
 <% if logged_in? && !@package.status.blank? && @package.status.name == 'Finished' && @package.can_be_shipped? %>
     <span style="text-align: left;">
-      <% form_remote_tag(
-                 :url => {:controller => 'toolbox', :action => 'add_errata'},
-                 :loading => "Element.show('spinner_errata_#{@package.id}');",
-                 :success => "Element.hide('spinner_errata_#{@package.id}');
-           ") do %>
-          <%= hidden_field_tag :package_id, @package.id %>
-          <%= submit_tag 'Add to Errata' %>
-          <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "spinner_errata_#{@package.id}"} %>
+    <% if Rails::VERSION::STRING < "4" %>
+        <% form_remote_tag(
+                   :url => {:controller => 'toolbox', :action => 'add_errata'},
+                   :loading => "Element.show('spinner_errata_#{@package.id}');",
+                   :success => "Element.hide('spinner_errata_#{@package.id}');
+             ") do %>
+            <%= hidden_field_tag :package_id, @package.id %>
+            <%= submit_tag 'Add to Errata' %>
+            <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "spinner_errata_#{@package.id}"} %>
+      <% end %>
+    <% else %>
+        <%= form_tag(
+                   {:controller => 'toolbox', :action => 'add_errata'},
+                   :remote => true,
+                   :loading => "Element.show('spinner_errata_#{@package.id}');",
+                   :success => "Element.hide('spinner_errata_#{@package.id}');
+             ") do %>
+            <%= hidden_field_tag :package_id, @package.id %>
+            <%= submit_tag 'Add to Errata' %>
+            <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "spinner_errata_#{@package.id}"} %>
+      <% end %>
     <% end %>
     </span>
 <% end %>

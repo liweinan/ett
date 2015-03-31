@@ -1,6 +1,7 @@
 <% if can_edit_package? @package %>
 <%= render :partial => 'layouts/line' %>
     <div class='manage-tbl' style="width:400px;">
+    <% if Rails::VERSION::STRING < "4" %>
       <% form_for PAttachment.new, :html => {:multipart => true} do |f| %>
           <%= f.hidden_field :package_id, :value => @package.id %>
           <p>
@@ -20,6 +21,27 @@
           </p>
 
       <% end %>
+    <% else %>
+      <%= form_for PAttachment.new, :html => {:multipart => true} do |f| %>
+          <%= f.hidden_field :package_id, :value => @package.id %>
+          <p>
+            Add Attachment:
+          </p>
+
+          <p>
+            <%= f.file_field :attachment %>
+          </p>
+          <%= render :partial => 'layouts/notification',
+                     :locals => {:title => 'Notify the attachment uploading to:',
+                                 :div_id => 'attachment'} %>
+          <p>
+            <%= f.submit 'Upload' %>
+            <%= render :partial => 'layouts/notification_link',
+                       :locals => {:div_id => 'attachment'} %>
+          </p>
+
+      <% end %>
+    <% end %>
     </div>
 <% end %>
 

@@ -1,11 +1,11 @@
-<% if has_task? && logged_in? && !Task.readonly?(Task.find_by_name(unescape_url(params[:task_id])))%>
+<% if has_task? && logged_in? && Task.find_by_name(unescape_url(params[:task_id])).read_only_task? %>
     <%= link_to 'New Package', :controller => :packages, :action => :new,
                 :task_id => params[:task_id] %> /
 <% end %>
 
 <%= link_to 'Search Packages', "/search/packages?task_id=#{ebtag}" %> /
 
-<% if has_task? && can_manage? && !Task.readonly?(Task.find_by_name(unescape_url(params[:task_id]))) %>
+<% if has_task? && can_manage? && Task.find_by_name(unescape_url(params[:task_id])).read_only_task? %>
     <a href="/import/<%= escape_url(params[:task_id]) %>">Import Packages</a>
     / <a href="/import/<%= escape_url(params[:task_id]) %>?ac=update">Update Packages</a>
     /
@@ -45,7 +45,7 @@
                   :controller => :settings, :action => :show,
                   :id => setting_id,
                   :task_id => escape_url(params[:task_id]) %>
-    <% if !task.frozen_state? && task.active? %>
+    <% if task.active? %>
     / <%= link_to 'Mass-Rebuild',
                   :controller => :mass_rebuild, :action => :first_step,
                   :task_id => escape_url(params[:task_id]) %>

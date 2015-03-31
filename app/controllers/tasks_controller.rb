@@ -5,7 +5,11 @@ class TasksController < ApplicationController
   # GET /tasks
   # GET /tasks.xml
   def index
-    @tasks = Task.find(:all, :order => "name asc")
+    if Rails::VERSION::STRING < "4"
+      @tasks = Task.find(:all, :order => "name asc")
+    else
+      @tasks = Task.all.order("name asc")
+    end
 
     respond_to do |format|
       format.html # index.html.erb
@@ -106,10 +110,18 @@ class TasksController < ApplicationController
 
     save_task_groups(@task, params)
 
+    old_read_only_task = @task.read_only_task
     respond_to do |format|
       if @task.update_attributes(params[:task]) && !os_adv_tag_error
         expire_all_fragments
-        flash[:notice] = 'Task was successfully updated.'
+        flash_text = ''
+        if !old_read_only_task && @task.read_only_task
+          @task.active = nil
+          @task.save
+          flash_text = ReadonlyTask.move_other_packages_to_already_released(@task.id)
+        end
+        flash[:notice] = "Task was successfully updated.\n#{flash_text}"
+        flash[:notice] = flash[:notice].gsub("\n", "<br>")
         format.html do
           redirect_to(:controller => :tasks,
                       :action => :show,
@@ -277,7 +289,11 @@ class TasksController < ApplicationController
 
         unless params['cronjob_' + params[:indexes][idx]].blank?
           params['cronjob_' + params[:indexes][idx]].each do |mode|
-            to_save.cronjob_modes << CronjobMode.first(:conditions => ["mode = ?", mode])
+            if Rails::VERSION::STRING < "4"
+              to_save.cronjob_modes << CronjobMode.first(:conditions => ["mode = ?", mode])
+            else
+              to_save.cronjob_modes << CronjobMode.where("mode = ?", mode).first
+            end
           end
         end
         to_save.task_id = task.id

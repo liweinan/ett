@@ -1,5 +1,4 @@
 class Task < ActiveRecord::Base
-#  acts_as_tree
   validates_presence_of :name
   validates_uniqueness_of :name
 
@@ -23,7 +22,9 @@ class Task < ActiveRecord::Base
 
   belongs_to :workflow
 
-  acts_as_textiled :description
+  if Rails::VERSION::STRING < "4"
+    acts_as_textiled :description
+  end
 
   LINK = {:tag => 0, :package => 1}
 
@@ -33,10 +34,6 @@ class Task < ActiveRecord::Base
       task_ids << task.id
     end
     task_ids
-  end
-
-  def frozen_state?
-    self.frozen_state == "1"
   end
 
   def self.from_task_ids(task_ids)
@@ -56,7 +53,11 @@ class Task < ActiveRecord::Base
   end
 
   def self.all_that_have_package_with_name(name)
-    Task.all(:conditions => ['id in (select task_id from packages where name = ?)', name])
+    if Rails::VERSION::STRING < "4"
+      Task.all(:conditions => ['id in (select task_id from packages where name = ?)', name])
+    else
+      Task.where("id in (select task_id from packages where name = ?)", name)
+    end
   end
 
   def use_bz_integration?
@@ -83,12 +84,8 @@ class Task < ActiveRecord::Base
     end
   end
 
-  def readonly?
-    !ReadonlyTask.find_by_task_id(id).blank?
-  end
-
-  def self.readonly?(task)
-    !ReadonlyTask.find_by_task_id(task.id).blank?
+  def read_only_task?
+    self.read_only_task
   end
 
   def active_packages # find the packages of the task which the workload time need to be tracked.
@@ -96,7 +93,11 @@ class Task < ActiveRecord::Base
     # So we will consider this package as active.
     # For example if the package is in 'Deleted' status, and because 'Deleted' status's 'is_track_time' is set to 'No',
     # so we think the packages marked in 'Delete' status is inactive.
-    Package.all(:conditions => ["task_id = ? and status_id in (select id from statuses where is_track_time != 'No') or status_id is null", id])
+    if Rails::VERSION::STRING < "4"
+      Package.all(:conditions => ["task_id = ? and status_id in (select id from statuses where is_track_time != 'No') or status_id is null", id])
+    else
+      Package.where("task_id = ? and status_id in (select id from statuses where is_track_time != 'No') or status_id is null", id)
+    end
   end
 
   def active?
@@ -104,7 +105,11 @@ class Task < ActiveRecord::Base
   end
 
   def sorted_os_advisory_tags
-    OsAdvisoryTag.all(:conditions => ['task_id = ?', self.id], :order => :priority)
+    if Rails::VERSION::STRING < "4"
+      OsAdvisoryTag.all(:conditions => ['task_id = ?', self.id], :order => :priority)
+    else
+      OsAdvisoryTag.where('task_id = ?', self.id).order(:priority)
+    end
   end
 
   def distros
@@ -126,7 +131,11 @@ class Task < ActiveRecord::Base
   end
 
   def has_pkg_with_optional_errata?
-    Package.find(:all,
-                 :conditions => ['task_id = ? and errata > ?', self.id, '']).count != 0
+    if Rails::VERSION::STRING < "4"
+      Package.find(:all,
+                   :conditions => ['task_id = ? and errata > ?', self.id, '']).count != 0
+    else
+      Package.where("task_id = ? and errata > ?", self.id, '').count != 0
+    end
   end
 end

@@ -6,7 +6,11 @@
         Tag
       </td>
       <td colspan style="text-align:left;">
-        <%= f.collection_select :task_id, Task.all(:order => 'name'), :id, :name %>
+        <% if Rails::VERSION::STRING < "4"  %>
+            <%= f.collection_select :task_id, Task.all(:order => 'name'), :id, :name %>
+        <% else %>
+            <%= f.collection_select :task_id, Task.all.order('name'), :id, :name %>
+        <% end %>
       </td>
     </tr>
 <% end %>

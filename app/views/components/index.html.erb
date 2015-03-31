@@ -10,7 +10,12 @@
             <th style="text-align: center">Operation</th>
         <% end %>
       </tr>
-      <% Component.all(:order => 'name').each do |component| %>
+      <% if Rails::VERSION::STRING < "4" %>
+          <% all_components = Component.all(:order => 'name') %>
+      <% else %>
+          <% all_components = Component.all.order('name') %>
+      <% end %>
+      <% all_components.each do |component| %>
           <tr>
             <td><%= link_to "#{component.name}", :controller => :components, :action => :show, :id => escape_url(component.name) %>
             <td><%component.tasks.each do |task|%><%=task.name %> / <%end%></td>

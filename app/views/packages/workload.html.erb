@@ -1,6 +1,10 @@
 <h2>Workload Report</h2>
 
-<% wls = WeeklyWorkload.all(:conditions => ["task_id=?", Task.find_by_name(unescape_url(params[:task_id])).id], :order => "start_of_week DESC") %>
+<% if Rails::VERSION::STRING < "4" %>
+    <% wls = WeeklyWorkload.all(:conditions => ["task_id=?", Task.find_by_name(unescape_url(params[:task_id])).id], :order => "start_of_week DESC") %>
+<% else %>
+    <% wls = WeeklyWorkload.where("task_id=?", Task.find_by_name(unescape_url(params[:task_id])).id).order("start_of_week DESC") %>
+<% end %>
 
 
 <div class='manage-tbl'>

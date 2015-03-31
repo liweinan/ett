@@ -1,6 +1,7 @@
 <h2>Mass Rebuild options</h2>
 <div style="height:20px;border:none;"></div>
 <div class='manage-tbl'>
+<% if Rails::VERSION::STRING < "4" %>
     <% form_tag("/mass-rebuild/second-step", :method => "post") do %>
       <table>
           <%= render :partial => 'mass_rebuild/fields/version' %>
@@ -16,5 +17,21 @@
       <p/>
       <td colspan="2" style="text-align: right"><input name="next" type="submit" value="Next!" /></td>
     <% end %>
+<% else %>
+    <%= form_tag("/mass-rebuild/second-step", :method => "post") do %>
+      <table>
+          <%= render :partial => 'mass_rebuild/fields/version' %>
+          <%= render :partial => 'mass_rebuild/fields/repository' %>
+          <%= render :partial => 'mass_rebuild/fields/filename' %>
+          <%= render :partial => 'mass_rebuild/fields/branch' %>
+          <%= render :partial => 'mass_rebuild/fields/type' %>
+          <%= render :partial => 'mass_rebuild/fields/distros' %>
+          <div class='manage-tbl'>
+          <%= render :partial => 'mass_rebuild/fields/clentry' %>
+      </table>
+      <p/>
+      <td colspan="2" style="text-align: right"><input name="next" type="submit" value="Next!" /></td>
+    <% end %>
+<% end %>
 </div>
 <br/>

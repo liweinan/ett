@@ -57,7 +57,7 @@ class Workflow < ActiveRecord::Base
     Task.transaction do
       # reset current workflow assignment
       Task.find_all_by_workflow_id(id).each do |task|
-        unless task.readonly?
+        unless task.read_only_task?
           task.workflow_id = nil
           task.save
         end
@@ -66,7 +66,7 @@ class Workflow < ActiveRecord::Base
       unless tasks.blank?
         tasks.each do |task|
           task = Task.find(task.to_i)
-          unless task.readonly?
+          unless task.read_only_task?
             task.workflow_id = id
             task.save
           end
@@ -76,7 +76,11 @@ class Workflow < ActiveRecord::Base
   end
 
   def next_statuses_of(current_status)
-    allowed_statuses = AllowedStatus.all(:conditions => ['workflow_id = ? and status_id = ?', id, current_status.id])
+    if Rails::VERSION::STRING < "4"
+      allowed_statuses = AllowedStatus.all(:conditions => ['workflow_id = ? and status_id = ?', id, current_status.id])
+    else
+      allowed_statuses = AllowedStatus.where('workflow_id = ? and status_id = ?', id, current_status.id)
+    end
     next_statuses = []
     allowed_statuses.each do |as|
       next_statuses << as.next_status

@@ -3,7 +3,11 @@ class TagsController < ApplicationController
   before_filter :check_can_manage, :only => [:new, :edit]
 
   def index
-    @tags = Tag.all(:conditions => ['task_id = ?', get_task(params[:task_id]).id])
+    if Rails::VERSION::STRING < "4"
+      @tags = Tag.all(:conditions => ['task_id = ?', get_task(params[:task_id]).id])
+    else
+      @tags = Tag.where('task_id = ?', get_task(params[:task_id]).id)
+    end
 
     respond_to do |format|
       format.html # index.html.erb

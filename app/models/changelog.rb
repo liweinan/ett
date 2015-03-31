@@ -4,7 +4,11 @@ class Changelog < ActiveRecord::Base
   validates_presence_of :package_id
   validates_presence_of :changed_at
 
-  default_scope :order => 'changed_at DESC'
+  if Rails::VERSION::STRING < "4"
+    default_scope :order => 'changed_at DESC'
+  else
+    default_scope { order('changed_at DESC') }
+  end
 
   CATEGORY = {:comment => 'COMMENT', :update => 'UPDATE',
               :create => 'CREATE', :clone => 'CLONE', :delete => 'DELETE'}
@@ -150,8 +154,6 @@ class Changelog < ActiveRecord::Base
 
 
   end
-
-  protected
 
   def self.diff_fields(orig_ar_obj, ar_obj)
 

@@ -1,7 +1,12 @@
 <div style="width:100%;text-align:left;">
 	<span style="padding-right:20px;"> 
 	  Components:
-      <% Component.all(:order => 'name').each do |component| %>
+     <% if Rails::VERSION::STRING < "4" %>
+         <% all_components = Component.all(:order => 'name') %>
+     <% else %>
+         <% all_components = Component.all.order('name') %>
+     <% end %>
+      <% all_components.each do |component| %>
 		<%= link_to "#{component.name}", :controller => :components, :action => :show, :id => escape_url(component.name), :user => params[:user] %>
           /
 		<% end %>

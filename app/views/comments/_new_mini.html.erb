@@ -1,4 +1,5 @@
 <div id="comment_mini_form_<%= package.id %>">
+<% if Rails::VERSION::STRING < "4" %>
   <% form_remote_tag(
              :url => {:controller => 'comments', :action => 'create'},
              :loading => "Element.show('spinner_comment_#{package.id}');",
@@ -25,4 +26,33 @@
         <%= render :partial => 'layouts/sep_tiny' %>
       </div>
   <% end %>
+<% else %>
+  <%= form_tag(
+             {:controller => 'comments', :action => 'create'},
+             :remote => true,
+             :loading => "Element.show('spinner_comment_#{package.id}');",
+             :success => "Element.hide('spinner_comment_#{package.id}');") do %>
+
+      <%= hidden_field_tag :package_id, package.id %>
+      <%= hidden_field_tag :pos, 'mini' %>
+
+      <div style="text-align: left;">
+        <%= render :partial => 'layouts/sep_tiny' %>
+        Add Comment:
+        <%= render :partial => 'layouts/sep_tiny' %>
+        <textarea name="comment" rows="5" cols="22"></textarea>
+        <%= render :partial => 'layouts/sep_tiny' %>
+
+        <%= submit_tag 'Post' %>
+
+        <input type="button"
+               value="Cancel"
+               onclick="Element.hide('comment_mini_form_<%=package.id%>')"/>
+
+        <%= render :partial => 'layouts/progress_indicator',
+                   :locals => {:progress_indicator_id => "spinner_comment_#{package.id}"} %>
+        <%= render :partial => 'layouts/sep_tiny' %>
+      </div>
+  <% end %>
+<% end %>
 </div>

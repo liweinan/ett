@@ -1,7 +1,7 @@
 <div class='manage-tbl'>
   <table id='bz_list_tbl'>
     <tr>
-      <% if logged_in? && !@package.task.readonly? %>
+      <% if logged_in? && !@package.task.read_only_task? %>
           <th class='content-list-head'>Operation</th>
       <% end %>
       <th class='content-list-head'>Bug ID</th>
@@ -15,7 +15,7 @@
     <% package.bz_bugs.each do |bz_bug| %>
         <% unless upgrade_bz_bugs.include? bz_bug  %>
         <tr id='bz_list_row_<%= bz_bug.id %>'>
-          <% if logged_in? && !@package.task.readonly? %>
+          <% if logged_in? && !@package.task.read_only_task? %>
               <td id="col_bz_ops_<%= bz_bug.id %>" class="small_font">
                 <%= render :partial => 'bz_bugs/ops', :locals => {:bz_bug => bz_bug} %>
               </td>

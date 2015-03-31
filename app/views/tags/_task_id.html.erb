@@ -1,7 +1,11 @@
 <% if params[:task_id].blank? %>
     Tag
     <br/>
-    <%= f.collection_select :task_id, Task.all(:order => 'name'), :id, :name %>
+    <% if Rails::VERSION::STRING < "4" %>
+        <%= f.collection_select :task_id, Task.all(:order => 'name'), :id, :name %>
+    <% else %>
+        <%= f.collection_select :task_id, Task.all.order('name'), :id, :name %>
+    <% end %>
 <% else %>
     <%= f.hidden_field :task_id, :value => Task.find_by_name(unescape_url(params[:task_id])).id %>
 <% end %>

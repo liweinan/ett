@@ -1,12 +1,25 @@
 <h1>Editing tag</h1>
 
-<% form_for(@tag) do |f| %>
-    <%= f.error_messages %>
+<% if Rails::VERSION::STRING < "4" %>
+	<% form_for(@tag) do |f| %>
+	    <%= f.error_messages %>
 
-    <%= render :partial => 'key', :locals => {:f => f} %>
-    <%= render :partial => 'value', :locals => {:f => f} %>
+	    <%= render :partial => 'key', :locals => {:f => f} %>
+	    <%= render :partial => 'value', :locals => {:f => f} %>
 
-    <p>
-      <%= f.submit 'Update' %>
-    </p>
+	    <p>
+	      <%= f.submit 'Update' %>
+	    </p>
+	<% end %>
+<% else %>
+	<%= form_for(@tag) do |f| %>
+	    <%= f.error_messages %>
+
+	    <%= render :partial => 'key', :locals => {:f => f} %>
+	    <%= render :partial => 'value', :locals => {:f => f} %>
+
+	    <p>
+	      <%= f.submit 'Update' %>
+	    </p>
+	<% end %>
 <% end %>

@@ -1,4 +1,9 @@
-<% Task.all(:order => 'lower(name)').each do |task| %>
+<% if Rails::VERSION::STRING < "4" %>
+    <% all_tasks = Task.all(:order => 'lower(name)')%>
+<% else %>
+    <% all_tasks = Task.all.order('lower(name)') %>
+<% end %>
+<% all_tasks.each do |task| %>
 <% if @task_names.blank? %>
         <label><%= check_box_tag('task_names[]', task.name, false) %> <%= task.name %></label>
 <% else %>

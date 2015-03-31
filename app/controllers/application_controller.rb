@@ -24,7 +24,11 @@ class ApplicationController < ActionController::Base
 
   # Scrub sensitive parameters from your log
   # filter_parameter_logging :password
-  filter_parameter_logging :bzauth_pwd, :pwd, :ubbs_pwd, :jira_pass
+  if Rails::VERSION::STRING < "4"
+    # this config has moved to config/initializers/filter_parameter_logging
+    # on Rails 4
+    filter_parameter_logging :bzauth_pwd, :pwd, :ubbs_pwd, :jira_pass
+  end
 
   def get_task(name)
     Task.find_by_name(unescape_url(name))
@@ -69,9 +73,13 @@ class ApplicationController < ActionController::Base
 
   def count_packages(bt, status_name)
     bt_quoted = "'#{bt}'"
-    global_status = Status.find(:first,
-                                :conditions => ["global='Y' AND name=?",
-                                                status_name])
+    if Rails::VERSION::STRING < "4"
+      global_status = Status.find(:first,
+                                  :conditions => ["global='Y' AND name=?",
+                                                  status_name])
+    else
+      global_status = Status.where("global='Y' AND name=?", status_name).first
+    end
     if global_status.nil?
       status_id = Status.find_by_name_and_task_id(status_name,
                                                   Task.find_by_name(bt).id).id

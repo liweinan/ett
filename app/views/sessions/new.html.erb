@@ -1,37 +1,74 @@
 <h2>Login</h2>
 
-<div class='manage-tbl'>
-  <% form_for(@session) do |f| %>
-      <table>
-        <tr>
-          <td>
-            Email
-          </td>
-          <td>
-            <%= f.text_field :email %>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            Password
-          </td>
-          <td>
-            <%= f.password_field :password %>
-          </td>
-      </tr>
-      <%= f.hidden_field :redirect, :value => params[:redirect] ? params[:redirect] : '/' %>
-        <tr>
-          <td colspan=2 style="text-align:right;">
-            Default password is your Email address. <%= f.submit 'Login' %>
-            <br/>
-          </td>
-        </tr>
-        <tr>
-          <td colspan=2 style="text-align:right;">
-            <%= link_to 'Reset Password', :controller => :users, :action => :reset_password, :id => -1 %>
-          </td>
-        </tr>
-      </table>
-  <% end %>
-</div>
+<% if Rails::VERSION::STRING < "4" %>
+    <div class='manage-tbl'>
+      <% form_for(@session) do |f| %>
+          <table>
+            <tr>
+              <td>
+                Email
+              </td>
+              <td>
+                <%= f.text_field :email %>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Password
+              </td>
+              <td>
+                <%= f.password_field :password %>
+              </td>
+          </tr>
+          <%= f.hidden_field :redirect, :value => params[:redirect] ? params[:redirect] : '/' %>
+            <tr>
+              <td colspan=2 style="text-align:right;">
+                Default password is your Email address. <%= f.submit 'Login' %>
+                <br/>
+              </td>
+            </tr>
+            <tr>
+              <td colspan=2 style="text-align:right;">
+                <%= link_to 'Reset Password', :controller => :users, :action => :reset_password, :id => -1 %>
+              </td>
+            </tr>
+          </table>
+      <% end %>
+    </div>
+<% else %>
+    <div class='manage-tbl'>
+      <%= form_for(@session) do |f| %>
+          <table>
+            <tr>
+              <td>
+                Email
+              </td>
+              <td>
+                <%= f.text_field :email %>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                Password
+              </td>
+              <td>
+                <%= f.password_field :password %>
+              </td>
+          </tr>
+          <%= f.hidden_field :redirect, :value => params[:redirect] ? params[:redirect] : '/' %>
+            <tr>
+              <td colspan=2 style="text-align:right;">
+                Default password is your Email address. <%= f.submit 'Login' %>
+                <br/>
+              </td>
+            </tr>
+            <tr>
+              <td colspan=2 style="text-align:right;">
+                <%= link_to 'Reset Password', :controller => :users, :action => :reset_password, :id => -1 %>
+              </td>
+            </tr>
+          </table>
+      <% end %>
+    </div>
+<% end %>
 <br/>

@@ -15,7 +15,12 @@
         More Reports
       </th>
     </tr>
-    <% TaskWorkloadSummary.all(:order => :id).each do |tws| %>
+    <% if Rails::VERSION::STRING < "4" %>
+        <% all_taskworkload = TaskWorkloadSummary.all(:order => :id) %>
+    <% else %>
+        <% all_taskworkload = TaskWorkloadSummary.all.order(:id) %>
+    <% end %>
+    <% all_taskworkload.each do |tws| %>
         <tr>
           <td><%= tws.task.name %></td>
           <td><%= tws.total_number_of_packages %></td>

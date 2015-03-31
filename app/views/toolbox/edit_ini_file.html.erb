@@ -1,61 +1,124 @@
 <div style="text-align: left;">
-<% form_remote_tag(
-    :url => {:controller => 'toolbox', :action => 'ini_file_ajax_req'},
-    :loading => "Element.show('spinner_build_#{@package_id}');",
-    :success => "Element.hide('spinner_build_#{@package_id}');") do %>
-    <%= hidden_field_tag :package_id, @package_id %>
-    <div class='manage-tbl'>
-    <% width = 62 %>
-    <table>
-        <tr>
-            <td><%= label_tag(:maven_group_artifact, "GroupId-ArtifactId") %></td>
-            <td><%= text_field_tag(:maven_group_artifact, @maven_group_artifact, :size => width) %></td>
-        </tr>
-        <tr>
-            <td><%= label_tag(:buildrequires, "Build Requires") %></td>
-            <td><%= text_field_tag(:buildrequires, @build_requires, :size => width) %></td>
-        </tr>
-        <tr>
-            <td><%= label_tag(:goals, "Goals") %></td>
-            <td><%= text_field_tag(:goals, @goals, :size => width) %></td>
-        </tr>
-        <tr>
-            <td><%= label_tag(:profiles, "Profiles") %></td>
-            <td><%= text_field_tag(:profiles, @profiles, :size => width) %></td>
-        </tr>
-        <tr>
-            <td><%= label_tag(:properties, "Properties") %></td>
-            <td><%= text_field_tag(:properties, @properties, :size => width) %></td>
-        </tr>
-        <tr>
-            <td colspan="2"><input id="javadocs" name="javadocs" type="checkbox" value="1" checked>Execute Javadocs goal</input></td>
-        </tr>
-        <tr>
-            <td colspan="2"><input id="suffix" name="suffix" type="checkbox" value="1"  checked>Enable Suffix Extension</input></td>
-        </tr>
-    </table>
-    <br />
-    <table>
-        <tr>
-            <th colspan="2" style="text-align: center;">Advanced</th>
-        </tr>
-        <tr>
-            <td><%= label_tag(:maven_options, "Maven Options") %></td>
-            <td><%= text_field_tag(:maven_options, @maven_options, :size => width) %></td>
-        </tr>
-        <tr>
-            <td><%= label_tag(:envs, "Environments") %></td>
-            <td><%= text_field_tag(:envs, @envs, :size => width) %></td>
-        </tr>
-        <tr>
-            <td><%= label_tag(:jvm_options, "JVM Options") %></td>
-            <td><%= text_field_tag(:jvm_options, @jvm_options, :size => width) %></td>
-        </tr>
-    </table>
+<% if Rails::VERSION::STRING < "4" %>
+    <% form_remote_tag(
+        :url => {:controller => 'toolbox', :action => 'ini_file_ajax_req'},
+        :loading => "Element.show('spinner_build_#{@package_id}');",
+        :success => "Element.hide('spinner_build_#{@package_id}');") do %>
+        <%= hidden_field_tag :package_id, @package_id %>
+        <div class='manage-tbl'>
+        <% width = 62 %>
+        <table>
+            <tr>
+                <td><%= label_tag(:maven_group_artifact, "GroupId-ArtifactId") %></td>
+                <td><%= text_field_tag(:maven_group_artifact, @maven_group_artifact, :size => width) %></td>
+            </tr>
+            <tr>
+                <td><%= label_tag(:buildrequires, "Build Requires") %></td>
+                <td><%= text_field_tag(:buildrequires, @build_requires, :size => width) %></td>
+            </tr>
+            <tr>
+                <td><%= label_tag(:goals, "Goals") %></td>
+                <td><%= text_field_tag(:goals, @goals, :size => width) %></td>
+            </tr>
+            <tr>
+                <td><%= label_tag(:profiles, "Profiles") %></td>
+                <td><%= text_field_tag(:profiles, @profiles, :size => width) %></td>
+            </tr>
+            <tr>
+                <td><%= label_tag(:properties, "Properties") %></td>
+                <td><%= text_field_tag(:properties, @properties, :size => width) %></td>
+            </tr>
+            <tr>
+                <td colspan="2"><input id="javadocs" name="javadocs" type="checkbox" value="1" checked>Execute Javadocs goal</input></td>
+            </tr>
+            <tr>
+                <td colspan="2"><input id="suffix" name="suffix" type="checkbox" value="1"  checked>Enable Suffix Extension</input></td>
+            </tr>
+        </table>
+        <br />
+        <table>
+            <tr>
+                <th colspan="2" style="text-align: center;">Advanced</th>
+            </tr>
+            <tr>
+                <td><%= label_tag(:maven_options, "Maven Options") %></td>
+                <td><%= text_field_tag(:maven_options, @maven_options, :size => width) %></td>
+            </tr>
+            <tr>
+                <td><%= label_tag(:envs, "Environments") %></td>
+                <td><%= text_field_tag(:envs, @envs, :size => width) %></td>
+            </tr>
+            <tr>
+                <td><%= label_tag(:jvm_options, "JVM Options") %></td>
+                <td><%= text_field_tag(:jvm_options, @jvm_options, :size => width) %></td>
+            </tr>
+        </table>
 
-    <br />
-    <%= submit_tag 'Submit edited ini file to repository' %>
-    <%= render :partial => 'layouts/progress_indicator',
-        :locals => {:progress_indicator_id => "spinner_build_#{@package_id}"} %>
+        <br />
+        <%= submit_tag 'Submit edited ini file to repository' %>
+        <%= render :partial => 'layouts/progress_indicator',
+            :locals => {:progress_indicator_id => "spinner_build_#{@package_id}"} %>
+    <% end %>
+<% else %>
+    <%= form_tag(
+        {:controller => 'toolbox', :action => 'ini_file_ajax_req'},
+        :remote => true,
+        :loading => "Element.show('spinner_build_#{@package_id}');",
+        :success => "Element.hide('spinner_build_#{@package_id}');") do %>
+        <%= hidden_field_tag :package_id, @package_id %>
+        <div class='manage-tbl'>
+        <% width = 62 %>
+        <table>
+            <tr>
+                <td><%= label_tag(:maven_group_artifact, "GroupId-ArtifactId") %></td>
+                <td><%= text_field_tag(:maven_group_artifact, @maven_group_artifact, :size => width) %></td>
+            </tr>
+            <tr>
+                <td><%= label_tag(:buildrequires, "Build Requires") %></td>
+                <td><%= text_field_tag(:buildrequires, @build_requires, :size => width) %></td>
+            </tr>
+            <tr>
+                <td><%= label_tag(:goals, "Goals") %></td>
+                <td><%= text_field_tag(:goals, @goals, :size => width) %></td>
+            </tr>
+            <tr>
+                <td><%= label_tag(:profiles, "Profiles") %></td>
+                <td><%= text_field_tag(:profiles, @profiles, :size => width) %></td>
+            </tr>
+            <tr>
+                <td><%= label_tag(:properties, "Properties") %></td>
+                <td><%= text_field_tag(:properties, @properties, :size => width) %></td>
+            </tr>
+            <tr>
+                <td colspan="2"><input id="javadocs" name="javadocs" type="checkbox" value="1" checked>Execute Javadocs goal</input></td>
+            </tr>
+            <tr>
+                <td colspan="2"><input id="suffix" name="suffix" type="checkbox" value="1"  checked>Enable Suffix Extension</input></td>
+            </tr>
+        </table>
+        <br />
+        <table>
+            <tr>
+                <th colspan="2" style="text-align: center;">Advanced</th>
+            </tr>
+            <tr>
+                <td><%= label_tag(:maven_options, "Maven Options") %></td>
+                <td><%= text_field_tag(:maven_options, @maven_options, :size => width) %></td>
+            </tr>
+            <tr>
+                <td><%= label_tag(:envs, "Environments") %></td>
+                <td><%= text_field_tag(:envs, @envs, :size => width) %></td>
+            </tr>
+            <tr>
+                <td><%= label_tag(:jvm_options, "JVM Options") %></td>
+                <td><%= text_field_tag(:jvm_options, @jvm_options, :size => width) %></td>
+            </tr>
+        </table>
+
+        <br />
+        <%= submit_tag 'Submit edited ini file to repository' %>
+        <%= render :partial => 'layouts/progress_indicator',
+            :locals => {:progress_indicator_id => "spinner_build_#{@package_id}"} %>
+    <% end %>
 <% end %>
 </div>

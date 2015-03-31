@@ -1,4 +1,4 @@
-<% if @package.task.use_mead_integration? && !@package.task.readonly? %>
+<% if @package.task.use_mead_integration? && !@package.task.read_only_task? %>
     <% if @package.pkg_brew_rpm_link('el6') %>
         <tr>
             <td>Brew</td>

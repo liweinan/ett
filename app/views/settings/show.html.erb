@@ -4,45 +4,89 @@
     <h1>Settings of <%= @setting.task.name %></h1>
 <% end %>
 <%= render :partial => 'layouts/sep' %>
-<% form_for(@setting) do |f| %>
-    <%= render :partial => 'settings/fields/enabled', :locals => {:f => f, :disabled => true} %>
-    <%= render :partial => 'layouts/sep' %>
-
-    <%= render :partial => 'settings/fields/use_bz_integration', :locals => {:f => f, :disabled => true} %>
-    <%= render :partial => 'layouts/sep' %>
-
-    <%= render :partial => 'settings/fields/use_jira_integration', :locals => {:f => f, :disabled => true} %>
-    <%= render :partial => 'layouts/sep' %>
-
-    <%= render :partial => 'settings/fields/use_mead_integration', :locals => {:f => f, :disabled => true} %>
-    <%= render :partial => 'layouts/sep' %>
-
-
-    <% if @setting.is_system_setting? %>
-        <%= render :partial => 'settings/fields/default_tag', :locals => {:f => f, :disabled => true} %>
+<% if Rails::VERSION::STRING < "4" %>
+    <% form_for(@setting) do |f| %>
+        <%= render :partial => 'settings/fields/enabled', :locals => {:f => f, :disabled => true} %>
         <%= render :partial => 'layouts/sep' %>
+
+        <%= render :partial => 'settings/fields/use_bz_integration', :locals => {:f => f, :disabled => true} %>
+        <%= render :partial => 'layouts/sep' %>
+
+        <%= render :partial => 'settings/fields/use_jira_integration', :locals => {:f => f, :disabled => true} %>
+        <%= render :partial => 'layouts/sep' %>
+
+        <%= render :partial => 'settings/fields/use_mead_integration', :locals => {:f => f, :disabled => true} %>
+        <%= render :partial => 'layouts/sep' %>
+
+
+        <% if @setting.is_system_setting? %>
+            <%= render :partial => 'settings/fields/default_tag', :locals => {:f => f, :disabled => true} %>
+            <%= render :partial => 'layouts/sep' %>
+        <% end %>
+
+
+        <h2>
+          Send email notifications to:
+        </h2>
+        <%= render :partial => 'settings/fields/props', :locals => {:f => f, :disabled => true} %>
+        <%= render :partial => 'settings/fields/recipients', :locals => {:f => f, :disabled => true} %>
+        <h2>
+          When:
+        </h2>
+        <%= render :partial => 'settings/fields/actions', :locals => {:f => f, :disabled => true} %>
+        <%= render :partial => 'layouts/sep' %>
+
+        <%# render :partial => 'settings/fields/xattrs', :locals => {:f => f, :disabled => true} %>
+        <%# render :partial => 'layouts/sep' %>
+
+        <%# render :partial => 'settings/fields/enable_xattrs', :locals => {:f => f, :disabled => true} %>
+        <%# render :partial => 'layouts/sep' %>
+
+        <%# render :partial => 'settings/fields/show_xattrs', :locals => {:f => f, :disabled => true} %>
+        <%# render :partial => 'layouts/sep' %>
+    <% end %>
+<% else %>
+    <%= form_for(@setting) do |f| %>
+        <%= render :partial => 'settings/fields/enabled', :locals => {:f => f, :disabled => true} %>
+        <%= render :partial => 'layouts/sep' %>
+
+        <%= render :partial => 'settings/fields/use_bz_integration', :locals => {:f => f, :disabled => true} %>
+        <%= render :partial => 'layouts/sep' %>
+
+        <%= render :partial => 'settings/fields/use_jira_integration', :locals => {:f => f, :disabled => true} %>
+        <%= render :partial => 'layouts/sep' %>
+
+        <%= render :partial => 'settings/fields/use_mead_integration', :locals => {:f => f, :disabled => true} %>
+        <%= render :partial => 'layouts/sep' %>
+
+
+        <% if @setting.is_system_setting? %>
+            <%= render :partial => 'settings/fields/default_tag', :locals => {:f => f, :disabled => true} %>
+            <%= render :partial => 'layouts/sep' %>
+        <% end %>
+
+
+        <h2>
+          Send email notifications to:
+        </h2>
+        <%= render :partial => 'settings/fields/props', :locals => {:f => f, :disabled => true} %>
+        <%= render :partial => 'settings/fields/recipients', :locals => {:f => f, :disabled => true} %>
+        <h2>
+          When:
+        </h2>
+        <%= render :partial => 'settings/fields/actions', :locals => {:f => f, :disabled => true} %>
+        <%= render :partial => 'layouts/sep' %>
+
+        <%# render :partial => 'settings/fields/xattrs', :locals => {:f => f, :disabled => true} %>
+        <%# render :partial => 'layouts/sep' %>
+
+        <%# render :partial => 'settings/fields/enable_xattrs', :locals => {:f => f, :disabled => true} %>
+        <%# render :partial => 'layouts/sep' %>
+
+        <%# render :partial => 'settings/fields/show_xattrs', :locals => {:f => f, :disabled => true} %>
+        <%# render :partial => 'layouts/sep' %>
     <% end %>
 
-
-    <h2>
-      Send email notifications to:
-    </h2>
-    <%= render :partial => 'settings/fields/props', :locals => {:f => f, :disabled => true} %>
-    <%= render :partial => 'settings/fields/recipients', :locals => {:f => f, :disabled => true} %>
-    <h2>
-      When:
-    </h2>
-    <%= render :partial => 'settings/fields/actions', :locals => {:f => f, :disabled => true} %>
-    <%= render :partial => 'layouts/sep' %>
-
-    <%# render :partial => 'settings/fields/xattrs', :locals => {:f => f, :disabled => true} %>
-    <%# render :partial => 'layouts/sep' %>
-
-    <%# render :partial => 'settings/fields/enable_xattrs', :locals => {:f => f, :disabled => true} %>
-    <%# render :partial => 'layouts/sep' %>
-
-    <%# render :partial => 'settings/fields/show_xattrs', :locals => {:f => f, :disabled => true} %>
-    <%# render :partial => 'layouts/sep' %>
 <% end %>
 
 <% if can_manage? %>

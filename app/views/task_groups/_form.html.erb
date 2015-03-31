@@ -6,7 +6,12 @@
 <p>
   Included Tasks:
 </p>
-<% Task.all(:order => :name).each do |task| %>
+<% if Rails::VERSION::STRING < "4" %>
+    <% all_tasks = Task.all(:order => :name) %>
+<% else %>
+    <% all_tasks = Task.all.order(:name) %>
+<% end %>
+<% all_tasks.each do |task| %>
     <table>
       <tr>
         <td style="text-align: right;">

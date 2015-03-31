@@ -231,7 +231,11 @@ class ToolboxController < ApplicationController
       return
     end
 
-    active_tasks = Task.all(:conditions => ['active = ?', '1'])
+    if Rails::VERSION::STRING < "4"
+      active_tasks = Task.all(:conditions => ['active = ?', '1'])
+    else
+      active_tasks = Task.where('active = ?', '1')
+    end
     active_tasks.each do |task|
       task.unclosed_pr_pkgs.each { |pkg| pkg.close_github_pr_closed(client) }
     end
@@ -239,7 +243,11 @@ class ToolboxController < ApplicationController
   end
 
   def update_previous_version
-    active_tasks = Task.all(:conditions => ["active = ? and previous_version_tag > ''", '1'])
+    if Rails::VERSION::STRING < "4"
+      active_tasks = Task.all(:conditions => ["active = ? and previous_version_tag > ''", '1'])
+    else
+      active_tasks = Task.where("active = ? and previous_version_tag > ''", '1')
+    end
 
     active_tasks.each do |task|
       update_previous_version_of_packages(task)

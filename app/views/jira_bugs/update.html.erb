@@ -1,8 +1,19 @@
+<% if Rails::VERSION::STRING < "4" %>
   <% form_for :jira_bug, @jira_bug, :url => { :action => "create" } do |f| %>
-  <table>
-  <tr><td>Summary:</td>
-  <td><%= f.text_field :summary %></td></tr>
-  <tr><td>Priority:</td>
-  <td><%= f.text_field :priority%></td></tr>
-  </table>
+	  <table>
+		  <tr><td>Summary:</td>
+		  <td><%= f.text_field :summary %></td></tr>
+		  <tr><td>Priority:</td>
+		  <td><%= f.text_field :priority%></td></tr>
+	  </table>
   <% end %>
+<% else %>
+  <%= form_for :jira_bug, @jira_bug, :url => { :action => "create" } do |f| %>
+	  <table>
+		  <tr><td>Summary:</td>
+		  <td><%= f.text_field :summary %></td></tr>
+		  <tr><td>Priority:</td>
+		  <td><%= f.text_field :priority%></td></tr>
+	  </table>
+  <% end %>
+<% end %>

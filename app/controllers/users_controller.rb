@@ -3,12 +3,22 @@ class UsersController < ApplicationController
   # GET /users.xml
   def index
     if params[:search].blank?
-      @users = User.all(:order => :name)
+      if Rails::VERSION::STRING < "4"
+        @users = User.all(:order => :name)
+      else
+        @users = User.all.order(:name)
+      end
     else
-      @users = User.find(:all,
-                         :conditions => ['name ILIKE ? OR email ILIKE ?',
-                                         "%#{params[:search]}%",
-                                         "%#{params[:search]}%"])
+      if Rails::VERSION::STRING < "4"
+        @users = User.find(:all,
+                           :conditions => ['name ILIKE ? OR email ILIKE ?',
+                                           "%#{params[:search]}%",
+                                           "%#{params[:search]}%"])
+      else
+        @users = User.where('name ILIKE ? OR email ILIKE ?',
+                            "%#{params[:search]}%",
+                            "%#{params[:search]}%")
+      end
     end
 
     respond_to do |format|

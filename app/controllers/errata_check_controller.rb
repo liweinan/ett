@@ -4,8 +4,13 @@ class ErrataCheckController < ApplicationController
   def sync
     nvrs = JSON.parse(params['nvrs'])
 
-    os_adv_tag = OsAdvisoryTag.first(:conditions => ['advisory = ?',
-                                                     params[:advisory]])
+    if Rails::VERSION::STRING < "4"
+      os_adv_tag = OsAdvisoryTag.first(:conditions => ['advisory = ?',
+                                                       params[:advisory]])
+    else
+      os_adv_tag = OsAdvisoryTag.where('advisory = ?',
+                                       params[:advisory]).first
+    end
 
     if os_adv_tag.nil?
       render(:text => 'No tag', :status => 200) and return
@@ -16,8 +21,12 @@ class ErrataCheckController < ApplicationController
     task = os_adv_tag.task
     distro = os_adv_tag.os_arch
 
-    all_packages = Package.all(:include => :rpm_diffs,
-                               :conditions => ["task_id = ?", task.id])
+    if Rails::VERSION::STRING < "4"
+      all_packages = Package.all(:include => :rpm_diffs,
+                                 :conditions => ["task_id = ?", task.id])
+    else
+      all_packages = Package.where("task_id = ?", task.id).includes(:rpm_diffs)
+    end
 
     RpmDiff.transaction do
       nvrs.each do |nvr|
@@ -53,8 +62,12 @@ class ErrataCheckController < ApplicationController
 
   def sync_bz
     bz_bugs = JSON.parse(params['bz_bugs'])
-    os_adv_tag = OsAdvisoryTag.find(:first,
-                                    :conditions => ['advisory = ?', params['advisory']])
+    if Rails::VERSION::STRING < "4"
+      os_adv_tag = OsAdvisoryTag.find(:first,
+                                      :conditions => ['advisory = ?', params['advisory']])
+    else
+      os_adv_tag = OsAdvisoryTag.where('advisory = ?', params['advisory']).first
+    end
 
     if os_adv_tag.nil?
       render(:text => 'OK', :status => 202) and return
@@ -65,7 +78,11 @@ class ErrataCheckController < ApplicationController
     render :text => 'OK', :status => 202
     BzBug.transaction do
       bz_bugs.each do |bug|
-        bz_bug = BzBug.first(:conditions => ['bz_id = ?', bug.to_s])
+        if Rails::VERSION::STRING < "4"
+          bz_bug = BzBug.first(:conditions => ['bz_id = ?', bug.to_s])
+        else
+          bz_bug = BzBug.where('bz_id = ?', bug.to_s).first
+        end
 
         # find out if bz_bug in our database
         bz_bug_in_errata = bzs.delete(bz_bug)
@@ -87,8 +104,13 @@ class ErrataCheckController < ApplicationController
   def sync_rpmdiffs
     rpmdiffs = JSON.parse(params['rpmdiffs'])
 
-    os_adv_tag = OsAdvisoryTag.first(:conditions => ['advisory = ?',
-                                                     params[:advisory]])
+    if Rails::VERSION::STRING < "4"
+      os_adv_tag = OsAdvisoryTag.first(:conditions => ['advisory = ?',
+                                                       params[:advisory]])
+    else
+      os_adv_tag = OsAdvisoryTag.where('advisory = ?',
+                                       params[:advisory]).first
+    end
 
     if os_adv_tag.nil?
       render(:text => 'OK', :status => 202) and return
@@ -97,8 +119,12 @@ class ErrataCheckController < ApplicationController
     task = os_adv_tag.task
     distro = os_adv_tag.os_arch
 
-    all_packages = Package.all(:include => [:rpm_diffs, :brew_nvrs],
-                               :conditions => ["task_id = ?", task.id])
+    if Rails::VERSION::STRING < "4"
+      all_packages = Package.all(:include => [:rpm_diffs, :brew_nvrs],
+                                 :conditions => ["task_id = ?", task.id])
+    else
+      all_packages = Package.where("task_id = ?", task.id).includes([:rpm_diffs, :brew_nvrs])
+    end
 
     RpmDiff.transaction do
       rpmdiffs.each do |rpmdiff|

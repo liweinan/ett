@@ -8,7 +8,11 @@
 
    users = []
    users << blank_user
-   users << User.find(:all, :order => 'name')
+   if Rails::VERSION::STRING < "4"
+    users << User.find(:all, :order => 'name')
+   else
+    users << User.all.order('name')
+   end
    users = users.flatten
 
 %>

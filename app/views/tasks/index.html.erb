@@ -10,8 +10,8 @@
       <th>Milestone</th>
       <th>Version</th>
       <th>Previous Version Tag</th>
-      <th>Frozen State?</th>
       <th>Cronjob activated?</th>
+      <th>Readonly?</th>
       <% if can_manage? %>
           <th>Operation</th>
       <% end %>
@@ -57,8 +57,8 @@
             <% end %>
           </td>
 
-          <td><%= task.frozen_state? ? "✓": "No" %></td>
           <td><%= task.active? ? "✓": "No" %></td>
+          <td><%= task.read_only_task? ? "✓": "No" %></td>
           <% if can_manage? %>
               <td><%= link_to 'Edit', :controller => :tasks, :action => :edit, :id => escape_url(task.name) %></td>
           <% end %>

@@ -35,9 +35,14 @@ class PackagesController < ApplicationController
   def show
     respond_to do |format|
       format.html {
-        @package = Package.find_by_name_and_task_id(unescape_url(params[:id]),
-                                                    find_task(params[:task_id]).id,
-                                                    :include => :p_attachments)
+        if Rails::VERSION::STRING < "4"
+          @package = Package.find_by_name_and_task_id(unescape_url(params[:id]),
+                                                      find_task(params[:task_id]).id,
+                                                      :include => :p_attachments)
+        else
+          @package = Package.includes(:p_attachments).find_by_name_and_task_id(unescape_url(params[:id]),
+                                                      find_task(params[:task_id]).id)
+        end
         if @package.blank?
           flash[:notice] = 'Package not found.'
           redirect_to("/tasks/#{escape_url(params[:task_id])}/packages")
@@ -539,7 +544,11 @@ class PackagesController < ApplicationController
   end
 
   def update_package_brew_nvr
-    active_tasks = Task.all(:conditions => ['active = ?', '1'])
+    if Rails::VERSION::STRING < "4"
+      active_tasks = Task.all(:conditions => ['active = ?', '1'])
+    else
+      active_tasks = Task.where('active = ?', '1')
+    end
     active_tasks.each do |task|
       task.packages.each do |package|
         brew_nvr = package.brew
@@ -730,28 +739,44 @@ class PackagesController < ApplicationController
                     'packages.status_id' => status.id,
                     'packages.task_id' => task.id}.merge(opts)
 
-      packages = Package.find(:all, :joins => [:assignments],
-                              :conditions => conditions,
-                              :order => order,
-                              :include => includes)
+      if Rails::VERSION::STRING < "4"
+        packages = Package.find(:all, :joins => [:assignments],
+                                :conditions => conditions,
+                                :order => order,
+                                :include => includes)
+      else
+        packages = Package.where(conditions).order(order).includes(includes).joins(:assignments)
+      end
     elsif !status_name.blank?
 
       status = Status.find_in_global_scope(status_name, task_name)
       conditions = {'packages.status_id' => status.id,
                     'packages.task_id' => task.id}.merge(opts)
-      packages = Package.find(:all, :conditions => conditions,
-                              :order => order, :include => includes)
+      if Rails::VERSION::STRING < "4"
+        packages = Package.find(:all, :conditions => conditions,
+                                :order => order, :include => includes)
+      else
+        packages = Package.where(conditions).order(order).includes(includes)
+      end
     elsif !tag_key.blank?
       tag = Tag.find_by_key_and_task_id(tag_key, task.id)
       conditions = {'assignments.tag_id' => tag.id,
                     'packages.task_id' => task.id}.merge(opts)
-      packages = Package.find(:all, :joins => [:assignments],
-                              :conditions => conditions,
-                              :order => order, :include => includes)
+      if Rails::VERSION::STRING < "4"
+        packages = Package.find(:all, :joins => [:assignments],
+                                :conditions => conditions,
+                                :order => order, :include => includes)
+      else
+        packages = Package.where(conditions).order(order).includes(includes).joins(:assignments)
+      end
     else
       conditions = {'packages.task_id' => task.id}.merge(opts)
-      packages = Package.find(:all, :conditions => conditions, :order => order,
-                              :include => includes)
+      if Rails::VERSION::STRING < "4"
+        packages = Package.find(:all, :conditions => conditions, :order => order,
+                                :include => includes)
+      else
+        packages = Package.where(conditions).order(order).includes(includes)
+      end
     end
     packages
   end

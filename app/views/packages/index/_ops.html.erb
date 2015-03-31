@@ -15,7 +15,7 @@
       <% end %>
   <% end %>
 
-  <% if !Task.readonly?(package.task) %>
+  <% if !package.task.read_only_task? %>
       <% unless package.blank? %>
           <% if logged_in? %>
               <% unless package.deleted? %>

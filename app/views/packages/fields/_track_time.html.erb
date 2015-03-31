@@ -13,25 +13,44 @@
     </td>
 </tr>
 <span id="manual_time_track_component">&nbsp;</span> <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'manual_time_track_component_indicator'} %>
-<% if logged_in? && !@package.task.readonly? %>
+<% if logged_in? && !@package.task.read_only_task? %>
     <tr>
         <td>Log work time</td>
     <%= render :partial => 'layouts/sep_tiny' %>
     <td>
-    <% form_remote_tag(
-               :url => {:controller => 'toolbox', :action => 'log_work_done'},
-               :loading => "Element.show('spinner_log_#{@package.id}');",
-               :success => "Element.hide('spinner_log_#{@package.id}');
-           document.getElementById('work_time_col').value='';
-           ") do %>
-        <div style="text-align: left;">
-            <%= hidden_field_tag :package_id, @package.id %>
-            <%= hidden_field_tag :refresh_page, 'manual_tracked_time' %>
-            <input id="work_time_col" name="work_time">
-          (Example: 1w,2d,3h,4m)
-          <%= submit_tag 'Log' %>
-          <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "spinner_log_#{@package.id}"} %>
-        </div>
+    <% if Rails::VERSION::STRING < "4" %>
+      <% form_remote_tag(
+                 :url => {:controller => 'toolbox', :action => 'log_work_done'},
+                 :loading => "Element.show('spinner_log_#{@package.id}');",
+                 :success => "Element.hide('spinner_log_#{@package.id}');
+             document.getElementById('work_time_col').value='';
+             ") do %>
+          <div style="text-align: left;">
+              <%= hidden_field_tag :package_id, @package.id %>
+              <%= hidden_field_tag :refresh_page, 'manual_tracked_time' %>
+              <input id="work_time_col" name="work_time">
+            (Example: 1w,2d,3h,4m)
+            <%= submit_tag 'Log' %>
+            <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "spinner_log_#{@package.id}"} %>
+          </div>
+      <% end %>
+    <% else %>
+      <%= form_tag(
+                 {:controller => 'toolbox', :action => 'log_work_done'},
+                 :remote => true,
+                 :loading => "Element.show('spinner_log_#{@package.id}');",
+                 :success => "Element.hide('spinner_log_#{@package.id}');
+             document.getElementById('work_time_col').value='';
+             ") do %>
+          <div style="text-align: left;">
+              <%= hidden_field_tag :package_id, @package.id %>
+              <%= hidden_field_tag :refresh_page, 'manual_tracked_time' %>
+              <input id="work_time_col" name="work_time">
+            (Example: 1w,2d,3h,4m)
+            <%= submit_tag 'Log' %>
+            <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => "spinner_log_#{@package.id}"} %>
+          </div>
+      <% end %>
     <% end %>
 </td>
 <% end %>

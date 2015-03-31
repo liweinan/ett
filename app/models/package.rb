@@ -1,3 +1,7 @@
+# ==============================================================================
+# Seems to be good for Rails4!
+# Just need to find an alternative to act_as_textiled
+# ==============================================================================
 require 'net/http'
 
 class Package < ActiveRecord::Base
@@ -19,7 +23,10 @@ class Package < ActiveRecord::Base
       500 => {:status => 'QUEUED FOR TEST', :style => 'background-color: #b2f4ff;'},
       -1 => {:status => 'DUPLICATE', :style => 'background-color: #b2ffa1;'}
   }
-  acts_as_textiled :notes
+  if Rails::VERSION::STRING < "4"
+    # TODO: fix me in Rails4
+    acts_as_textiled :notes
+  end
   acts_as_commentable
 
   belongs_to :user #assignee
@@ -31,12 +38,8 @@ class Package < ActiveRecord::Base
   has_many :rpm_diffs, :dependent => :destroy
   has_many :assignments, :dependent => :destroy
   has_many :tags, :through => :assignments
-  has_many :bz_bugs, :class_name => 'BzBug',
-           :foreign_key => 'package_id', :order => 'created_at'
-
+  has_many :bz_bugs, :dependent => :destroy
   has_many :brew_nvrs, :dependent => :destroy
-
-  #has_and_belongs_to_many :components
 
   has_many :to_relationships, :class_name => 'PackageRelationship',
            :foreign_key => 'from_package_id', :dependent => :destroy
@@ -54,6 +57,7 @@ class Package < ActiveRecord::Base
   validates_presence_of :created_by
   validates_presence_of :updated_by
 
+  # provided by default_value_for gem
   default_value_for :time_consumed, 0
   default_value_for :time_point, 0
   default_value_for :status_changed_at, Time.now
@@ -196,8 +200,14 @@ class Package < ActiveRecord::Base
     else
       relationship = Relationship.find_by_name(relationship_name)
       unless relationship.blank?
-        unless PackageRelationship.all(:conditions =>  ['(from_package_id = ? or to_package_id = ?) and relationship_id = ?', self.id, self.id, relationship.id]).blank?
-          return true
+        if Rails::VERSION::STRING < "4"
+          unless PackageRelationship.all(:conditions =>  ['(from_package_id = ? or to_package_id = ?) and relationship_id = ?', self.id, self.id, relationship.id]).blank?
+            return true
+          end
+        else
+          unless PackageRelationship.where('(from_package_id = ? or to_package_id = ?) and relationship_id = ?', self.id, self.id, relationship.id).blank?
+            return true
+          end
         end
       end
       false
@@ -253,7 +263,7 @@ class Package < ActiveRecord::Base
   def to_s
     str = "Name: #{name}\n" \
           "Created By: #{creator.name}(#{creator.email})\n" \
-          "Created At: #{created_at.to_s}\n" \
+          "Created At: #{created_at}\n" \
           "Belongs To: #{task.name}\n"
     unless assignee.blank?
       str += "Assignee: #{assignee.name}(#{assignee.email})\n"
@@ -263,7 +273,11 @@ class Package < ActiveRecord::Base
 
   # FIXME: not used anywhere, candidate for removal
   def pending_bz_bugs
-    BzBug.all(:conditions => ['package_id = ? and bz_action is not null', self.id])
+    if Rails::VERSION::STRING < "4"
+      BzBug.all(:conditions => ['package_id = ? and bz_action is not null', self.id])
+    else
+      BzBug.where('package_id = ? and bz_action is not null', self.id)
+    end
   end
 
   # FIXME: not used anywhere, candidate for removal
@@ -328,9 +342,14 @@ class Package < ActiveRecord::Base
   end
 
   def update_tag_if_not_shipped
-    not_shipped_tag = Tag.find(:first,
-                               :conditions => ['key = ? and task_id = ?',
-                                               'Not Shipped', self.task_id])
+    if Rails::VERSION::STRING < "4"
+      not_shipped_tag = Tag.find(:first,
+                                 :conditions => ['key = ? and task_id = ?',
+                                                 'Not Shipped', self.task_id])
+    else
+      not_shipped_tag = Tag.where('key = ? and task_id = ?',
+                                  'Not Shipped', self.task_id).first
+    end
 
     if !in_shipped_list? && !not_shipped_tag.nil? && !self.tags.include?(not_shipped_tag)
       if in_shipped_database?
@@ -341,9 +360,14 @@ class Package < ActiveRecord::Base
   end
 
   def update_tag_if_native
-    native_tag = Tag.find(:first,
-                          :conditions => ['key = ? and task_id = ?',
-                          'Native', self.task_id])
+    if Rails::VERSION::STRING < "4"
+      native_tag = Tag.find(:first,
+                            :conditions => ['key = ? and task_id = ?',
+                            'Native', self.task_id])
+    else
+      native_tag = Tag.where('key = ? and task_id = ?',
+                            'Native', self.task_id).first
+    end
 
     if !native_tag.nil? && !self.tags.include?(native_tag) && self.name.include?('native')
       self.tags << native_tag
@@ -693,9 +717,15 @@ class Package < ActiveRecord::Base
     self.status_changed_at = Time.now
 
     if !last_status.blank? && last_status.is_time_tracked?
-      time_track = TrackTime.all(:conditions => ['package_id=? and status_id=?',
-                                                 self.id,
-                                                 last_status.id])[0]
+      if Rails::VERSION::STRING < "4"
+        time_track = TrackTime.all(:conditions => ['package_id=? and status_id=?',
+                                                   self.id,
+                                                   last_status.id])[0]
+      else
+        time_track = TrackTime.where('package_id=? and status_id=?',
+                                     self.id,
+                                     last_status.id).take
+      end
       time_track = TrackTime.new if time_track.blank?
 
       time_track.package_id = self.id
@@ -975,10 +1005,8 @@ class Package < ActiveRecord::Base
       bz_struct[bz.os_arch] = bz.bz_id
     end
 
-    uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
     # the errata request is sent to mead-scheduler's rest api:
 
-    res = nil
     links = []
     # TODO: remove those copy-pasted code!
     self.task.os_advisory_tags.each do |os_tag|
@@ -1002,8 +1030,13 @@ class Package < ActiveRecord::Base
     links
   end
 
+  # TODO: candidate for removal, no one uses it
   def self.package_unique?(package)
-    @package_sets ||= Set.new(Package.all(:select => "name").map {|pkg| pkg.name})
+    if Rails::VERSION::STRING < "4"
+      @package_sets ||= Set.new(Package.all(:select => "name").map {|pkg| pkg.name})
+    else
+      @package_sets ||= Set.new(Package.select("name").distinct.map {|pkg| pkg.name})
+    end
     !@package_sets.include?(package)
   end
 
@@ -1039,10 +1072,15 @@ class Package < ActiveRecord::Base
     packages.flatten.uniq
   end
 
+  # TODO: candidate for removal
   def self.distinct_in_tasks(tasks)
-    Package.all(:select => 'distinct name',
-                :conditions => ['task_id in (?)', Task.tasks_to_ids(tasks)],
-                :order => 'name')
+    if Rails::VERSION::STRING < "4"
+      Package.all(:select => 'distinct name',
+                  :conditions => ['task_id in (?)', Task.tasks_to_ids(tasks)],
+                  :order => 'name')
+    else
+      Package.where("task_id in (?)", Task.tasks_to_ids(tasks)).select('name').distinct.order('name')
+    end
   end
 
   def self.distinct_in_tasks_can_show(tasks)
@@ -1053,10 +1091,13 @@ class Package < ActiveRecord::Base
         can_show_status_ids << status.id
       end
     end
-
-    Package.all(:select => 'distinct name',
-                :conditions => ['task_id in (?) and (status_id in (?) or status_id is NULL)', task_ids, can_show_status_ids.uniq],
-                :order => 'name')
+    if Rails::VERSION::STRING < "4"
+      Package.all(:select => 'distinct name',
+                  :conditions => ['task_id in (?) and (status_id in (?) or status_id is NULL)', task_ids, can_show_status_ids.uniq],
+                  :order => 'name')
+    else
+      Package.where('task_id in (?) and (status_id in (?) or status_id is NULL)', task_ids, can_show_status_ids.uniq).select('name').distinct.order('name')
+    end
   end
 
   def validate

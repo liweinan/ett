@@ -1,4 +1,4 @@
-<% if @package.status && @package.status.code == 'inprogress' && !@package.task.readonly? %>
+<% if @package.status && @package.status.code == 'inprogress' && !@package.task.read_only_task? %>
     <tr>
         <td>Submit builds to Mead-Scheduler</td>
         <td><%= render :partial => 'packages/fields/build' %></td>
