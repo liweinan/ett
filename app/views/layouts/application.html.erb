@@ -19,7 +19,9 @@
   <%= javascript_include_tag 'jquery/dist/jquery.js' %>
   <%= javascript_include_tag 'filament-dialog/dialog.js' %>
   <%= javascript_include_tag 'tablesaw.js' %>
-  <%= csrf_meta_tag %>
+  <% if Rails::VERSION::STRING > "2" %>
+    <%= csrf_meta_tag %>
+  <% end %>
 </head>
 <body>
 <%# image_tag 'confidential.jpg' %>
