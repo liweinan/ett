@@ -314,14 +314,29 @@ class Package < ActiveRecord::Base
     end
   end
 
+  def in_shipped_database?
+    ans = ''
+    begin
+      Net::HTTP.start('mead.usersys.redhat.com') do |http|
+        resp = http.get("/mead-scheduler/rest/package/#{self.task.prod}/#{name}/shipped")
+        ans = resp.body
+      end
+      !ans.include?("NO Package")
+    rescue
+      false
+    end
+  end
+
   def update_tag_if_not_shipped
     not_shipped_tag = Tag.find(:first,
                                :conditions => ['key = ? and task_id = ?',
                                                'Not Shipped', self.task_id])
 
     if !in_shipped_list? && !not_shipped_tag.nil? && !self.tags.include?(not_shipped_tag)
-      self.tags << not_shipped_tag
-      self.save
+      if in_shipped_database?
+        self.tags << not_shipped_tag
+        self.save
+      end
     end
   end
 
@@ -1060,5 +1075,4 @@ class Package < ActiveRecord::Base
       Changelog.package_deleted(self)
     end
   end
-
 end
