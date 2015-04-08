@@ -95,15 +95,15 @@ Statuses:
 <p> ✔ : nvr added to errata. ✘ : nvr not in shipped-list </p>
 <form name="distroselect">
     Choose the brew distro to show:
-        <% el6select = !params.include?(:brew) %>
-        <% if el6select %>
-            <% distro_selected = 'el6' %>
+        <% distro_specified = params.include?(:brew) %>
+        <% if !distro_specified %>
+            <% @distro_selected = @task.distros[0] %>
         <% else %>
-            <% distro_selected = params[:brew] %>
+            <% @distro_selected = params[:brew] %>
         <% end %>
         <select name="menu" onChange="window.document.location.href=this.options[this.selectedIndex].value;" value="GO">
         <% task_erb.os_advisory_tags.each do |tag| %>
-            <option value="<%= request.url.gsub(/\?.*/, '') + "?brew=#{tag.os_arch}" %>" <%= distro_selected == tag.os_arch ? 'selected="selected"' : '' %>><%= tag.os_arch %></option>
+            <option value="<%= request.url.gsub(/\?.*/, '') + "?brew=#{tag.os_arch}" %>" <%= @distro_selected == tag.os_arch ? 'selected="selected"' : '' %>><%= tag.os_arch %></option>
         <% end %>
     </select>
 </form>
