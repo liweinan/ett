@@ -411,7 +411,7 @@ class Package < ActiveRecord::Base
   #
   # Returns: string
   def brew_style
-    brew_nvr = self.nvr_in_brew('el6')
+    brew_nvr = self.nvr_in_brew(self.task.distros[0])
 
     if brew_nvr.nil? || brew_nvr.empty? || latest_brew_nvr.nil? || latest_brew_nvr.empty?
       ''
@@ -470,7 +470,7 @@ class Package < ActiveRecord::Base
     # Use alt part only if ver does not contain any dots
     alt_first_part_ver = ver.gsub(/(.)redhat.*/, '').gsub('-', '_')
     alt_second_part_ver = ver.gsub(/#{alt_first_part_ver}(.)/, '').gsub('-', '_')
-    [mead, nvr_in_brew('el6')].each do |item|
+    [mead, nvr_in_brew(self.task.distros[0])].each do |item|
       if !item.nil? && !item.empty?
         if ver.include?('.')
           unless item.include?(first_part_ver) && item.include?(second_part_ver)
@@ -503,7 +503,7 @@ class Package < ActiveRecord::Base
   def generate_bz_comment
     "Source URL: #{git_url}\n" +
     "Mead-Build: #{mead}\n" +
-    "Brew-Build: #{self.nvr_in_brew('el6')}\n"
+    "Brew-Build: #{self.nvr_in_brew(self.task.distros[0])}\n"
   end
 
   def select_rpmdiff(distro)
