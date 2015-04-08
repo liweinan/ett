@@ -790,11 +790,12 @@ class Package < ActiveRecord::Base
   def get_brew_name(candidate_tag=nil, distro=nil)
     # TODO: make the tag more robust
     tag = candidate_tag.nil? ? "#{task.primary_os_advisory_tag.candidate_tag}-build" : candidate_tag
+    prod_name = self.task.prod
 
     # FIXME: stop that hardcoding... one day!
     pkg_name = self.name
     if distro == 'el7' && self.is_scl_package?
-      pkg_name = 'eap6-' + pkg_name.sub(/-eap6$/, '')
+      pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
     end
     uri = URI.parse(URI.encode("#{APP_CONFIG['mead_scheduler']}/mead-brewbridge/pkg/latest/#{tag}/#{pkg_name}"))
 

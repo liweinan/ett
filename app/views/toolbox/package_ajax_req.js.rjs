@@ -29,10 +29,10 @@ git_url_not_provided = "You do not have the source-url specified in ETT. You nee
 begin
   type_build = 'chain'
   type_build = 'wrapper' if params.include?(:wrapper_build)
-  is_eap6_pac = pac.name.end_with?('-eap6')
+  is_wrapper_wrapper_pac = pac.name.end_with?("-#{pac.task.prod}")
   page << "var submit = true;"
   page << "var x = '#{type_build}';"
-  page << "var is_eap6_pac = #{is_eap6_pac};"
+  page << "var is_wrapper_wrapper_pac = #{is_wrapper_wrapper_pac};"
   page << "var clentry = '#{params['clentry']['text'].inspect[1..-2].gsub(/'/, "\\\\'")}';"
   page << "var move_fwd = true;"
   page << "if (move_fwd && \"#{git_url_check.to_s}\" == \"false\") {"
@@ -40,7 +40,7 @@ begin
   page << "     move_fwd = false;"
   page << "     TINY.box.hide()"
   page << "}"
-  page << "if ( move_fwd && x == 'chain' && is_eap6_pac) {"
+  page << "if ( move_fwd && x == 'chain' && is_wrapper_wrapper_pac) {"
   page << "  move_fwd = confirm(\"#{warning_string}\");"
   page << "} else if (move_fwd && x == 'chain') {"
   page << "  move_fwd = confirm(\"#{warning_chain}\");"
