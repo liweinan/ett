@@ -180,7 +180,7 @@ class Package < ActiveRecord::Base
       repo_link = url_link.split("#")[0]
       commit_id = url_link.split("#")[1]
       repo_name = repo_link.gsub("git://git.app.eng.bos.redhat.com/", '')
-      "http://git.app.eng.bos.redhat.com/git/#{repo_name}/commit?id=#{commit_id}"
+      "http://git.app.eng.bos.redhat.com/git/#{repo_name}.git/commit?id=#{commit_id}"
     end
   end
 
@@ -794,6 +794,9 @@ class Package < ActiveRecord::Base
 
     # FIXME: stop that hardcoding... one day!
     pkg_name = self.name
+
+    distro = self.task.distros[0] if distro.nil?
+
     if distro == 'el7' && self.is_scl_package?
       pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
     end
@@ -820,9 +823,15 @@ class Package < ActiveRecord::Base
   end
 
   def update_source_url_info
-    self.brew_scm_url = get_scm_url_brew
-    self.git_url = self.brew_scm_url
-    save
+    # update only when necessary
+    if self.git_url.blank?
+      scm_url_to_update = get_scm_url_brew
+      unless scm_url_to_update.nil?
+        self.brew_scm_url = get_scm_url_brew
+        self.git_url = self.brew_scm_url
+        save
+      end
+    end
   end
 
   def duplicate_package_msg
