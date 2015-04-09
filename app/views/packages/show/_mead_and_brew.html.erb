@@ -1,13 +1,14 @@
 <% if @package.task.use_mead_integration? && !@package.task.readonly? %>
-    <% if @package.pkg_brew_rpm_link('el6') %>
+    <% main_distro = @package.task.distros[0] %>
+    <% if @package.pkg_brew_rpm_link(main_distro) %>
         <tr>
             <td>Brew</td>
-            <td><%= link_to @package.brew_in_errata('el6'), @package.pkg_brew_rpm_link('el6') %></td>
+            <td><%= link_to @package.brew_in_errata(main_distro), @package.pkg_brew_rpm_link(main_distro) %></td>
         </tr>
     <% else %>
         <tr>
             <td>Brew</td>
-            <td><%= h @package.brew_in_errata('el6') %></td>
+            <td><%= h @package.brew_in_errata(main_distro) %></td>
         </tr>
     <% end %>
 
