@@ -553,15 +553,17 @@ class Package < ActiveRecord::Base
       update_mead_brew_info
       update_source_url_info unless self.mead.nil?
 
-      self.task.os_advisory_tags.each do |tag|
-        brew_nvr =  self.brew_nvrs.select { |obj| obj.distro == tag.os_arch }
-        if brew_nvr.blank?
-          create_brew_nvr(tag.os_arch)
-        else
-          brew_nvr = brew_nvr[0]
-          brew_nvr.nvr = self.get_brew_name(tag.candidate_tag + '-build', tag.os_arch)
-          brew_nvr.link = self.get_brew_rpm_link(brew_nvr.nvr)
-          brew_nvr.save
+      if self.build_type != "MEAD_ONLY"
+        self.task.os_advisory_tags.each do |tag|
+          brew_nvr =  self.brew_nvrs.select { |obj| obj.distro == tag.os_arch }
+          if brew_nvr.blank?
+            create_brew_nvr(tag.os_arch)
+          else
+            brew_nvr = brew_nvr[0]
+            brew_nvr.nvr = self.get_brew_name(tag.candidate_tag + '-build', tag.os_arch)
+            brew_nvr.link = self.get_brew_rpm_link(brew_nvr.nvr)
+            brew_nvr.save
+          end
         end
       end
     end
