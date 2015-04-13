@@ -551,7 +551,7 @@ class Package < ActiveRecord::Base
   def update_mead_information
     if task.use_mead_integration?
       update_mead_brew_info
-      update_source_url_info
+      update_source_url_info unless self.mead.nil?
 
       self.task.os_advisory_tags.each do |tag|
         brew_nvr =  self.brew_nvrs.select { |obj| obj.distro == tag.os_arch }
@@ -732,12 +732,29 @@ class Package < ActiveRecord::Base
   # get_mead_info will go get the mead nvr from the rpm repo directly if it
   # cannot find it via the mead scheduler
   def update_mead_brew_info
+
+    get_mead_nvr
+    self.mead_link = self.get_brew_maven_link(self.mead) if self.mead
+
+    self.mead_action = Package::MEAD_ACTIONS[:done]
+    self.save
+  end
+
+  def get_mead_nvr(retries=3)
+
+    if retries.zero?
+      return nil
+    end
     brew_pkg = self.get_brew_name
     if brew_pkg.blank?
       uri = URI.parse("http://pkgs.devel.redhat.com/cgit/rpms/#{self.name}/plain/last-mead-build?h=#{self.task.primary_os_advisory_tag.candidate_tag}")
       res = Net::HTTP.get_response(uri)
       # TODO: error handling
       package_old_mead = res.body if res.code == '200'
+
+      # retry if we get nil
+      return get_mead_nvr(retries-1) if package_old_mead.nil?
+
       package_name = self.parse_nvr(package_old_mead)[:name]
 
       uri = URI.parse("http://mead.usersys.redhat.com/mead-brewbridge/pkg/latest/#{self.task.primary_os_advisory_tag.candidate_tag}-build/#{package_name}")
@@ -746,11 +763,6 @@ class Package < ActiveRecord::Base
     else
       self.mead = get_mead_name(brew_pkg) unless brew_pkg.blank?
     end
-
-    self.mead_link = self.get_brew_maven_link(self.mead) if self.mead
-
-    self.mead_action = Package::MEAD_ACTIONS[:done]
-    self.save
   end
 
   def deleted_style
