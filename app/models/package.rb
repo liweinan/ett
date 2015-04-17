@@ -837,11 +837,13 @@ class Package < ActiveRecord::Base
   end
 
   def update_source_url_info
+    #TODO: at some point, fix this logic
+    self.brew_scm_url = get_scm_url_brew
+    save
     # update only when necessary
     if self.git_url.blank?
       scm_url_to_update = get_scm_url_brew
       unless scm_url_to_update.nil?
-        self.brew_scm_url = get_scm_url_brew
         self.git_url = self.brew_scm_url
         save
       end
