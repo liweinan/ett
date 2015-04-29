@@ -814,10 +814,24 @@ class Package < ActiveRecord::Base
     if distro == 'el7' && self.is_scl_package?
       pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
     end
+
+    nvr = get_nvr_from_bridge(tag, pkg_name)
+    if nvr =~  /\.ep[0-9]+\.el[0-9]+/
+      return nvr
+    else
+      # TODO: clean this up one day Dustin?
+      # did this because in eap7, almost all packages are scl
+      # but somehow the metadata still says it's not scl
+      # so workaround is, if the nvr only contains el7, it's most certainly wrong
+      # and we'll consider it as an scl package instead
+      new_pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
+      return get_nvr_from_bridge(tag, new_pkg_name)
+    end
+  end
+
+  def get_nvr_from_bridge(tag, pkg_name)
     uri = URI.parse(URI.encode("#{APP_CONFIG['mead_scheduler']}/mead-brewbridge/pkg/latest/#{tag}/#{pkg_name}"))
-
     res = Net::HTTP.get_response(uri)
-
     (res.code == '200' && !res.body.include?('ERROR')) ? res.body : nil
   end
 
