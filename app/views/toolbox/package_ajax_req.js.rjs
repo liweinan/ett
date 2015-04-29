@@ -1,15 +1,30 @@
 pac = Package.find(params[:package_id])
 
-git_url_check = true
+type_of_pac = pac.build_type
+
+regular_rpm_type = ["NON_WRAPPER", "REPOLIB_SOURCE", "NATIVE", "JBOSS_AS_WRAPPER", "JBOSSAS_WRAPPER"]
+chain_type = ["WRAPPER", "WRAPPER_SOURCE"]
+repolib_wrapper_type = ["REPOLIB_WRAPPER"]
+mead_only_type = ["MEAD_ONLY"]
+
+# deal with git_url_check ######################################################
+git_url_check = false
+
+if mead_only_type.include?(type_of_pac) || chain_type.include?(type_of_pac)
+  git_url_check = true
+end
 
 if !params.include?(:wrapper_build) && pac.git_url.blank?
-  git_url_check = false unless pac.native?
+  git_url_check = true unless pac.native?
 end
+
+git_url_check = false unless pac.git_url.blank?
+################################################################################
 
 spec_file_included = params.include?(:edit_spec_file) ? 1 : 0
 maven_build_arguments_file_included = params.include?(:edit_maven_build_arguments) ? 1 : 0
 
-source_pkg = pac.name.sub('-eap6', '')
+source_pkg = pac.name.sub(/-eap[0-9]+/, '')
 warning_string = "This will also build the source '#{source_pkg}' package. " \
                  "If you only want to build the '#{pac.name}' wrapper of it " \
                  "please select CANCEL and make sure you check the Wrapper " \
@@ -27,20 +42,29 @@ git_url_not_provided = "You do not have the source-url specified in ETT. You nee
   "to specify it for this type of build."
 
 begin
-  type_build = 'chain'
-  type_build = 'wrapper' if params.include?(:wrapper_build)
-  is_wrapper_wrapper_pac = pac.name.end_with?("-#{pac.task.prod}")
+  if chain_type.include?(type_of_pac)
+    type_build = 'chain'
+    type_build = 'wrapper' if params.include?(:wrapper_build)
+  elsif regular_rpm_type.include?(type_of_pac)
+    type_build = 'wrapper'
+  elsif repolib_wrapper_type.include?(type_of_pac)
+    type_build = 'repolib_wrapper'
+  elsif mead_only_type.include?(type_of_pac)
+    type_build = 'mead-only'
+  else
+    type_build = 'chain'
+  end
+
   page << "var submit = true;"
   page << "var x = '#{type_build}';"
-  page << "var is_wrapper_wrapper_pac = #{is_wrapper_wrapper_pac};"
   page << "var clentry = '#{params['clentry']['text'].inspect[1..-2].gsub(/'/, "\\\\'")}';"
   page << "var move_fwd = true;"
-  page << "if (move_fwd && \"#{git_url_check.to_s}\" == \"false\") {"
+  page << "if (move_fwd && \"#{git_url_check.to_s}\" == \"true\") {"
   page << "    alert(\"#{git_url_not_provided}\");"
   page << "     move_fwd = false;"
   page << "     TINY.box.hide()"
   page << "}"
-  page << "if ( move_fwd && x == 'chain' && is_wrapper_wrapper_pac) {"
+  page << "if ( move_fwd && x == 'repolib_wrapper') {"
   page << "  move_fwd = confirm(\"#{warning_string}\");"
   page << "} else if (move_fwd && x == 'chain') {"
   page << "  move_fwd = confirm(\"#{warning_chain}\");"
