@@ -21,6 +21,10 @@ class ReadonlyTask < ActiveRecord::Base
             if pkg.nvr_in_brew(main_distro) != pkg_to_change.nvr_in_brew(main_distro)
               next
             end
+            # only remove packages from their erratas if they are in the same prod
+            if pkg.task.prod != pkg_to_change.task.prod
+              next
+            end
             pkg_to_change.status_id = status.id
             str += pkg_to_change.remove_nvr_and_bugs_from_errata.to_s
             str += "\n"
