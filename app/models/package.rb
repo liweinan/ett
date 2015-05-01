@@ -782,7 +782,11 @@ class Package < ActiveRecord::Base
 
     begin
       param = server.call('getBuild', mead)
-      param.nil? ? nil : server.call('getTaskRequest', param['task_id'])[0]
+      unless param.nil?
+        param['task_id'].nil? ? nil : server.call('getTaskRequest', param['task_id'])[0]
+      else
+        nil
+      end
     rescue XMLRPC::FaultException
       nil
     end
@@ -811,12 +815,18 @@ class Package < ActiveRecord::Base
 
     distro = self.task.distros[0] if distro.nil?
 
-    if distro == 'el7' && self.is_scl_package?
+    if prod_name == "eap6" && distro == 'el7' && self.is_scl_package?
+      pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
+
+    elsif prod_name == "eap7" && self.is_scl_package?
       pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
     end
 
+    prod_version = prod_name.sub("eap", "")
+
+
     nvr = get_nvr_from_bridge(tag, pkg_name)
-    if nvr =~  /\.ep[0-9]+\.el[0-9]+/
+    if nvr =~  /\.ep#{prod_version}\.el[0-9]+/
       return nvr
     else
       # TODO: clean this up one day Dustin?
