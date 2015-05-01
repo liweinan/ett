@@ -42,21 +42,18 @@ git_url_not_provided = "You do not have the source-url specified in ETT. You nee
   "to specify it for this type of build."
 
 begin
-  if chain_type.include?(type_of_pac)
-    type_build = 'chain'
-    type_build = 'wrapper' if params.include?(:wrapper_build)
-  elsif regular_rpm_type.include?(type_of_pac)
-    type_build = 'wrapper'
-  elsif repolib_wrapper_type.include?(type_of_pac)
-    type_build = 'repolib_wrapper'
-  elsif mead_only_type.include?(type_of_pac)
-    type_build = 'mead-only'
-  else
-    type_build = 'chain'
+  type_build = 'chain'
+  type_build = 'wrapper' if params.include?(:wrapper_build)
+
+  is_wrapper_wrapper_pac = false
+
+  if repolib_wrapper_type.include?(type_of_pac)
+    is_wrapper_wrapper_pac = true
   end
 
   page << "var submit = true;"
   page << "var x = '#{type_build}';"
+  page << "var is_wrapper_wrapper_pac = #{is_wrapper_wrapper_pac};"
   page << "var clentry = '#{params['clentry']['text'].inspect[1..-2].gsub(/'/, "\\\\'")}';"
   page << "var move_fwd = true;"
   page << "if (move_fwd && \"#{git_url_check.to_s}\" == \"true\") {"
@@ -64,7 +61,7 @@ begin
   page << "     move_fwd = false;"
   page << "     TINY.box.hide()"
   page << "}"
-  page << "if ( move_fwd && x == 'repolib_wrapper') {"
+  page << "if ( move_fwd && x == 'chain' && is_wrapper_wrapper_pac) {"
   page << "  move_fwd = confirm(\"#{warning_string}\");"
   page << "} else if (move_fwd && x == 'chain') {"
   page << "  move_fwd = confirm(\"#{warning_chain}\");"
