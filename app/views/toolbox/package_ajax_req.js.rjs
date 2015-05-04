@@ -51,9 +51,12 @@ begin
     is_wrapper_wrapper_pac = true
   end
 
+  is_mead_only_build = mead_only_type.include?(type_of_pac)
+
   page << "var submit = true;"
   page << "var x = '#{type_build}';"
   page << "var is_wrapper_wrapper_pac = #{is_wrapper_wrapper_pac};"
+  page << "var is_mead_only_build = #{is_mead_only_build};"
   page << "var clentry = '#{params['clentry']['text'].inspect[1..-2].gsub(/'/, "\\\\'")}';"
   page << "var move_fwd = true;"
   page << "if (move_fwd && \"#{git_url_check.to_s}\" == \"true\") {"
@@ -63,7 +66,7 @@ begin
   page << "}"
   page << "if ( move_fwd && x == 'chain' && is_wrapper_wrapper_pac) {"
   page << "  move_fwd = confirm(\"#{warning_string}\");"
-  page << "} else if (move_fwd && x == 'chain') {"
+  page << "} else if (move_fwd && x == 'chain' && !is_mead_only_build ) {"
   page << "  move_fwd = confirm(\"#{warning_chain}\");"
   page << "}"
   page << "if (move_fwd && #{current_user != pac.assignee}) {"
