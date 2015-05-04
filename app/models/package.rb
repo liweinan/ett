@@ -538,13 +538,17 @@ class Package < ActiveRecord::Base
     end
   end
 
-  def get_brew_maven_link(nvr)
+  def get_brew_maven_link(nvr, retries=3)
     server = XMLRPC::Client.new("brewhub.devel.redhat.com", "/brewhub", 80)
     begin
       call = server.call("getMavenBuild", nvr)
       'https://brewweb.devel.redhat.com/buildinfo?buildID=' + call['build_id'].to_s
     rescue Exception => e
-      get_brew_rpm_link(nvr)
+      if retries == 0
+        get_brew_rpm_link(nvr)
+      else
+        get_brew_maven_link(nvr, retries - 1)
+      end
     end
   end
 
@@ -756,12 +760,7 @@ class Package < ActiveRecord::Base
 
       # retry if we get nil
       return get_mead_nvr(retries-1) if package_old_mead.nil?
-
-      package_name = self.parse_nvr(package_old_mead)[:name]
-
-      uri = URI.parse("http://mead.usersys.redhat.com/mead-brewbridge/pkg/latest/#{self.task.primary_os_advisory_tag.candidate_tag}-build/#{package_name}")
-      res = Net::HTTP.get_response(uri)
-      self.mead = res.body if res.code == '200'
+      self.mead = package_old_mead.strip # remove trailing newline char
     else
       self.mead = get_mead_name(brew_pkg) unless brew_pkg.blank?
     end
