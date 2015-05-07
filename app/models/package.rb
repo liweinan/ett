@@ -293,9 +293,11 @@ class Package < ActiveRecord::Base
   # Returns: string
   def brew_in_errata(distro)
     brew = self.nvr_in_brew(distro)
-    return '✔  ' + brew if in_errata?(distro)
-    return '✘  ' + brew if brew && !can_be_shipped?
-    return  brew # else
+    if brew
+      return '✔  ' + brew if in_errata?(distro)
+      return '✘  ' + brew if brew && !can_be_shipped?
+      return  brew # else
+    end
   end
 
   # Probe the mead scheduler and ask if this package can be shipped or not
@@ -825,7 +827,9 @@ class Package < ActiveRecord::Base
 
 
     nvr = get_nvr_from_bridge(tag, pkg_name)
-    if nvr =~  /\.ep#{prod_version}\.el[0-9]+/
+    if prod.include?('eap') && nvr =~  /\.ep#{prod_version}\.el[0-9]+/
+      return nvr
+    elsif prod.include?('jws') || prod.include?('ews')
       return nvr
     else
       # TODO: clean this up one day Dustin?
