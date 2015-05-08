@@ -829,7 +829,7 @@ class Package < ActiveRecord::Base
     nvr = get_nvr_from_bridge(tag, pkg_name)
     if prod_name.include?('eap') && nvr =~  /\.ep#{prod_version}\.el[0-9]+/
       return nvr
-    elsif prod_name.include?('jws') || prod.include?('ews')
+    elsif prod_name.include?('jws') || prod_name.include?('ews')
       return nvr
     else
       # TODO: clean this up one day Dustin?
