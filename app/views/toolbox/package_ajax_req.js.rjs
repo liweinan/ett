@@ -1,6 +1,6 @@
 pac = Package.find(params[:package_id])
 
-type_of_pac = pac.build_type
+type_of_pac = MeadSchedulerService.build_type(pac.task.prod, pac.name)
 
 regular_rpm_type = ["NON_WRAPPER", "REPOLIB_SOURCE", "NATIVE", "JBOSS_AS_WRAPPER", "JBOSSAS_WRAPPER"]
 chain_type = ["WRAPPER", "WRAPPER_SOURCE"]
