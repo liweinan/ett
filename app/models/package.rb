@@ -525,41 +525,12 @@ class Package < ActiveRecord::Base
     rpmdiff
   end
 
-  def get_brew_rpm_link(nvr, retries = 3)
-    server = XMLRPC::Client.new("brewhub.devel.redhat.com", "/brewhub", 80)
-    begin
-      call = server.call("getBuild", nvr)
-      'https://brewweb.devel.redhat.com/taskinfo?taskID=' + call['task_id'].to_s
-    rescue Exception => e
-      if retries == 0
-        nil
-      else
-        puts "Retrying for nvr '#{nvr}'... attempt #{4 - retries}"
-        get_brew_rpm_link(nvr, retries - 1)
-      end
-    end
-  end
-
-  def get_brew_maven_link(nvr, retries=3)
-    server = XMLRPC::Client.new("brewhub.devel.redhat.com", "/brewhub", 80)
-    begin
-      call = server.call("getMavenBuild", nvr)
-      'https://brewweb.devel.redhat.com/buildinfo?buildID=' + call['build_id'].to_s
-    rescue Exception => e
-      if retries == 0
-        get_brew_rpm_link(nvr)
-      else
-        get_brew_maven_link(nvr, retries - 1)
-      end
-    end
-  end
-
   def update_mead_information
     if task.use_mead_integration?
       update_mead_brew_info
       update_source_url_info unless self.mead.nil?
 
-      if self.build_type != "MEAD_ONLY"
+      if MeadSchedulerService.build_type(self.task.prod, self.name) != "MEAD_ONLY"
         self.task.os_advisory_tags.each do |tag|
           brew_nvr =  self.brew_nvrs.select { |obj| obj.distro == tag.os_arch }
           if brew_nvr.blank?
@@ -567,20 +538,12 @@ class Package < ActiveRecord::Base
           else
             brew_nvr = brew_nvr[0]
             brew_nvr.nvr = self.get_brew_name(tag.candidate_tag + '-build', tag.os_arch)
-            brew_nvr.link = self.get_brew_rpm_link(brew_nvr.nvr)
+            brew_nvr.link = BrewService.get_brew_rpm_link(brew_nvr.nvr)
             brew_nvr.save
           end
         end
       end
     end
-  end
-
-  # TODO: move to a model
-  def get_mead_name(brew_pkg)
-    uri = URI.parse(URI.encode("#{APP_CONFIG['mead_scheduler']}/mead-brewbridge/pkg/wrapped/#{brew_pkg}"))
-    res = Net::HTTP.get_response(uri)
-
-    (res.code == '200' && !res.body.include?('ERROR')) ? res.body : nil
   end
 
   def sync_tags
@@ -732,22 +695,18 @@ class Package < ActiveRecord::Base
     log_entry.save
   end
 
-  def build_type
-    Net::HTTP.get('mead.usersys.redhat.com',
-                  "/mead-scheduler/rest/package/#{self.task.prod}/#{self.name}/type")
-  end
-
   # get_mead_info will go get the mead nvr from the rpm repo directly if it
   # cannot find it via the mead scheduler
   def update_mead_brew_info
 
     get_mead_nvr
-    self.mead_link = self.get_brew_maven_link(self.mead) if self.mead
+    self.mead_link = BrewService.get_brew_maven_link(self.mead) if self.mead
 
     self.mead_action = Package::MEAD_ACTIONS[:done]
     self.save
   end
 
+  # NEED TO SERIOUSLY LOOK AT IT
   def get_mead_nvr(retries=3)
 
     if retries.zero?
@@ -764,9 +723,10 @@ class Package < ActiveRecord::Base
       return get_mead_nvr(retries-1) if package_old_mead.nil?
       self.mead = package_old_mead.strip # remove trailing newline char
     else
-      self.mead = get_mead_name(brew_pkg) unless brew_pkg.blank?
+      self.mead = MeadSchedulerService.get_mead_nvr_from_wrapper_nvr(brew_pkg) unless brew_pkg.blank?
     end
   end
+
 
   def deleted_style
     if self.deleted?
@@ -776,35 +736,6 @@ class Package < ActiveRecord::Base
     end
   end
 
-  def get_scm_url_brew
-    server = XMLRPC::Client.new('brewhub.devel.redhat.com', '/brewhub', 80)
-
-    return nil if mead.nil?
-
-    begin
-      param = server.call('getBuild', mead)
-      unless param.nil?
-        param['task_id'].nil? ? nil : server.call('getTaskRequest', param['task_id'])[0]
-      else
-        nil
-      end
-    rescue XMLRPC::FaultException
-      nil
-    end
-  end
-
-  def is_scl_package?
-    ans = ''
-    begin
-      Net::HTTP.start('mead.usersys.redhat.com') do |http|
-        resp = http.get("/mead-scheduler/rest/package/#{self.task.prod}/#{name}/scl")
-        ans = resp.body
-      end
-      ans == 'YES'
-    rescue
-      true
-    end
-  end
 
   def get_brew_name(candidate_tag=nil, distro=nil)
     # TODO: make the tag more robust
@@ -816,17 +747,18 @@ class Package < ActiveRecord::Base
 
     distro = self.task.distros[0] if distro.nil?
 
-    if prod_name == "eap6" && distro == 'el7' && self.is_scl_package?
+    is_scl_package = MeadSchedulerService.is_scl_package?(prod_name, self.name)
+    # different naming convention for different products
+    if prod_name == "eap6" && distro == 'el7' && is_scl_package
       pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
 
-    elsif prod_name == "eap7" && self.is_scl_package?
+    elsif prod_name == "eap7" && is_scl_package
       pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
     end
 
     prod_version = prod_name.sub("eap", "")
 
-
-    nvr = get_nvr_from_bridge(tag, pkg_name)
+    nvr = MeadSchedulerService.get_nvr_from_bridge(tag, pkg_name)
     if prod_name.include?('eap') && nvr =~  /\.ep#{prod_version}\.el[0-9]+/
       return nvr
     elsif prod_name.include?('jws') || prod_name.include?('ews')
@@ -838,15 +770,10 @@ class Package < ActiveRecord::Base
       # so workaround is, if the nvr only contains el7, it's most certainly wrong
       # and we'll consider it as an scl package instead
       new_pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
-      return get_nvr_from_bridge(tag, new_pkg_name)
+      return MeadSchedulerService.get_nvr_from_bridge(tag, new_pkg_name)
     end
   end
 
-  def get_nvr_from_bridge(tag, pkg_name)
-    uri = URI.parse(URI.encode("#{APP_CONFIG['mead_scheduler']}/mead-brewbridge/pkg/latest/#{tag}/#{pkg_name}"))
-    res = Net::HTTP.get_response(uri)
-    (res.code == '200' && !res.body.include?('ERROR')) ? res.body : nil
-  end
 
   # based on the brew koji code, move it to package model afterwards
   # error checking omitted
@@ -865,11 +792,11 @@ class Package < ActiveRecord::Base
 
   def update_source_url_info
     #TODO: at some point, fix this logic
-    self.brew_scm_url = get_scm_url_brew
+    self.brew_scm_url = BrewService.get_scm_url_brew(self.mead)
     save
     # update only when necessary
     if self.git_url.blank?
-      scm_url_to_update = get_scm_url_brew
+      scm_url_to_update = self.brew_scm_url
       unless scm_url_to_update.nil?
         self.git_url = self.brew_scm_url
         save
@@ -952,7 +879,7 @@ class Package < ActiveRecord::Base
 
   def remove_nvr_and_bugs_from_errata
     result = ''
-    self.generate_mead_sched_link.each do |link, nvr, advisory|
+    self.generate_errata_add_remove_link.each do |link, nvr, advisory|
       uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
       req = Net::HTTP::Delete.new(link)
 
@@ -981,7 +908,6 @@ class Package < ActiveRecord::Base
     result
   end
 
-
   def add_nvr_and_bugs_to_errata
 
     status_sched = ''
@@ -992,7 +918,7 @@ class Package < ActiveRecord::Base
         "Package not in shipped list. Aborting"
     else
       uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
-      self.generate_mead_sched_link.each do |link, nvr, advisory|
+      self.generate_errata_add_remove_link.each do |link, nvr, advisory|
 
         req = Net::HTTP::Post.new(link)
 
@@ -1022,14 +948,11 @@ class Package < ActiveRecord::Base
     status_sched
   end
 
-  def generate_mead_sched_link
+  def generate_errata_add_remove_link
     bz_struct = {}
     self.upgrade_bz.each do |bz|
       bz_struct[bz.os_arch] = bz.bz_id
     end
-
-    uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
-    # the errata request is sent to mead-scheduler's rest api:
 
     res = nil
     links = []
@@ -1060,6 +983,7 @@ class Package < ActiveRecord::Base
     !@package_sets.include?(package)
   end
 
+  # TODO: perhaps improve it?
   def native?
     self.tags.each do |tag|
       return true if tag.key == 'Native'
