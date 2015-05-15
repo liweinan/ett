@@ -366,29 +366,11 @@ class ApplicationController < ActionController::Base
     session[:bz_pass] = pwd if session[:bz_pass].blank? || session[:bz_pass] != pwd
   end
 
-  # TODO: move me to model
-  def get_bz_update_link(id, oneway, params)
-    link = APP_CONFIG['mead_scheduler'] +
-        APP_CONFIG['bz_bug_summary_update_url'].gsub('<id>', id).gsub('<oneway>', oneway)
-
-    params.each do |key, value|
-      link += "&#{key}=#{URI::encode(value)}"
-    end
-
-    link
-  end
-
   def has_bz_auth_info?(params=Hash.new)
     # TODO not complete
     (!current_user.blank? && !session[:bz_pass].blank?) ||
     (!params[:bzauth_user].blank? && !params[:bzauth_pwd].blank?) ||
     (!params[:ubbs_user].blank? && !params[:ubbs_pwd].blank?)
-  end
-
-  def set_bz_upstream_fields(bz_id, oneway, params)
-    uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
-    req = Net::HTTP::Put.new(get_bz_update_link(bz_id, oneway, params))
-    Net::HTTP.start(uri.host, uri.port) { |http| http.request(req) }
   end
 
   def current_bzuser(params)

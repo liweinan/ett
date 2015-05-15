@@ -301,7 +301,7 @@ class PackagesController < ApplicationController
           params_bz[:userid] = shared_bz_user
           params_bz[:pwd] = shared_bz_pass
 
-          set_bz_upstream_fields(bz_bug.bz_id, oneway='true', params_bz)
+          MeadSchedulerService.set_bz_upstream_fields(bz_bug.bz_id, oneway='true', params_bz)
 
           bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
           bz_bug.save
