@@ -39,6 +39,36 @@ class BrewService
       end
     end
 
+    # should it be put there? should the brew_service know about the models?
+    def update_previous_version_of_packages(task)
+      begin
+        server = XMLRPC::Client.new("brewhub.devel.redhat.com", "/brewhub", 80)
+        task.packages.each do |package|
+          next if !package.can_be_shipped?
+
+          param = server.call("getLatestRPMS", task.previous_version_tag, package.name)
+          nvr_info = param[1][0]
+          unless nvr_info.nil?
+            version = nvr_info['version']
+            release = nvr_info['release']
+            release = release.split('.')[1].gsub('_', '-')
+            if release.include?("redhat")
+              abbreviated_version = version + '.' + release
+            else
+              abbreviated_version = version
+            end
+            package.previous_version = abbreviated_version
+            package.save
+          end
+        end
+      rescue Exception => e
+        puts "Error for task #{task.name} in finding previous version of packages"
+        puts "Probably because its previous version tag is empty"
+        puts "Previous_version_tag of task is: #{task.previous_version_tag}"
+      end
+    end
+
+
 
 
 	  private
