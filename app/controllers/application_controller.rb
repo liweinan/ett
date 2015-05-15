@@ -382,7 +382,7 @@ class ApplicationController < ActionController::Base
   end
 
   def get_bz_info(bz_id, user_id, pwd)
-    @response = BzBug.query_bz_bug_info(bz_id, user_id, pwd)
+    @response = MeadSchedulerService.query_bz_bug_info(bz_id, user_id, pwd)
 
     bz_info = nil
     bz_info = JSON.parse(@response.body) if @response.class == Net::HTTPOK

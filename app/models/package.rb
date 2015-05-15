@@ -304,29 +304,7 @@ class Package < ActiveRecord::Base
   #
   # Returns: boolean
   def in_shipped_list?
-    ans = ''
-    begin
-      Net::HTTP.start('mead.usersys.redhat.com') do |http|
-        resp = http.get("/mead-scheduler/rest/package/#{self.task.prod}/#{name}/shipped")
-        ans = resp.body
-      end
-      ans == 'YES'
-    rescue
-      true
-    end
-  end
-
-  def in_shipped_database?
-    ans = ''
-    begin
-      Net::HTTP.start('mead.usersys.redhat.com') do |http|
-        resp = http.get("/mead-scheduler/rest/package/#{self.task.prod}/#{name}/shipped")
-        ans = resp.body
-      end
-      !ans.include?("NO Package")
-    rescue
-      false
-    end
+    MeadSchedulerService.in_shipped_list?(self.task.prod, name)
   end
 
   def update_tag_if_not_shipped
@@ -335,10 +313,8 @@ class Package < ActiveRecord::Base
                                                'Not Shipped', self.task_id])
 
     if !in_shipped_list? && !not_shipped_tag.nil? && !self.tags.include?(not_shipped_tag)
-      if in_shipped_database?
-        self.tags << not_shipped_tag
-        self.save
-      end
+      self.tags << not_shipped_tag
+      self.save
     end
   end
 

@@ -67,5 +67,27 @@ class MeadSchedulerService
 
       res
     end
+
+    def query_bz_bug_info(bz_id, user, pwd)
+      uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
+      req = Net::HTTP::Get.new("/mead-bzbridge/bug/#{bz_id}?userid=#{user}&pwd=#{pwd}")
+      req['Accept'] = 'application/json'
+      Net::HTTP.start(uri.host, uri.port) do |http|
+        http.request(req)
+      end
+    end
+
+    def in_shipped_list?(prod, pac_name)
+      ans = ''
+      begin
+        Net::HTTP.start('mead.usersys.redhat.com') do |http|
+          resp = http.get("/mead-scheduler/rest/package/#{prod}/#{pac_name}/shipped")
+          ans = resp.body
+        end
+        ans == 'YES'
+      rescue
+        true
+      end
+    end
 	end
 end

@@ -96,7 +96,7 @@ class BzBugsController < ApplicationController
         end
 
         unless @do_nothing
-          @response = BzBug.query_bz_bug_info(bz_id,
+          @response = MeadSchedulerService.query_bz_bug_info(bz_id,
                                               extract_username(params[:user]),
                                               params[:pwd])
 
@@ -189,7 +189,7 @@ class BzBugsController < ApplicationController
       end_check_param
 
       @bz_bug = BzBug.find(params[:id])
-      @response = BzBug.query_bz_bug_info(@bz_bug.bz_id,
+      @response = MeadSchedulerService.query_bz_bug_info(@bz_bug.bz_id,
                                           extract_username(params[:user]),
                                           params[:pwd])
 
