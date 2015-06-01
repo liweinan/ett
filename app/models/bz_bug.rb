@@ -114,7 +114,7 @@ class BzBug < ActiveRecord::Base
       # "BZ#999999: Upgrade jboss-aggregator to 7.2.0.Final-redhat-7 (MOCK)"
       bug_info = BzBug.extract_bz_bug_info(response.body)
       bz_id = bug_info[:bz_id]
-      response = BzBug.query_bz_bug_info(bz_id, parameters['userid'], parameters['pwd'])
+      response = MeadSchedulerService.query_bz_bug_info(bz_id, parameters['userid'], parameters['pwd'])
 
       if response.class == Net::HTTPOK
         bz_info = JSON.parse(response.body)
@@ -165,16 +165,6 @@ class BzBug < ActiveRecord::Base
       bug_info[:summary] = body.split(/^\d+:\s*/)[1]
     end
     bug_info
-  end
-
-  # TODO: maybe make it a method function instead?
-  def self.query_bz_bug_info(bz_id, user, pwd)
-    uri = URI.parse(URI.encode(APP_CONFIG['mead_scheduler']))
-    req = Net::HTTP::Get.new("/mead-bzbridge/bug/#{bz_id}?userid=#{user}&pwd=#{pwd}")
-    req['Accept'] = 'application/json'
-    Net::HTTP.start(uri.host, uri.port) do |http|
-      http.request(req)
-    end
   end
 
   # return a list of bzs belonging to that task and in the distro

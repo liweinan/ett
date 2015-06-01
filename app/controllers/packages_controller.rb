@@ -301,7 +301,7 @@ class PackagesController < ApplicationController
           params_bz[:userid] = shared_bz_user
           params_bz[:pwd] = shared_bz_pass
 
-          set_bz_upstream_fields(bz_bug.bz_id, oneway='true', params_bz)
+          MeadSchedulerService.set_bz_upstream_fields(bz_bug.bz_id, oneway='true', params_bz)
 
           bz_bug.bz_action = BzBug::BZ_ACTIONS[:accepted]
           bz_bug.save
@@ -383,7 +383,7 @@ class PackagesController < ApplicationController
       error = false
 
       new_bzs.each do |bz_id|
-        bz_query_resp = BzBug.query_bz_bug_info(bz_id, shared_bz_user, shared_bz_pass)
+        bz_query_resp = MeadSchedulerService.query_bz_bug_info(bz_id, shared_bz_user, shared_bz_pass)
         if bz_query_resp.class == Net::HTTPOK
           bz_queried << JSON.parse(bz_query_resp.body)
         else

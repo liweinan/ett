@@ -304,29 +304,7 @@ class Package < ActiveRecord::Base
   #
   # Returns: boolean
   def in_shipped_list?
-    ans = ''
-    begin
-      Net::HTTP.start('mead.usersys.redhat.com') do |http|
-        resp = http.get("/mead-scheduler/rest/package/#{self.task.prod}/#{name}/shipped")
-        ans = resp.body
-      end
-      ans == 'YES'
-    rescue
-      true
-    end
-  end
-
-  def in_shipped_database?
-    ans = ''
-    begin
-      Net::HTTP.start('mead.usersys.redhat.com') do |http|
-        resp = http.get("/mead-scheduler/rest/package/#{self.task.prod}/#{name}/shipped")
-        ans = resp.body
-      end
-      !ans.include?("NO Package")
-    rescue
-      false
-    end
+    MeadSchedulerService.in_shipped_list?(self.task.prod, name)
   end
 
   def update_tag_if_not_shipped
@@ -335,10 +313,8 @@ class Package < ActiveRecord::Base
                                                'Not Shipped', self.task_id])
 
     if !in_shipped_list? && !not_shipped_tag.nil? && !self.tags.include?(not_shipped_tag)
-      if in_shipped_database?
-        self.tags << not_shipped_tag
-        self.save
-      end
+      self.tags << not_shipped_tag
+      self.save
     end
   end
 
@@ -526,23 +502,29 @@ class Package < ActiveRecord::Base
   end
 
   def update_mead_information
-    if task.use_mead_integration?
-      update_mead_brew_info
-      update_source_url_info unless self.mead.nil?
+    begin
+      if task.use_mead_integration?
+        update_mead_brew_info
+        update_source_url_info unless self.mead.nil?
 
-      if MeadSchedulerService.build_type(self.task.prod, self.name) != "MEAD_ONLY"
-        self.task.os_advisory_tags.each do |tag|
-          brew_nvr =  self.brew_nvrs.select { |obj| obj.distro == tag.os_arch }
-          if brew_nvr.blank?
-            create_brew_nvr(tag.os_arch)
-          else
-            brew_nvr = brew_nvr[0]
-            brew_nvr.nvr = self.get_brew_name(tag.candidate_tag + '-build', tag.os_arch)
-            brew_nvr.link = BrewService.get_brew_rpm_link(brew_nvr.nvr)
-            brew_nvr.save
+        if MeadSchedulerService.build_type(self.task.prod, self.name) != "MEAD_ONLY"
+          self.task.os_advisory_tags.each do |tag|
+            brew_nvr =  self.brew_nvrs.select { |obj| obj.distro == tag.os_arch }
+            if brew_nvr.blank?
+              create_brew_nvr(tag.os_arch)
+            else
+              brew_nvr = brew_nvr[0]
+              brew_nvr.nvr = self.get_brew_name(tag.candidate_tag + '-build', tag.os_arch)
+              brew_nvr.link = BrewService.get_brew_rpm_link(brew_nvr.nvr)
+              brew_nvr.save
+            end
           end
         end
       end
+    rescue Timeout::Error
+      puts "Ran a timeout for update_mead_information"
+    rescue
+      puts "some kind of error happened while trying to call update_mead_information for #{self.name}"
     end
   end
 
