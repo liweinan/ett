@@ -67,6 +67,14 @@ class BzBug < ActiveRecord::Base
     bz_bug.keywords = bz_info['keywords'].join(',')
     bz_bug.last_synced_at = Time.now
 
+    upgrade_bz_regex = /RHEL(\d+) RPMs: Upgrade/
+    match_data = bz_bug.summary.match(upgrade_bz_regex)
+
+    unless match_data.nil?
+      os_arch = match_data[1]
+      bz_bug.os_arch = "el" + os_arch
+    end
+
     bz_bug.save
     bz_bug
   end
