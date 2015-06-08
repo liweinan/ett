@@ -65,12 +65,9 @@ class ErrataCheckController < ApplicationController
     render :text => 'OK', :status => 202
     BzBug.transaction do
       bz_bugs.each do |bug|
-        bz_bug = BzBug.first(:conditions => ['bz_id = ?', bug.to_s])
-
-        # find out if bz_bug in our database
-        bz_bug_in_errata = bzs.delete(bz_bug)
-
-        unless bz_bug_in_errata.nil?
+        bz_bug_in_errata = find_bz(bzs, bug.to_s)
+        if !bz_bug_in_errata.nil?
+          bzs.reject! { |bz| bz.bz_id == bug.to_s }
           bz_bug_in_errata.is_in_errata = 'YES'
           bz_bug_in_errata.save
         end
@@ -83,6 +80,15 @@ class ErrataCheckController < ApplicationController
       end
     end
   end
+
+  def find_bz(bz_list, bz_id)
+    bz_list.each do |bz|
+      return bz if bz.bz_id == bz_id
+    end
+
+    return nil
+  end
+
 
   def sync_rpmdiffs
     rpmdiffs = JSON.parse(params['rpmdiffs'])
