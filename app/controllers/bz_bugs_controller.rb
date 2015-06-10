@@ -218,6 +218,18 @@ class BzBugsController < ApplicationController
     end
   end
 
+  def find_bzs
+    if params[:package_id].blank?
+      @bzs = BzBug.all
+    else
+      @bzs = BzBug.find(:all, :conditions => ['package_id = ?', params[:package_id]])
+    end
+
+    respond_to do |format|
+      format.json { render :json => @bzs}
+    end
+  end
+
   def destroy
     BzBug.find(params[:id]).destroy
   end

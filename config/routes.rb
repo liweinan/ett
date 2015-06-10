@@ -79,6 +79,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'mass-rebuild/second-step', :controller => 'mass_rebuild', :action => 'second_step'
   map.connect 'mass-rebuild/third-step', :controller => 'mass_rebuild', :action => 'third_step'
   map.connect 'mass-rebuild/fourth-step', :controller => 'mass_rebuild', :action => 'fourth_step'
+  map.connect 'bz_bug/find_bzs/:package_id', :controller => 'bz_bugs', :action => 'find_bzs'
   map.connect ':controller/:action/:id'
   map.connect ':controller/:action/:id.:format'
 end
