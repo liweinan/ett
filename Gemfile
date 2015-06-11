@@ -9,3 +9,7 @@ gem 'rake', '0.8.7'
 gem 'iniparse', '1.3.2'
 gem 'xml-simple', '~> 1.1.4'
 gem 'octokit', '2.7.2'
+
+gem 'vestal_versions', '0.8.3'
+gem 'will_paginate', '2.3.15'
+

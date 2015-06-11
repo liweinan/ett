@@ -35,6 +35,8 @@ GEM
     sawyer (0.5.5)
       addressable (~> 2.3.5)
       faraday (~> 0.8, < 0.10)
+    vestal_versions (0.8.3)
+    will_paginate (2.3.15)
     xml-simple (1.1.4)
 
 PLATFORMS
@@ -50,4 +52,9 @@ DEPENDENCIES
   pg (= 0.10.1)
   rails (= 2.3.11)
   rake (= 0.8.7)
+  vestal_versions (= 0.8.3)
+  will_paginate (= 2.3.15)
   xml-simple (~> 1.1.4)
+
+BUNDLED WITH
+   1.10.2

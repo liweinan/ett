@@ -1,8 +1,22 @@
+# this is needed because brew wants the properties to be separated by a newline
+# we also request the key so that we can add the proper number of spaces to
+# align the text
+def text_to_add(key, value)
+  len_key = key.strip.size
+  # the '3' is because when the ini parse is generated, it is '<key> = '
+  # so the ' = ' takes 3 spaces
+  value = value.strip
+  newline_length = len_key + 3
+  substitute_space_with_newline_and_space = "\n" + (" " * newline_length)
+  new_val = value.gsub(/\s+/, substitute_space_with_newline_and_space)
+  return new_val
+end
+
 def add_if_not_nil(vehicle, key, item)
   if !item.nil? || item.strip() != ''
     puts "#{key}:: =#{item}= =#{item.strip() != ''}="
   end
-  vehicle.option(key, item) if !item.nil? && item.strip() != ''
+  vehicle.option(key, text_to_add(key, item)) if !item.nil? && item.strip() != ''
 end
 
 pac = Package.find(params[:package_id])
