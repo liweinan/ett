@@ -6,6 +6,7 @@
     <%= hidden_field_tag :package_id, @package_id %>
     <div class='manage-tbl'>
     <% width = 62 %>
+    <h2><%= @message %></h2>
     <table>
         <tr>
             <td><%= label_tag(:maven_group_artifact, "GroupId-ArtifactId") %></td>

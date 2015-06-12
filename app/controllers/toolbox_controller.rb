@@ -1,4 +1,6 @@
 require 'shellwords'
+require 'digest/sha1'
+
 class ToolboxController < ApplicationController
 
   def get_pac_btns
@@ -127,15 +129,8 @@ class ToolboxController < ApplicationController
     end
   end
 
-  def edit_ini_file
-    @package_id = params[:id]
-    @package = Package.find(@package_id)
-
-    branch = @package.task.primary_os_advisory_tag.candidate_tag
-    ini_file = get_file_content_from_rpm_repo(@package.name, branch,
-                                              "#{@package.name}.ini")
-
-    if ini_file.blank?
+  def rpm_ini_file_blank(package)
+    if package.ini_file.blank?
       @maven_group_artifact = ''
       @build_requires = ''
       @goals = ''
@@ -144,13 +139,10 @@ class ToolboxController < ApplicationController
       @maven_options = ''
       @envs = ''
       @jvm_options = ''
+      @message = "No ini file found in Git repository"
     else
-      unless @package.ini_file.blank?
-        data = parse_ini_file(@package.ini_file)
-      else
-        data = parse_ini_file(ini_file)
-      end
-
+      @message = "Using saved ini file from ETT"
+      data = parse_ini_file(package.ini_file)
       section = data.keys[0]
       config = data[section]
       @maven_group_artifact = section
@@ -161,6 +153,62 @@ class ToolboxController < ApplicationController
       @maven_options = replace_newline_to_whitespace(config['maven_options'])
       @envs = replace_newline_to_whitespace(config['envs'])
       @jvm_options = replace_newline_to_whitespace(config['jvm_options'])
+    end
+  end
+
+  def sha_ini_consistent?(package, ini_file)
+    # check if saved sha_ini_file same as in the repo.
+    # if not, that means the ini_file in the repo was changed and we should
+    # invalidate the ini_file we have saved.
+    package.sha_ini_file == Digest::SHA1.hexdigest(ini_file)
+  end
+
+  def rpm_ini_file_not_blank(package, ini_file)
+    if !package.ini_file.blank?
+      if sha_ini_consistent?(package, ini_file)
+        # use saved ini_file
+        @message = "Using saved ini file from ETT"
+        data = parse_ini_file(package.ini_file)
+      else
+        @message = "ini file in Git repository changed! Using Git ini file instead of ini file saved in ETT"
+        data = parse_ini_file(ini_file)
+        package.sha_ini_file = Digest::SHA1.hexdigest(ini_file)
+        package.ini_file = ini_file
+        package.save
+      end
+    else
+      @message = "Something wrong happened. Loading the ini file in Git repository instead!"
+      data = parse_ini_file(ini_file)
+      package.sha_ini_file = Digest::SHA1.hexdigest(ini_file)
+      package.ini_file = ini_file
+      package.save
+    end
+
+    section = data.keys[0]
+    config = data[section]
+    @maven_group_artifact = section
+    @build_requires = replace_newline_to_whitespace(config['buildrequires'])
+    @goals = replace_newline_to_whitespace(config['goals'])
+    @profiles = replace_newline_to_whitespace(config['profiles'])
+    @properties = replace_newline_to_whitespace(config['properties'])
+    @maven_options = replace_newline_to_whitespace(config['maven_options'])
+    @envs = replace_newline_to_whitespace(config['envs'])
+    @jvm_options = replace_newline_to_whitespace(config['jvm_options'])
+  end
+
+  def edit_ini_file
+    @message = ''
+    @package_id = params[:id]
+    @package = Package.find(@package_id)
+
+    branch = @package.task.primary_os_advisory_tag.candidate_tag
+    ini_file = get_file_content_from_rpm_repo(@package.name, branch,
+                                              "#{@package.name}.ini")
+
+    if ini_file.blank?
+      rpm_ini_file_blank(@package)
+    else
+      rpm_ini_file_not_blank(@package, ini_file)
     end
     render :layout => false
   end
