@@ -177,7 +177,7 @@ class ToolboxController < ApplicationController
         package.save
       end
     else
-      @message = "Something wrong happened. Loading the ini file in Git repository instead!"
+      @message = "Loading the ini file in Git repository!"
       data = parse_ini_file(ini_file)
       package.sha_ini_file = Digest::SHA1.hexdigest(ini_file)
       package.ini_file = ini_file
