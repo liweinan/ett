@@ -179,7 +179,7 @@ class Package < ActiveRecord::Base
       url_link = self.git_url
       repo_link = url_link.split("#")[0]
       commit_id = url_link.split("#")[1]
-      repo_name = repo_link.gsub("git://git.app.eng.bos.redhat.com/", '')
+      repo_name = repo_link.gsub("git://git.app.eng.bos.redhat.com/", '').gsub(/\.git/, '')
       "http://git.app.eng.bos.redhat.com/git/#{repo_name}.git/commit?id=#{commit_id}"
     end
   end
