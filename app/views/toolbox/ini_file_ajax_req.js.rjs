@@ -27,15 +27,7 @@ pac.ini_file = IniParse.gen do |doc|
     add_if_not_nil(vehicle, "profiles", params["profiles"])
 
     goals = params["goals"] || ""
-    properties = params["properties"] || ""
-
-    if !params["javadocs"].blank? && !goals.include?("javadoc:")
-      goals += " javadoc:jar"
-    end
-
-    if !params["suffix"].blank? && !properties.include?("suffix")
-      properties += " version.incremental.suffix=redhat"
-    end
+    properties = params["properties"] || "version.incremental.suffix=redhat"
 
     add_if_not_nil(vehicle, "goals", goals)
     add_if_not_nil(vehicle, "properties", properties)

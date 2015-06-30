@@ -1,5 +1,6 @@
 <%= javascript_include_tag :defaults %>
     <div style="text-align: left;">
+    <h2><%= @m_b_a_status %></h2>
     <% form_remote_tag(
                :url => {:controller => 'toolbox', :action => 'maven_build_arguments_ajax_req'},
                :loading => "Element.show('spinner_build_#{@package_id}');",

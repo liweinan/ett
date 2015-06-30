@@ -94,11 +94,34 @@ class ToolboxController < ApplicationController
 
 
     @pac = Package.find(@package_id)
-    if @pac.spec_file.blank?
-      @spec_file = tiny_box_helper(get_spec_file_content(@pac.name,
-                                                     @pac.task.primary_os_advisory_tag.candidate_tag))
+    upstream_file_content = get_spec_file_content(@pac.name, 
+                                                  @pac.task.primary_os_advisory_tag.candidate_tag)
+    sha_upstream_file_content = Digest::SHA1.hexdigest(upstream_file_content)
+
+    if upstream_file_content.blank?
+      if @pac.spec_file.blank?
+        @spec_file = tiny_box_helper('')
+        @spec_file_status = "spec file in the repository is empty"
+      else
+        @spec_file = tiny_box_helper(@pac.spec_file)
+        @spec_file_status = "Showing saved spec file"
+      end
     else
-      @spec_file = tiny_box_helper(@pac.spec_file)
+      if @pac.spec_file.blank?
+        @spec_file = tiny_box_helper(upstream_file_content)
+        @spec_file_status = "Loading spec file from the repository"
+      else
+        if @pac.sha_spec_file == sha_upstream_file_content
+          @spec_file = tiny_box_helper(@pac.spec_file)
+          @spec_file_status = "Showing saved spec file"
+        else
+          @spec_file = tiny_box_helper(upstream_file_content)
+          @pac.sha_spec_file = sha_upstream_file_content
+          @pac.spec_file = upstream_file_content
+          @pac.save!
+          @spec_file_status = "Upstream spec file content has changed! Loading the spec file in the repository instead"
+        end
+      end
     end
 
     render :layout => false
@@ -110,11 +133,34 @@ class ToolboxController < ApplicationController
 
     @pac = Package.find(@package_id)
 
-    if @pac.maven_build_arguments.blank?
-      @m_b_a = tiny_box_helper(get_maven_build_arguments_content(@pac.name,
-                                                     @pac.task.primary_os_advisory_tag.candidate_tag))
+    upstream_file_content = get_maven_build_arguments_content(@pac.name,
+                                                     @pac.task.primary_os_advisory_tag.candidate_tag)
+    sha_upstream_file_content = Digest::SHA1.hexdigest(upstream_file_content)
+
+    if upstream_file_content.blank?
+      if @pac.maven_build_arguments.blank?
+        @m_b_a = tiny_box_helper('')
+        @m_b_a_status = "maven-build-arguments file not present in repository"
+      else
+        @m_b_a = tiny_box_helper(@pac.maven_build_arguments)
+        @m_b_a_status = "Showing saved maven-build-arguments file"
+      end
     else
-      @m_b_a = tiny_box_helper(@pac.maven_build_arguments)
+      if @pac.maven_build_arguments.blank?
+        @m_b_a = tiny_box_helper(upstream_file_content)
+        @m_b_a_status = "Loading maven-build-arguments file from the repository"
+      else
+        if @pac.sha_maven_build_arguments == sha_upstream_file_content
+          @m_b_a = tiny_box_helper(@pac.maven_build_arguments)
+          @m_b_a_status = "Showing saved maven-build-arguments file"
+        else
+          @m_b_a = tiny_box_helper(upstream_file_content)
+          @pac.sha_maven_build_arguments = sha_upstream_file_content
+          @pac.maven_build_arguments = upstream_file_content
+          @pac.save!
+          @m_b_a_status = "Upstream maven-build-arguments has changed! Loading the file in the repository instead"
+        end
+      end
     end
 
     render :layout => false
@@ -127,6 +173,19 @@ class ToolboxController < ApplicationController
       # leaving 2 whitespace chars so that it's more visible on the webview
       string_info.gsub("\n", "  ")
     end
+  end
+
+  def extract_ini_variables(data)
+    section = data.keys[0]
+    config = data[section]
+    @maven_group_artifact = section
+    @build_requires = replace_newline_to_whitespace(config['buildrequires'])
+    @goals = replace_newline_to_whitespace(config['goals'])
+    @profiles = replace_newline_to_whitespace(config['profiles'])
+    @properties = replace_newline_to_whitespace(config['properties'])
+    @maven_options = replace_newline_to_whitespace(config['maven_options'])
+    @envs = replace_newline_to_whitespace(config['envs'])
+    @jvm_options = replace_newline_to_whitespace(config['jvm_options'])
   end
 
   def rpm_ini_file_blank(package)
@@ -143,16 +202,7 @@ class ToolboxController < ApplicationController
     else
       @message = "Using saved ini file from ETT"
       data = parse_ini_file(package.ini_file)
-      section = data.keys[0]
-      config = data[section]
-      @maven_group_artifact = section
-      @build_requires = replace_newline_to_whitespace(config['buildrequires'])
-      @goals = replace_newline_to_whitespace(config['goals'])
-      @profiles = replace_newline_to_whitespace(config['profiles'])
-      @properties = replace_newline_to_whitespace(config['properties'])
-      @maven_options = replace_newline_to_whitespace(config['maven_options'])
-      @envs = replace_newline_to_whitespace(config['envs'])
-      @jvm_options = replace_newline_to_whitespace(config['jvm_options'])
+      extract_ini_variables(data)
     end
   end
 
@@ -183,17 +233,7 @@ class ToolboxController < ApplicationController
       package.ini_file = ini_file
       package.save
     end
-
-    section = data.keys[0]
-    config = data[section]
-    @maven_group_artifact = section
-    @build_requires = replace_newline_to_whitespace(config['buildrequires'])
-    @goals = replace_newline_to_whitespace(config['goals'])
-    @profiles = replace_newline_to_whitespace(config['profiles'])
-    @properties = replace_newline_to_whitespace(config['properties'])
-    @maven_options = replace_newline_to_whitespace(config['maven_options'])
-    @envs = replace_newline_to_whitespace(config['envs'])
-    @jvm_options = replace_newline_to_whitespace(config['jvm_options'])
+    extract_ini_variables(data)
   end
 
   def edit_ini_file
