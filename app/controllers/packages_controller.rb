@@ -152,6 +152,7 @@ class PackagesController < ApplicationController
         if shared_inline_bzs.blank?
           # this is when everything is saved
           @package.update_attributes(params[:package])
+          @package.update_ini_scmurl
           @package.reload
           # this is needed since we write to @package later in this section of
           # the code. (@package.status_changed_at = Time.now). This messes up

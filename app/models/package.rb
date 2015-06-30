@@ -139,6 +139,14 @@ class Package < ActiveRecord::Base
     end
   end
 
+  def update_ini_scmurl
+    unless self.ini_file.blank?
+      self.ini_file.gsub!(/scmurl.*/, "scmurl = #{self.git_url}")
+      self.ini_file = self.ini_file.gsub(/scmurl.*/, "scmurl = #{self.git_url}")
+      self.save!
+    end
+  end
+
   # TODO: deprecate this
   def deleted?
     false

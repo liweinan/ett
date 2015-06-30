@@ -129,6 +129,19 @@ class ToolboxController < ApplicationController
     end
   end
 
+  def extract_ini_variables(data)
+    section = data.keys[0]
+    config = data[section]
+    @maven_group_artifact = section
+    @build_requires = replace_newline_to_whitespace(config['buildrequires'])
+    @goals = replace_newline_to_whitespace(config['goals'])
+    @profiles = replace_newline_to_whitespace(config['profiles'])
+    @properties = replace_newline_to_whitespace(config['properties'])
+    @maven_options = replace_newline_to_whitespace(config['maven_options'])
+    @envs = replace_newline_to_whitespace(config['envs'])
+    @jvm_options = replace_newline_to_whitespace(config['jvm_options'])
+  end
+
   def rpm_ini_file_blank(package)
     if package.ini_file.blank?
       @maven_group_artifact = ''
@@ -143,16 +156,7 @@ class ToolboxController < ApplicationController
     else
       @message = "Using saved ini file from ETT"
       data = parse_ini_file(package.ini_file)
-      section = data.keys[0]
-      config = data[section]
-      @maven_group_artifact = section
-      @build_requires = replace_newline_to_whitespace(config['buildrequires'])
-      @goals = replace_newline_to_whitespace(config['goals'])
-      @profiles = replace_newline_to_whitespace(config['profiles'])
-      @properties = replace_newline_to_whitespace(config['properties'])
-      @maven_options = replace_newline_to_whitespace(config['maven_options'])
-      @envs = replace_newline_to_whitespace(config['envs'])
-      @jvm_options = replace_newline_to_whitespace(config['jvm_options'])
+      extract_ini_variables(data)
     end
   end
 
@@ -183,17 +187,7 @@ class ToolboxController < ApplicationController
       package.ini_file = ini_file
       package.save
     end
-
-    section = data.keys[0]
-    config = data[section]
-    @maven_group_artifact = section
-    @build_requires = replace_newline_to_whitespace(config['buildrequires'])
-    @goals = replace_newline_to_whitespace(config['goals'])
-    @profiles = replace_newline_to_whitespace(config['profiles'])
-    @properties = replace_newline_to_whitespace(config['properties'])
-    @maven_options = replace_newline_to_whitespace(config['maven_options'])
-    @envs = replace_newline_to_whitespace(config['envs'])
-    @jvm_options = replace_newline_to_whitespace(config['jvm_options'])
+    extract_ini_variables(data)
   end
 
   def edit_ini_file
