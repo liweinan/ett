@@ -1,5 +1,6 @@
 <%= javascript_include_tag :defaults %>
     <div style="text-align: left;">
+    <h2><%= @spec_file_status %></h2>
     <% form_remote_tag(
                :url => {:controller => 'toolbox', :action => 'spec_file_ajax_req'},
                :loading => "Element.show('spinner_build_#{@package_id}');",
