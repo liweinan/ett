@@ -9,6 +9,10 @@
     <h2><%= @message %></h2>
     <table>
         <tr>
+            <td><%= label_tag(:scmurl, "scm-url") %></td>
+            <td><%= text_field_tag(:scmurl, @package.git_url, :size => width, :disabled => true) %></td>
+        </tr>
+        <tr>
             <td><%= label_tag(:maven_group_artifact, "GroupId-ArtifactId") %></td>
             <td><%= text_field_tag(:maven_group_artifact, @maven_group_artifact, :size => width) %></td>
         </tr>
@@ -27,6 +31,10 @@
         <tr>
             <td><%= label_tag(:properties, "Properties") %></td>
             <td><%= text_field_tag(:properties, @properties, :size => width) %></td>
+        </tr>
+        <tr>
+            <td><%= label_tag(:patches, "Patches") %></td>
+            <td colspan="2"><%= check_box("patches", "enabled", {:checked => @patches_enabled }) %>Have Patches?</input></td>
         </tr>
     </table>
     <br />

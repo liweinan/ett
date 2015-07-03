@@ -186,6 +186,7 @@ class ToolboxController < ApplicationController
     @maven_options = replace_newline_to_whitespace(config['maven_options'])
     @envs = replace_newline_to_whitespace(config['envs'])
     @jvm_options = replace_newline_to_whitespace(config['jvm_options'])
+    @patches_enabled = config.has_key?("patches")
   end
 
   def rpm_ini_file_blank(package)
@@ -199,6 +200,7 @@ class ToolboxController < ApplicationController
       @envs = ''
       @jvm_options = ''
       @message = "No ini file found in Git repository"
+      @patches_enabled = false
     else
       @message = "Using saved ini file from ETT"
       data = parse_ini_file(package.ini_file)
