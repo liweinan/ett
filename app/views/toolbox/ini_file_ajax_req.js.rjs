@@ -23,6 +23,8 @@ pac = Package.find(params[:package_id])
 pac.ini_file = IniParse.gen do |doc|
   doc.section(params['maven_group_artifact']) do |vehicle|
     add_if_not_nil(vehicle, "scmurl", pac.git_url)
+
+    add_if_not_nil(vehicle, "patches", ".") if params["patches"]["enabled"] == "1"
     add_if_not_nil(vehicle, "buildrequires", params["buildrequires"])
     add_if_not_nil(vehicle, "profiles", params["profiles"])
 
