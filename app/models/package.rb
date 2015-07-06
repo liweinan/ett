@@ -141,9 +141,9 @@ class Package < ActiveRecord::Base
 
   def update_ini_scmurl
     unless self.ini_file.blank?
-      self.ini_file.gsub!(/scmurl.*/, "scmurl = #{self.git_url}")
-      self.ini_file = self.ini_file.gsub(/scmurl.*/, "scmurl = #{self.git_url}")
-      self.save!
+      old_ini_file = self.ini_file
+      self.ini_file = old_ini_file.gsub(/scmurl.*/, "scmurl = #{self.git_url}")
+      save
     end
   end
 
