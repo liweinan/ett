@@ -36,6 +36,7 @@ pac.ini_file = IniParse.gen do |doc|
     add_if_not_nil(vehicle, "maven_options", params["maven_options"])
     add_if_not_nil(vehicle, "envs", params["envs"])
     add_if_not_nil(vehicle, "jvm_options", params["jvm_options"])
+    add_if_not_nil(vehicle, "packages", params["packages"])
   end
 end.to_ini
 pac.save
