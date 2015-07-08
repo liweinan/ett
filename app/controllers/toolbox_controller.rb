@@ -186,6 +186,7 @@ class ToolboxController < ApplicationController
     @maven_options = replace_newline_to_whitespace(config['maven_options'])
     @envs = replace_newline_to_whitespace(config['envs'])
     @jvm_options = replace_newline_to_whitespace(config['jvm_options'])
+    @packages = replace_newline_to_whitespace(config['packages'])
     @patches_enabled = config.has_key?("patches")
   end
 
@@ -199,6 +200,7 @@ class ToolboxController < ApplicationController
       @maven_options = ''
       @envs = ''
       @jvm_options = ''
+      @packages = ''
       @message = "No ini file found in Git repository"
       @patches_enabled = false
     else

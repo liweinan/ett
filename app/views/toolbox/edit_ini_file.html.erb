@@ -43,6 +43,10 @@
             <th colspan="2" style="text-align: center;">Advanced</th>
         </tr>
         <tr>
+            <td><%= label_tag(:packages, "Packages") %></td>
+            <td><%= text_field_tag(:packages, @packages, :size => width) %></td>
+        </tr>
+        <tr>
             <td><%= label_tag(:maven_options, "Maven Options") %></td>
             <td><%= text_field_tag(:maven_options, @maven_options, :size => width) %></td>
         </tr>
