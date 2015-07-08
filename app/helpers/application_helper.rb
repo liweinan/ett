@@ -105,7 +105,7 @@ module ApplicationHelper
     res = MeadSchedulerService.send_build_to_scheduler(prod, pac.name, params_build, req_data)
 
     if pac.name == 'httpd'
-      params_build_httpd = "mode=#{mode}&userid=#{current_user.email.gsub('@redhat.com', '')}&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}&distros=el7"
+      params_build_httpd = "mode=#{mode}&userid=#{current_user.email.gsub('@redhat.com', '')}&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}&distros=el7&etttask=#{escape_url(pac.task.name)}"
       params_build_httpd += "&erratum=" + pac.errata unless pac.errata.blank?
       res_httpd = MeadSchedulerService.send_build_to_scheduler(prod, 'httpd22', params_build_httpd, nil)
     end
