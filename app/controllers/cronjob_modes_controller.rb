@@ -101,6 +101,9 @@ class CronjobModesController < ApplicationController
         branch = tag.candidate_tag if count == 0
       end
 
+      # override the branch string if the field build_branch is specified
+      branch = task.build_branch unless task.build_branch.blank?
+
       product_info = {:version => task.tag_version,
                       :prod => task.prod,
                       :branch => branch,
