@@ -729,7 +729,7 @@ class Package < ActiveRecord::Base
 
   def get_brew_name(candidate_tag=nil, distro=nil)
     # TODO: make the tag more robust
-    tag = task.primary_os_advisory_tag.build_tag
+    tag = candidate_tag.nil? ? "#{task.primary_os_advisory_tag.candidate_tag}-build" : candidate_tag
     prod_name = self.task.prod
 
     # FIXME: stop that hardcoding... one day!
