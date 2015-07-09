@@ -522,7 +522,7 @@ class Package < ActiveRecord::Base
               create_brew_nvr(tag.os_arch)
             else
               brew_nvr = brew_nvr[0]
-              brew_nvr.nvr = self.get_brew_name(tag.build_tag, tag.os_arch)
+              brew_nvr.nvr = self.get_brew_name(tag.candidate_tag + '-build', tag.os_arch)
               brew_nvr.link = BrewService.get_brew_rpm_link(brew_nvr.nvr)
               brew_nvr.save
             end
@@ -727,9 +727,9 @@ class Package < ActiveRecord::Base
   end
 
 
-  def get_brew_name(build_tag=nil, distro=nil)
+  def get_brew_name(candidate_tag=nil, distro=nil)
     # TODO: make the tag more robust
-    tag = build_tag || task.primary_os_advisory_tag.build_tag
+    tag = task.primary_os_advisory_tag.build_tag
     prod_name = self.task.prod
 
     # FIXME: stop that hardcoding... one day!
@@ -836,7 +836,7 @@ class Package < ActiveRecord::Base
       brew_nvr = BrewNvr.new
       brew_nvr.package_id = self.id
       brew_nvr.distro = distro
-      brew_nvr.nvr = self.get_brew_name(adv_tag[0].build_tag, distro)
+      brew_nvr.nvr = self.get_brew_name(adv_tag[0].candidate_tag + '-build', distro)
       brew_nvr.save
       brew_nvr.nvr
     else
