@@ -56,6 +56,11 @@ class MeadSchedulerService
     end
 
     def send_build_to_scheduler(prod, pac_name, params_build, req_data)
+      puts "======================================="
+      puts " Request build sent"
+      puts "---------------------------------------"
+      puts "/mead-scheduler/rest/build/sched/#{prod}/#{pac_name}?" + params_build
+      puts "======================================="
       req = Net::HTTP::Post.new("/mead-scheduler/rest/build/sched/#{prod}/#{pac_name}?" + params_build)
       req.body = req_data.to_json unless req_data.blank?
       req.content_type = 'text/plain' unless req_data.blank?
