@@ -22,6 +22,14 @@
                   <br />
               <% end %>
 
+              <br/>
+              <% @pac.task.os_advisory_tags.each do |tag| %>
+                <% distro = tag.os_arch %>
+                <%= label_tag(distro, distro) %>
+                <%= check_box_tag(distro, '1', true) %>
+              <% end %>
+              <br/>
+
               <% unless @pac.maven_build_arguments.blank? %>
                   <%= label_tag('Submit edited maven-build-arguments file') %>
                   <%= check_box_tag(:edit_maven_build_arguments, '1', true) %>
