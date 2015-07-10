@@ -74,7 +74,8 @@ module ApplicationHelper
 
   def submit_build(pac, clentry, prod, mode,
                    include_spec_file,
-                   include_maven_build_arguments_file)
+                   include_maven_build_arguments_file,
+                   distros_to_build)
 
     bz_bug_structure = {}
 
@@ -86,14 +87,8 @@ module ApplicationHelper
       end
     end
 
-    distros_to_build = []
-    pac.task.os_advisory_tags.each { |tag| distros_to_build << tag.os_arch }
-
-    # no el7 httpd build for rhel7. build httpd22 for rhel7
-    distros_to_build.delete("el7") if pac.name == 'httpd'
-
     # stupid URI.encode cannot encode the '+' sign
-    params_build = "mode=#{mode}&userid=#{current_user.email.gsub('@redhat.com', '')}" + "&sources=#{url_encode(pac.git_url)}&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}&bugs=#{url_encode(bz_bug_structure.to_json)}&distros=#{distros_to_build.join(',')}&etttask=#{escape_url(pac.task.name)}"
+    params_build = "mode=#{mode}&userid=#{current_user.email.gsub('@redhat.com', '')}" + "&sources=#{url_encode(pac.git_url)}&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}&bugs=#{url_encode(bz_bug_structure.to_json)}&distros=#{distros_to_build}&etttask=#{escape_url(pac.task.name)}"
     params_build += "&erratum=" + pac.errata unless pac.errata.blank?
 
     req_data = {}
@@ -103,12 +98,6 @@ module ApplicationHelper
 
 
     res = MeadSchedulerService.send_build_to_scheduler(prod, pac.name, params_build, req_data)
-
-    if pac.name == 'httpd'
-      params_build_httpd = "mode=#{mode}&userid=#{current_user.email.gsub('@redhat.com', '')}&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}&distros=el7&etttask=#{escape_url(pac.task.name)}"
-      params_build_httpd += "&erratum=" + pac.errata unless pac.errata.blank?
-      res_httpd = MeadSchedulerService.send_build_to_scheduler(prod, 'httpd22', params_build_httpd, nil)
-    end
 
     case res.code
     when "202"

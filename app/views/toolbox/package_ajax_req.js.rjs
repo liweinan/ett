@@ -18,6 +18,18 @@ if !params.include?(:wrapper_build) && pac.git_url.blank?
   git_url_check = true unless pac.native?
 end
 
+distros_to_build = []
+
+pac.task.os_advisory_tags.each do |tag|
+  distro = tag.os_arch
+
+  if params[distro] == "1"
+    distros_to_build << distro
+  end
+end
+
+distros_to_build = distros_to_build.join(',')
+
 git_url_check = false unless pac.git_url.blank?
 ################################################################################
 
@@ -82,6 +94,7 @@ begin
   page << "      'authenticity_token': '#{form_authenticity_token}',"
   page << "      'clentry': clentry,"
   page << "      'edit_spec_file': #{spec_file_included},"
+  page << "      'distros_to_build': '#{distros_to_build}',"
   page << "      'edit_maven_build_arguments': #{maven_build_arguments_file_included},"
   page << "    }"
   page << "  })"
