@@ -962,7 +962,7 @@ class Package < ActiveRecord::Base
         link += '&erratum=' + self.errata
       end
 
-      link += '&tag=' + os_tag.target_tag unless os_tag.target_tag.blank?
+      link += '&tag=' + os_tag.candidate_tag + "-candidate" unless os_tag.candidate_tag.blank?
       links << [link, latest_brew_nvr, advisory_used]
     end
     links
