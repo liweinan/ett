@@ -94,8 +94,8 @@ class CronjobModesController < ApplicationController
         distros << tag.os_arch
         to_add[tag.os_arch] = tag.modes_to_build
 
-        unless tag.target_tag.blank? || tag.errata_prod_release.blank?
-          to_add[:errata][tag.target_tag] = tag.errata_prod_release
+        unless tag.candidate_tag.blank? || tag.errata_prod_release.blank?
+          to_add[:errata][tag.candidate_tag + "-candidate"] = tag.errata_prod_release
         end
 
         branch = tag.candidate_tag if count == 0
