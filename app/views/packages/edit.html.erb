@@ -84,6 +84,13 @@
                     changelog += '\n- Reason: ' + changelog_res;
                     notes.value = changelog + '\n\n' + notes.value;
                 }
+            } else if (status == '84' && !defaultSelected) {
+                var changelog_res = prompt('Please enter reason why this package needs to be fixed');
+                if (changelog_res != null) {
+                    var changelog = '* Need to be fixed @ ' + new Date().toDateString();
+                    changelog += '\n- Reason: ' + changelog_res;
+                    notes.value = changelog + '\n\n' + notes.value;
+                }
             } else if (ver != "") {
                 if (!checkPackageVersionFormat(ver)) {
                     alert('<%=t"version_fmt_incorrect"%>');
