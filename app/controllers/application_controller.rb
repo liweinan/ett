@@ -396,7 +396,7 @@ class ApplicationController < ActionController::Base
 
     return 401 if bzauth_user.blank? || bzauth_pwd.blank?
 
-    res = Net::HTTP.get_response(URI("#{APP_CONFIG['bz_bug_check']}#{bzauth_user}?pwd=#{bzauth_pwd}"))
+    res = Net::HTTP.get_response(URI(URI.escape("#{APP_CONFIG['bz_bug_check']}#{bzauth_user}?pwd=#{bzauth_pwd}")))
     res.code
   end
 end
