@@ -8,7 +8,8 @@ def text_to_add(key, value)
   value = value.strip
   newline_length = len_key + 3
   substitute_space_with_newline_and_space = "\n" + (" " * newline_length)
-  new_val = value.gsub(/\s+/, substitute_space_with_newline_and_space)
+  # regex from: http://stackoverflow.com/questions/11566094/trying-to-split-string-into-single-words-or-quoted-words-and-want-to-keep-the
+  new_val = value.gsub(/\s(?=(?:[^"]|"[^"]*")*$)/, substitute_space_with_newline_and_space)
   return new_val
 end
 
