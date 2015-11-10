@@ -1,125 +1,58 @@
 require 'jira_bug.rb'
 
 class JiraBugsController < ApplicationController
-  # GET /jira_bugs
-  def index
-    @jira_bugs = JiraBug.all
-  end
-
-  def show 
-    begin
-        # Is it already in database?
-      if JiraBug.exists?(:key => params[:id])
-        # Update the local copy
-        puts "#{params[:id]} found."
-        @jira_bug = JiraBug.find(params[:id])
-      else
-        puts "#{params[:id]} not found."
-      end
-    rescue => e
-      # Handle errors here
-      raise
-    end
-  end
-
-  def new
-  end
 
   def create
-  end
+    jira_name = params[:jira_value].strip
+    pkg = Package.find(params[:package_id])
+    jira_server = APP_CONFIG['jira_server']
 
-  # This update action should be called when the user 
-  # hits the 'submit' button on an edit issue form.
-  # The params are all of the fields being edited
-  # and the other fields for the bug.
-  def update
-    begin_check_param
-    check_param_user(params)
-    check_param_pwd(params)
-    end_check_param
-    
-    # Authenticate from userinfo
-    JiraBug.authenticate(params[:jira_user], params[:jira_pass])
-    
-    @response = JiraBug.update(params)
+    rest_url = URI.parse("#{jira_server}/rest/api/2/issue/#{jira_name}")
+    http = Net::HTTP.new(rest_url.host, rest_url.port)
+    http.use_ssl = true
+    res = http.request(Net::HTTP::Get.new(rest_url.request_uri))
 
-    @jira_bug = JiraBug.find(params[:id])
-    @info = JiraBug.get(params[:id])
-    # Update the local copy of the JIRA as well
-    JiraBug.update_from_jira_info(@info, @jira_bug)
-  end
+    res_json = JSON.parse(res.body)
+    assignee_name = res_json['fields']['assignee']['displayName']
+    summary = res_json['fields']['summary']
+    status = res_json["fields"]["status"]["statusCategory"]["name"]
 
-  def edit
-      if JiraBug.exists?(:key => params[:id])
-        # Update the local copy
-        @jira_bug = JiraBug.find(params[:id])
-      else
-        @jira_bug = nil
-      end
+    @jira_bug = JiraBug.new
+    @jira_bug.assignee = assignee_name
+    @jira_bug.summary = summary
+    @jira_bug.status = status
+    @jira_bug.package_id = pkg.id
+    @jira_bug.jira_bug = jira_name
+    @jira_bug.creator_id = current_user.id
+    @jira_bug.last_synced_at = Time.now
+    @jira_bug.save
+
+    respond_to do |format|
+      format.js { render :status => 200 }
+    end
   end
 
   def destroy
+    JiraBug.find(params[:id]).destroy
   end
 
-  def sync
-      begin_check_param
-      check_param_user(params)
-      check_param_pwd(params)
-      end_check_param
-    # Authenticate from userinfo
-    JiraBug.authenticate(params[:jira_user], params[:jira_pass])
-    
-    begin
-    # Grab the issue info from JIRA
-    @info = JiraBug.get(params[:id])
-
-    if @info.nil?
-      # handle 
-      raise ArgumentError, 'Jira did not find an issue by that key.'
+  def render_partial
+    if params[:package_id] != '0'
+      @package = Package.find(params[:package_id])
     end
+    respond_to do |format|
 
-      # Is it already in database?
-      if JiraBug.exists?(:key => params[:id])
-        # Update the local copy
-        @jira_bug = JiraBug.find(params[:id])
-
-        unless @jira_bug.nil?
-          JiraBug.update_from_jira_info(@info, @jira_bug)
+      format.js do
+        if params[:id].scan(/\d+/) != ['0']
+          jira_bug_temp = JiraBug.find(params[:id].scan(/\d+/))[0]
         else
-          raise
+          jira_bug_temp = nil
         end
-      else
-        # Create a new local copy
-        @jira_bug = JiraBug.create_from_jira_info(@info)
+        render(:partial => params[:partial],
+               :locals => {:id => params[:id],
+                           :package_id => params[:package_id],
+                           :jira_bug => jira_bug_temp})
       end
-  
-    rescue => e
-      # Handle errors here
-      raise e
-    end
-
-  end
-
-  def check_param_user(params)
-    if params[:jira_user].blank?
-      @err_msg << "Jira account user can't be empty.\n"
     end
   end
-
-  def check_param_pwd(params)
-    if params[:jira_pass].blank?
-      @err_msg << "Jira account password can't be empty.\n"
-    end
-  end
-
-  def begin_check_param
-    @err_msg = ''
-  end
-
-  def end_check_param
-    unless @err_msg.blank?
-      raise ArgumentError, @err_msg
-    end
-  end
- 
 end

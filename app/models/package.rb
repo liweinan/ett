@@ -34,6 +34,8 @@ class Package < ActiveRecord::Base
   has_many :bz_bugs, :class_name => 'BzBug',
            :foreign_key => 'package_id', :order => 'created_at'
 
+  has_many :jira_bugs
+
   has_many :brew_nvrs, :dependent => :destroy
 
   #has_and_belongs_to_many :components

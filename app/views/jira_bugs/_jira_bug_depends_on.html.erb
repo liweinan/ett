@@ -1,1 +1,0 @@
-<tr><td colspan="2"><%= @ele %></td><td colspan="2"><%= @jira_bug[@ele].split(',').map { |issue| JiraBug.generate_ref(issue) } %></td></tr>

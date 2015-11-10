@@ -1,6 +1,6 @@
 <%= render :partial => 'layouts/line' %>
 <%= render :partial => 'layouts/sep' %>
-<h3>Related Bugzilla Bugs</h3>
+<h3>Related Bugs</h3>
 
 <% if logged_in? && !@package.task.readonly? %>
     <form onsubmit="return false;">
@@ -25,7 +25,7 @@
     <%= render :partial => 'layouts/sep' %>
     <form onsubmit="return false;">
       <button onclick="renderBzBugForm('sync_bz_bug');">
-        Sync bug information with Bugzilla
+        Sync bug information
       </button>
       <%= render :partial => 'layouts/progress_indicator',
                  :locals => {:progress_indicator_id => 'sync_bz_bug_form_div_indicator'} %>
