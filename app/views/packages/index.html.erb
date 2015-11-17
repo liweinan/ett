@@ -131,6 +131,7 @@ Statuses:
           <% if @task.use_bz_integration? %>
               <%= render :partial => 'packages/index/errata_bz', :locals => {:package => package} %>
               <%= render :partial => 'packages/index/bz', :locals => {:package => package} %>
+              <%= render :partial => 'packages/index/jira', :locals => {:package => package} %>
           <% end %>
           <%= render :partial => 'packages/index/github_pr', :locals => {:package => package} %>
           <% if @task.has_pkg_with_optional_errata? %>
