@@ -82,6 +82,23 @@ Statuses:
                     :task_id => params[:task_id], :tag => tag.key %> /
     <% end %>
 <% end %>
+
+<%= render :partial => 'layouts/sep' %>
+<div class='manage-tbl'>
+    <table>
+        <tr>
+            <td class='content-list-head'>OS</td>
+            <td class='content-list-head'>Target tag</td>
+        </tr>
+            <% task_erb.os_advisory_tags.each do |adv_tag| %>
+                <tr>
+                    <td><%= adv_tag.os_arch %></td>
+                    <td><%= adv_tag.target_tag %></td>
+                </tr>
+            <% end %>
+    </table>
+</div>
+<%= render :partial => 'layouts/sep' %>
 <% if logged_in? && !Task.readonly?(task_erb) %>
     <%= render :partial => 'layouts/sep' %>
     <span id="inline_editor_switch" style="display:none;">
