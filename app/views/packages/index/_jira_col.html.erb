@@ -1,0 +1,5 @@
+<% unless package.blank? %>
+    <% package.jira_bugs(true).each do |jira| %>
+        <%= link_to jira.jira_bug, "#{APP_CONFIG['jira_server']}/browse/#{jira.jira_bug}", :target => '_blank' %>
+    <% end %>
+<% end %>

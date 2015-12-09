@@ -1,0 +1,4 @@
+<% unless jira_bug.creator.nil? %>
+<% puts jira_bug.creator %>
+<%=jira_bug.creator.name%> (<a href="mailto:<%=jira_bug.creator.email%>"><%=jira_bug.creator.email%></a>)
+<% end %>

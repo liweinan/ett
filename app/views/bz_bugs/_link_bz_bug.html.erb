@@ -1,5 +1,5 @@
 <%@package = Package.find(params[:package_id])%>
-<h3>Link to an existing bug</h3>
+<h3>Link to an existing Bugzilla bug</h3>
 <form onsubmit="return false;">
   <div class='manage-tbl'>
     <table>
@@ -24,13 +24,39 @@
           Bugzilla Bug ID
         </td>
         <td style="text-align: left">
-          <input id="lbb_bz_id"/>
+          <input id="lbb_bz_id" placeholder="1234"/>
         </td>
       </tr>
       <tr>
         <td colspan="2" style="text-align: right">
           <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'link_bz_bug_indicator', :msg => "Be patient"} %>
           <button onclick="createBzBugLink()">
+            Link
+          </button>
+          <button onclick="hideBzBugForm('link_bz_bug')">
+            Cancel
+          </button>
+        </td>
+      </tr>
+    </table>
+  </div>
+</form>
+<h3>or a JIRA bug</h3>
+<form onsubmit="return false;">
+  <div class='manage-tbl'>
+    <table>
+      <tr>
+        <td style="text-align: right">
+          JIRA
+        </td>
+        <td style="text-align: left">
+          <input id="jira_value" placeholder="JBEAP-1234" value=""/>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align: right">
+          <%= render :partial => 'layouts/progress_indicator', :locals => {:progress_indicator_id => 'link_jira_bug_indicator', :msg => "Be patient"} %>
+          <button onclick="createJIRABugLink()">
             Link
           </button>
           <button onclick="hideBzBugForm('link_bz_bug')">

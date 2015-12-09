@@ -43,5 +43,33 @@
         </tr>
         <% end %>
     <% end %>
+    <!-- now draw jira bugs -->
+    <% package.jira_bugs.each do |jira_bug| %>
+      <tr id='jira_list_row_<%= jira_bug.id %>'>
+      <% if logged_in? && !@package.task.readonly? %>
+          <td id="col_jira_ops_<%= jira_bug.id %>" class="small_font">
+            <%= render :partial => 'jira_bugs/ops', :locals => {:jira_bug => jira_bug} %>
+          </td>
+      <% end %>
+      <td id="col_jira_id_<%= jira_bug.id %>" class="small_font">
+        <%= render :partial => 'jira_bugs/jira_id', :locals => {:jira_bug => jira_bug} %>
+      </td>
+      <td id="col_jira_creator_<%= jira_bug.id %>" class="small_font">
+        <%= render :partial => 'jira_bugs/creator', :locals => {:jira_bug => jira_bug} %>
+      </td>
+      <td id="col_jira_assignee_<%= jira_bug.id %>" class="small_font">
+        <%= render :partial => 'jira_bugs/jira_assignee', :locals => {:jira_bug => jira_bug} %>
+      </td>
+      <td id="col_jira_last_synced_at_<%= jira_bug.id %>" class="small_font">
+        <%= render :partial => 'jira_bugs/last_synced_at', :locals => {:jira_bug => jira_bug} %>
+      </td>
+      <td id="col_jira_status_<%= jira_bug.id %>" class="small_font">
+        <%= render :partial => 'jira_bugs/jira_status', :locals => {:jira_bug => jira_bug} %>
+      </td>
+      <td id="col_jira_summary_<%= jira_bug.id %>" class="small_font">
+        <%= render :partial => 'jira_bugs/summary', :locals => {:jira_bug => jira_bug} %>
+      </td>
+      </tr>
+    <% end %>
   </table>
 </div>

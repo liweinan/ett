@@ -198,6 +198,35 @@
             });
     }
 
+    function createJIRABugLink() {
+        var jira_value = document.getElementById('jira_value').value;
+        jira_value = jira_value.replace(/^\s+|\s+$/g, '');
+
+        // TODO: change /bz_bugs
+        new Ajax.Request('/jira_bugs',
+            {
+                method: 'POST',
+                asynchronous: true,
+                evalScripts: true,
+                onLoading: function () {
+                    Element.show('link_jira_bug_indicator');
+                },
+                onSuccess: function () {
+                    var div = document.getElementById('link_bz_bug_form_div');
+                    Element.hide(div);
+                    div.innerHTML = '';
+                },
+                onFailure: function () {
+                    Element.hide('link_jira_bug_indicator');
+                },
+
+                parameters: {
+                    'jira_value': jira_value,
+                    'package_id': '<%=package.id%>',
+                    'authenticity_token': '<%=form_authenticity_token%>'}
+            });
+    }
+
     function createBzBugLink() {
         var user = document.getElementById('lbb_user').value;
         var pwd = document.getElementById('lbb_pwd').value;
@@ -240,6 +269,37 @@
         var indicator = document.getElementById(div_id + '_indicator');
 
         new Ajax.Request('/bz_bugs/render_partial/' + id, {
+            method: 'GET',
+            asynchronous: true,
+            evalScripts: true,
+            onLoading: function () {
+                if (indicator) {
+                    Element.show(indicator);
+                }
+            },
+            onSuccess: function (response) {
+                if (indicator) {
+                    Element.hide(indicator);
+                }
+                var content = response.responseText;
+                var div = document.getElementById(div_id);
+                div.innerHTML = content;
+                Element.show(div);
+                Element.highlight(div);
+            },
+            parameters: {
+                "id": id,
+                'partial': partial,
+                'package_id': package_id
+            }
+        });
+    }
+
+    function renderJiraPartial(id, div_id, partial, package_id) {
+        package_id = typeof package_id !== 'undefined' ? package_id : 0;
+        var indicator = document.getElementById(div_id + '_indicator');
+
+        new Ajax.Request('/jira_bugs/render_partial/' + id, {
             method: 'GET',
             asynchronous: true,
             evalScripts: true,
@@ -369,6 +429,44 @@
         Element.highlight(row);
     }
 
+    function addJiraBugRow(id) {
+        var tbl = document.getElementById('bz_list_tbl');
+        var rowCnt = tbl.rows.length;
+        var row = tbl.insertRow(rowCnt);
+        row.id = 'jira_list_row_' + id;
+
+        var colOps = row.insertCell(0);
+        colOps.id = 'col_jira_ops_' + id;
+        renderJiraOps(id, colOps);
+
+        var colJiraBugId = row.insertCell(1);
+        colJiraBugId.id = 'col_jira_id_' + id;
+        renderJiraBugId(id, colJiraBugId);
+
+        var colJiraBugCreator = row.insertCell(2);
+        colJiraBugCreator.id = 'col_jira_creator_' + id;
+        renderJiraBugCreator(id, colJiraBugCreator);
+
+
+        var colJiraBugAssignee = row.insertCell(3);
+        colJiraBugAssignee.id = 'col_jira_assignee_' + id;
+        renderJiraPartial(id, colJiraBugAssignee.id, 'jira_bugs/jira_assignee');
+
+        var colJiraLastSyncedAt = row.insertCell(4);
+        colJiraLastSyncedAt.id = 'col_jira_last_synced_at_' + id;
+        renderJiraBugLastSyncedAt(id, colJiraLastSyncedAt);
+
+        var colJiraBugStatus = row.insertCell(5);
+        colJiraBugStatus.id = 'col_jira_status_' + id;
+        renderJiraBugStatus(id, colJiraBugStatus);
+
+        var colJiraBugSummary = row.insertCell(6);
+        colJiraBugSummary.id = 'col_jira_summary_' + id;
+        renderJiraBugSummary(id, colJiraBugSummary);
+
+        Element.highlight(row);
+    }
+
     function renderByUpgradeBz() {
         renderPartial('0', 'upgrade_bz_unique', 'bz_bugs/upgrade_bz_bug', '<%=package.id%>');
     }
@@ -378,14 +476,31 @@
         renderPartial(id, col.id, 'bz_bugs/bz_id', '<%=package.id%>');
     }
 
+    function renderJiraBugId(id, col) {
+        col.className = 'small_font';
+        renderJiraPartial(id, col.id, 'jira_bugs/jira_id', '<%=package.id%>');
+    }
+
     function renderOps(id, col) {
         col.className = 'small_font';
         renderPartial(id, col.id, 'bz_bugs/ops', '<%=package.id%>');
     }
 
+    function renderJiraOps(id, col) {
+        col.className = 'small_font';
+        renderJiraPartial(id, col.id, 'jira_bugs/ops', '<%=package.id%>');
+    }
+
+
+
     function renderBzBugCreator(id, col) {
         col.className = 'small_font';
         renderPartial(id, col.id, 'bz_bugs/creator', '<%=package.id%>');
+    }
+
+    function renderJiraBugCreator(id, col) {
+        col.className = 'small_font';
+        renderJiraPartial(id, col.id, 'jira_bugs/creator', '<%=package.id%>');
     }
 
     function renderBzBugLastSyncedAt(id, col) {
@@ -393,14 +508,29 @@
         renderPartial(id, col.id, 'bz_bugs/last_synced_at', '<%=package.id%>');
     }
 
+    function renderJiraBugLastSyncedAt(id, col) {
+        col.className = 'small_font';
+        renderJiraPartial(id, col.id, 'jira_bugs/last_synced_at', '<%=package.id%>');
+    }
+
     function renderBzBugStatus(id, col) {
         col.className = 'small_font';
         renderPartial(id, col.id, 'bz_bugs/bz_status', '<%=package.id%>');
     }
 
+    function renderJiraBugStatus(id, col) {
+        col.className = 'small_font';
+        renderJiraPartial(id, col.id, 'jira_bugs/jira_status', '<%=package.id%>');
+    }
+
     function renderBzBugSummary(id, col) {
         col.className = 'small_font';
         renderPartial(id, col.id, 'bz_bugs/summary', '<%=package.id%>');
+    }
+
+    function renderJiraBugSummary(id, col) {
+        col.className = 'small_font';
+        renderJiraPartial(id, col.id, 'jira_bugs/summary', '<%=package.id%>');
     }
 
     function deleteRow(rowid) {
@@ -417,6 +547,10 @@
         deleteRow('bz_list_row_' + id);
     }
 
+    function deleteJiraBugRow(id) {
+        deleteRow('jira_list_row_' + id);
+    }
+
     function deleteBzBugLink(id, bz_bug_id) {
         var confirm = window.confirm("Are you sure to remove link to bz" + bz_bug_id + "?");
         if (confirm == true) {
@@ -429,6 +563,26 @@
                     },
                     onSuccess: function () {
                         deleteBzBugRow(id);
+                    },
+                    parameters: {
+                        '_method': 'delete',
+                        'authenticity_token': '<%=form_authenticity_token%>'}
+                });
+        }
+    }
+
+    function deleteJiraBugLink(id, jira_bug_id) {
+        var confirm = window.confirm("Are you sure to remove link to Jira " + jira_bug_id + "?");
+        if (confirm == true) {
+            new Ajax.Request('/jira_bugs/' + id,
+                {
+                    method: 'POST',
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function () {
+                    },
+                    onSuccess: function () {
+                        deleteJiraBugRow(id);
                     },
                     parameters: {
                         '_method': 'delete',
