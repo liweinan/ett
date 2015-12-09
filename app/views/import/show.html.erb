@@ -55,10 +55,12 @@
         <% if task.use_bz_integration? %>
         function validateForm() {
             if (document.getElementById('create_bz').checked) {
-                if (checkBzAuthFieldsNotEmpty()) {
+                var bzauth_user = document.getElementById('bzauth_user');
+                var bzauth_pwd = document.getElementById('bzauth_pwd');
+
+                if (checkBzAuthFieldsNotEmpty(bzauth_user, bzauth_pwd)) {
                     return true;
                 } else {
-                    alert('<%=t"bz_auth_failed"%>');
                     return false;
                 }
                 ;
