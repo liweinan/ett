@@ -746,6 +746,10 @@ class Package < ActiveRecord::Base
 
     elsif prod_name == "eap7" && is_scl_package
       pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
+
+    elsif !prod_name.nil? && prod_name.start_with?("jbcs") && is_scl_package
+      pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
+
     end
 
     prod_version = prod_name.sub("eap", "")
@@ -754,6 +758,8 @@ class Package < ActiveRecord::Base
     if prod_name.include?('eap') && nvr =~  /\.ep#{prod_version}\.el[0-9]+/
       return nvr
     elsif prod_name.include?('jws') || prod_name.include?('ews')
+      return nvr
+    elsif prod_name.start_with?('jbcs')
       return nvr
     else
       # TODO: clean this up one day Dustin?
