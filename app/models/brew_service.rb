@@ -88,7 +88,7 @@ class BrewService
       server = get_xmlrpc_client
       begin
         call = server.call(method, nvr)
-        buildinfo_link + call[key].to_s
+        info_link + call[key].to_s
       rescue Exception => e
         if retries.zero?
           nil
