@@ -982,11 +982,10 @@ class Package < ActiveRecord::Base
   end
 
   # TODO: perhaps improve it?
-  def native?
-    self.tags.each do |tag|
-      return true if tag.key == 'Native'
-    end
-    false
+  def regular_rpm?
+    type_of_build = MeadSchedulerService.build_type(self.task.prod, self.name)
+    regular_rpm_type = ["NON_WRAPPER", "REPOLIB_SOURCE", "NATIVE", "JBOSS_AS_WRAPPER", "JBOSSAS_WRAPPER"]
+    regular_rpm_type.include?(type_of_build)
   end
 
   protected

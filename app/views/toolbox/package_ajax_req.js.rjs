@@ -15,7 +15,7 @@ if mead_only_type.include?(type_of_pac) || chain_type.include?(type_of_pac)
 end
 
 if !params.include?(:wrapper_build) && pac.git_url.blank?
-  git_url_check = true unless pac.native?
+  git_url_check = true unless pac.regular_rpm?
 end
 
 distros_to_build = []
