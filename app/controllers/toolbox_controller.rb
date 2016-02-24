@@ -94,8 +94,8 @@ class ToolboxController < ApplicationController
 
 
     @pac = Package.find(@package_id)
-    upstream_file_content = get_spec_file_content(@pac.name, 
-                                                  @pac.task.primary_os_advisory_tag.candidate_tag)
+    upstream_file_content = get_spec_file_content(@pac.name,
+                                                  @pac.task.build_branch)
     sha_upstream_file_content = Digest::SHA1.hexdigest(upstream_file_content)
 
     if upstream_file_content.blank?
