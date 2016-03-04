@@ -79,6 +79,14 @@ module ApplicationHelper
 
     bz_bug_structure = {}
 
+    no_source_repos = false
+
+    if pac.tags
+      pac.tags.each do |tag|
+        no_source_repos = true if tag.key == 'nosource-repos'
+      end
+    end
+
     pac.upgrade_bz.each do |bz_bug|
       if bz_bug.os_arch.blank?
         bz_bug_structure['el6'] = bz_bug.bz_id.to_i
@@ -88,7 +96,15 @@ module ApplicationHelper
     end
 
     # stupid URI.encode cannot encode the '+' sign
-    params_build = "mode=#{mode}&userid=#{current_user.email.gsub('@redhat.com', '')}" + "&sources=#{url_encode(pac.git_url)}&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}&bugs=#{url_encode(bz_bug_structure.to_json)}&distros=#{distros_to_build}&etttask=#{escape_url(pac.task.name)}"
+    params_build = "mode=#{mode}&userid=#{current_user.email.gsub('@redhat.com', '')}" + "&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}&bugs=#{url_encode(bz_bug_structure.to_json)}&distros=#{distros_to_build}&etttask=#{escape_url(pac.task.name)}"
+
+    # if 'no_source_repos' tag present, don't send whatever value is in the git_url field
+    if no_source_repos
+      params_build += "&sources="
+    else
+      params_build += "&sources=#{url_encode(pac.git_url)}"
+    end
+
     params_build += "&erratum=" + pac.errata unless pac.errata.blank?
 
     req_data = {}
