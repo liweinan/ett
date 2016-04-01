@@ -23,7 +23,7 @@ class BrewService
     end
 
     def get_scm_url_brew(mead_nvr)
-      server = XMLRPC::Client.new('brewhub.engineering.redhat.com', '/brewhub', 80)
+      server = XMLRPC::Client.new('brewhub.devel.redhat.com', '/brewhub', 80)
 
       return nil if mead_nvr.nil?
 
@@ -42,7 +42,7 @@ class BrewService
     # should it be put there? should the brew_service know about the models?
     def update_previous_version_of_packages(task)
       begin
-        server = XMLRPC::Client.new("brewhub.engineering.redhat.com", "/brewhub", 80)
+        server = XMLRPC::Client.new("brewhub.devel.redhat.com", "/brewhub", 80)
         task.packages.each do |package|
           next if !package.can_be_shipped?
 
@@ -73,15 +73,15 @@ class BrewService
 
 	  private
 	  def get_xmlrpc_client
-	  	XMLRPC::Client.new("brewhub.engineering.redhat.com", "/brewhub", 80)
+	  	XMLRPC::Client.new("brewhub.devel.redhat.com", "/brewhub", 80)
 	  end
 
     def taskinfo_link
-      'https://brewweb.engineering.redhat.com/koji/taskinfo?taskID='
+      'https://brewweb.devel.redhat.com/taskinfo?taskID='
     end
 
     def buildinfo_link
-      'https://brewweb.engineering.redhat.com/koji/buildinfo?buildID='
+      'https://brewweb.devel.redhat.com/buildinfo?buildID='
     end
 
     def get_brew_item(method, nvr, key, info_link, retries = 3)
