@@ -9,8 +9,23 @@ def text_to_add(key, value)
   newline_length = len_key + 3
   substitute_space_with_newline_and_space = "\n" + (" " * newline_length)
   # regex from: http://stackoverflow.com/questions/11566094/trying-to-split-string-into-single-words-or-quoted-words-and-want-to-keep-the
-  new_val = value.gsub(/\s(?=(?:[^"]|"[^"]*")*$)/, substitute_space_with_newline_and_space)
-  return new_val
+  new_val = value.gsub(/\s+(?=(?:[^"]|"[^"]*")*$)/, substitute_space_with_newline_and_space)
+
+  # we want to remove quotes for type 'key="my value is long"'
+  # to: 'key=my value is long'
+  new_val_val = new_val.split("\n").map do |item|
+
+    # see if there is a whitespace in line and if it contains ="
+    if item.strip.match(/\s/) && item.include?('="')
+      # remove the quotes, but not \"
+      item.gsub(/(["'])((\\{2})*|(.*?[^\\](\\{2})*))\1/, '\2')
+    else
+      item
+    end
+  end
+
+  # reconstruct the string
+  return new_val_val.join("\n")
 end
 
 def add_if_not_nil(vehicle, key, item)
