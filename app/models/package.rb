@@ -706,7 +706,12 @@ class Package < ActiveRecord::Base
     end
     brew_pkg = self.get_brew_name
     if brew_pkg.blank?
-      uri = URI.parse("http://pkgs.devel.redhat.com/cgit/rpms/#{self.name}/plain/last-mead-build?h=#{self.task.primary_os_advisory_tag.candidate_tag}")
+      if self.task.build_branch.strip.blank?
+        git_branch = self.task.primary_os_advisory_tag.candidate_tag
+      else
+        git_branch = self.task.build_branch
+      end
+      uri = URI.parse("http://pkgs.devel.redhat.com/cgit/rpms/#{self.name}/plain/last-mead-build?h=#{git_branch}")
       res = Net::HTTP.get_response(uri)
       # TODO: error handling
       package_old_mead = res.body if res.code == '200'
