@@ -757,24 +757,8 @@ class Package < ActiveRecord::Base
 
     end
 
-    prod_version = prod_name.sub("eap", "")
-
     nvr = MeadSchedulerService.get_nvr_from_bridge(tag, pkg_name)
-    if prod_name.include?('eap') && nvr =~  /\.ep#{prod_version}\.el[0-9]+/
-      return nvr
-    elsif prod_name.include?('jws') || prod_name.include?('ews')
-      return nvr
-    elsif prod_name.start_with?('jbcs')
-      return nvr
-    else
-      # TODO: clean this up one day Dustin?
-      # did this because in eap7, almost all packages are scl
-      # but somehow the metadata still says it's not scl
-      # so workaround is, if the nvr only contains el7, it's most certainly wrong
-      # and we'll consider it as an scl package instead
-      new_pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
-      return MeadSchedulerService.get_nvr_from_bridge(tag, new_pkg_name)
-    end
+    return nvr
   end
 
 
