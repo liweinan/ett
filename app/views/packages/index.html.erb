@@ -42,7 +42,7 @@
 <% if has_task_and_readonly? params[:task_id] %>
     <h2 style="color: red;">This task is read only</h2>
 <% end %>
-<% if @task.frozen_state? %>
+<% if @task && @task.frozen_state? %>
     <h2 style="color: red;">This task is frozen</h2>
 <% end %>
 
@@ -110,6 +110,7 @@ Statuses:
                :locals => {:progress_indicator_id => 'inline_editor_indicator'} %>
 <% end %>
 <p> ✔ : nvr added to errata. ✘ : nvr not in shipped-list </p>
+<% if has_task? %>
 <form name="distroselect">
     Choose the brew distro to show:
         <% distro_specified = params.include?(:brew) %>
@@ -124,6 +125,7 @@ Statuses:
         <% end %>
     </select>
 </form>
+<% end %>
 
 <div class='manage-tbl'>
   <%= render :partial => 'layouts/sep' %>
@@ -145,21 +147,21 @@ Statuses:
           <%= render :partial => 'packages/index/ver', :locals => {:package => package} %>
           <%= render :partial => 'packages/index/previous_version', :locals => {:package => package} %>
           <%= render :partial => 'packages/index/milestone', :locals => {:package => package} %>
-          <% if @task.use_bz_integration? %>
+          <% if @task && @task.use_bz_integration? %>
               <%= render :partial => 'packages/index/errata_bz', :locals => {:package => package} %>
               <%= render :partial => 'packages/index/bz', :locals => {:package => package} %>
               <%= render :partial => 'packages/index/jira', :locals => {:package => package} %>
           <% end %>
           <%= render :partial => 'packages/index/github_pr', :locals => {:package => package} %>
-          <% if @task.has_pkg_with_optional_errata? %>
+          <% if @task && @task.has_pkg_with_optional_errata? %>
               <%= render :partial => 'packages/index/async_erratum', :locals => {:package => package} %>
           <% end %>
           <%= render :partial => 'packages/index/git_url', :locals => {:package => package} %>
-          <% if @task.use_mead_integration? %>
+          <% if @task && @task.use_mead_integration? %>
               <%= render :partial => 'packages/index/mead', :locals => {:package => package} %>
           <% end %>
 
-          <% if @task.use_mead_integration? %>
+          <% if @task && @task.use_mead_integration? %>
               <%= render :partial => 'packages/index/brew', :locals => {:package => package} %>
               <%= render :partial => 'packages/index/rpmdiff', :locals => {:package => package} %>
           <% end %>
