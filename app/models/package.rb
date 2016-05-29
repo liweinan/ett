@@ -95,10 +95,16 @@ class Package < ActiveRecord::Base
 
   def close_github_pr_closed(github_client)
 
-    git_repo = ENV['GITHUB_REPO_LINK']
+    # github_pr is a github url
+    # https://github.com/kaka/koukou/pull/482
+    # we need to extract the git repo name and url from it.
+    # pr_number = '482'
+    pr_number = self.github_pr.split('/')[-1]
 
+    # git_repo = 'kaka/koukou'
+    git_repo = self.github_pr.sub("https://github.com/", "").sub(/\/pull.*/, '')
     begin
-      pull_request = github_client.pull_request git_repo, self.github_pr
+      pull_request = github_client.pull_request git_repo, pr_number
 
       if pull_request.state == 'closed'
         # TODO: yeah maybe one day rename that to something more appropriate
@@ -178,7 +184,7 @@ class Package < ActiveRecord::Base
     if self.github_pr.blank?
       ""
     else
-      "https://github.com/#{ENV["GITHUB_REPO_LINK"]}/pull/#{self.github_pr}"
+      "#{self.github_pr}"
     end
   end
 
