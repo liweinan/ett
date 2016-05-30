@@ -739,10 +739,7 @@ class Package < ActiveRecord::Base
     end
   end
 
-
-  def get_brew_name(candidate_tag=nil, distro=nil)
-    # TODO: make the tag more robust
-    tag = candidate_tag.nil? ? "#{task.primary_os_advisory_tag.candidate_tag}-candidate" : candidate_tag
+  def get_pkg_name(candidate_tag=nil, distro=nil)
     prod_name = self.task.prod
 
     # FIXME: stop that hardcoding... one day!
@@ -760,9 +757,13 @@ class Package < ActiveRecord::Base
 
     elsif !prod_name.nil? && prod_name.start_with?("jbcs") && is_scl_package
       pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
-
     end
+    pkg_name
+  end
 
+  def get_brew_name(candidate_tag=nil, distro=nil)
+    tag = candidate_tag.nil? ? "#{task.primary_os_advisory_tag.candidate_tag}-candidate" : candidate_tag
+    pkg_name = get_pkg_name(candidate_tag, distro)
     nvr = MeadSchedulerService.get_nvr_from_bridge(tag, pkg_name)
     return nvr
   end
