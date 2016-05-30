@@ -46,7 +46,8 @@ class BrewService
         task.packages.each do |package|
           next if !package.can_be_shipped?
 
-          param = server.call("getLatestRPMS", task.previous_version_tag, package.name)
+          # use package.get_pkg_name for SCL packages
+          param = server.call("getLatestRPMS", task.previous_version_tag, package.get_pkg_name)
           nvr_info = param[1][0]
           unless nvr_info.nil?
             version = nvr_info['version']
