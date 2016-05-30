@@ -739,6 +739,7 @@ class Package < ActiveRecord::Base
     end
   end
 
+  # TODO: prod names are hardcoded
   def get_pkg_name(candidate_tag=nil, distro=nil)
     prod_name = self.task.prod
 
