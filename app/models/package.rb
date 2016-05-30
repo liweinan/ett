@@ -165,7 +165,7 @@ class Package < ActiveRecord::Base
   end
 
   def github_pr_style
-    if self.github_pr.nil? || self.github_pr_closed
+    if self.github_pr.blank? || self.github_pr_closed
       ''
     else
       'background-color: #ff5757;'
