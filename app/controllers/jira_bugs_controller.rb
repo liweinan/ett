@@ -13,13 +13,19 @@ class JiraBugsController < ApplicationController
     res = http.request(Net::HTTP::Get.new(rest_url.request_uri))
 
     res_json = JSON.parse(res.body)
-    if res_json['fields'].key?('assignee') && res_json['fields']['assignee']
-      assignee_name = res_json['fields']['assignee']['displayName']
+    if res_json.key?('fields')
+      if res_json['fields'].key?('assignee') && res_json['fields']['assignee']
+        assignee_name = res_json['fields']['assignee']['displayName']
+      else
+        assignee_name = ''
+      end
+      summary = res_json['fields']['summary']
+      status = res_json["fields"]["status"]["statusCategory"]["name"]
     else
       assignee_name = ''
+      summary = ''
+      status = ''
     end
-    summary = res_json['fields']['summary']
-    status = res_json["fields"]["status"]["statusCategory"]["name"]
 
     @jira_bug = JiraBug.new
     @jira_bug.assignee = assignee_name
