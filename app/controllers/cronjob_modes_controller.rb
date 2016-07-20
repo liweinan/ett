@@ -85,25 +85,20 @@ class CronjobModesController < ApplicationController
     response = {:products => []}
     active_tasks = Task.all(:conditions => ['active = ?', "1"])
     active_tasks.each do |task|
-      os_adv_tags = task.os_advisory_tags
       distros = []
       to_add = {}
       to_add[:errata] = {}
-      branch = ''
+
+      os_adv_tags = task.os_advisory_tags
       os_adv_tags.each_with_index do |tag, count|
         distros << tag.os_arch
         to_add[tag.os_arch] = tag.modes_to_build
-
         unless tag.candidate_tag.blank? || tag.errata_prod_release.blank?
           to_add[:errata][tag.candidate_tag + "-candidate"] = tag.errata_prod_release
         end
-
-        branch = tag.candidate_tag if count == 0
       end
 
-      # override the branch string if the field build_branch is specified
-      branch = task.build_branch unless task.build_branch.blank?
-
+      branch = task.get_dist_git_branch
       product_info = {:version => task.tag_version,
                       :prod => task.prod,
                       :branch => branch,
@@ -115,8 +110,6 @@ class CronjobModesController < ApplicationController
       puts product_info
 
       response[:products] << product_info
-
-
     end
 
     render :json => response
