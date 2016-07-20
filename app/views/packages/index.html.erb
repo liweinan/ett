@@ -97,6 +97,17 @@ Statuses:
                 </tr>
             <% end %>
     </table>
+    <br />
+    <table>
+        <tr>
+            <td class='content-list-head'></td>
+            <td class='content-list-head'>Branch</td>
+        </tr>
+        <tr>
+            <td>Branch Used for dist-git</td>
+            <td><%= task_erb.get_dist_git_branch %></td>
+        </tr>
+    </table>
 </div>
 <%= render :partial => 'layouts/sep' %>
 <% if logged_in? && !Task.readonly?(task_erb) %>

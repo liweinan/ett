@@ -129,4 +129,16 @@ class Task < ActiveRecord::Base
     Package.find(:all,
                  :conditions => ['task_id = ? and errata > ?', self.id, '']).count != 0
   end
+
+  def get_dist_git_branch
+
+    branch = ''
+
+    branch = self.os_advisory_tags.first.candidate_tag unless self.os_advisory_tags.blank?
+
+    # override the branch string if the field build_branch is specified
+    branch = self.build_branch unless self.build_branch.blank?
+
+    branch
+  end
 end
