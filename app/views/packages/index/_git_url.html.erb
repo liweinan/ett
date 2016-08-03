@@ -4,5 +4,6 @@
                        :field_name => 'git_url',
                        :field_type => 'packages/index/field_input',
                        :partial => 'packages/index/git_url_col',
-                       :style => package.get_scm_url_style} %>
+                       :style => package.get_scm_url_style,
+                       :title => package.get_scm_url_warning_title} %>
 <% end %>
