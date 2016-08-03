@@ -165,10 +165,18 @@ class Package < ActiveRecord::Base
   end
 
   def github_pr_style
+    github_pr_warnings[0]
+  end
+
+  def github_pr_warning_title
+    github_pr_warnings[1]
+  end
+
+  def github_pr_warnings
     if self.github_pr.blank? || self.github_pr_closed
-      ''
+      ['', '']
     else
-      'background-color: #ff5757;'
+      ['background-color: #ff5757;', 'The PR is not merged/closed yet!']
     end
   end
 
@@ -405,14 +413,24 @@ class Package < ActiveRecord::Base
   #
   # Returns: string
   def brew_style
+    brew_warnings[0]
+  end
+
+  def brew_warning_title
+    brew_warnings[1]
+  end
+
+  def brew_warnings
     brew_nvr = self.nvr_in_brew(self.task.distros[0])
 
     if brew_nvr.nil? || brew_nvr.empty? || latest_brew_nvr.nil? || latest_brew_nvr.empty?
-      ''
+      ['', '']
     elsif brew_nvr == latest_brew_nvr
-      ''
+      ['', '']
     else
-      'background-color: yellow;'
+      reason = 'Brew NVR listed here and latest Brew NVR for this package are different!\n'
+      reason += "Brew nvr in ETT = #{brew_nvr}\nLatest Brew nvr in Brew = #{latest_brew_nvr}"
+      ['background-color: yellow;', reason]
     end
   end
 
@@ -425,12 +443,22 @@ class Package < ActiveRecord::Base
   # This check will only run if the user can no more edit the version
   # Returns: string
   def get_scm_url_style
+    get_scm_url_warnings[0]
+  end
+
+  def get_scm_url_warning_title
+    get_scm_url_warnings[1]
+  end
+
+  def get_scm_url_warnings
     if git_url.blank? || brew_scm_url.blank?
-      ''
+      ['', '']
     elsif (!can_edit_version?) && (git_url.strip != brew_scm_url.strip)
-      'background-color: yellow;'
+      warn_reason = "SCM Url in ETT is not the same as the SCM Url used to build the Mead/Brew NVR\n"
+      warn_reason += "ETT SCM Url = #{git_url}\nMead/Brew NVR Scm Url = #{brew_scm_url}"
+      ['background-color: yellow;', warn_reason]
     else
-      ''
+      ['', '']
     end
   end
 
@@ -446,9 +474,17 @@ class Package < ActiveRecord::Base
   #
   # Returns: string
   def version_style
+    version_warnings[0]
+  end
 
+  def version_warning_title
+    version_warnings[1]
+  end
+
+  def version_warnings
+    failed_reason = "Version in version field and version in Mead/Brew NVR do not match"
     if ver.nil? || ver.empty?
-      return ''
+      return ['', '']
     end
 
     # e.g ver = 4.0.19.SP3-redhat-1
@@ -468,18 +504,18 @@ class Package < ActiveRecord::Base
       if !item.nil? && !item.empty?
         if ver.include?('.')
           unless item.include?(first_part_ver) && item.include?(second_part_ver)
-            return 'background-color: #ff5757;'
+            return ['background-color: #ff5757;', failed_reason]
           end
         else
           unless item.include?(alt_first_part_ver) && item.include?(alt_second_part_ver)
-            return 'background-color: #ff5757;'
+            return ['background-color: #ff5757;', failed_reason]
           end
         end
       end
     end
 
     # if they are valid, return empty
-    ''
+    ['', '']
   end
 
   def get_bz_email
