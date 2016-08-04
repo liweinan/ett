@@ -197,14 +197,22 @@ class Package < ActiveRecord::Base
   end
 
   def git_url_http_link
-    if !self.git_url || !self.git_url.include?("git://git.app.eng.bos.redhat.com")
+    if !self.git_url
       ''
-    else
+    elsif self.git_url.include?("git://git.app.eng.bos.redhat.com")
       url_link = self.git_url
       repo_link = url_link.split("#")[0]
       commit_id = url_link.split("#")[1]
       repo_name = repo_link.gsub("git://git.app.eng.bos.redhat.com/", '').gsub(/\.git/, '')
       "http://git.app.eng.bos.redhat.com/git/#{repo_name}.git/commit?id=#{commit_id}"
+    elsif self.git_url.include?("git+https://code.engineering.redhat.com")
+      url_link = self.git_url
+      repo_link = url_link.split("#")[0]
+      commit_id = url_link.split("#")[1]
+      repo_name = repo_link.gsub("git+https://code.engineering.redhat.com/", '').gsub(/\.git/, '')
+      "https://code.engineering.redhat.com/gerrit/gitweb?p=#{repo_name}.git;h=#{commit_id}"
+    else
+      ''
     end
   end
 
