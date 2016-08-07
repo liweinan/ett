@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: worktime_stats
+#
+#  id              :integer          not null, primary key
+#  package_stat_id :integer
+#  user_id         :integer
+#  minutes         :integer
+#  time_span       :text
+#  created_at      :datetime
+#  updated_at      :datetime
+#
+
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:

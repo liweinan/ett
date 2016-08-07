@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: package_stats
+#
+#  id                 :integer          not null, primary key
+#  weekly_workload_id :integer
+#  package_id         :integer
+#  user_id            :integer
+#  minutes            :integer
+#  created_at         :datetime
+#  updated_at         :datetime
+#
+
 class PackageStat < ActiveRecord::Base
   belongs_to :weekly_workload, :class_name => 'WeeklyWorkload', :foreign_key => 'workload_id'
   belongs_to :package, :class_name => 'Package', :foreign_key => 'package_id'

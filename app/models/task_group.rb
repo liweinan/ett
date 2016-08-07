@@ -1,3 +1,13 @@
+# == Schema Information
+#
+# Table name: task_groups
+#
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  created_at :datetime
+#  updated_at :datetime
+#
+
 class TaskGroup < ActiveRecord::Base
   has_many :task_group_to_tasks, :dependent => :destroy
   has_many :tasks, :through => :task_group_to_tasks

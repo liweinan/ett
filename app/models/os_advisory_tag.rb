@@ -1,3 +1,20 @@
+# == Schema Information
+#
+# Table name: os_advisory_tags
+#
+#  id                  :integer          not null, primary key
+#  os_arch             :string(255)
+#  advisory            :string(255)
+#  candidate_tag       :string(255)
+#  task_id             :integer
+#  created_at          :datetime
+#  updated_at          :datetime
+#  priority            :string(255)
+#  target_tag          :string(255)
+#  build_tag           :string(255)
+#  errata_prod_release :string(255)
+#
+
 class OsAdvisoryTag < ActiveRecord::Base
   validates_presence_of :os_arch
   validates_presence_of :advisory
