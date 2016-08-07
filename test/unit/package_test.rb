@@ -12,7 +12,6 @@
 #  task_id                   :integer
 #  status_id                 :integer
 #  created_by                :integer
-#  version                   :string(255)
 #  ver                       :string(255)
 #  brew_link                 :string(255)
 #  group_id                  :string(255)
@@ -30,7 +29,6 @@
 #  time_point                :integer
 #  sourceURL                 :string(255)
 #  RPM                       :string(255)
-#  MEAD                      :string(255)
 #  git_url                   :string(255)
 #  mead_action               :string(255)
 #  in_errata                 :string(255)
