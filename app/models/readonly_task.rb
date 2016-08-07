@@ -1,3 +1,13 @@
+# == Schema Information
+#
+# Table name: readonly_tasks
+#
+#  id         :integer          not null, primary key
+#  task_id    :integer
+#  created_at :datetime
+#  updated_at :datetime
+#
+
 class ReadonlyTask < ActiveRecord::Base
   belongs_to :task
 

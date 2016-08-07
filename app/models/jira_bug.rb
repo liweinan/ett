@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: jira_bugs
+#
+#  id             :integer          not null, primary key
+#  package_id     :integer
+#  creator_id     :integer
+#  summary        :string(255)
+#  status         :string(255)
+#  assignee       :string(255)
+#  last_synced_at :datetime
+#  jira_bug       :string(255)
+#
+
 class JiraBug < ActiveRecord::Base
 # assignee_name
 # summary

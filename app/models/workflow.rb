@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: workflows
+#
+#  id              :integer          not null, primary key
+#  name            :string(255)
+#  created_at      :datetime
+#  updated_at      :datetime
+#  start_status_id :integer
+#
+
 class Workflow < ActiveRecord::Base
   belongs_to :start_status, :class_name => 'Status',
              :foreign_key => 'start_status_id'

@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: tags
+#
+#  id         :integer          not null, primary key
+#  key        :string(255)
+#  value      :text
+#  created_at :datetime
+#  updated_at :datetime
+#  task_id    :integer
+#
+
 class Tag < ActiveRecord::Base
   validates_presence_of :key
   validates_presence_of :task_id

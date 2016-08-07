@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: p_attachments
+#
+#  id                      :integer          not null, primary key
+#  attachment_file_name    :string(255)
+#  attachment_content_type :string(255)
+#  attachment_file_size    :integer
+#  attachment_updated_at   :datetime
+#  created_at              :datetime
+#  updated_at              :datetime
+#  package_id              :integer
+#  created_by              :integer
+#
+
 ## Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 #
 ## This model initially had no columns defined.  If you add columns to the

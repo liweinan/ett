@@ -1,3 +1,24 @@
+# == Schema Information
+#
+# Table name: bz_bugs
+#
+#  id             :integer          not null, primary key
+#  bz_id          :string(255)
+#  package_id     :integer
+#  creator_id     :integer
+#  created_at     :datetime
+#  updated_at     :datetime
+#  summary        :string(255)
+#  bz_status      :string(255)
+#  last_synced_at :datetime
+#  bz_action      :string(255)
+#  bz_assignee    :string(255)
+#  component      :string(255)
+#  keywords       :string(255)
+#  is_in_errata   :string(255)
+#  os_arch        :string(255)
+#
+
 require 'net/http'
 require 'json'
 

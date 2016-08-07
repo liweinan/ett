@@ -1,3 +1,17 @@
+# == Schema Information
+#
+# Table name: changelogs
+#
+#  id         :integer          not null, primary key
+#  package_id :integer
+#  changed_by :integer
+#  category   :string(255)
+#  references :string(255)
+#  from_value :text
+#  to_value   :text
+#  changed_at :datetime
+#
+
 class Changelog < ActiveRecord::Base
   belongs_to :package
   belongs_to :user, :class_name => 'User', :foreign_key => 'changed_by'
