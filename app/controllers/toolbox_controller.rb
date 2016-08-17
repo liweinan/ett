@@ -245,7 +245,7 @@ class ToolboxController < ApplicationController
     @package_id = params[:id]
     @package = Package.find(@package_id)
 
-    branch = @package.task.primary_os_advisory_tag.candidate_tag
+    branch = @package.get_dist_git_branch
     ini_file = get_file_content_from_rpm_repo(@package.name, branch,
                                               "#{@package.name}.ini")
 
