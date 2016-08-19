@@ -6,6 +6,7 @@ regular_rpm_type = ["NON_WRAPPER", "REPOLIB_SOURCE", "NATIVE", "JBOSS_AS_WRAPPER
 chain_type = ["WRAPPER", "WRAPPER_SOURCE"]
 repolib_wrapper_type = ["REPOLIB_WRAPPER"]
 mead_only_type = ["MEAD_ONLY"]
+container_type = ["CONTAINER"]
 
 # deal with git_url_check ######################################################
 git_url_check = false
@@ -16,6 +17,10 @@ end
 
 if !params.include?(:wrapper_build) && pac.git_url.blank?
   git_url_check = true unless pac.regular_rpm?
+end
+
+if container_type.include?(type_of_pac)
+  git_url_check = false
 end
 
 distros_to_build = []
@@ -63,6 +68,7 @@ begin
     is_wrapper_wrapper_pac = true
   end
 
+  type_build = 'container' if container_type.include?(type_of_pac)
   is_mead_only_build = mead_only_type.include?(type_of_pac)
 
   page << "var submit = true;"
