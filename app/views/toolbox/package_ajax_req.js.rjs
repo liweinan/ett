@@ -19,10 +19,6 @@ if !params.include?(:wrapper_build) && pac.git_url.blank?
   git_url_check = true unless pac.regular_rpm?
 end
 
-if container_type.include?(type_of_pac)
-  git_url_check = false
-end
-
 distros_to_build = []
 
 pac.task.os_advisory_tags.each do |tag|
