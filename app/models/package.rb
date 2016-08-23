@@ -882,14 +882,21 @@ class Package < ActiveRecord::Base
   end
 
   def update_source_url_info
-    #TODO: at some point, fix this logic
-    self.brew_scm_url = BrewService.get_scm_url_brew(self.mead)
+    scm_url_to_update = BrewService.get_scm_url_brew(self.mead)
+
+    # if scm url from brew contains rpm, the scm url is most likely
+    # the rpm repo of the build, not the repo of the _source_ of the build
+    # In that case, ignore the scm url
+    if scm_url_to_update.include?("rpms")
+      scm_url_to_update = nil
+    end
+
+    self.brew_scm_url = scm_url_to_update
     save
     # update only when necessary
     if self.git_url.blank?
-      scm_url_to_update = self.brew_scm_url
       unless scm_url_to_update.nil?
-        self.git_url = self.brew_scm_url
+        self.git_url = scm_url_to_update
         save
       end
     end
@@ -1045,7 +1052,6 @@ class Package < ActiveRecord::Base
       bz_struct[bz.os_arch] = bz.bz_id
     end
 
-    res = nil
     links = []
     # TODO: remove those copy-pasted code!
     self.task.os_advisory_tags.each do |os_tag|
