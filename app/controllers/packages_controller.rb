@@ -12,6 +12,7 @@ class PackagesController < ApplicationController
   def index
     unless params[:task_id].blank?
       @packages = get_pacs(params)
+      @title = unescape_url(params[:task_id])
     end
 
     respond_to do |format|
