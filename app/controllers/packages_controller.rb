@@ -221,6 +221,13 @@ class PackagesController < ApplicationController
     end
   end
 
+  def refresh_nvr_information
+    package = Package.find(params[:id])
+    package.update_mead_information
+    show_package(params, package)
+  end
+
+
   def old_package_values(package)
     old_status_changed_at = package.status_changed_at
     old_status = package.status
