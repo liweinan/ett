@@ -1,0 +1,13 @@
+<% if @package.task.use_mead_integration? &&
+      @package.status &&
+      @package.status.code == 'finished' &&
+      !@package.task.readonly? &&
+      (@package.assignee == current_user || can_manage?)%>
+      <hr />
+    <tr>
+        <td>Refresh NVR Information</td>
+        <td>
+          <%= button_to "Refresh", {:controller => "packages", :action => "refresh_nvr_information", :id => @package} %>
+        </td>
+      </tr>
+<% end %>
