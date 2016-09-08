@@ -94,5 +94,18 @@ class MeadSchedulerService
         true
       end
     end
+
+    def maintainer(prod, pac_name)
+      ans = ''
+      begin
+        Net::HTTP.start('mead.usersys.redhat.com') do |http|
+          resp = http.get("/mead-scheduler/rest/package/#{prod}/#{pac_name}/maintainer")
+          ans = resp.body
+        end
+      rescue
+        ans = ''
+      end
+      ans
+    end
 	end
 end
