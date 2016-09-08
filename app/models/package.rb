@@ -849,10 +849,7 @@ class Package < ActiveRecord::Base
     if prod_name == "eap6" && distro == 'el7' && is_scl_package
       pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
 
-    elsif prod_name == "eap7" && is_scl_package
-      pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
-
-    elsif !prod_name.nil? && prod_name.start_with?("jbcs") && is_scl_package
+    elsif is_scl_package
       pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
     end
     pkg_name
