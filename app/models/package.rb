@@ -849,7 +849,8 @@ class Package < ActiveRecord::Base
     if prod_name == "eap6" && distro == 'el7' && is_scl_package
       pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
 
-    elsif is_scl_package
+    # Only enable scl thing for RHEL distros, aka when distro = el_
+    elsif is_scl_package && distro.match(/^el/)
       pkg_name = "#{prod_name}-" + pkg_name.sub(/-#{prod_name}$/, '')
     end
     pkg_name
