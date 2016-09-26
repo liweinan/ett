@@ -7,6 +7,7 @@ chain_type = ["WRAPPER", "WRAPPER_SOURCE"]
 repolib_wrapper_type = ["REPOLIB_WRAPPER"]
 mead_only_type = ["MEAD_ONLY"]
 container_type = ["CONTAINER"]
+windows_type = ["WINDOWS"]
 
 # deal with git_url_check ######################################################
 git_url_check = false
@@ -65,6 +66,7 @@ begin
   end
 
   type_build = 'container' if container_type.include?(type_of_pac)
+  type_build = 'windows' if windows_type.include?(type_of_pac)
   is_mead_only_build = mead_only_type.include?(type_of_pac)
 
   page << "var submit = true;"
