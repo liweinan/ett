@@ -67,6 +67,7 @@ begin
 
   type_build = 'container' if container_type.include?(type_of_pac)
   type_build = 'windows' if windows_type.include?(type_of_pac)
+  type_build = 'windows' if distros_to_build.include?("win")
   is_mead_only_build = mead_only_type.include?(type_of_pac)
 
   page << "var submit = true;"
