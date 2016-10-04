@@ -14,8 +14,12 @@ class MeadSchedulerService
     def build_type(prod, name)
       # have to put it as mead.usersys, instead of APP_CONFIG
       # why?????????/
-      Net::HTTP.get('mead.usersys.redhat.com',
-                    "/mead-scheduler/rest/package/#{prod}/#{name}/type")
+      begin
+        Net::HTTP.get('mead.usersys.redhat.com',
+                      "/mead-scheduler/rest/package/#{prod}/#{name}/type")
+      rescue
+        ''
+      end
     end
 
 	  def is_scl_package?(prod, name)

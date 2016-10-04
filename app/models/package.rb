@@ -1087,6 +1087,10 @@ class Package < ActiveRecord::Base
     regular_rpm_type.include?(type_of_build)
   end
 
+  def type_of_build
+    MeadSchedulerService.build_type(self.task.prod, self.name)
+  end
+
   def maintainer
     MeadSchedulerService.maintainer(self.task.prod, self.name)
   end
