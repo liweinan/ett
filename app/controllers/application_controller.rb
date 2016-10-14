@@ -60,7 +60,23 @@ class ApplicationController < ActionController::Base
   end
 
   def can_edit_package?(package)
-    logged_in_and_owner_package(package) || can_manage?
+    logged_in_and_owner_package(package) || can_manage? || coordinator_task_user(package) || maintainer_pkg(package)
+  end
+
+  def coordinator_task_user(package)
+    logged_in? && session[:current_user].id == package.task.coordinator_id
+  end
+
+  def maintainer_pkg(package)
+    # package.maintainer should return the kerberos name
+    # the email should be <kerberos name>@<>
+    if logged_in?
+      if package.maintainer.blank?
+        false
+      else
+        session[:current_user].email.include?(package.maintainer)
+      end
+    end
   end
 
   def logged_in_and_owner_package(_package)
