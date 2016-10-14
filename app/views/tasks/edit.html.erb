@@ -5,6 +5,7 @@
       <%= f.error_messages %>
       <table>
         <%= render :partial => 'tasks/fields/name', :locals => {:f => f} %>
+        <%= render :partial => 'tasks/fields/coordinator', :locals => {:f => f} %>
         <%= render :partial => 'tasks/fields/previous_version_tag', :locals => {:f => f} %>
         <!-- add any new fields in the options partial so that it can be shared -->
         <%= render :partial => 'tasks/options', :locals => {:f => f} %>

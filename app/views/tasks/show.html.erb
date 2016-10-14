@@ -12,6 +12,18 @@
     </tr>
     <tr>
       <td>
+        Coordinator:
+      </td>
+      <td>
+        <% if @task.coordinator.blank? %>
+           -
+        <% else %>
+          <%= h @task.coordinator.name %>
+        <% end %>
+      </td>
+    </tr>
+    <tr>
+      <td>
         Repository:
       </td>
       <td>

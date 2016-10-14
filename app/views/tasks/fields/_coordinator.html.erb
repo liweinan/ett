@@ -1,0 +1,20 @@
+<%
+
+   blank_user = User.new
+   blank_user.id = ''
+   blank_user.name = '-'
+
+   users = []
+   users << blank_user
+   users << User.find(:all, :order => 'name')
+   users = users.flatten
+%>
+<tr>
+  <td>
+    Coordinator
+  </td>
+  <td style="text-align:left;">
+    <%= select_tag('task[coordinator_id]',
+                   options_from_collection_for_select(users, :id, :name, @task.coordinator_id)) %>
+  </td>
+</tr>

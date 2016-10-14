@@ -49,6 +49,7 @@ class Task < ActiveRecord::Base
   has_one :setting, :class_name => 'Setting', :foreign_key => 'task_id'
 
   belongs_to :workflow
+  belongs_to :coordinator, :class_name => 'User', :foreign_key => 'coordinator_id'
 
   acts_as_textiled :description
 
