@@ -111,6 +111,7 @@ module ApplicationHelper
     req_data[:spec_file] = pac.spec_file if include_spec_file == "1"
     req_data[:maven_build_arguments] = pac.maven_build_arguments if include_maven_build_arguments_file == "1"
     req_data[:ini_file] = pac.ini_file unless pac.ini_file.blank?
+    req_data[:pkg_version] = pac.ver
 
 
     res = MeadSchedulerService.send_build_to_scheduler(prod, pac.name, params_build, req_data)
