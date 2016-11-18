@@ -566,6 +566,11 @@ class PackagesController < ApplicationController
     end
   end
 
+  def reports
+    @packages = get_pacs(params)
+    @task = find_task(params[:task_id])
+  end
+
   def export_to_csv
 
     require 'faster_csv'
