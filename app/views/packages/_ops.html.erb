@@ -26,7 +26,9 @@
             :task_id => escape_url(params[:task_id]), :user => params[:user],
             :style => 'printable' %> /
 <%= link_to 'Export to CSV',
-            "/packages/export_to_csv/-1?task_id=#{escape_url(params[:task_id])}&tag=#{escape_url(params[:tag])}&status=#{escape_url(params[:status])}&user=#{escape_url(params[:user])}" %>
+            "/packages/export_to_csv/-1?task_id=#{escape_url(params[:task_id])}&tag=#{escape_url(params[:tag])}&status=#{escape_url(params[:status])}&user=#{escape_url(params[:user])}" %> /
+<%= link_to 'Report',
+            "/packages/reports/-1?task_id=#{escape_url(params[:task_id])}" %>
 
 <% if has_task? && can_manage? %>
     <%

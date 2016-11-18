@@ -1,0 +1,17 @@
+<thead>
+<tr>
+  <<%= col %> data-priority="1" class='content-list-head'>Name</<%= col %>>
+  <<%= col %> data-priority="2" class='content-list-head'>Status</<%= col %>>
+  <<%= col %> data-priority="3" class='content-list-head'>Tags</<%= col %>>
+  <<%= col %> data-priority="4" class='content-list-head'>Assignee</<%= col %>>
+  <<%= col %> data-priority="5" class='content-list-head'>Version</<%= col %>>
+  <% if @task.use_bz_integration? %>
+      <<%= col %> data-priority="9" class='content-list-head'>BZ</<%= col %>>
+  <% end %>
+  <<%= col %> width=20 data-priority="13" class='content-list-head'>GitUrl</<%= col %>>
+  <% if @task.use_mead_integration? %>
+      <<%= col %> data-priority="14" class='content-list-head'>Mead</<%= col %>>
+      <<%= col %> data-priority="15" class='content-list-head'>Brew <%= params.include?(:brew) ? "(#{params[:brew]})": ''%></<%= col %>>
+  <% end %>
+</tr>
+</thead>

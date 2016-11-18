@@ -1,0 +1,278 @@
+<!--
+  - GLOBAL VARIABLES
+  -->
+<% if has_task? %>
+  <% unescape_task = unescape_url(params[:task_id]) %>
+  <% task_erb = Task.find_by_name(unescape_task) %>
+<% end %>
+
+<% if has_task? %>
+    <% @task = task_erb %>
+    <h2>
+      Listing packages of <%= unescape_task %>
+      <% if has_status? %>
+          / <%= unescape_url(params[:status]) %>
+      <% end %>
+      <% if has_tag? %>
+          / <%= unescape_url(params[:tag]) %>
+      <% end %>
+    </h2>
+    <% unless task_erb.description.blank? %>
+        <%= @task.description %>
+    <% end %>
+<% else %>
+    <h2>Listing packages</h2>
+<% end %>
+<% if has_task_and_readonly? params[:task_id] %>
+    <h2 style="color: red;">This task is read only</h2>
+<% end %>
+<% if @task && @task.frozen_state? %>
+    <h2 style="color: red;">This task is frozen</h2>
+<% end %>
+
+<%= render :partial => 'layouts/sep' %>
+<div class='manage-tbl'>
+    <table>
+        <tr>
+            <td class='content-list-head'>OS</td>
+            <td class='content-list-head'>Target tag</td>
+        </tr>
+            <% task_erb.os_advisory_tags.each do |adv_tag| %>
+                <tr>
+                    <td><%= adv_tag.os_arch %></td>
+                    <td><%= adv_tag.target_tag %></td>
+                </tr>
+            <% end %>
+    </table>
+    <br />
+    <table>
+        <tr>
+            <td class='content-list-head'></td>
+            <td class='content-list-head'>Branch</td>
+        </tr>
+        <tr>
+            <td>Branch Used for dist-git</td>
+            <td><%= task_erb.get_dist_git_branch %></td>
+        </tr>
+    </table>
+</div>
+<%= render :partial => 'layouts/sep' %>
+<% if logged_in? && !Task.readonly?(task_erb) %>
+    <%= render :partial => 'layouts/sep' %>
+    <span id="inline_editor_switch" style="display:none;">
+      <a href="javascript:void(0);" onclick="getPacBtns();">
+        [ENABLE INLINE EDITOR]
+      </a>
+    </span>
+    <%= render :partial => 'layouts/progress_indicator',
+               :locals => {:progress_indicator_id => 'inline_editor_indicator'} %>
+<% end %>
+<p> ✔ : nvr added to errata. ✘ : nvr not in shipped-list </p>
+<% if has_task? %>
+<form name="distroselect">
+    Choose the brew distro to show:
+        <% distro_specified = params.include?(:brew) %>
+        <% if !distro_specified %>
+            <% @distro_selected = @task.distros[0] %>
+        <% else %>
+            <% @distro_selected = params[:brew] %>
+        <% end %>
+        <select name="menu" onChange="window.document.location.href=this.options[this.selectedIndex].value;" value="GO">
+        <% task_erb.os_advisory_tags.each do |tag| %>
+            <option value="<%= request.url.gsub(/\?.*/, '') + "?brew=#{tag.os_arch}" %>" <%= @distro_selected == tag.os_arch ? 'selected="selected"' : '' %>><%= tag.os_arch %></option>
+        <% end %>
+    </select>
+</form>
+<% end %>
+
+<div class='manage-tbl'>
+  <%= render :partial => 'layouts/sep' %>
+  <table data-mode="columntoggle">
+    <%= render :partial => 'packages/index/reports_header', :locals => {:col => 'th'} %>
+    <% @packages.each_with_index do |package, i| %>
+        <% if i % 25 == 0 && i > 0 %>
+            <%= render :partial => 'packages/index/reports_header', :locals => {:col => 'td'} %>
+        <% end %>
+        <tr>
+          <% @show_progress = true %>
+          <% if logged_in? %>
+              <%= render :partial => 'packages/index/ops', :locals => {:package => package} %>
+          <% end %>
+          <%= render :partial => 'packages/index/name', :locals => {:package => package} %>
+          <%= render :partial => 'packages/index/status', :locals => {:package => package} %>
+          <%= render :partial => 'packages/index/tag', :locals => {:package => package} %>
+          <%= render :partial => 'packages/index/user', :locals => {:package => package} %>
+          <%= render :partial => 'packages/index/ver', :locals => {:package => package} %>
+          <% if @task && @task.use_bz_integration? %>
+              <%= render :partial => 'packages/index/errata_bz', :locals => {:package => package} %>
+          <% end %>
+          <%= render :partial => 'packages/index/git_url', :locals => {:package => package} %>
+          <% if @task && @task.use_mead_integration? %>
+              <%= render :partial => 'packages/index/mead', :locals => {:package => package} %>
+          <% end %>
+
+          <% if @task && @task.use_mead_integration? %>
+              <%= render :partial => 'packages/index/brew', :locals => {:package => package} %>
+          <% end %>
+        </tr>
+    <% end %>
+  </table>
+</div>
+<%= render :partial => 'layouts/sep' %>
+
+
+<!--The following codes are all for inline editors-->
+<% content_for :js do %>
+    <script type="text/javascript">
+
+        function show_pac_editor(div, pac_id, field_name, field_type) {
+            Element.hide(div + '_field');
+            Element.hide(build_pac_btn_id(div, field_type));
+            new Ajax.Request('/toolbox/get_pac_form',
+                {
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function (request) {
+                        Element.show(div + '_indicator');
+                    },
+                    onSuccess: function (response) {
+                        Element.hide(div + '_indicator');
+                    },
+                    parameters: {
+                        'form_id': div + '_editor',
+                        'pac_id': pac_id,
+                        'field_name': field_name,
+                        'field_type': field_type,
+                        'authenticity_token': '<%=form_authenticity_token%>'}
+                });
+            Element.show(div + '_editor');
+            Element.setStyle(div + '_td', {'text-decoration': 'none', 'background': 'none'});
+            document.getElementById(div + "_switch").innerHTML = 'off';
+        }
+
+        function hide_pac_editor(div, field_type) {
+            Element.show(div + '_field');
+            Element.show(build_pac_btn_id(div, field_type));
+            Element.hide(div + '_editor');
+            document.getElementById(div + "_switch").innerHTML = 'on';
+        }
+
+        function show_pac_btn(div, field_type) {
+            if (document.getElementById(div + "_switch").innerHTML == 'on')
+                Element.show(build_pac_btn_id(div, field_type));
+        }
+
+        function hide_pac_btn(div, field_type) {
+            if (document.getElementById(div + "_switch").innerHTML == 'on')
+                Element.hide(build_pac_btn_id(div, field_type));
+        }
+
+        function build_pac_btn_id(div, field_type) {
+            return div + '_-' + field_type + '-_btn';
+        }
+
+        function getPacBtns() {
+            // get the [EDIT] link, and inject each editable columns
+            var pacBtns = document.getElementsByRegex('^pac.*btn');
+
+            // inject [EDIT] link switch
+            var pacBtnSwitches = document.getElementsByRegex('^pac.*switch');
+            new Ajax.Request('/toolbox/get_initial_pac_btn_switch',
+                {
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function (request) {
+                        document.getElementById('inline_editor_switch').innerHTML = "LOADING INLINE EDITOR...";
+                        Element.show('inline_editor_indicator');
+                    },
+                    parameters: {
+                        'ids': pacBtnSwitches.toString(),
+                        'authenticity_token': '<%=form_authenticity_token%>'}
+                });
+
+            new Ajax.Request('/toolbox/get_pac_btns',
+                {
+                    asynchronous: true,
+                    evalScripts: true,
+                    onSuccess: function (response) {
+                        Element.hide('inline_editor_indicator');
+                        document.getElementById('inline_editor_switch').innerHTML = '<span style="color:#228b22;">[INLINE EDITOR ENABLED]</span>';
+                        new Effect.Highlight('inline_editor_switch', { duration: 1 });
+
+                    },
+                    parameters: {
+                        'ids': pacBtns.toString(),
+                        'authenticity_token': '<%=form_authenticity_token%>'}
+                });
+        }
+
+        Event.observe(window, 'load', function () {
+            Element.show('inline_editor_switch');
+        });
+
+        function showLog(pac_id) {
+            new Ajax.Request('/toolbox/show_log_dialog',
+                {
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function (request) {
+                        Element.show('log_area_indicator_' + pac_id);
+                    },
+                    onSuccess: function (response) {
+                        Element.hide('log_area_indicator_' + pac_id);
+                        Element.show('log_area_' + pac_id);
+                    },
+                    parameters: {
+                        'id': pac_id,
+                        'authenticity_token': '<%=form_authenticity_token%>'
+                    }
+                });
+        }
+
+        function showCommentDialog(pac_id) {
+            new Ajax.Request('/toolbox/show_comment_dialog',
+                {
+                    asynchronous: true,
+                    evalScripts: true,
+                    onLoading: function (request) {
+                        Element.show('comment_area_indicator_' + pac_id);
+                    },
+                    onSuccess: function (response) {
+                        Element.hide('comment_area_indicator_' + pac_id);
+                        Element.show('comment_area_' + pac_id);
+                    },
+                    parameters: {
+                        'id': pac_id,
+                        'authenticity_token': '<%=form_authenticity_token%>'
+                    }
+                });
+        }
+    </script>
+
+    <script type="text/javascript">
+        function validateBzAccountAndPostInlineEditorForm(params) {
+            var bzauth_user = document.getElementById('bzauth_user_' + params.myId);
+            var bzauth_pwd = document.getElementById('bzauth_pwd_' + params.myId);
+            checkBzAuthInfoWithCallback(bzauth_user, bzauth_pwd, "validate_bz_auth_indicator_" + params.myId, postInlineEditorFormCallback, params);
+        }
+
+        function postInlineEditorFormCallback(params) {
+            postInlineEditorForm(params.myId, params.myName, params.myForm);
+        }
+
+        function postInlineEditorForm(id, name, form) {
+            new Ajax.Request('/packages/' + id,
+                {
+                    asynchronous: true, evalScripts: true,
+                    onLoading: function (request) {
+                        Element.show('pac_' + id + '_' + name + '_spinner');
+                    },
+                    onSuccess: function (request) {
+
+                    },
+                    parameters: Form.serialize(form)
+                });
+            return false;
+        }
+    </script>
+<% end %>
