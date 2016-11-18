@@ -604,11 +604,13 @@ class PackagesController < ApplicationController
           val << package.assignee.email
         end
 
+        main_distro = package.task.distros[0]
+
         val << package.ver
         val << package.bzs_flatten
         val << package.git_url
         val << package.mead
-        val << package.brew
+        val << package.nvr_in_brew(main_distro)
 
 
         csv << val
