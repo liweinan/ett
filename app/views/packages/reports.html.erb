@@ -94,10 +94,6 @@
             <%= render :partial => 'packages/index/reports_header', :locals => {:col => 'td'} %>
         <% end %>
         <tr>
-          <% @show_progress = true %>
-          <% if logged_in? %>
-              <%= render :partial => 'packages/index/ops', :locals => {:package => package} %>
-          <% end %>
           <%= render :partial => 'packages/index/name', :locals => {:package => package} %>
           <%= render :partial => 'packages/index/status', :locals => {:package => package} %>
           <%= render :partial => 'packages/index/tag', :locals => {:package => package} %>
