@@ -806,8 +806,11 @@ class Package < ActiveRecord::Base
     if retries.zero?
       return nil
     end
+
+    type_of_build = MeadSchedulerService.build_type(self.task.prod, self.name)
+
     brew_pkg = self.get_brew_name
-    if brew_pkg.blank?
+    if brew_pkg.blank? || type_of_build == 'CONTAINER'
       if self.task.build_branch.strip.blank?
         git_branch = self.task.primary_os_advisory_tag.candidate_tag
       else
@@ -885,7 +888,7 @@ class Package < ActiveRecord::Base
     # if scm url from brew contains rpm, the scm url is most likely
     # the rpm repo of the build, not the repo of the _source_ of the build
     # In that case, ignore the scm url
-    if scm_url_to_update.include?("rpms")
+    if scm_url_to_update && scm_url_to_update.include?("rpms")
       scm_url_to_update = nil
     end
 
