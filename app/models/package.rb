@@ -542,6 +542,18 @@ class Package < ActiveRecord::Base
   end
 
   def version_warnings
+
+    # Container type builds
+    if self.name.end_with?("-docker")
+      nvr = nvr_in_brew(self.task.distros[0])
+      ver_alt = ver.gsub('-', '_')
+      if nvr.include?(ver_alt)
+        return ['', '']
+      else
+        return ['background-color: #ff5757;', 'Version and Brew NVR do not match']
+      end
+    end
+
     failed_reason = "Version in version field and version in Mead/Brew NVR do not match"
     if ver.nil? || ver.empty?
       return ['', '']
