@@ -10,16 +10,11 @@ class BrewService
 	############################################################################
 	class << self
 	  def get_brew_rpm_link(nvr, retries = 3)
-      get_brew_item('getBuild', nvr, 'task_id', taskinfo_link)
+      get_brew_item('getBuild', nvr, 'build_id', buildinfo_link)
 	  end
 
     def get_brew_maven_link(nvr)
-      result = get_brew_item('getMavenBuild', nvr, 'build_id', buildinfo_link)
-      if result.nil?
-        get_brew_rpm_link(nvr)
-      else
-        result
-      end
+      get_brew_rpm_link(nvr)
     end
 
     def get_scm_url_brew(mead_nvr)
