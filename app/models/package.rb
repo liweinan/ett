@@ -546,6 +546,9 @@ class Package < ActiveRecord::Base
     # Container type builds
     if self.name.end_with?("-docker")
       nvr = nvr_in_brew(self.task.distros[0])
+      if nvr.nil? || ver.nil? || ver.empty?
+        return ['', '']
+      end
       ver_alt = ver.gsub('-', '_')
       if nvr.include?(ver_alt)
         return ['', '']
