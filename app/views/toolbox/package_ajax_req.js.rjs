@@ -4,7 +4,7 @@ type_of_pac = MeadSchedulerService.build_type(pac.task.prod, pac.name)
 
 regular_rpm_type = ["NON_WRAPPER", "REPOLIB_SOURCE", "NATIVE", "JBOSS_AS_WRAPPER", "JBOSSAS_WRAPPER"]
 chain_type = ["WRAPPER", "WRAPPER_SOURCE"]
-repolib_wrapper_type = ["REPOLIB_WRAPPER", "WRAPPER_ONLY"]
+repolib_wrapper_type = ["REPOLIB_WRAPPER"]
 mead_only_type = ["MEAD_ONLY"]
 container_type = ["CONTAINER"]
 windows_type = ["WINDOWS"]
@@ -16,7 +16,7 @@ if mead_only_type.include?(type_of_pac) || chain_type.include?(type_of_pac)
   git_url_check = true
 end
 
-if !params.include?(:wrapper_build) && pac.git_url.blank? && !repolib_wrapper_type.include?(type_of_pac)
+if !params.include?(:wrapper_build) && pac.git_url.blank?
   git_url_check = true unless pac.regular_rpm?
 end
 
@@ -81,7 +81,7 @@ begin
   page << "     move_fwd = false;"
   page << "     TINY.box.hide()"
   page << "}"
-  page << "if ( move_fwd && x == 'chain' && 1is_wrapper_wrapper_pac) {"
+  page << "if ( move_fwd && x == 'chain' && is_wrapper_wrapper_pac) {"
   page << "  move_fwd = confirm(\"#{warning_string}\");"
   page << "} else if (move_fwd && x == 'chain' && !is_mead_only_build ) {"
   page << "  move_fwd = confirm(\"#{warning_chain}\");"
