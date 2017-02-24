@@ -60,10 +60,17 @@ begin
   type_build = 'wrapper' if params.include?(:wrapper_build)
 
   is_wrapper_wrapper_pac = false
+  is_wrapper_only = false
 
-  if repolib_wrapper_type.include?(type_of_pac)
+  if type_of_pac == "REPOLIB_WRAPPER"
     is_wrapper_wrapper_pac = true
   end
+
+  if type_of_pac == "WRAPPER_ONLY"
+    is_wrapper_only = true
+  end
+
+
 
   type_build = 'container' if container_type.include?(type_of_pac)
   type_build = 'windows' if windows_type.include?(type_of_pac)
@@ -73,6 +80,7 @@ begin
   page << "var submit = true;"
   page << "var x = '#{type_build}';"
   page << "var is_wrapper_wrapper_pac = #{is_wrapper_wrapper_pac};"
+  page << "var is_wrapper_only = #{is_wrapper_only};"
   page << "var is_mead_only_build = #{is_mead_only_build};"
   page << "var clentry = '#{params['clentry']['text'].inspect[1..-2].gsub(/'/, "\\\\'")}';"
   page << "var move_fwd = true;"
@@ -81,9 +89,9 @@ begin
   page << "     move_fwd = false;"
   page << "     TINY.box.hide()"
   page << "}"
-  page << "if ( move_fwd && x == 'chain' && 1is_wrapper_wrapper_pac) {"
+  page << "if ( move_fwd && x == 'chain' && is_wrapper_wrapper_pac) {"
   page << "  move_fwd = confirm(\"#{warning_string}\");"
-  page << "} else if (move_fwd && x == 'chain' && !is_mead_only_build ) {"
+  page << "} else if (move_fwd && x == 'chain' && !is_mead_only_build && !is_wrapper_only ) {"
   page << "  move_fwd = confirm(\"#{warning_chain}\");"
   page << "}"
   page << "if (move_fwd && #{current_user != pac.assignee}) {"
