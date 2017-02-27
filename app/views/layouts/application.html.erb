@@ -66,11 +66,20 @@
 
     function selectTaskGroup(task_group_id) {
         if (task_group_id == "-") {
-            window.location.href = window.location.href.replace(/task_group_id=\d*/, "").replace(/&+/, "");
+            /* task_group_id=- is used to tell _task_group_list.html.erb to not set any default task_group_list */
+            if (/task_group_id=[\d-]*/.test(window.location.href)) {
+                window.location.href = window.location.href.replace(/task_group_id=[\d,-]*/, "task_group_id=-");
+            } else {
+                if (/\?/.test(window.location.href)) {
+                    window.location.href = window.location.href + "&task_group_id=-";
+                } else {
+                    window.location.href = window.location.href + "?task_group_id=-";
+                }
+            }
         } else {
-            if (/task_group_id=\d*/.test(window.location.href)) {
+            if (/task_group_id=[\d-]*/.test(window.location.href)) {
 
-                window.location.href = window.location.href.replace(/task_group_id=\d*/, "task_group_id=" + task_group_id);
+                window.location.href = window.location.href.replace(/task_group_id=[\d-]*/, "task_group_id=" + task_group_id);
             } else {
                 if (/\?/.test(window.location.href)) {
                     window.location.href = window.location.href + "&task_group_id=" + task_group_id;

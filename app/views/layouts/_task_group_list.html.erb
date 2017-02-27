@@ -1,6 +1,15 @@
 <select id="id_task_group_selection" name="task_group_selection" onchange="selectTaskGroup(this.options[this.selectedIndex].value);">
-  <option value="-" <% if params[:task_group_id].blank? %>selected<% end %>>-</option>
+  <!--
+      if params[:task_group_id] is '-', reset the session's task_group_id
+      otherwise set it to whatever it is
+  -->
+  <% if params[:task_group_id] == "-" %>
+  <%    session[:task_group_id] = nil %>
+  <% else %>
+  <%    session[:task_group_id] = params[:task_group_id] unless params[:task_group_id].blank? %>
+  <% end %>
+  <option value="-" <% if session[:task_group_id].blank? %>selected<% end %>>-</option>
   <% TaskGroup.all.each do |tg| %>
-      <option value="<%= tg.id %>" <% if tg.id == params[:task_group_id].to_i %>selected<% end %>><%= tg.name %></option>
+      <option value="<%= tg.id %>" <% if tg.id == session[:task_group_id].to_i %>selected<% end %>><%= tg.name %></option>
   <% end %>
 </select>
