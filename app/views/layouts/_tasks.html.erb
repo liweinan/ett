@@ -4,13 +4,33 @@ Task Group: <%= render :partial => 'layouts/task_group_list' %>
 	<span style="padding-right:20px;"> 
 		Tasks:
       <% if session[:task_group_id].blank? %>
-          <% Task.all(:order => 'name', :conditions => "can_show='Yes'").each do |task| %>
+          <% Task.all(:order => 'name', :conditions => "can_show='Yes' and frozen_state<>'1'").each do |task| %>
               <%= render :partial => 'layouts/task_links', :locals => { :task => task, :user => params[:user] } %>
           <% end %>
+          <br><br>
+                Frozen Tasks:
+                <select onchange="location = this.options[this.selectedIndex].value">
+                    <option>-</option>
+                    <% Task.all(:order => 'name', :conditions => "can_show='Yes' and frozen_state='1'").each do |frozen_task| %>
+                        <option value="<%= url_for(:controller => :packages, :action => :index, :task_id => escape_url(frozen_task.name))%>"><%= frozen_task.name %></option>
+                    <% end %>
+                </select>
       <% else %>
         <% TaskGroup.find(session[:task_group_id]).tasks.each do |task| %>
+            <% unless task.frozen_state? %>
               <%= render :partial => 'layouts/task_links', :locals => { :task => task, :user => params[:user] } %>
+          <% end %>
         <% end %>
+      <br><br>
+            Frozen Tasks:
+            <select onchange="location = this.options[this.selectedIndex].value">
+                <option>-</option>
+                <% TaskGroup.find(session[:task_group_id]).tasks.each do |frozen_task| %>
+                    <% if frozen_task.frozen_state? %>
+                    <option value="<%= url_for(:controller => :packages, :action => :index, :task_id => escape_url(frozen_task.name))%>"><%= frozen_task.name %></option>
+                    <% end %>
+                <% end %>
+            </select>
       <% end %>
 	</span>
 </div>
