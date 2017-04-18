@@ -30,6 +30,12 @@ pac.task.os_advisory_tags.each do |tag|
   end
 end
 
+if distros_to_build.empty?
+  pac.task.os_advisory_tags.each do |tag|
+    distro = tag.os_arch
+    distros_to_build << distro
+end
+
 distros_to_build = distros_to_build.join(',')
 
 git_url_check = false unless pac.git_url.blank?

@@ -22,16 +22,18 @@
                   <br />
               <% end %>
 
-              <br/>
-              <hr />
-              <div>
-                  The OS choices are for Wrapper/RPM builds only. If you are only
-                  doing Mead builds, please don't modify those settings
-              </div>
-              <% @pac.task.os_advisory_tags.each do |tag| %>
-                <% distro = tag.os_arch %>
-                <%= label_tag(distro, distro) %>
-                <%= check_box_tag(distro, '1', true) %>
+              <% if can_manage? %>
+                <br/>
+                <hr />
+                <div>
+                    The OS choices are for Wrapper/RPM builds only. If you are only
+                    doing Mead builds, please don't modify those settings
+                </div>
+                <% @pac.task.os_advisory_tags.each do |tag| %>
+                  <% distro = tag.os_arch %>
+                  <%= label_tag(distro, distro) %>
+                  <%= check_box_tag(distro, '1', true) %>
+                <% end %>
               <% end %>
               <br/>
 
