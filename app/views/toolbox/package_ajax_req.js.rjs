@@ -34,6 +34,7 @@ if distros_to_build.empty?
   pac.task.os_advisory_tags.each do |tag|
     distro = tag.os_arch
     distros_to_build << distro
+  end
 end
 
 distros_to_build = distros_to_build.join(',')
