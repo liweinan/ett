@@ -1,0 +1,3 @@
+<% disabled ||= false %>
+<input type="hidden" name="setting[use_pnc_wrapper]" value='No'/>
+<label><%= check_box_tag('setting[use_pnc_wrapper]', 'Yes', @setting.use_pnc_wrapper?, :disabled => disabled) %> Use PNC Wrapper?</label>
