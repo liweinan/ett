@@ -16,6 +16,8 @@
 
     <%= render :partial => 'settings/fields/use_mead_integration', :locals => {:f => f} %>
     <%= render :partial => 'layouts/sep' %>
+    <%= render :partial => 'settings/fields/use_pnc_wrapper', :locals => {:f => f} %>
+    <%= render :partial => 'layouts/sep' %>
 
     <% if @setting.is_system_setting? %>
         <%= render :partial => 'settings/fields/default_tag', :locals => {:f => f} %>

@@ -27,8 +27,9 @@ class Setting < ActiveRecord::Base
   default_value_for :enabled, 'No'
   default_value_for :show_xattrs, 'No'
   default_value_for :enable_xattrs, 'No'
-  default_value_for :use_bz_integration, 'No'
-  default_value_for :use_mead_integration, 'No'
+  default_value_for :use_bz_integration, 'Yes'
+  default_value_for :use_mead_integration, 'Yes'
+  default_value_for :use_pnc_wrapper, 'No'
 
 
   PROPS = {:creator => 0b1, :commenter => 0b10, :assignee => 0b100}
@@ -175,6 +176,10 @@ class Setting < ActiveRecord::Base
 
   def use_mead_integration?
     use_mead_integration == 'Yes'
+  end
+
+  def use_pnc_wrapper?
+    use_pnc_wrapper == 'Yes'
   end
 
   def use_jira_integration?
