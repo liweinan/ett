@@ -184,7 +184,11 @@ class Setting < ActiveRecord::Base
   end
 
   def auto_finished?
-    auto_finished == 'Yes'
+    if auto_finished.nil?
+      true
+    else
+      auto_finished == 'Yes'
+    end
   end
 
   def use_jira_integration?
