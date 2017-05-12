@@ -21,6 +21,15 @@ class UsersController < ApplicationController
 
   end
 
+  def generate_new_token
+    @user = User.find(params[:id])
+    @user.generate_new_token if current_user == @user
+
+    respond_to do |format|
+      format.html { redirect_to @user }
+    end
+  end
+
   # GET /users/1
   # GET /users/1.xml
   def show
@@ -117,6 +126,7 @@ class UsersController < ApplicationController
       false
     end
   end
+
 
   def reset_password
     if request.post?

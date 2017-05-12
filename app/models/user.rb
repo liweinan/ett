@@ -64,4 +64,9 @@ class User < ActiveRecord::Base
     self.save
   end
 
+  def generate_new_token
+    require 'securerandom'
+    self.token = SecureRandom.hex
+    self.save
+  end
 end
