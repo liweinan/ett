@@ -339,6 +339,45 @@ class ToolboxController < ApplicationController
     render :nothing => true
   end
 
+  def auto_finish
+    require "redis"
+    client = Redis.new(:host => APP_CONFIG['redis_server'], :port => APP_CONFIG['redis_port'])
+    length = client.llen("ett_pkg_to_close")
+    1.upto(length) do |cnt|
+      pkg_info = client.lpop("ett_pkg_to_close")
+      content = JSON.parse(pkg_info)
+      next if content['status'] != "FINISHED"
+      move_to_finished(content['pkg_name'], content['ett_task'])
+    end
+
+    render(:nothing => true)
+  end
+
+  def move_to_finished(pkg_name, task_name)
+    task = Task.find_by_name(unescape_url(task_name))
+    return if task.nil?
+
+    if task.setting.auto_finished?
+      package = Package.find(:first, :conditions => {'packages.task_id' => task.id, 'packages.name' => pkg_name})
+      if package.nil?
+        return
+      end
+      package.status = Status.find(:first, :conditions => {"statuses.code" => "finished"})
+      if package.task.use_mead_integration? && package.status && package.status.status_in_finished
+        package.update_ini_scmurl
+        package.reload
+        # this is needed since we write to @package later in this section of
+        # the code. (@package.status_changed_at = Time.now). This messes up
+        # with the latest_changes command since the latest_change will be that
+        # instead of what the user changed in the website.
+        package.update_mead_information
+        package.milestone = package.task.milestone
+        package.spec_file = package.maven_build_arguments = package.ini_file = nil
+      end
+      package.save
+    end
+  end
+
   def update_previous_version_of_task
     task = find_task(params[:task_id])
     update_previous_version_of_packages(task) unless task.previous_version_tag.blank?

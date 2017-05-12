@@ -13,3 +13,4 @@ gem 'octokit', '2.7.2'
 gem 'vestal_versions', '0.8.3'
 gem 'will_paginate', '2.3.15'
 
+gem 'redis', '3.3.3'

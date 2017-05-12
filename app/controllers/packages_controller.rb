@@ -143,7 +143,7 @@ class PackagesController < ApplicationController
 
     update_params_hash!(params, @package)
 
-    old_values = old_package_values(orig_package)
+    old_values = orig_package.old_package_values
 
     respond_to do |format|
       Package.transaction do
@@ -190,7 +190,7 @@ class PackagesController < ApplicationController
           @package.save
 
           if Rails.env.production?
-            update_changelog(orig_package, @package)
+            @package.update_changelog(orig_package)
             do_sync(%w(name notes ver assignee brew_link group_id artifact_id project_name project_url license scm))
             sync_actions(params, @package)
           end
@@ -227,20 +227,6 @@ class PackagesController < ApplicationController
     show_package(params, package)
   end
 
-
-  def old_package_values(package)
-    old_status_changed_at = package.status_changed_at
-    old_status = package.status
-    old_assignee = package.assignee
-    old_version = package.ver
-    old_github_pr = package.github_pr
-
-    {:old_ver => old_version,
-     :old_status_changed_at => old_status_changed_at,
-     :old_status => old_status,
-     :old_assignee => old_assignee,
-     :old_github_pr => old_github_pr}
-  end
 
   def update_changelog(orig_package, package)
     orig_tags = orig_package.tags.clone
