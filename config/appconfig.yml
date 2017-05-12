@@ -9,3 +9,6 @@ bz_bug_summary_update_url: "/mead-bzbridge/bug/<id>?oneway=<oneway>"
 bz_bug_status_update_url_mocked: "/mead-bzbridge/bug/status/<id>?oneway=<oneway>"
 magic_bug_id: "966279"
 jira_server: "https://issues.jboss.org"
+
+redis_server: "ett.usersys.redhat.com"
+redis_port: "6379"

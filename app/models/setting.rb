@@ -30,6 +30,7 @@ class Setting < ActiveRecord::Base
   default_value_for :use_bz_integration, 'Yes'
   default_value_for :use_mead_integration, 'Yes'
   default_value_for :use_pnc_wrapper, 'No'
+  default_value_for :auto_finished, 'Yes'
 
 
   PROPS = {:creator => 0b1, :commenter => 0b10, :assignee => 0b100}
@@ -180,6 +181,10 @@ class Setting < ActiveRecord::Base
 
   def use_pnc_wrapper?
     use_pnc_wrapper == 'Yes'
+  end
+
+  def auto_finished?
+    auto_finished == 'Yes'
   end
 
   def use_jira_integration?

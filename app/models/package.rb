@@ -714,6 +714,23 @@ class Package < ActiveRecord::Base
     log_entry.save
   end
 
+  def old_package_values
+    old_status_changed_at = self.status_changed_at
+    old_status = self.status
+    old_assignee = self.assignee
+    old_version = self.ver
+    old_github_pr = self.github_pr
+
+    {:old_ver => old_version,
+     :old_status_changed_at => old_status_changed_at,
+     :old_status => old_status,
+     :old_assignee => old_assignee,
+     :old_github_pr => old_github_pr}
+  end
+  def update_changelog(orig_package)
+    orig_tags = orig_package.tags.clone
+    Changelog.package_updated(orig_package, self, orig_tags)
+  end
 
   def notify_package_created(params, current_user)
     url = self.get_package_link(params, :create)

@@ -1,0 +1,3 @@
+<% disabled ||= false %>
+<input type="hidden" name="setting[auto_finished]" value='No'/>
+<label><%= check_box_tag('setting[auto_finished]', 'Yes', @setting.auto_finished?, :disabled => disabled) %> Use Auto Finish feature?</label>
