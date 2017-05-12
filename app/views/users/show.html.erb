@@ -21,6 +21,14 @@
       <td>Can Manage</td>
       <td><%= h @user.can_manage %></td>
     </tr>
+    <% if its_myself?(@user) %>
+      <tr>
+        <td>Token (Use for REST requests)</td>
+        <td><%= h @user.token %>
+          <%= button_to "Generate New Token", {:controller => "users", :action => "generate_new_token", :id => @user} %>
+        </td>
+      </tr>
+    <% end %>
   </table>
 </div>
 
