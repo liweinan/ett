@@ -19,6 +19,8 @@
     <%= render :partial => 'settings/fields/use_pnc_wrapper', :locals => {:f => f, :disabled => true} %>
     <%= render :partial => 'layouts/sep' %>
 
+    <%= render :partial => 'settings/fields/use_auto_finished', :locals => {:f => f, :disabled => true} %>
+    <%= render :partial => 'layouts/sep' %>
 
     <% if @setting.is_system_setting? %>
         <%= render :partial => 'settings/fields/default_tag', :locals => {:f => f, :disabled => true} %>
