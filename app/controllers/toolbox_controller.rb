@@ -363,6 +363,7 @@ class ToolboxController < ApplicationController
         return
       end
       package.status = Status.find(:first, :conditions => {"statuses.code" => "finished"})
+      package.save
       if package.task.use_mead_integration? && package.status && package.status.status_in_finished
         package.update_ini_scmurl
         package.reload
