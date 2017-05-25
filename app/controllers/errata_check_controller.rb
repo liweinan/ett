@@ -119,7 +119,7 @@ class ErrataCheckController < ApplicationController
         package = all_packages.select {|pkg| pkg.name == pac_name}
 
         if package.empty?
-          package_prod = package.task.prod
+          package_prod = task.prod
           # in case the package is SCL. e.g eap7-<package>
           pac_name = pac_name.sub(package_prod + '-', '')
           package = all_packages.select {|pkg| pkg.name == pac_name}
