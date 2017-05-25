@@ -18,13 +18,19 @@ class ErrataCheckController < ApplicationController
 
     all_packages = Package.all(:include => :rpm_diffs,
                                :conditions => ["task_id = ?", task.id])
-
     RpmDiff.transaction do
       nvrs.each do |nvr|
 
         pac_name = parse_nvr(nvr)[:name]
 
         package = all_packages.select {|pkg| pkg.name == pac_name}
+
+        if package.empty?
+          package_prod = task.prod
+          # in case the package is SCL. e.g eap7-<package>
+          pac_name = pac_name.sub(package_prod + '-', '')
+          package = all_packages.select {|pkg| pkg.name == pac_name}
+        end
 
         unless package.empty?
           package = package[0]
@@ -111,6 +117,13 @@ class ErrataCheckController < ApplicationController
         nvr = rpmdiff['nvr']
         pac_name = parse_nvr(nvr)[:name]
         package = all_packages.select {|pkg| pkg.name == pac_name}
+
+        if package.empty?
+          package_prod = package.task.prod
+          # in case the package is SCL. e.g eap7-<package>
+          pac_name = pac_name.sub(package_prod + '-', '')
+          package = all_packages.select {|pkg| pkg.name == pac_name}
+        end
 
         unless package.empty?
           package = package[0]
