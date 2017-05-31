@@ -221,6 +221,98 @@ class PackagesController < ApplicationController
     end
   end
 
+  # POST /packages/<package>/start_build
+  # Parameters:
+  # - token (required: str)
+  # - clentry (required: str, should start with '- ')
+  # - version (optional: str)
+  # - scm_url (optional: str)
+  # - wrapper_only (optional: bool)
+  def start_build
+    token = params[:id]
+    if token.empty?
+      respond_to do |format|
+        format.json { render :json => {:msg => "Token not provided!"}, :status => 400 }
+        return
+      end
+    end
+
+    clentry = params[:clentry]
+    if clentry.empty?
+      respond_to do |format|
+        format.json { render :json => {:msg => "Clentry not provided!"}, :status => 400 }
+        return
+      end
+    end
+
+    user = User.find_by_token(token)
+    if user.empty?
+      respond_to do |format|
+        format.json { render :json => {:msg => "User not found with this token"}, :status => 400 }
+        return
+      end
+    end
+
+
+    @package = Package.find_by_name_and_task_id(unescape_url(params[:id]),
+                                                find_task(params[:task_id]).id)
+
+    if @package.empty?
+      respond_to do |format|
+        format.json { render :json => {:msg => "Package or task not found"}, :status => 404 }
+        return
+      end
+    end
+
+    if params[:version]
+      @package.ver = params[:version]
+    end
+
+    if params[:scm_url]
+      @package.git_url = params[:scm_url]
+      @package.update_ini_scmurl
+    end
+    @package.save
+
+    distros_to_build = []
+
+    pac.task.os_advisory_tags.each do |tag|
+      distros_to_build << tag.os_arch
+    end
+
+    type_of_pac = MeadSchedulerService.build_type(@package.task.prod, @package.name)
+
+    regular_rpm_type = ["NON_WRAPPER", "REPOLIB_SOURCE", "NATIVE", "JBOSS_AS_WRAPPER", "JBOSSAS_WRAPPER"]
+    chain_type = ["WRAPPER", "WRAPPER_SOURCE"]
+    repolib_wrapper_type = ["REPOLIB_WRAPPER", "WRAPPER_ONLY"]
+    mead_only_type = ["MEAD_ONLY"]
+    container_type = ["CONTAINER"]
+    windows_type = ["WINDOWS"]
+    type_build = 'chain'
+    type_build = 'wrapper' if params[:wrapper_only]
+
+    type_build = 'wrapper' if repolib_wrapper_type.include?(type_of_pac)
+
+    type_build = 'container' if container_type.include?(type_of_pac)
+    type_build = 'windows' if windows_type.include?(type_of_pac)
+    type_build = 'windows' if distros_to_build.include?("win")
+    # Start build here
+    result = submit_build(@package, clentry, @package.task.prod, type_build,
+                          false, false, distros_to_build, user)
+
+    # return 202
+    respond_to do |format|
+      # If submit successful, return 202
+      if result.start_with?("Success")
+        status = 202
+      else
+        # return 400, witch content of error
+        status = 400
+      end
+      format.json { render :json => {:msg => result}, :status => status }
+    end
+  end
+
   def refresh_nvr_information
     package = Package.find(params[:id])
     package.update_mead_information

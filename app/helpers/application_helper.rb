@@ -75,7 +75,8 @@ module ApplicationHelper
   def submit_build(pac, clentry, prod, mode,
                    include_spec_file,
                    include_maven_build_arguments_file,
-                   distros_to_build)
+                   distros_to_build,
+                   builder_user = nil)
 
     bz_bug_structure = {}
 
@@ -95,8 +96,12 @@ module ApplicationHelper
       end
     end
 
+    if builder_user.nil?
+      builder_user = current_user
+    end
+
     # stupid URI.encode cannot encode the '+' sign
-    params_build = "mode=#{mode}&userid=#{current_user.email.gsub('@redhat.com', '')}" + "&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}&bugs=#{url_encode(bz_bug_structure.to_json)}&distros=#{distros_to_build}&etttask=#{escape_url(pac.task.name)}"
+    params_build = "mode=#{mode}&userid=#{builder_user.email.gsub('@redhat.com', '')}" + "&clentry=#{url_encode(clentry)}&version=#{pac.task.tag_version}&bugs=#{url_encode(bz_bug_structure.to_json)}&distros=#{distros_to_build}&etttask=#{escape_url(pac.task.name)}"
 
     # if 'no_source_repos' tag present, don't send whatever value is in the git_url field
     if no_source_repos
