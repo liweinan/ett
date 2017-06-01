@@ -1,4 +1,5 @@
 class PackagesController < ApplicationController
+  include ApplicationHelper
 #  helper :sparklines
   before_filter :check_task, :only => [:new, :edit]
   before_filter :check_task_or_user, :only => [:export_to_csv]
@@ -218,6 +219,125 @@ class PackagesController < ApplicationController
         format.html { render :action => :edit }
         format.js
       end
+    end
+  end
+
+  # POST /packages/<package>/start-build
+  # Parameters:
+  # - token (required: str)
+  # - clentry (required: str, should start with '- ')
+  # - version (optional: str)
+  # - scm_url (optional: str)
+  # - wrapper_only (optional: bool)
+  def start_build
+    token = params[:token]
+    if token.blank?
+      respond_to do |format|
+        format.html { render :action => :edit }
+        format.json { render :json => {:msg => "Token not provided!"}, :status => 400 }
+      end
+      return
+    end
+
+    clentry = params[:clentry]
+    if clentry.blank?
+      respond_to do |format|
+        format.json { render :json => {:msg => "Clentry not provided!"}, :status => 400 }
+      end
+      return
+    end
+
+    user = User.find_by_token(token)
+    if user.blank?
+      respond_to do |format|
+        format.json { render :json => {:msg => "User not found with this token"}, :status => 400 }
+      end
+      return
+    end
+
+    task = find_task(params[:task])
+    if task.blank?
+      respond_to do |format|
+        format.json { render :json => {:msg => "Task not found!"}, :status => 400 }
+      end
+      return
+    end
+    error_msg = ''
+    if task.frozen_state?
+      error_msg = "Task is frozen! Cannot perform builds"
+    end
+
+    if task.readonly?
+      error_msg = "Task is read only! Cannot perform builds"
+    end
+
+    unless error_msg.blank?
+      respond_to do |format|
+        format.json { render :json => {:msg => error_msg}, :status => 400 }
+      end
+      return
+    end
+
+    @package = Package.find_by_name_and_task_id(unescape_url(params[:package]),
+                                                find_task(params[:task]).id)
+
+    if @package.blank?
+      respond_to do |format|
+        format.json { render :json => {:msg => "Package not found"}, :status => 404 }
+      end
+      return
+    end
+
+    if params[:version]
+      @package.ver = params[:version]
+    end
+
+    if params[:scm_url]
+      @package.git_url = params[:scm_url]
+      @package.update_ini_scmurl
+    end
+    @package.save
+
+    distros_to_build = []
+
+    @package.task.os_advisory_tags.each do |tag|
+      distros_to_build << tag.os_arch
+    end
+
+    type_of_pac = MeadSchedulerService.build_type(@package.task.prod, @package.name)
+
+    regular_rpm_type = ["NON_WRAPPER", "REPOLIB_SOURCE", "NATIVE", "JBOSS_AS_WRAPPER", "JBOSSAS_WRAPPER"]
+    chain_type = ["WRAPPER", "WRAPPER_SOURCE"]
+    repolib_wrapper_type = ["REPOLIB_WRAPPER", "WRAPPER_ONLY"]
+    mead_only_type = ["MEAD_ONLY"]
+    container_type = ["CONTAINER"]
+    windows_type = ["WINDOWS"]
+    type_build = 'chain'
+    type_build = 'wrapper' if params[:wrapper_only]
+
+    type_build = 'wrapper' if repolib_wrapper_type.include?(type_of_pac)
+
+    type_build = 'container' if container_type.include?(type_of_pac)
+    type_build = 'windows' if windows_type.include?(type_of_pac)
+    type_build = 'windows' if distros_to_build.include?("win")
+
+    in_progress_status = Status.find(:first, :conditions => {"statuses.code" => "inprogress", "statuses.global" => "Y"})
+    @package.status = in_progress_status
+    @package.save
+    # Start build here
+    result = submit_build(@package, clentry, @package.task.prod, type_build,
+                          false, false, distros_to_build, user)
+
+    # return 202
+    respond_to do |format|
+      # If submit successful, return 202
+      if result.start_with?("Success")
+        status = 202
+      else
+        # return 400, witch content of error
+        status = 400
+      end
+      format.json { render :json => {:msg => result}, :status => status }
     end
   end
 
