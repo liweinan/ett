@@ -1,4 +1,5 @@
 class PackagesController < ApplicationController
+  include ApplicationHelper
 #  helper :sparklines
   before_filter :check_task, :only => [:new, :edit]
   before_filter :check_task_or_user, :only => [:export_to_csv]
@@ -221,7 +222,7 @@ class PackagesController < ApplicationController
     end
   end
 
-  # POST /packages/<package>/start_build
+  # POST /packages/<package>/start-build
   # Parameters:
   # - token (required: str)
   # - clentry (required: str, should start with '- ')
@@ -229,39 +230,62 @@ class PackagesController < ApplicationController
   # - scm_url (optional: str)
   # - wrapper_only (optional: bool)
   def start_build
-    token = params[:id]
-    if token.empty?
+    token = params[:token]
+    if token.blank?
       respond_to do |format|
+        format.html { render :action => :edit }
         format.json { render :json => {:msg => "Token not provided!"}, :status => 400 }
-        return
       end
+      return
     end
 
     clentry = params[:clentry]
-    if clentry.empty?
+    if clentry.blank?
       respond_to do |format|
         format.json { render :json => {:msg => "Clentry not provided!"}, :status => 400 }
-        return
       end
+      return
     end
 
     user = User.find_by_token(token)
-    if user.empty?
+    if user.blank?
       respond_to do |format|
         format.json { render :json => {:msg => "User not found with this token"}, :status => 400 }
-        return
       end
+      return
     end
 
-
-    @package = Package.find_by_name_and_task_id(unescape_url(params[:id]),
-                                                find_task(params[:task_id]).id)
-
-    if @package.empty?
+    task = find_task(params[:task])
+    if task.blank?
       respond_to do |format|
-        format.json { render :json => {:msg => "Package or task not found"}, :status => 404 }
-        return
+        format.json { render :json => {:msg => "Task not found!"}, :status => 400 }
       end
+      return
+    end
+    error_msg = ''
+    if task.frozen_state?
+      error_msg = "Task is frozen! Cannot perform builds"
+    end
+
+    if task.readonly?
+      error_msg = "Task is read only! Cannot perform builds"
+    end
+
+    unless error_msg.blank?
+      respond_to do |format|
+        format.json { render :json => {:msg => error_msg}, :status => 400 }
+      end
+      return
+    end
+
+    @package = Package.find_by_name_and_task_id(unescape_url(params[:package]),
+                                                find_task(params[:task]).id)
+
+    if @package.blank?
+      respond_to do |format|
+        format.json { render :json => {:msg => "Package not found"}, :status => 404 }
+      end
+      return
     end
 
     if params[:version]
@@ -276,7 +300,7 @@ class PackagesController < ApplicationController
 
     distros_to_build = []
 
-    pac.task.os_advisory_tags.each do |tag|
+    @package.task.os_advisory_tags.each do |tag|
       distros_to_build << tag.os_arch
     end
 
@@ -296,6 +320,10 @@ class PackagesController < ApplicationController
     type_build = 'container' if container_type.include?(type_of_pac)
     type_build = 'windows' if windows_type.include?(type_of_pac)
     type_build = 'windows' if distros_to_build.include?("win")
+
+    in_progress_status = Status.find(:first, :conditions => {"statuses.code" => "inprogress", "statuses.global" => "Y"})
+    @package.status = in_progress_status
+    @package.save
     # Start build here
     result = submit_build(@package, clentry, @package.task.prod, type_build,
                           false, false, distros_to_build, user)

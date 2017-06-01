@@ -80,6 +80,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'mass-rebuild/third-step', :controller => 'mass_rebuild', :action => 'third_step'
   map.connect 'mass-rebuild/fourth-step', :controller => 'mass_rebuild', :action => 'fourth_step'
   map.connect 'bz_bug/find_bzs/:package_id', :controller => 'bz_bugs', :action => 'find_bzs'
+  map.connect 'tasks/:task/packages/:package/start-build.:format', :controller => 'packages', :action => 'start_build'
   map.connect ':controller/:action/:id'
   map.connect ':controller/:action/:id.:format'
 end

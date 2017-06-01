@@ -118,6 +118,10 @@ module ApplicationHelper
     req_data[:ini_file] = pac.ini_file unless pac.ini_file.blank?
     req_data[:pkg_version] = pac.ver
 
+    puts prod
+    puts pac.name
+    puts params_build
+    puts req_data
 
     res = MeadSchedulerService.send_build_to_scheduler(prod, pac.name, params_build, req_data)
 
