@@ -99,6 +99,17 @@ class MeadSchedulerService
       end
     end
 
+    def set_advisory_status(advisory, active_status)
+      req = Net::HTTP::Put.new("/mead-scheduler/rest/errata/#{advisory}?active=#{active_status}")
+      uri = URI.parse(URI.encode(APP_CONFIG["mead_scheduler"]))
+
+      res = Net::HTTP.start(uri.host, uri.port) do |http|
+        http.request(req)
+      end
+
+      res
+    end
+
     def maintainer(prod, pac_name)
       ans = ''
       begin

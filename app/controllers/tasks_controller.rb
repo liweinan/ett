@@ -1,3 +1,5 @@
+require 'net/http'
+
 class TasksController < ApplicationController
   before_filter :check_can_manage, :only => [:create, :update, :new, :edit, :clone, :clone_review]
   before_filter :clone_form_validation, :only => :clone
@@ -88,6 +90,9 @@ class TasksController < ApplicationController
   # PUT /tasks/1
   # PUT /tasks/1.xml
   def update
+
+    old_task = Task.find(params[:id])
+
     @task = Task.find(params[:id])
     params[:task][:name].strip!
     params[:task][:name].downcase!
@@ -108,6 +113,7 @@ class TasksController < ApplicationController
 
     respond_to do |format|
       if @task.update_attributes(params[:task]) && !os_adv_tag_error
+        notify_frozen_state_changed(old_task, @task)
         expire_all_fragments
         flash[:notice] = 'Task was successfully updated.'
         format.html do
@@ -297,6 +303,32 @@ class TasksController < ApplicationController
         (empty = false) unless col.blank?
       end
       empty
+    end
+  end
+
+  def notify_frozen_state_changed(old_task, updated_task)
+    if old_task.frozen_state? == updated_task.frozen_state?
+      puts old_task.frozen_state?
+      puts updated_task.frozen_state?
+      # frozen state didn't change, exit
+      return
+    end
+
+    # if we are here, frozen state has changed
+    if updated_task.frozen_state?
+      # Need to tell mead-scheduler to make erratas inactive
+      active = false
+    else
+      # Need to tell mead-scheduler to make erratas active
+      active = true
+    end
+
+    updated_task.os_advisory_tags.each do |tag|
+      begin
+        MeadSchedulerService.set_advisory_status(tag.advisory, active)
+      rescue
+        puts "Could not set active status for #{tag.advisory}"
+      end
     end
   end
 end
