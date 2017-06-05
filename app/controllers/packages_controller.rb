@@ -303,6 +303,7 @@ class PackagesController < ApplicationController
     @package.task.os_advisory_tags.each do |tag|
       distros_to_build << tag.os_arch
     end
+    distros_to_build_str = distros_to_build.join(',')
 
     type_of_pac = MeadSchedulerService.build_type(@package.task.prod, @package.name)
 
@@ -326,7 +327,7 @@ class PackagesController < ApplicationController
     @package.save
     # Start build here
     result = submit_build(@package, clentry, @package.task.prod, type_build,
-                          false, false, distros_to_build, user)
+                          false, false, distros_to_build_str, user)
 
     # return 202
     respond_to do |format|
