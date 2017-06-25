@@ -296,6 +296,10 @@ class PackagesController < ApplicationController
       @package.git_url = params[:scm_url]
       @package.update_ini_scmurl
     end
+
+    # Put the requestor as the new assignee
+    @package.assignee = user
+
     @package.save
 
     distros_to_build = []
