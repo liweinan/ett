@@ -27,6 +27,7 @@
         <%= render :partial => 'packages/fields/tags', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/ver', :locals => {:f => f} %>
         <%= render :partial => 'packages/fields/git_url', :locals => {:f => f} %>
+        <%= render :partial => 'packages/fields/queue', :locals => {:f => f} %>
 
         <% if @package.task.use_mead_integration? %>
             <%= render :partial => 'packages/fields/brew', :locals => {:f => f} %>

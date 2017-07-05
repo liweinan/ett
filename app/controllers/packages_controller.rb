@@ -226,6 +226,7 @@ class PackagesController < ApplicationController
   # Parameters:
   # - token (required: str)
   # - clentry (required: str, should start with '- ')
+  # - queue (optional: str)
   # - version (optional: str)
   # - scm_url (optional: str)
   # - wrapper_only (optional: bool)
@@ -295,6 +296,10 @@ class PackagesController < ApplicationController
     if params[:scm_url]
       @package.git_url = params[:scm_url]
       @package.update_ini_scmurl
+    end
+
+    if params[:queue]
+      @package.queue = params[:queue]
     end
 
     # Put the requestor as the new assignee
