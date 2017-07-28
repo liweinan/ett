@@ -1,6 +1,6 @@
 <% unless package.blank? %>
 <% unless package.errata.blank? %>
-    <%= h package.errata %>
+    <%= link_to package.errata, APP_CONFIG['errata_link'] + package.errata, :target => :_blank %>
 <% else %>
     -
 <% end %>
