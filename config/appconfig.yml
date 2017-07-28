@@ -12,3 +12,4 @@ jira_server: "https://issues.jboss.org"
 
 redis_server: "ett.usersys.redhat.com"
 redis_port: "6379"
+errata_link: "https://errata.devel.redhat.com/advisory/"
