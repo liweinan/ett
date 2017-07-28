@@ -16,7 +16,7 @@ class ReadonlyTask < ActiveRecord::Base
   # same versions.
   def self.move_other_packages_to_already_released(task_id)
     task = Task.find(task_id)
-    packages = task.packages.all.select {|pkg| pkg.status.name == 'Finished'}
+    packages = task.packages.all.select {|pkg| pkg.status && pkg.status.name == 'Finished'}
     str = ''
     packages.each do |pkg|
       similar_pkgs = Package.find(:all,

@@ -139,6 +139,28 @@ class ErrataCheckController < ApplicationController
     render :text => 'OK', :status => 202
   end
 
+  def close_task_errata
+    task_to_close = params[:task]
+
+    task = Task.find_by_name(task_to_close)
+    unless task.nil?
+      task.frozen_state = "1"
+      task.active = "0"
+      task.save
+      result = ''
+      unless Task.readonly?(task)
+        result = ReadonlyTask.move_other_packages_to_already_released(task.id)
+        rt = ReadonlyTask.new
+        rt.task_id = task.id
+        rt.save
+      end
+      render :text => result, :status => 202
+    else
+      redner :text => "Task not found", :status => 404
+    end
+
+  end
+
   private
   def parse_nvr(nvr)
     ret = {}

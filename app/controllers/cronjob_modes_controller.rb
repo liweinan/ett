@@ -90,8 +90,10 @@ class CronjobModesController < ApplicationController
       to_add[:errata] = {}
 
       os_adv_tags = task.os_advisory_tags
+      advisories = []
       os_adv_tags.each_with_index do |tag, count|
         distros << tag.os_arch
+        advisories << tag.advisory
         to_add[tag.os_arch] = tag.modes_to_build
         unless tag.candidate_tag.blank? || tag.errata_prod_release.blank?
           to_add[:errata][tag.candidate_tag + "-candidate"] = tag.errata_prod_release
@@ -104,7 +106,8 @@ class CronjobModesController < ApplicationController
                       :branch => branch,
                       :repository => task.repository,
                       :name => task.name,
-                      :distros => distros}
+                      :distros => distros,
+                      :errata_numbers => advisories}
 
       product_info.merge!(to_add)
       puts product_info
