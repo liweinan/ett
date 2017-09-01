@@ -1,5 +1,8 @@
 <% unless package.blank? %>
-    <% package.jira_bugs(true).each do |jira| %>
+    <% package.jira_bugs(true).each_with_index do |jira, index| %>
         <%= link_to jira.jira_bug, "#{APP_CONFIG['jira_server']}/browse/#{jira.jira_bug}", :target => '_blank' %>
+        <% if (index + 1) % 5 == 0 %>
+            <br />
+        <% end %>
     <% end %>
 <% end %>
