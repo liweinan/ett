@@ -128,7 +128,7 @@ class ErrataCheckController < ApplicationController
         unless package.empty?
           package = package[0]
           rpmdiff_pac = package.get_rpmdiff(distro)
-          if package.nvr_in_brew(distro) == rpmdiff['nvr']
+          if package.nvr_in_brew(distro, false) == rpmdiff['nvr']
             rpmdiff_pac.rpmdiff_status = rpmdiff['status']
             rpmdiff_pac.rpmdiff_id = rpmdiff['id']
             rpmdiff_pac.save
