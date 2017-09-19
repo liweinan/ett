@@ -996,8 +996,8 @@ class Package < ActiveRecord::Base
     end
   end
 
-  def nvr_in_brew(distro)
-    self.reload
+  def nvr_in_brew(distro, reload=true)
+    self.reload if reload
     brew_nvr = self.brew_nvrs.select {|obj| obj.distro == distro}
     if brew_nvr.blank?
       if self.status_in_finished?
