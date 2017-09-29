@@ -48,6 +48,7 @@ class ReadonlyTasksController < ApplicationController
             result += ReadonlyTask.move_other_packages_to_already_released(task_id.to_i)
             result += "-------------------\n"
             task.active = nil
+            task.frozen_state = "1"
             task.save
           end
 
