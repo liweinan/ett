@@ -23,7 +23,8 @@
   <% if @task.use_mead_integration? %>
       <<%= col %> data-priority="14" class='content-list-head'>Mead</<%= col %>>
       <<%= col %> data-priority="15" class='content-list-head'>Brew <%= params.include?(:brew) ? "(#{params[:brew]})": ''%></<%= col %>>
-      <<%= col %> data-priority="16" class='content-list-head'>Rpm Diff</<%= col %>>
+      <<%= col %> data-priority="16" class='content-list-head'>License <%= params.include?(:brew) ? "(#{params[:brew]})": ''%></<%= col %>>
+      <<%= col %> data-priority="17" class='content-list-head'>Rpm Diff</<%= col %>>
   <% end %>
 </tr>
 </thead>

@@ -1,0 +1,7 @@
+<% unless package.blank? %>
+<%= render :partial => 'packages/index/field_template',
+           :locals => {:package => package,
+                       :field_name => 'license',
+                       :field_type => 'packages/index/field_input',
+                       :partial => 'packages/index/license_col'} %>
+<% end %>

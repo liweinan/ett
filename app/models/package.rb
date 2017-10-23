@@ -384,6 +384,15 @@ class Package < ActiveRecord::Base
     end
   end
 
+  def license_in_errata(distro)
+    brew_nvr = self.brew_nvr_for_distro(distro)
+    if brew_nvr and brew_nvr.license
+      brew_nvr.license
+    else
+      '-'
+    end
+  end
+
   # Probe the mead scheduler and ask if this package can be shipped or not
   #
   # Returns: boolean
@@ -643,6 +652,7 @@ class Package < ActiveRecord::Base
               brew_nvr = brew_nvr[0]
               brew_nvr.nvr = self.get_brew_name(tag.candidate_tag + '-candidate', tag.os_arch)
               brew_nvr.link = BrewService.get_brew_rpm_link(brew_nvr.nvr)
+              brew_nvr.license = BrewService.get_rpm_license(brew_nvr.nvr)
               brew_nvr.save
             end
           end
@@ -979,8 +989,9 @@ class Package < ActiveRecord::Base
       brew_nvr.distro = distro
       brew_nvr.nvr = self.get_brew_name(adv_tag[0].candidate_tag + '-candidate', distro)
       brew_nvr.link = BrewService.get_brew_rpm_link(brew_nvr.nvr)
+      brew_nvr.license = BrewService.get_rpm_license(brew_nvr.nvr)
       brew_nvr.save
-      brew_nvr.nvr
+      brew_nvr
     else
       '-'
     end
@@ -996,17 +1007,28 @@ class Package < ActiveRecord::Base
     end
   end
 
-  def nvr_in_brew(distro, reload=true)
+  def brew_nvr_for_distro(distro, reload=true)
     self.reload if reload
     brew_nvr = self.brew_nvrs.select {|obj| obj.distro == distro}
     if brew_nvr.blank?
       if self.status_in_finished?
-        create_brew_nvr(distro)
+        brew_nvr_obj = create_brew_nvr(distro)
       else
-        '-'
+        brew_nvr_obj = nil
       end
     else
-      brew_nvr[0].nvr
+      brew_nvr_obj = brew_nvr[0]
+    end
+
+    brew_nvr_obj
+  end
+
+  def nvr_in_brew(distro, reload=true)
+    brew_nvr_obj = brew_nvr_for_distro(distro, reload)
+    if brew_nvr_obj.nil?
+      '-'
+    else
+      brew_nvr_obj.nvr
     end
   end
 
