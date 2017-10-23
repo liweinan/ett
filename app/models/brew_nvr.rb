@@ -9,7 +9,7 @@
 #  created_at :datetime
 #  updated_at :datetime
 #  link       :string(255)
-#
+#  license    :string(255)
 
 class BrewNvr < ActiveRecord::Base
   belongs_to :package

@@ -23,4 +23,9 @@
             <td><%= h @package.mead %></td>
         </tr>
     <% end %>
+
+    <tr>
+        <td>License</td>
+        <td><%= h @package.license_in_errata(main_distro) %>
+    </tr>
 <% end %>

@@ -174,6 +174,7 @@ Statuses:
 
           <% if @task && @task.use_mead_integration? %>
               <%= render :partial => 'packages/index/brew', :locals => {:package => package} %>
+              <%= render :partial => 'packages/index/license', :locals => {:package => package} %>
               <%= render :partial => 'packages/index/rpmdiff', :locals => {:package => package} %>
           <% end %>
         </tr>

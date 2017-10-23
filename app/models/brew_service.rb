@@ -18,7 +18,7 @@ class BrewService
     end
 
     def get_scm_url_brew(mead_nvr)
-      server = XMLRPC::Client.new('brewhub.devel.redhat.com', '/brewhub', 80)
+      server = get_xmlrpc_client
 
       return nil if mead_nvr.nil?
 
@@ -37,7 +37,7 @@ class BrewService
     # should it be put there? should the brew_service know about the models?
     def update_previous_version_of_packages(task)
       begin
-        server = XMLRPC::Client.new("brewhub.devel.redhat.com", "/brewhub", 80)
+        server = get_xmlrpc_client
         task.packages.each do |package|
           next if !package.can_be_shipped?
 
@@ -64,8 +64,22 @@ class BrewService
       end
     end
 
+    def get_rpm_license(rpm_nvr)
+      server = get_xmlrpc_client
+      rpm_info = server.call('getRPM', rpm_nvr + '.noarch')
 
+      if rpm_info
+        rpm_id = rpm_info['id']
+        license_info = server.call('getRPMHeaders', rpm_id, '', '', ['license'])
 
+        if license_info && license_info.key?('license')
+          return license_info['license']
+        end
+      end
+
+      # If no license information found for that nvr
+      return nil
+    end
 
 	  private
 	  def get_xmlrpc_client
